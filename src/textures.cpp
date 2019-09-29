@@ -18,13 +18,22 @@ namespace Dynamo {
 
 		SDL_Surface *surface;
 		if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-			surface = SDL_CreateRGBSurface(0, width, height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+			surface = SDL_CreateRGBSurface(
+				0, width, height, 32, 
+				0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF
+			);
 		}
 		else {
-			surface = SDL_CreateRGBSurface(0, width, height, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+			surface = SDL_CreateRGBSurface(
+				0, width, height, 32, 
+				0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
+			);
 		}
 		
-		texture_map_[id] = SDL_CreateTextureFromSurface(renderer_, surface);
+		texture_map_[id] = SDL_CreateTextureFromSurface(
+			renderer_, 
+			surface
+		);
 		SDL_FreeSurface(surface);
 	}
 
@@ -36,17 +45,26 @@ namespace Dynamo {
 		texture_map_[id] = IMG_LoadTexture(renderer_, filename.c_str());
 	}
 
-	void Textures::load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color) {
+	void Textures::load_text(std::string id, std::string text, 
+							 std::string font_id, uint32_t rgb_color) {
 		if(texture_map_.count(id)) {
 			SDL_DestroyTexture(texture_map_[id]);
 		}
 
-		SDL_Surface *surf = TTF_RenderText_Solid(fonts_[font_id], text.c_str(), hex_to_rgb(rgb_color));
-		texture_map_[id] = SDL_CreateTextureFromSurface(renderer_, surf);
+		SDL_Surface *surf = TTF_RenderText_Solid(
+			fonts_[font_id], 
+			text.c_str(), 
+			hex_to_rgb(rgb_color)
+		);
+		texture_map_[id] = SDL_CreateTextureFromSurface(
+			renderer_, 
+			surf
+		);
 		SDL_FreeSurface(surf);
 	}
 
-	void Textures::load_font(std::string font_id, std::string filename, int size) {
+	void Textures::load_font(std::string font_id, 
+							 std::string filename, int size) {
 		if(fonts_.count(font_id)) {
 			TTF_CloseFont(fonts_[font_id]);
 		}

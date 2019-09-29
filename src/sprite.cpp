@@ -5,11 +5,13 @@ namespace Dynamo {
 		texture_ = texture;
 		frame_w_ = frame_width;
 		frame_h_ = frame_height;
-		SDL_QueryTexture(texture_, nullptr, nullptr, &texture_w_, &texture_h_);
+		SDL_QueryTexture(
+			texture_, 
+			nullptr, nullptr, 
+			&texture_w_, &texture_h_
+		);
 
 		target_ = new SDL_Rect();
-
-		accumulator_ = 0.0f;
 		if(!frame_w_ && !frame_h_) {
 			max_frames_ = 1;
 			source_.push_back(nullptr);
@@ -23,15 +25,18 @@ namespace Dynamo {
 			for(int j = 0; j < ver_frames; j++) {
 				for(int i = 0; i < hor_frames; i++) {
 					SDL_Rect *frame_rect = new SDL_Rect();
+
 					frame_rect->w = frame_w_;
 					frame_rect->h = frame_h_;
 					frame_rect->x = i*frame_w_;
 					frame_rect->y = j*frame_h_;
+					
 					source_.push_back(frame_rect);
 				}
 			}
 		}
 
+		accumulator_ = 0.0f;
 		current_frame_ = 0;
 
 		finished_ = false;
@@ -87,23 +92,24 @@ namespace Dynamo {
 	}
 
 	SDL_RendererFlip Sprite::get_flip() {
-		SDL_RendererFlip flip = SDL_FLIP_NONE;
+		int flip = SDL_FLIP_NONE;
 		if(hflip_ && vflip_) {
-			flip = (SDL_RendererFlip)(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+			flip = (SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
 		}
 		else if(hflip_) {
-			flip = (SDL_RendererFlip)SDL_FLIP_HORIZONTAL;
+			flip = SDL_FLIP_HORIZONTAL;
 		}
 		else if(vflip_) {
-			flip = (SDL_RendererFlip)SDL_FLIP_VERTICAL;
+			flip = SDL_FLIP_VERTICAL;
 		}
-		return flip;
+		
+		return (SDL_RendererFlip)flip;
 	}
 
 	uint8_t Sprite::get_alpha() {
-		uint8_t a;
-		SDL_GetTextureAlphaMod(texture_, &a);
-		return a;
+		uint8_t alpha;
+		SDL_GetTextureAlphaMod(texture_, &alpha);
+		return alpha;
 	}
 
 	bool Sprite::get_finished() {
@@ -128,7 +134,10 @@ namespace Dynamo {
 	}
 
 	void Sprite::set_blend(SPRITE_BLEND mode) {
-		SDL_SetTextureBlendMode(texture_, static_cast<SDL_BlendMode>(mode));
+		SDL_SetTextureBlendMode(
+			texture_, 
+			static_cast<SDL_BlendMode>(mode)
+		);
 	}
 
 	void Sprite::set_target(int x, int y, int w, int h) {

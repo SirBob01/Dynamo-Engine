@@ -18,8 +18,8 @@ namespace Dynamo {
 		
 		int ambient_channel_;
 
-		float master_volume_;
-		float volume_conversion_; // Conversion rate of SDL_Mixer volume
+		float master_vol_;
+		float vol_convert_; // Conversion rate of SDL_Mixer volume
 		
 	public:
 		Jukebox();
@@ -31,9 +31,9 @@ namespace Dynamo {
 		float get_sfx_volume();
 
 		// Set volume to a value between 0.0 and 1.0
-		void set_master_volume(float volume);
-		void set_music_volume(float volume);
-		void set_sfx_volume(float volume);
+		void set_master_volume(float vol);
+		void set_music_volume(float vol);
+		void set_sfx_volume(float vol);
 
 		// Stream audio (called in main engine game-loop)
 		void stream_music();

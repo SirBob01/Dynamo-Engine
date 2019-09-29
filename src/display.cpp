@@ -16,7 +16,11 @@ namespace Dynamo {
 
 		border_color_ = {0, 0, 0};
 
-		renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
+		renderer_ = SDL_CreateRenderer(
+			window_, 
+			-1, 
+			SDL_RENDERER_ACCELERATED
+		);
 		SDL_RenderSetLogicalSize(renderer_, width, height);
 	}
 
@@ -25,6 +29,14 @@ namespace Dynamo {
 		SDL_DestroyWindow(window_);
 	}
 
+	SDL_Window *Display::get_window() {
+		return window_;
+	}
+
+	SDL_Renderer *Display::get_renderer() {
+		return renderer_;
+	}
+	
 	int Display::get_width() {
 		return logic_w_;
 	}
@@ -41,14 +53,6 @@ namespace Dynamo {
 	int Display::get_window_height() {
 		SDL_GetWindowSize(window_, nullptr, &window_h_);
 		return window_h_;
-	}
-
-	SDL_Window *Display::get_window() {
-		return window_;
-	}
-
-	SDL_Renderer *Display::get_renderer() {
-		return renderer_;
 	}
 
 	void Display::set_title(std::string title) {
@@ -79,20 +83,32 @@ namespace Dynamo {
 
 	void Display::draw_point(int x, int y, uint32_t rgb_color) {
 		SDL_Color color = hex_to_rgb(rgb_color);
-		SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 0xFF);
+		SDL_SetRenderDrawColor(
+			renderer_, 
+			color.r, color.g, color.b, 0xFF
+		);
 		SDL_RenderDrawPoint(renderer_, x, y);
 	}
 
-	void Display::draw_line(int x1, int y1, int x2, int y2, uint32_t rgb_color) {
+	void Display::draw_line(int x1, int y1, 
+							int x2, int y2, 
+							uint32_t rgb_color) {
 		SDL_Color color = hex_to_rgb(rgb_color);
-		SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 0xFF);
+		SDL_SetRenderDrawColor(
+			renderer_, 
+			color.r, color.g, color.b, 0xFF
+		);
 		SDL_RenderDrawLine(renderer_, x1, y1, x2, y2);
 	}
 
-	void Display::draw_rect(int x, int y, int w, int h, uint32_t rgb_color, bool fill) {
-		SDL_Color color = hex_to_rgb(rgb_color);
-		SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 0xFF);
+	void Display::draw_rect(int x, int y, int w, int h, 
+							uint32_t rgb_color, bool fill) {
 		SDL_Rect rect = {x, y, w, h};
+		SDL_Color color = hex_to_rgb(rgb_color);
+		SDL_SetRenderDrawColor(
+			renderer_, 
+			color.r, color.g, color.b, 0xFF
+		);
 		if(fill) {
 			SDL_RenderFillRect(renderer_, &rect);
 		}
@@ -101,11 +117,13 @@ namespace Dynamo {
 		}
 	}
 
-	void Display::draw_circle(int cx, int cy, int r, uint32_t rgb_color, bool fill) {
+	void Display::draw_circle(int cx, int cy, int r, 
+							  uint32_t rgb_color, bool fill) {
 		// Midpoint algorithm
 		int x = r;
 		int y = 0;
 		int p = 1 - r;
+
 		while(x >= y) {
 			if(!fill) {
 				draw_point(cx+x, cy+y, rgb_color);
@@ -135,7 +153,10 @@ namespace Dynamo {
 	}
 
 	void Display::refresh() {
-		SDL_SetRenderDrawColor(renderer_, border_color_.r, border_color_.g, border_color_.b, 0xFF);
+		SDL_SetRenderDrawColor(
+			renderer_, 
+			border_color_.r, border_color_.g, border_color_.b, 0xFF
+		);
 		SDL_RenderPresent(renderer_);
 		SDL_RenderClear(renderer_);
 	}

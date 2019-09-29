@@ -16,16 +16,23 @@ namespace Dynamo {
 			if(event_.type == SDL_QUIT) {
 				quit_ = true;
 			}
+			
 			if(event_.type == SDL_MOUSEBUTTONDOWN) {
-				pressed_[INPUT_MOUSELEFT] = (event_.button.button == SDL_BUTTON_LEFT);
-				pressed_[INPUT_MOUSEMIDDLE] = (event_.button.button == SDL_BUTTON_MIDDLE);
-				pressed_[INPUT_MOUSERIGHT] = (event_.button.button == SDL_BUTTON_RIGHT);
+				uint8_t button = event_.button.button;
+
+				pressed_[INPUT_MOUSELEFT] = (button == SDL_BUTTON_LEFT);
+				pressed_[INPUT_MOUSEMIDDLE] = (button == SDL_BUTTON_MIDDLE);
+				pressed_[INPUT_MOUSERIGHT] = (button == SDL_BUTTON_RIGHT);
 			}
+			
 			if(event_.type == SDL_MOUSEBUTTONUP) {
-				released_[INPUT_MOUSELEFT] = (event_.button.button == SDL_BUTTON_LEFT);
-				released_[INPUT_MOUSEMIDDLE] = (event_.button.button == SDL_BUTTON_MIDDLE);
-				released_[INPUT_MOUSERIGHT] = (event_.button.button == SDL_BUTTON_RIGHT);
+				uint8_t button = event_.button.button;
+				
+				released_[INPUT_MOUSELEFT] = (button == SDL_BUTTON_LEFT);
+				released_[INPUT_MOUSEMIDDLE] = (button == SDL_BUTTON_MIDDLE);
+				released_[INPUT_MOUSERIGHT] = (button == SDL_BUTTON_RIGHT);
 			}
+
 			if(event_.type == SDL_KEYDOWN && event_.key.repeat == 0) {
 				pressed_[event_.key.keysym.scancode] = true;
 
@@ -36,9 +43,11 @@ namespace Dynamo {
 					}
 				}
 			}
+
 			if(event_.type == SDL_KEYUP) {
 				released_[event_.key.keysym.scancode] = true;
 			}
+			
 			if(event_.type == SDL_TEXTINPUT) {
 				text_input_ += event_.text.text;
 			}

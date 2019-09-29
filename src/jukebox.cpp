@@ -6,8 +6,8 @@ namespace Dynamo {
 		
 		ambient_channel_ = 1;
 
-		master_volume_ = 1.0;
-		volume_conversion_ = 128.0;
+		master_vol_ = 1.0;
+		vol_convert_ = 128.0;
 	}
 
 	Jukebox::~Jukebox() {
@@ -30,48 +30,60 @@ namespace Dynamo {
 	}
 
 	float Jukebox::get_master_volume() {
-		return master_volume_;
+		return master_vol_;
 	}
 
 	float Jukebox::get_music_volume() {
-		return Mix_VolumeMusic(-1) / volume_conversion_;
+		return Mix_VolumeMusic(-1) / vol_convert_;
 	}
 
 	float Jukebox::get_sfx_volume() {
-		return Mix_Volume(-1, -1) / volume_conversion_;
+		return Mix_Volume(-1, -1) / vol_convert_;
 	}
 
-	void Jukebox::set_master_volume(float volume) {
-		master_volume_ = volume;
+	void Jukebox::set_master_volume(float vol) {
+		master_vol_ = vol;
 	}
 
-	void Jukebox::set_music_volume(float volume) {
-		Mix_VolumeMusic(master_volume_ * volume * volume_conversion_);
+	void Jukebox::set_music_volume(float vol) {
+		Mix_VolumeMusic(master_vol_ * vol* vol_convert_);
 	}
 
-	void Jukebox::set_sfx_volume(float volume) {
-		Mix_Volume(-1, master_volume_ * volume * volume_conversion_);
+	void Jukebox::set_sfx_volume(float vol) {
+		Mix_Volume(-1, master_vol_ * vol* vol_convert_);
 	}
 
 	void Jukebox::queue_music(std::string filename, int ms) {
 		if(!music_map_.count(filename)) {
 			music_map_[filename] = Mix_LoadMUS(filename.c_str());
 		}
-		music_stream_.push_back(std::make_pair(music_map_[filename], ms));
+		music_stream_.push_back(
+			std::make_pair(music_map_[filename], ms)
+		);
 	}
 
 	void Jukebox::stream_music() {
+		// Play the first track in the queue
 		if(!Mix_PlayingMusic() && !music_stream_.empty()) {
-			std::pair<Mix_Music *, int> &current = music_stream_.front();
-			Mix_FadeInMusic(current.first, -1, current.second);
+			std::pair<Mix_Music *, int> &track = music_stream_.front();
+			Mix_FadeInMusic(
+				track.first, 
+				-1, 
+				track.second
+			);
 			music_stream_.pop_front();
 		}
 	}
 
 	void Jukebox::stream_ambient() {
 		if(!Mix_Playing(ambient_channel_) && !ambient_stream_.empty()) {
-			std::pair<Mix_Chunk *, int> &current = ambient_stream_.front();
-			Mix_FadeInChannel(ambient_channel_, current.first, -1, current.second);
+			std::pair<Mix_Chunk *, int> &track = ambient_stream_.front();
+			Mix_FadeInChannel(
+				ambient_channel_, 
+				track.first, 
+				-1, 
+				track.second
+			);
 			ambient_stream_.pop_front();
 		}
 	}
@@ -92,7 +104,9 @@ namespace Dynamo {
 		if(!chunk_map_.count(filename)) {
 			chunk_map_[filename] = Mix_LoadWAV(filename.c_str());
 		}
-		ambient_stream_.push_back(std::make_pair(chunk_map_[filename], ms));
+		ambient_stream_.push_back(
+			std::make_pair(chunk_map_[filename], ms)
+		);
 	}
 
 	void Jukebox::pause_ambient() {

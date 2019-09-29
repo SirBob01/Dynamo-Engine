@@ -4,8 +4,9 @@ namespace Dynamo {
 	Engine::Engine(int width, int height, std::string title) {
 		SDL_Init(SDL_INIT_EVERYTHING);
 
-		// Ugly ass singleton code
 		modules_ = new Modules();
+
+		// Initialize
 		modules_->display = new Display(width, height, title);
 		modules_->textures = new Textures(modules_->display->get_renderer());
 		modules_->jukebox = new Jukebox();
@@ -42,8 +43,8 @@ namespace Dynamo {
 			Scene *next_scene = current_scene->get_child();
 			current_scene->set_child(nullptr);
 
-			// Only pop a scene if it is "dead"
-			// Allows layered scenes (e.g. A pause menu over gameplay)
+			// Only pop a scene if it is "dead" to
+			// allow scene layering (e.g. pause menu over gameplay)
 			if(!current_scene->get_alive()) {
 				delete current_scene;
 				current_scene = nullptr;
@@ -55,7 +56,7 @@ namespace Dynamo {
 			}
 		}
 		
-		// Play music
+		// Play soundtracks
 		modules_->jukebox->stream_music();
 		modules_->jukebox->stream_ambient();
 
@@ -72,6 +73,7 @@ namespace Dynamo {
 	}
 
 	void Engine::quit() {
+		// Clean up
 		delete modules_->display;
 		delete modules_->textures;
 		delete modules_->jukebox;

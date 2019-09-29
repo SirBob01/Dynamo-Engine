@@ -283,6 +283,8 @@ namespace Dynamo {
 
 		// Get the value of a text input event
 		std::string get_text_input();
+
+		// Reset the text input string field
 		void reset_text_input();
 
 		// Set and get the input bindings

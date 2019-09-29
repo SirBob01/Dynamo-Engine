@@ -25,10 +25,12 @@ namespace Dynamo {
 	}
 
 	void Clock::set_fps(int fps) {
+		// Delay each loop iteration to maintain framerate
 		float cap_time = 1000.0/(float)fps;
 		if(delta_ < cap_time) {
 			SDL_Delay(cap_time - delta_);
 		}
+		
 		previous_ = current_;
 	}
 }
