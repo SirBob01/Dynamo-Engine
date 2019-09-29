@@ -1,13 +1,13 @@
 #include "inputs.h"
 
-GameInputs::GameInputs() {
+Dynamo::Inputs::Inputs() {
 	text_input = "";
 	quit = false;
 }
 
-void GameInputs::poll() {
-	std::memset(pressed, false, (GAME_INPUT_LEN + 1) * sizeof(bool));
-	std::memset(released, false, (GAME_INPUT_LEN + 1) * sizeof(bool));
+void Dynamo::Inputs::poll() {
+	std::memset(pressed, false, (INPUT_LEN + 1) * sizeof(bool));
+	std::memset(released, false, (INPUT_LEN + 1) * sizeof(bool));
 	
 	SDL_GetMouseState(&mouse_x, &mouse_y);
 
@@ -16,14 +16,14 @@ void GameInputs::poll() {
 			quit = true;
 		}
 		if(event.type == SDL_MOUSEBUTTONDOWN) {
-			pressed[GAME_INPUT_MOUSELEFT] = (event.button.button == SDL_BUTTON_LEFT);
-			pressed[GAME_INPUT_MOUSEMIDDLE] = (event.button.button == SDL_BUTTON_MIDDLE);
-			pressed[GAME_INPUT_MOUSERIGHT] = (event.button.button == SDL_BUTTON_RIGHT);
+			pressed[INPUT_MOUSELEFT] = (event.button.button == SDL_BUTTON_LEFT);
+			pressed[INPUT_MOUSEMIDDLE] = (event.button.button == SDL_BUTTON_MIDDLE);
+			pressed[INPUT_MOUSERIGHT] = (event.button.button == SDL_BUTTON_RIGHT);
 		}
 		if(event.type == SDL_MOUSEBUTTONUP) {
-			released[GAME_INPUT_MOUSELEFT] = (event.button.button == SDL_BUTTON_LEFT);
-			released[GAME_INPUT_MOUSEMIDDLE] = (event.button.button == SDL_BUTTON_MIDDLE);
-			released[GAME_INPUT_MOUSERIGHT] = (event.button.button == SDL_BUTTON_RIGHT);
+			released[INPUT_MOUSELEFT] = (event.button.button == SDL_BUTTON_LEFT);
+			released[INPUT_MOUSEMIDDLE] = (event.button.button == SDL_BUTTON_MIDDLE);
+			released[INPUT_MOUSERIGHT] = (event.button.button == SDL_BUTTON_RIGHT);
 		}
 		if(event.type == SDL_KEYDOWN && event.key.repeat == 0) {
 			pressed[event.key.keysym.scancode] = true;
@@ -44,52 +44,52 @@ void GameInputs::poll() {
 	}
 }
 
-void GameInputs::reset_text_input() {
-	text_input = "";
-}
-
-std::string GameInputs::get_text_input() {
+std::string Dynamo::Inputs::get_text_input() {
 	return text_input;
 }
 
-void GameInputs::bind(std::string command, GAME_INPUT input) {
+void Dynamo::Inputs::reset_text_input() {
+	text_input = "";
+}
+
+void Dynamo::Inputs::bind(std::string command, INPUT input) {
 	binds[command] = input;
 }
 
-GAME_INPUT GameInputs::get_bind(std::string command) {
+Dynamo::INPUT Dynamo::Inputs::get_bind(std::string command) {
 	return binds[command];
 }
 
-bool GameInputs::get_pressed(GAME_INPUT input) {
+bool Dynamo::Inputs::get_pressed(std::string command) {
+	return get_pressed_raw(binds[command]);
+}
+
+bool Dynamo::Inputs::get_released(std::string command) {
+	return get_released_raw(binds[command]);
+}
+
+bool Dynamo::Inputs::get_pressed_raw(INPUT input) {
 	return pressed[input];
 }
 
-bool GameInputs::get_released(GAME_INPUT input) {
+bool Dynamo::Inputs::get_released_raw(INPUT input) {
 	return released[input];
 }
 
-bool GameInputs::get_pressed_bind(std::string command) {
-	return get_pressed(binds[command]);
-}
-
-bool GameInputs::get_released_bind(std::string command) {
-	return get_released(binds[command]);
-}
-
-std::string GameInputs::get_name(GAME_INPUT input) {
+std::string Dynamo::Inputs::get_name(INPUT input) {
 	std::string s = " ";
-	if(input < GAME_INPUT_MOUSELEFT) {
+	if(input < INPUT_MOUSELEFT) {
 		s = SDL_GetScancodeName(static_cast<SDL_Scancode>(input));
 	}
 	else {
 		switch(input) {
-			case GAME_INPUT_MOUSELEFT:
+			case INPUT_MOUSELEFT:
 				s = "Left Mouse";
 				break;
-			case GAME_INPUT_MOUSEMIDDLE:
+			case INPUT_MOUSEMIDDLE:
 				s = "Middle Mouse";
 				break;
-			case GAME_INPUT_MOUSERIGHT:
+			case INPUT_MOUSERIGHT:
 				s = "Right Mouse";
 				break;
 			default:
@@ -99,14 +99,14 @@ std::string GameInputs::get_name(GAME_INPUT input) {
 	return s;
 }
 
-int GameInputs::get_mouse_x() {
+int Dynamo::Inputs::get_mouse_x() {
 	return mouse_x;
 }
 
-int GameInputs::get_mouse_y() {
+int Dynamo::Inputs::get_mouse_y() {
 	return mouse_y;
 }
 
-bool GameInputs::get_quit() {
+bool Dynamo::Inputs::get_quit() {
 	return quit;
 }

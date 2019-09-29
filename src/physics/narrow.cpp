@@ -1,6 +1,6 @@
 #include "narrow.h"
 
-PhysicsProjection Physics_project_polygon(PhysicsPolygon *poly, Vec2D axis, PhysicsBody *body) {
+Physics::Projection Physics::project_polygon(Physics::Polygon *poly, Physics::Vec2D axis, Physics::Body *body) {
 	float p_max = axis * body->convert_to_world(poly->get_vertexes()[0]);
 	float p_min = p_max;
 
@@ -17,7 +17,7 @@ PhysicsProjection Physics_project_polygon(PhysicsPolygon *poly, Vec2D axis, Phys
 	return {p_min, p_max};
 }
 
-PhysicsProjection Physics_project_circle(PhysicsCircle *circle, Vec2D axis, PhysicsBody *body) {
+Physics::Projection Physics::project_circle(Physics::Circle *circle, Physics::Vec2D axis, Physics::Body *body) {
 	Vec2D world_center = body->convert_to_world(circle->get_centroid());
 	float r = circle->get_radius();
 
@@ -32,16 +32,16 @@ PhysicsProjection Physics_project_circle(PhysicsCircle *circle, Vec2D axis, Phys
 	}
 }
 
-PhysicsProjection Physics_project_edge(PhysicsEdge *edge, Vec2D axis, PhysicsBody *body) {
+Physics::Projection Physics::project_edge(Physics::Edge *edge, Physics::Vec2D axis, Physics::Body *body) {
 	// TODO: Implement edges once done with polygons and circles
 }
 
 // Manifold generation
-bool Physics_colliding_polygons(PhysicsPolygon *a, PhysicsPolygon *b, PhysicsPair *pair, PhysicsManifold *m) {
+bool Physics::colliding_polygons(Physics::Polygon *a, Physics::Polygon *b, Physics::Pair *pair, Physics::Manifold *m) {
 	return false;
 }
 
-bool Physics_colliding_circles(PhysicsCircle *a, PhysicsCircle *b, PhysicsPair *pair, PhysicsManifold *m) {
+bool Physics::colliding_circles(Physics::Circle *a, Physics::Circle *b, Physics::Pair *pair, Physics::Manifold *m) {
 	Vec2D a_pos = pair->a->convert_to_world(a->get_centroid());
 	Vec2D b_pos = pair->b->convert_to_world(b->get_centroid());
 
@@ -72,46 +72,46 @@ bool Physics_colliding_circles(PhysicsCircle *a, PhysicsCircle *b, PhysicsPair *
 	}
 }
 
-bool Physics_colliding_polygon_circle(PhysicsPolygon *p, PhysicsCircle *c, PhysicsPair *pair, PhysicsManifold *m) {
+bool Physics::colliding_polygon_circle(Physics::Polygon *p, Physics::Circle *c, Physics::Pair *pair, Physics::Manifold *m) {
 	return false;
 }
 
-PhysicsManifold Physics_colliding(PhysicsPair *pair, PhysicsFixture *a, PhysicsFixture *b) {
-	PhysicsManifold m;
+Physics::Manifold Physics::colliding(Physics::Pair *pair, Physics::Fixture *a, Physics::Fixture *b) {
+	Manifold m;
 	m.pair = pair;
 	m.a = a;
 	m.b = b;
 
 	// Call suitable collision functions
-	PHYSICS_SHAPE_TYPE a_type = a->shape->get_type();
-	PHYSICS_SHAPE_TYPE b_type = b->shape->get_type();
+	SHAPE_TYPE a_type = a->shape->get_type();
+	SHAPE_TYPE b_type = b->shape->get_type();
 
-	if(a_type == PHYSICS_SHAPE_POLYGON && b_type == PHYSICS_SHAPE_POLYGON) {
+	if(a_type == SHAPE_POLYGON && b_type == SHAPE_POLYGON) {
 		// Polygon - polygon
-		Physics_colliding_polygons((PhysicsPolygon *)a->shape, (PhysicsPolygon *)b->shape, pair, &m);
+		colliding_polygons((Polygon *)a->shape, (Polygon *)b->shape, pair, &m);
 	}
-	else if(a_type == PHYSICS_SHAPE_CIRCLE && b_type == PHYSICS_SHAPE_CIRCLE) {
+	else if(a_type == SHAPE_CIRCLE && b_type == SHAPE_CIRCLE) {
 		// Circle - circle
-		Physics_colliding_circles((PhysicsCircle *)a->shape, (PhysicsCircle *)b->shape, pair, &m);
+		colliding_circles((Circle *)a->shape, (Circle *)b->shape, pair, &m);
 	}
-	else if(a_type == PHYSICS_SHAPE_POLYGON && b_type == PHYSICS_SHAPE_CIRCLE) {
+	else if(a_type == SHAPE_POLYGON && b_type == SHAPE_CIRCLE) {
 		// Polygon - circle
-		Physics_colliding_polygon_circle((PhysicsPolygon *)a->shape, (PhysicsCircle *)b->shape, pair, &m);
+		colliding_polygon_circle((Polygon *)a->shape, (Circle *)b->shape, pair, &m);
 	}
-	else if(a_type == PHYSICS_SHAPE_CIRCLE && b_type == PHYSICS_SHAPE_POLYGON) {
+	else if(a_type == SHAPE_CIRCLE && b_type == SHAPE_POLYGON) {
 		// Circle - polygon
-		Physics_colliding_polygon_circle((PhysicsPolygon *)b->shape, (PhysicsCircle *)a->shape, pair, &m);
+		colliding_polygon_circle((Polygon *)b->shape, (Circle *)a->shape, pair, &m);
 	}
 
 	return m;
 }
 
 
-void Physics_resolve_impulse(PhysicsManifold *m) {
+void Physics::resolve_impulse(Physics::Manifold *m) {
 	// This is the bulk of the actual physics resolution code
 	// Restitution and friction coefficients
-	float e = Physics_min(m->a->restitution, m->b->restitution);
-	float f = Physics_min(1.0, m->a->friction + m->b->friction);
+	float e = min(m->a->restitution, m->b->restitution);
+	float f = min(1.0, m->a->friction + m->b->friction);
 
 	// Inverse masses
 	float invm_a = 1.0 / m->pair->a->get_mass();
@@ -155,10 +155,10 @@ void Physics_resolve_impulse(PhysicsManifold *m) {
 
 	// Correct positions
 	float allowance = 0.01;
-	float corr_coeff = Physics_max(m->penetration - allowance, 0.0) / (invm_a + invm_b);
+	float corr_coeff = max(m->penetration - allowance, 0.0) / (invm_a + invm_b);
 
 	// Update final velocities
-	if(m->pair->a->get_type() == PHYSICS_BODY_DYNAMIC) {
+	if(m->pair->a->get_type() == BODY_DYNAMIC) {
 		Vec2D a_pos = m->pair->a->get_pos();
 
 		m->pair->a->set_pos(a_pos - m->normal * corr_coeff * invm_a);
@@ -166,7 +166,7 @@ void Physics_resolve_impulse(PhysicsManifold *m) {
 		m->pair->a->set_angular_vel(a_ang + (invI_a * r_a.cross(impulse)));
 	}
 
-	if(m->pair->b->get_type() == PHYSICS_BODY_DYNAMIC) {
+	if(m->pair->b->get_type() == BODY_DYNAMIC) {
 		float b_ang = m->pair->b->get_angular_vel();
 		Vec2D b_pos = m->pair->b->get_pos();
 

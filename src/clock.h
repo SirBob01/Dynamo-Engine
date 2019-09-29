@@ -1,23 +1,25 @@
-#ifndef GAME_CLOCK
-#define GAME_CLOCK
+#ifndef DYNAMO_CLOCK_H_
+#define DYNAMO_CLOCK_H_
 
 #include <SDL2/SDL.h>
 
-class GameClock {
-	int frames;
-	int previous;
-	int current;
+namespace Dynamo {
+	class Clock {
+		int frames;
+		int previous;
+		int current;
 
-	float delta;
+		float delta;
 
-public:
-	GameClock();
+	public:
+		Clock();
 
-	int get_frames();
-	float get_delta();
+		int get_frames();
+		float get_delta();
 
-	void tick();
-	void set_fps(int fps);
-};
+		void tick();
+		void set_fps(int fps);
+	};
+}
 
 #endif

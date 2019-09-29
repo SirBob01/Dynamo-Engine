@@ -1,35 +1,36 @@
-#ifndef GAME_PHYSICS_SHAPE
-#define GAME_PHYSICS_SHAPE
+#ifndef DYNAMO_PHYSICS_SHAPE_H_
+#define DYNAMO_PHYSICS_SHAPE_H_
 
 #include "vec2d.h"
 
-typedef enum {
-	PHYSICS_SHAPE_POLYGON,
-	PHYSICS_SHAPE_CIRCLE,
-	PHYSICS_SHAPE_EDGE,
-	PHYSICS_SHAPE_COUNT = 3,
-} PHYSICS_SHAPE_TYPE;
+namespace Physics {
+	typedef enum {
+		SHAPE_POLYGON,
+		SHAPE_CIRCLE,
+		SHAPE_EDGE,
+		SHAPE_COUNT = 3,
+	} SHAPE_TYPE;
 
-// All points passed here by the Body should be in local coordinates
-class PhysicsShape {
-protected:
-	PHYSICS_SHAPE_TYPE type;
-	Vec2D centroid;
-	float volume;
+	// All points passed here by the Body should be in local coordinates
+	class Shape {
+	protected:
+		SHAPE_TYPE type;
+		Vec2D centroid;
+		float volume;
 
-public:
-	PhysicsShape(PHYSICS_SHAPE_TYPE t);
+	public:
+		Shape(SHAPE_TYPE t);
 
-	PHYSICS_SHAPE_TYPE get_type();
+		SHAPE_TYPE get_type();
 
-	Vec2D get_centroid();
+		Vec2D get_centroid();
 
-	float get_volume();
+		float get_volume();
 
-	virtual float get_inertia(float density);
+		virtual float get_inertia(float density);
 
-	virtual bool is_in_bounds(Vec2D local);
-};
-
+		virtual bool is_in_bounds(Vec2D local);
+	};
+}
 
 #endif

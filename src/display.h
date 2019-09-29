@@ -1,51 +1,63 @@
-#ifndef GAME_DISPLAY
-#define GAME_DISPLAY
+#ifndef DYNAMO_DISPLAY_H_
+#define DYNAMO_DISPLAY_H_
 
 #include <SDL2/SDL.h>
+
 #include <string>
 
 #include "sprite.h"
 #include "color.h"
 
-class GameDisplay {
-	int logic_width;
-	int logic_height;
+namespace Dynamo {
+	class Display {
+		int logic_width;
+		int logic_height;
 
-	int window_w;
-	int window_h;
+		int window_w;
+		int window_h;
 
-	SDL_Color border_color;
+		SDL_Color border_color;
 
-	SDL_Window *window;
-	SDL_Renderer *renderer;
+		SDL_Window *window;
+		SDL_Renderer *renderer;
 
-public:
-	GameDisplay(int width, int height, std::string title);
-	~GameDisplay();
+	public:
+		Display(int width, int height, std::string title);
+		~Display();
 
-	int get_width();
-	int get_height();
+		// Get the draw port dimensions
+		int get_width();
+		int get_height();
 
-	int get_window_width();
-	int get_window_height();
+		// Get the physical GUI window dimentions
+		int get_window_width();
+		int get_window_height();
 
-	SDL_Window *get_window();
-	SDL_Renderer *get_renderer();
+		SDL_Window *get_window();
+		SDL_Renderer *get_renderer();
 
-	void set_title(std::string title);
-	void set_fill(uint32_t rgb_color);
-	void set_borderfill(uint32_t rgb_color);
+		// Set the GUI bar title
+		void set_title(std::string title);
 
-	void draw_sprite(GameSprite *sprite);
+		// Set the fill of the draw port
+		void set_fill(uint32_t rgb_color);
 
-	// Drawing primitives
-	void draw_point(int x, int y, uint32_t rgb_color);
-	void draw_line(int x1, int y1, int x2, int y2, uint32_t rgb_color);
-	void draw_rect(int x, int y, int w, int h, uint32_t rgb_color, bool fill);
-	void draw_circle(int cx, int cy, int r, uint32_t rgb_color, bool fill);
-	void draw_polygon(int points[][2], int n, uint32_t rgb_color);
+		// Set the fill of the stretched border
+		void set_borderfill(uint32_t rgb_color);
 
-	void refresh();
-};
+		// Draw a single sprite
+		void draw_sprite(Sprite *sprite);
+
+		// Draw primitive shapes
+		void draw_point(int x, int y, uint32_t rgb_color);
+		void draw_line(int x1, int y1, int x2, int y2, uint32_t rgb_color);
+		void draw_rect(int x, int y, int w, int h, uint32_t rgb_color, bool fill);
+		void draw_circle(int cx, int cy, int r, uint32_t rgb_color, bool fill);
+		void draw_polygon(int points[][2], int n, uint32_t rgb_color);
+
+		// Refresh the display after each game-loop iteration
+		void refresh();
+	};
+}
 
 #endif

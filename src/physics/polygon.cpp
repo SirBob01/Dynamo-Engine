@@ -1,6 +1,6 @@
 #include "polygon.h"
 
-PhysicsPolygon::PhysicsPolygon(Vec2D *verts, int n) : PhysicsShape(PHYSICS_SHAPE_POLYGON) {
+Physics::Polygon::Polygon(Physics::Vec2D *verts, int n) : Physics::Shape(Physics::SHAPE_POLYGON) {
 	// Set vertexes
 	vertexes = new Vec2D[n];
 	for(int i = 0; i < n; i++) {
@@ -21,7 +21,7 @@ PhysicsPolygon::PhysicsPolygon(Vec2D *verts, int n) : PhysicsShape(PHYSICS_SHAPE
 		Vec2D b = vertexes[(i+1)%n];
 		volume += (a.x + b.x) * (a.y - b.y);
 	}
-	volume = Physics_abs(volume);
+	volume = abs(volume);
 	volume /= 2;
 
 	// Calculate centroid
@@ -38,24 +38,24 @@ PhysicsPolygon::PhysicsPolygon(Vec2D *verts, int n) : PhysicsShape(PHYSICS_SHAPE
 	sides = n;
 }
 
-PhysicsPolygon::~PhysicsPolygon() {
+Physics::Polygon::~Polygon() {
 	delete vertexes;
 	delete normals;
 }
 
-int PhysicsPolygon::get_sides() {
+int Physics::Polygon::get_sides() {
 	return sides;
 }
 
-Vec2D *PhysicsPolygon::get_vertexes() {
+Physics::Vec2D *Physics::Polygon::get_vertexes() {
 	return vertexes;
 }
 
-Vec2D *PhysicsPolygon::get_normals() {
+Physics::Vec2D *Physics::Polygon::get_normals() {
 	return normals;
 }
 
-float PhysicsPolygon::get_inertia(float density) {
+float Physics::Polygon::get_inertia(float density) {
 	float I = 0.0;
 
 	for(int i = 0; i < sides; i++) {
@@ -72,7 +72,7 @@ float PhysicsPolygon::get_inertia(float density) {
 	return I * density / 12.0;
 }
 
-bool PhysicsPolygon::is_in_bounds(Vec2D local) {
+bool Physics::Polygon::is_in_bounds(Physics::Vec2D local) {
 	// Winding number algorithm
 	int wn = 0;
 	for(int i = 0; i < sides; i++) {

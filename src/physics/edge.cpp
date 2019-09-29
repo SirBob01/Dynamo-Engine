@@ -1,6 +1,6 @@
 #include "edge.h"
 
-PhysicsEdge::PhysicsEdge(Vec2D endpoints[2]) : PhysicsShape(PHYSICS_SHAPE_EDGE) {
+Physics::Edge::Edge(Physics::Vec2D endpoints[2]) : Physics::Shape(Physics::SHAPE_EDGE) {
 	start = endpoints[0];
 	end = endpoints[1];
 
@@ -11,7 +11,7 @@ PhysicsEdge::PhysicsEdge(Vec2D endpoints[2]) : PhysicsShape(PHYSICS_SHAPE_EDGE) 
 	volume = d.length();
 }
 
-float PhysicsEdge::get_inertia(float density) {
+float Physics::Edge::get_inertia(float density) {
 	// Easy one dimensional calculation
 	return density * volume * volume * volume / 12.0;
 }

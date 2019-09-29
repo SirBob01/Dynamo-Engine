@@ -1,46 +1,46 @@
 #include "scene.h"
 
-GameScene::GameScene(GameScene *p, GameModules *c) {
-	modules = c;
-
-	parent_scene = p;
+Dynamo::Scene::Scene(Dynamo::Scene *parent, Dynamo::Modules *m) {
+	modules = m;
+	
+	parent_scene = parent;
 	child_scene = nullptr;
 	alive = true;
 }
 
-GameScene::~GameScene() {
+Dynamo::Scene::~Scene() {
 	// Default black fill
 	modules->display->set_fill(0x000000);
 	modules->display->set_borderfill(0x000000);
 }
 
-void GameScene::kill() {
+void Dynamo::Scene::kill() {
 	// Allows engine to transition to next scene
 	alive = false;
 }
 
-bool GameScene::get_alive() {
+bool Dynamo::Scene::get_alive() {
 	return alive;
 }
 
-GameScene *GameScene::get_parent() {
+Dynamo::Scene *Dynamo::Scene::get_parent() {
 	return parent_scene;
 }
 
-GameScene *GameScene::get_child() {
+Dynamo::Scene *Dynamo::Scene::get_child() {
 	return child_scene;
 }
 
-void GameScene::set_child(GameScene *next) {
+void Dynamo::Scene::set_child(Scene *next) {
 	child_scene = next;
 }
 
-void GameScene::update() {
+void Dynamo::Scene::update() {
 	// Override
 	// Update modules of this scene
 }
 
-void GameScene::draw() {
+void Dynamo::Scene::draw() {
 	// Override
 	// Draw scene sprites
 }

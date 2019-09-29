@@ -1,35 +1,39 @@
-#ifndef GAME_TEXTURES
-#define GAME_TEXTURES
+#ifndef DYNAMO_TEXTURES_H_
+#define DYNAMO_TEXTURES_H_
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+
 #include <unordered_map>
 #include <string>
 
 #include "color.h"
 
-class GameTextures {
-	SDL_Renderer *renderer;
-	
-	std::unordered_map<std::string, TTF_Font *> fonts;
-	std::unordered_map<std::string, SDL_Texture *> texture_map;
+namespace Dynamo {
+	class Textures {
+		SDL_Renderer *renderer;
+		
+		std::unordered_map<std::string, TTF_Font *> fonts;
+		std::unordered_map<std::string, SDL_Texture *> texture_map;
 
-public:
-	GameTextures(SDL_Renderer *r);
-	~GameTextures();
+	public:
+		Textures(SDL_Renderer *r);
+		~Textures();
 
-	// Pre-load resources (on Scene initialization)
-	// If texture exists in map, it is overwritten by new texture
-	// Prevents memory leaks (don't trust user)
-	void load_surface(std::string id, int width, int height);
-	void load_image(std::string id, std::string filename);
-	void load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color);
-	void load_font(std::string font_id, std::string filename, int size);
+		// Pre-load resources on Scene initialization
+		// If texture exists, it is overwritten to prevent memory leaks
+		void load_surface(std::string id, int width, int height);
+		void load_image(std::string id, std::string filename);
+		void load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color);
+		void load_font(std::string font_id, std::string filename, int size);
 
-	SDL_Texture *get_texture(std::string id);
+		// Get a texture from an id key
+		SDL_Texture *get_texture(std::string id);
 
-	void clear_all();
-};
+		// Free all loaded textures from memory
+		void clear_all();
+	};	
+}
 
 #endif

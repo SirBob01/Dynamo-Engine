@@ -1,6 +1,6 @@
 #include "sprite.h"
 
-GameSprite::GameSprite(SDL_Texture *t, int frame_width, int frame_height) {
+Dynamo::Sprite::Sprite(SDL_Texture *t, int frame_width, int frame_height) {
 	texture = t;
 	frame_w = frame_width;
 	frame_h = frame_height;
@@ -41,7 +41,7 @@ GameSprite::GameSprite(SDL_Texture *t, int frame_width, int frame_height) {
 	visible = true;
 }
 
-GameSprite::~GameSprite() {
+Dynamo::Sprite::~Sprite() {
 	delete target;
 	for(auto &r : source) {
 		delete r;
@@ -49,43 +49,43 @@ GameSprite::~GameSprite() {
 	source.clear();
 }
 
-SDL_Texture *GameSprite::get_texture() {
+SDL_Texture *Dynamo::Sprite::get_texture() {
 	return texture;
 }
 
-int GameSprite::get_width() {
+int Dynamo::Sprite::get_width() {
 	return texture_w;
 }
 
-int GameSprite::get_frame_height() {
-	return frame_h;
-}
-
-int GameSprite::get_frame_width() {
-	return frame_w;
-}
-
-int GameSprite::get_height() {
+int Dynamo::Sprite::get_height() {
 	return texture_h;
 }
 
-SDL_Rect *GameSprite::get_source() {
+int Dynamo::Sprite::get_frame_height() {
+	return frame_h;
+}
+
+int Dynamo::Sprite::get_frame_width() {
+	return frame_w;
+}
+
+SDL_Rect *Dynamo::Sprite::get_source() {
 	return source[current_frame];
 }
 
-SDL_Rect *GameSprite::get_target() {
+SDL_Rect *Dynamo::Sprite::get_target() {
 	return target;
 }
 
-bool GameSprite::get_visible() {
+bool Dynamo::Sprite::get_visible() {
 	return visible;
 }
 
-float GameSprite::get_angle() {
+float Dynamo::Sprite::get_angle() {
 	return angle;
 }
 
-SDL_RendererFlip GameSprite::get_flip() {
+SDL_RendererFlip Dynamo::Sprite::get_flip() {
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	if(hflip && vflip) {
 		flip = (SDL_RendererFlip)(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
@@ -99,42 +99,38 @@ SDL_RendererFlip GameSprite::get_flip() {
 	return flip;
 }
 
-uint8_t GameSprite::get_alpha() {
+uint8_t Dynamo::Sprite::get_alpha() {
 	uint8_t a;
 	SDL_GetTextureAlphaMod(texture, &a);
 	return a;
 }
 
-bool GameSprite::get_finished() {
+bool Dynamo::Sprite::get_finished() {
 	return finished;
 }
 
-void GameSprite::set_visible(bool new_visible) {
+void Dynamo::Sprite::set_visible(bool new_visible) {
 	visible = new_visible;
 }
 
-void GameSprite::set_angle(float new_angle) {
+void Dynamo::Sprite::set_angle(float new_angle) {
 	angle = new_angle;
 }
 
-void GameSprite::set_flip(bool new_hflip, bool new_vflip) {
+void Dynamo::Sprite::set_flip(bool new_hflip, bool new_vflip) {
 	hflip = new_hflip;
 	vflip = new_vflip;
 }
 
-void GameSprite::set_alpha(uint8_t a) {
+void Dynamo::Sprite::set_alpha(uint8_t a) {
 	SDL_SetTextureAlphaMod(texture, a);
 }
 
-void GameSprite::set_blend(GAME_BLEND mode) {
+void Dynamo::Sprite::set_blend(SPRITE_BLEND mode) {
 	SDL_SetTextureBlendMode(texture, static_cast<SDL_BlendMode>(mode));
 }
 
-void GameSprite::set_finished(bool new_finished) {
-	finished = new_finished;
-}
-
-void GameSprite::set_target(int x, int y, int w, int h) {
+void Dynamo::Sprite::set_target(int x, int y, int w, int h) {
 	// One may pass the fields of a bounding box or something
 	if(w < 1 || h < 1) {
 		set_visible(false);
@@ -146,12 +142,12 @@ void GameSprite::set_target(int x, int y, int w, int h) {
 	target->h = h;
 }
 
-void GameSprite::animate(float dt, float fps, bool loop) {
+void Dynamo::Sprite::animate(float dt, float fps, bool loop) {
 	accumulator += dt;
 	if(accumulator >= (1000.0/fps)) {
 		current_frame++;
 		accumulator = 0;
-	}	
+	}
 
 	if(current_frame > max_frames-1) {
 		if(loop) {

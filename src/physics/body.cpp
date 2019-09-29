@@ -1,6 +1,6 @@
 #include "body.h"
 
-PhysicsBody::PhysicsBody(PhysicsBodyDef def) {
+Physics::Body::Body(Physics::BodyDef def) {
 	// Default values
 	type = def.type;
 
@@ -20,9 +20,9 @@ PhysicsBody::PhysicsBody(PhysicsBodyDef def) {
 	set_angle(def.angle);
 }
 
-PhysicsBody::~PhysicsBody() {
-	PhysicsFixture *f = fixtures;
-	PhysicsFixture *next;
+Physics::Body::~Body() {
+	Fixture *f = fixtures;
+	Fixture *next;
 	while(f != nullptr) {
 		next = f->next;
 		delete f;
@@ -31,40 +31,40 @@ PhysicsBody::~PhysicsBody() {
 	fixtures = nullptr;
 }
 
-PHYSICS_BODY_TYPE PhysicsBody::get_type() {
+Physics::BODY_TYPE Physics::Body::get_type() {
 	return type;
 }
 
-PhysicsFixture *PhysicsBody::get_fixtures() {
+Physics::Fixture *Physics::Body::get_fixtures() {
 	return fixtures;
 }
 
-Vec2D PhysicsBody::get_pos() {
+Physics::Vec2D Physics::Body::get_pos() {
 	return offset;
 }
 
-Vec2D PhysicsBody::get_vel() {
+Physics::Vec2D Physics::Body::get_vel() {
 	return vel;
 }
 
-float PhysicsBody::get_angle() {
+float Physics::Body::get_angle() {
 	return angle;
 }
 
-float PhysicsBody::get_angular_vel() {
+float Physics::Body::get_angular_vel() {
 	return angular_vel;
 }
 
-float PhysicsBody::get_inertia() {
+float Physics::Body::get_inertia() {
 	return inertia;
 }
 
-float PhysicsBody::get_mass() {
+float Physics::Body::get_mass() {
 	return net_mass;
 }
 
-void PhysicsBody::add_fixture(PhysicsFixture f) {
-	PhysicsFixture *fixture = new PhysicsFixture();
+void Physics::Body::add_fixture(Physics::Fixture f) {
+	Fixture *fixture = new Fixture();
 	fixture->shape = f.shape;
 	fixture->density = f.density;
 	fixture->restitution = f.restitution;
@@ -89,7 +89,7 @@ void PhysicsBody::add_fixture(PhysicsFixture f) {
 		fixtures = fixture;
 	}
 	else {
-		PhysicsFixture *current = fixtures;
+		Fixture *current = fixtures;
 		while(current->next != nullptr) {
 			current = current->next;
 		}
@@ -97,16 +97,16 @@ void PhysicsBody::add_fixture(PhysicsFixture f) {
 	}
 }
 
-void PhysicsBody::set_pos(Vec2D v) {
+void Physics::Body::set_pos(Physics::Vec2D v) {
 	offset = v;
 }
 
-void PhysicsBody::set_vel(Vec2D v) {
+void Physics::Body::set_vel(Physics::Vec2D v) {
 	vel = v;
 }
 
-void PhysicsBody::set_angle(float radians) {
-	angle = Physics_wrap_val(radians, 0, 2*PI);
+void Physics::Body::set_angle(float radians) {
+	angle = wrap_val(radians, 0, 2*PI);
 
 	float s = sin(angle);
 	float c = cos(angle);
@@ -117,21 +117,21 @@ void PhysicsBody::set_angle(float radians) {
 	rotform.d = c;
 }
 
-void PhysicsBody::set_angular_vel(float radps) {
+void Physics::Body::set_angular_vel(float radps) {
 	angular_vel = radps;
 }
 
-const Vec2D PhysicsBody::convert_to_world(Vec2D local_point) {
+const Physics::Vec2D Physics::Body::convert_to_world(Physics::Vec2D local_point) {
 	local_point -= center;
 	return local_point.transform(rotform) + offset;
 }
 
-const Vec2D PhysicsBody::convert_to_local(Vec2D world_point) {
+const Physics::Vec2D Physics::Body::convert_to_local(Physics::Vec2D world_point) {
 	world_point -= offset;
 	return world_point.transform(rotform.inverse()) + center;
 }
 
-bool PhysicsBody::is_stationary() {
+bool Physics::Body::is_stationary() {
 	// Body isn't moving in space
 	bool linear = (vel.x == 0 && vel.y == 0);
 	bool angular = (angular_vel == 0);

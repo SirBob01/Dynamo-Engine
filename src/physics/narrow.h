@@ -1,5 +1,5 @@
-#ifndef GAME_PHYSICS_NARROW
-#define GAME_PHYSICS_NARROW
+#ifndef DYNAMO_PHYSICS_NARROW_H_
+#define DYNAMO_PHYSICS_NARROW_H_
 
 #include "body.h"
 #include "polygon.h"
@@ -8,34 +8,40 @@
 #include "broad.h"
 #include "vec2d.h"
 
-struct PhysicsManifold {
-	// Participating bodies
-	PhysicsPair *pair;
-	
-	// Relevant fixtures
-	PhysicsFixture *a;
-	PhysicsFixture *b;
+namespace Physics {
+	struct Manifold {
+		// Participating bodies
+		Pair *pair;
+		
+		// Relevant fixtures
+		Fixture *a;
+		Fixture *b;
 
-	// Collision data
-	Vec2D normal; // Normalized direction
-	Vec2D contact;
-	float penetration;
-};
+		// Collision data
+		Vec2D normal; // Normalized direction
+		Vec2D contact;
+		float penetration;
+	};
 
-// Project shape onto axis for SAT algorithm
-PhysicsProjection Physics_project_polygon(PhysicsPolygon *poly, Vec2D axis, PhysicsBody *body);
+	// Project shape onto axis for SAT algorithm
+	Projection project_polygon(Polygon *poly, Vec2D axis, Body *body);
 
-PhysicsProjection Physics_project_circle(PhysicsCircle *circle, Vec2D axis, PhysicsBody *body);
+	Projection project_circle(Circle *circle, Vec2D axis, Body *body);
 
-PhysicsProjection Physics_project_edge(PhysicsEdge *edge, Vec2D axis, PhysicsBody *body);
+	Projection project_edge(Edge *edge, Vec2D axis, Body *body);
 
-// Manifold generation
-bool Physics_colliding_circles(PhysicsCircle *a, PhysicsCircle *b, PhysicsPair *pair, PhysicsManifold *m);
+	// Manifold generation
+	bool colliding_polygons(Polygon *a, Polygon *b, Pair *pair, Manifold *m);
 
-// Collision wrapper
-PhysicsManifold Physics_colliding(PhysicsPair *pair, PhysicsFixture *a, PhysicsFixture *b);
+	bool colliding_circles(Circle *a, Circle *b, Pair *pair, Manifold *m);
 
-// Impulse calculation
-void Physics_resolve_impulse(PhysicsManifold *m);
+	bool colliding_polygon_circle(Polygon *p, Circle *c, Pair *pair, Manifold *m);
+
+	// Collision wrapper
+	Manifold colliding(Pair *pair, Fixture *a, Fixture *b);
+
+	// Impulse calculation
+	void resolve_impulse(Manifold *m);
+}
 
 #endif

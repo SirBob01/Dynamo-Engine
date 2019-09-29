@@ -1,44 +1,44 @@
 #include "vec2d.h"
 
-float Mat2D::determinant() const {
+float Physics::Mat2D::determinant() const {
 	return a * d - b * c;
 }
 
-const Mat2D Mat2D::operator+(const Mat2D &rhs) const {
+const Physics::Mat2D Physics::Mat2D::operator+(const Physics::Mat2D &rhs) const {
 	return {a+rhs.a, b+rhs.b, 
 			c+rhs.c, d+rhs.d};
 }
 
-const Mat2D Mat2D::operator-(const Mat2D &rhs) const {
+const Physics::Mat2D Physics::Mat2D::operator-(const Physics::Mat2D &rhs) const {
 	return {a-rhs.a, b-rhs.b, 
 			c-rhs.c, d-rhs.d};
 }
 
-const Mat2D Mat2D::operator*(const Mat2D &rhs) const {
+const Physics::Mat2D Physics::Mat2D::operator*(const Physics::Mat2D &rhs) const {
 	return {a*rhs.a + b*rhs.c, a*rhs.b + b*rhs.d,
 			c*rhs.a + d*rhs.c, c*rhs.b + d*rhs.d};
 }
 
-const Mat2D Mat2D::operator*(float scalar) const {
+const Physics::Mat2D Physics::Mat2D::operator*(float scalar) const {
 	return {a * scalar, b * scalar,
 			c * scalar, d * scalar};
 }
 
-const Mat2D Mat2D::operator/(float scalar) const {
+const Physics::Mat2D Physics::Mat2D::operator/(float scalar) const {
 	return {a / scalar, b / scalar,
 			c / scalar, d / scalar};
 }
 
-const Mat2D Mat2D::operator-() const {
+const Physics::Mat2D Physics::Mat2D::operator-() const {
 	return {-a, -b, -c, -d};
 };
 
-const Mat2D Mat2D::inverse() const {
+const Physics::Mat2D Physics::Mat2D::inverse() const {
 	Mat2D inv = {d, -b, -c, a};
 	return inv / determinant();
 }
 
-Mat2D &Mat2D::operator+=(const Mat2D &rhs) {
+Physics::Mat2D &Physics::Mat2D::operator+=(const Physics::Mat2D &rhs) {
 	a += rhs.a;
 	b += rhs.b;
 	c += rhs.c;
@@ -46,7 +46,7 @@ Mat2D &Mat2D::operator+=(const Mat2D &rhs) {
 	return *this;
 };
 
-Mat2D &Mat2D::operator-=(const Mat2D &rhs) {
+Physics::Mat2D &Physics::Mat2D::operator-=(const Physics::Mat2D &rhs) {
 	a -= rhs.a;
 	b -= rhs.b;
 	c -= rhs.c;
@@ -54,7 +54,7 @@ Mat2D &Mat2D::operator-=(const Mat2D &rhs) {
 	return *this;
 };
 
-Mat2D &Mat2D::operator*=(const Mat2D &rhs) {
+Physics::Mat2D &Physics::Mat2D::operator*=(const Physics::Mat2D &rhs) {
 	float new_a = a*rhs.a + b*rhs.c;
 	float new_b = a*rhs.b + b*rhs.d;
 	float new_c = c*rhs.a + d*rhs.c;
@@ -66,7 +66,7 @@ Mat2D &Mat2D::operator*=(const Mat2D &rhs) {
 	return *this;
 };
 
-Mat2D &Mat2D::operator*=(float scalar) {
+Physics::Mat2D &Physics::Mat2D::operator*=(float scalar) {
 	a *= scalar;
 	b *= scalar;
 	c *= scalar;
@@ -74,7 +74,7 @@ Mat2D &Mat2D::operator*=(float scalar) {
 	return *this;
 }
 
-Mat2D &Mat2D::operator/=(float scalar) {
+Physics::Mat2D &Physics::Mat2D::operator/=(float scalar) {
 	a /= scalar;
 	b /= scalar;
 	c /= scalar;
@@ -82,75 +82,75 @@ Mat2D &Mat2D::operator/=(float scalar) {
 	return *this;
 }
 
-bool Mat2D::operator==(const Mat2D &rhs) const {
+bool Physics::Mat2D::operator==(const Physics::Mat2D &rhs) const {
 	return a == rhs.a && b == rhs.b && c == rhs.c && d == rhs.d;
 }
 
-bool Mat2D::operator!=(const Mat2D &rhs) const {
+bool Physics::Mat2D::operator!=(const Physics::Mat2D &rhs) const {
 	return a != rhs.a || b != rhs.b || c != rhs.c || d != rhs.d;	
 }
 
-float Vec2D::length_squared() {
+float Physics::Vec2D::length_squared() {
 	return pow(x, 2) + pow(y, 2);
 }
 
-float Vec2D::length() {
+float Physics::Vec2D::length() {
 	return sqrt(length_squared());
 }
 
-const Vec2D Vec2D::left_normal() {
+const Physics::Vec2D Physics::Vec2D::left_normal() {
 	return {-y, x};
 }
 
-const Vec2D Vec2D::right_normal() {
+const Physics::Vec2D Physics::Vec2D::right_normal() {
 	return {y, -x};
 }
 
-const Vec2D Vec2D::operator+(const Vec2D &rhs) const {
+const Physics::Vec2D Physics::Vec2D::operator+(const Physics::Vec2D &rhs) const {
 	return {x + rhs.x, y + rhs.y};
 }
 
-const Vec2D Vec2D::operator-(const Vec2D &rhs) const {
+const Physics::Vec2D Physics::Vec2D::operator-(const Physics::Vec2D &rhs) const {
 	return {x - rhs.x, y - rhs.y};
 }
 
-const Vec2D Vec2D::operator*(float scalar) const {
+const Physics::Vec2D Physics::Vec2D::operator*(float scalar) const {
 	return {scalar * x, scalar * y};
 }
 
-const Vec2D Vec2D::operator/(float scalar) const {
+const Physics::Vec2D Physics::Vec2D::operator/(float scalar) const {
 	return {x / scalar, y / scalar};
 }
 
-const Vec2D Vec2D::operator-() const {
+const Physics::Vec2D Physics::Vec2D::operator-() const {
 	return {-x, -y};
 }
 
-Vec2D &Vec2D::operator+=(const Vec2D &rhs) {
+Physics::Vec2D &Physics::Vec2D::operator+=(const Physics::Vec2D &rhs) {
 	x += rhs.x;
 	y += rhs.y;
 	return *this;
 }
 
-Vec2D &Vec2D::operator-=(const Vec2D &rhs) {
+Physics::Vec2D &Physics::Vec2D::operator-=(const Physics::Vec2D &rhs) {
 	x -= rhs.x;
 	y -= rhs.y;
 	return *this;
 }
 
-Vec2D &Vec2D::operator*=(float scalar) {
+Physics::Vec2D &Physics::Vec2D::operator*=(float scalar) {
 	x *= scalar;
 	y *= scalar;
 	return *this;
 }
 
-Vec2D &Vec2D::operator/=(float scalar) {
+Physics::Vec2D &Physics::Vec2D::operator/=(float scalar) {
 	x /= scalar;
 	y /= scalar;
 	return *this;
 }
 
-Vec2D &Vec2D::normalize() {
+Physics::Vec2D &Physics::Vec2D::normalize() {
 	float mag = length();
 	if(mag != 0.0) {
 		x /= mag;
@@ -159,7 +159,7 @@ Vec2D &Vec2D::normalize() {
 	return *this;
 }
 
-Vec2D &Vec2D::transform(const Mat2D &rhs) {
+Physics::Vec2D &Physics::Vec2D::transform(const Physics::Mat2D &rhs) {
 	float new_x = rhs.a*x + rhs.b*y;
 	float new_y = rhs.c*x + rhs.d*y;
 	x = new_x;
@@ -167,18 +167,18 @@ Vec2D &Vec2D::transform(const Mat2D &rhs) {
 	return *this;
 }
 
-float Vec2D::operator*(const Vec2D &rhs) const {
+float Physics::Vec2D::operator*(const Physics::Vec2D &rhs) const {
 	return x * rhs.x + y * rhs.y;
 }
 
-float Vec2D::cross(const Vec2D &rhs) const {
+float Physics::Vec2D::cross(const Physics::Vec2D &rhs) const {
 	return x * rhs.y - y * rhs.x;
 }
 
-bool Vec2D::operator==(const Vec2D &rhs) const {
+bool Physics::Vec2D::operator==(const Physics::Vec2D &rhs) const {
 	return (x == rhs.x && y == rhs.y);
 }
 
-bool Vec2D::operator!=(const Vec2D &rhs) const {
+bool Physics::Vec2D::operator!=(const Physics::Vec2D &rhs) const {
 	return (x != rhs.x || y != rhs.y);
 }

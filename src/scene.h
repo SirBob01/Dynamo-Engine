@@ -1,5 +1,5 @@
-#ifndef GAME_SCENE
-#define GAME_SCENE
+#ifndef DYNAMO_SCENE_H_
+#define DYNAMO_SCENE_H_
 
 #include <SDL2/SDL.h>
 #include <unordered_set>
@@ -10,38 +10,50 @@
 #include "inputs.h"
 #include "clock.h"
 
-// Objects that need to be passed from scene to scene
-struct GameModules {
-	GameDisplay *display;
-	GameTextures *textures;
-	GameJukebox *jukebox;
-	GameInputs *inputs;
-	GameClock *clock;
-};
+namespace Dynamo {
+	// Singleton objects that need to be passed from scene to scene
+	struct Modules {
+		Display *display;
+		Textures *textures;
+		Jukebox *jukebox;
+		Inputs *inputs;
+		Clock *clock;
+	};
 
-class GameScene {	
-	bool alive;
+	class Scene {	
+		bool alive;
 
-protected:
-	GameScene *parent_scene;
-	GameScene *child_scene;
-	
-	GameModules *modules;
+	protected:
+		Scene *parent_scene;
+		Scene *child_scene;
+		
+		Modules *modules;
 
-public:
-	GameScene(GameScene *p, GameModules *c);
-	virtual ~GameScene();
+	public:
+		Scene(Scene *parent, Modules *m);
+		virtual ~Scene();
 
-	void kill();
-	bool get_alive();
+		// Kill the current scene
+		void kill();
 
-	GameScene *get_parent();
-	GameScene *get_child();
+		// Check if the current scene is alive
+		bool get_alive();
 
-	void set_child(GameScene *next);
+		// Get the previus scene
+		Scene *get_parent();
+		
+		// Get the next scene
+		Scene *get_child();
 
-	virtual void update();
-	virtual void draw();
-};
+		// Set the next scene after this one dies
+		void set_child(Scene *next);
+
+		// Handle scene logic
+		virtual void update();
+
+		// Draw all renderable scene objects
+		virtual void draw();
+	};
+}
 
 #endif

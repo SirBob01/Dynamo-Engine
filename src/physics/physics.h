@@ -1,5 +1,5 @@
-#ifndef GAME_PHYSICS_MAIN
-#define GAME_PHYSICS_MAIN
+#ifndef DYNAMO_PHYSICS_MAIN_H_
+#define DYNAMO_PHYSICS_MAIN_H_
 
 #include "world.h"
 #include "narrow.h"

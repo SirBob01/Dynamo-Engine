@@ -1,32 +1,32 @@
 #include "engine.h"
 
-GameEngine::GameEngine(int width, int height, std::string title) {
+Dynamo::Engine::Engine(int width, int height, std::string title) {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	// Should probably find a better version to do this...
-	modules = new GameModules();
-	modules->display = new GameDisplay(width, height, title);
-	modules->textures = new GameTextures(modules->display->get_renderer());
-	modules->jukebox = new GameJukebox();
-	modules->inputs = new GameInputs();
-	modules->clock = new GameClock();
+	// Ugly ass singleton code
+	modules = new Modules();
+	modules->display = new Display(width, height, title);
+	modules->textures = new Textures(modules->display->get_renderer());
+	modules->jukebox = new Jukebox();
+	modules->inputs = new Inputs();
+	modules->clock = new Clock();
 
 	running = false;
 }
 
-bool GameEngine::get_running() {
+bool Dynamo::Engine::get_running() {
 	return running;
 }
 
-GameModules *GameEngine::get_modules() {
+Dynamo::Modules *Dynamo::Engine::get_modules() {
 	return modules;
 }
 
-void GameEngine::push_scene(GameScene *scene) {
+void Dynamo::Engine::push_scene(Scene *scene) {
 	scene_stack.push(scene);
 }
 
-void GameEngine::run(int fps_cap) {
+void Dynamo::Engine::run(int fps_cap) {
 	modules->clock->tick();
 	modules->inputs->poll();
 	
@@ -34,11 +34,11 @@ void GameEngine::run(int fps_cap) {
 		stop();
 	}
 	else {
-		GameScene *current_scene = scene_stack.top();
+		Scene *current_scene = scene_stack.top();
 		current_scene->update();
 		current_scene->draw();
 
-		GameScene *next_scene = current_scene->get_child();
+		Scene *next_scene = current_scene->get_child();
 		current_scene->set_child(nullptr);
 
 		// Only pop a scene if it is "dead"
@@ -62,15 +62,15 @@ void GameEngine::run(int fps_cap) {
 	modules->clock->set_fps(fps_cap);
 }
 
-void GameEngine::start() {
+void Dynamo::Engine::start() {
 	running = true;
 }
 
-void GameEngine::stop() {
+void Dynamo::Engine::stop() {
 	running = false;
 }
 
-void GameEngine::quit() {
+void Dynamo::Engine::quit() {
 	delete modules->display;
 	delete modules->textures;
 	delete modules->jukebox;

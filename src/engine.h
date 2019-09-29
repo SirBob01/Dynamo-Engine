@@ -1,30 +1,44 @@
-#ifndef GAME_ENGINE
-#define GAME_ENGINE
+#ifndef DYNAMO_ENGINE_H_
+#define DYNAMO_ENGINE_H_
 
 #include <SDL2/SDL.h>
+
 #include <string>
 #include <stack>
 
 #include "scene.h"
 
-class GameEngine {
-	GameModules *modules;
-	std::stack<GameScene *> scene_stack;
+namespace Dynamo {
+	class Engine {
+		Modules *modules;
+		std::stack<Scene *> scene_stack;
 
-	bool running;
+		bool running;
 
-public:
-	GameEngine(int width, int height, std::string title);
+	public:
+		Engine(int width, int height, std::string title);
 
-	bool get_running();
-	GameModules *get_modules();
+		// Check if the engine is running
+		bool get_running();
 
-	void push_scene(GameScene *scene);
-	
-	void run(int fps_cap);
-	void start();
-	void stop();
-	void quit();
-};
+		// Get the module components for each scene
+		Modules *get_modules();
+
+		// Add a new scene to the stack
+		void push_scene(Scene *scene);
+		
+		// Perform a single frame update
+		void run(int fps_cap);
+
+		// Start the application
+		void start();
+
+		// Pause the application
+		void stop();
+
+		// Uninitialize all modules and free memory
+		void quit();
+	};
+}
 
 #endif

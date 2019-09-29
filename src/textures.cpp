@@ -1,16 +1,16 @@
 #include "textures.h"
 
-GameTextures::GameTextures(SDL_Renderer *r) {
+Dynamo::Textures::Textures(SDL_Renderer *r) {
 	renderer = r;
 	TTF_Init();
 }
 
-GameTextures::~GameTextures() {
+Dynamo::Textures::~Textures() {
 	clear_all();
 	TTF_Quit();
 }
 
-void GameTextures::load_surface(std::string id, int width, int height) {
+void Dynamo::Textures::load_surface(std::string id, int width, int height) {
 	if(texture_map.count(id)) {
 		SDL_DestroyTexture(texture_map[id]);
 	}
@@ -27,7 +27,7 @@ void GameTextures::load_surface(std::string id, int width, int height) {
 	SDL_FreeSurface(surface);
 }
 
-void GameTextures::load_image(std::string id, std::string filename) {
+void Dynamo::Textures::load_image(std::string id, std::string filename) {
 	if(texture_map.count(id)) {
 		SDL_DestroyTexture(texture_map[id]);
 	}
@@ -35,7 +35,7 @@ void GameTextures::load_image(std::string id, std::string filename) {
 	texture_map[id] = IMG_LoadTexture(renderer, filename.c_str());
 }
 
-void GameTextures::load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color) {
+void Dynamo::Textures::load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color) {
 	if(texture_map.count(id)) {
 		SDL_DestroyTexture(texture_map[id]);
 	}
@@ -45,7 +45,7 @@ void GameTextures::load_text(std::string id, std::string text, std::string font_
 	SDL_FreeSurface(surf);
 }
 
-void GameTextures::load_font(std::string font_id, std::string filename, int size) {
+void Dynamo::Textures::load_font(std::string font_id, std::string filename, int size) {
 	if(fonts.count(font_id)) {
 		TTF_CloseFont(fonts[font_id]);
 	}
@@ -53,11 +53,11 @@ void GameTextures::load_font(std::string font_id, std::string filename, int size
 	fonts[font_id] = TTF_OpenFont(filename.c_str(), size);
 }
 
-SDL_Texture *GameTextures::get_texture(std::string id) {
+SDL_Texture *Dynamo::Textures::get_texture(std::string id) {
 	return texture_map[id];
 }
 
-void GameTextures::clear_all() {
+void Dynamo::Textures::clear_all() {
 	for(auto &item : texture_map) {
 		SDL_DestroyTexture(item.second);
 	}

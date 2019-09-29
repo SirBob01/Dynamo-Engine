@@ -1,5 +1,5 @@
-#ifndef GAME_PHYSICS_BROAD
-#define GAME_PHYSICS_BROAD
+#ifndef DYNAMO_PHYSICS_BROAD_H_
+#define DYNAMO_PHYSICS_BROAD_H_
 
 #include <stack>
 
@@ -10,42 +10,44 @@
 #include "common.h"
 #include "vec2d.h"
 
-struct PhysicsPair {
-	PhysicsBody *a;
-	PhysicsBody *b;
-};
+namespace Physics {
+	struct Pair {
+		Body *a;
+		Body *b;
+	};
 
-struct PhysicsProjection {
-	float min, max;
+	struct Projection {
+		float min, max;
 
-	float get_range();
-	
-	bool is_overlapping(const PhysicsProjection &b);
-};
+		float get_range();
+		
+		bool is_overlapping(const Projection &b);
+	};
 
-// TODO: Implement bounding volume hierarchy
-struct PhysicsAABB {
-	PhysicsProjection x;
-	PhysicsProjection y;
+	// TODO: Implement bounding volume hierarchy
+	struct AABB {
+		Projection x;
+		Projection y;
 
-	PhysicsAABB *left = nullptr;
-	PhysicsAABB *right = nullptr;
+		AABB *left = nullptr;
+		AABB *right = nullptr;
 
-	float get_width();
-	float get_height();
-	float get_volume();
+		float get_width();
+		float get_height();
+		float get_volume();
 
-	void add_volume(const PhysicsAABB &b);
+		void add_volume(const AABB &b);
 
-	bool is_colliding(const PhysicsAABB &b);
-};
+		bool is_colliding(const AABB &b);
+	};
 
-PhysicsAABB Physics_get_aabb_polygon(PhysicsPolygon *poly, PhysicsBody *body);
+	AABB get_aabb_polygon(Polygon *poly, Body *body);
 
-PhysicsAABB Physics_get_aabb_circle(PhysicsCircle *circle, PhysicsBody *body);
+	AABB get_aabb_circle(Circle *circle, Body *body);
 
-PhysicsAABB Physics_get_aabb_edge(PhysicsEdge *edge, PhysicsBody *body);
+	AABB get_aabb_edge(Edge *edge, Body *body);
 
-PhysicsAABB Physics_get_aabb(PhysicsBody *body);
+	AABB get_aabb(Body *body);
+}
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef GAME_PHYSICS_WORLD
-#define GAME_PHYSICS_WORLD
+#ifndef DYNAMO_PHYSICS_WORLD_H_
+#define DYNAMO_PHYSICS_WORLD_H_
 
 #include <vector>
 
@@ -8,30 +8,32 @@
 #include "broad.h"
 #include "vec2d.h"
 
-class PhysicsWorld {
-	std::vector<PhysicsBody *> bodies;
-	std::vector<PhysicsPair> pairs;
+namespace Physics {
+	class World {
+		std::vector<Body *> bodies;
+		std::vector<Pair> pairs;
 
-	Vec2D world_forces;
+		Vec2D world_forces;
 
-public:
-	PhysicsWorld(Vec2D forces);
+	public:
+		World(Vec2D forces);
 
-	~PhysicsWorld();
+		~World();
 
-	PhysicsBody *create_body(PhysicsBodyDef body_def);
+		Body *create_body(BodyDef body_def);
 
-	void clear_bodies();
+		void clear_bodies();
 
-	std::vector<PhysicsBody *> &get_bodies();
+		std::vector<Body *> &get_bodies();
 
-	void update_pairs();
+		void update_pairs();
 
-	void solve(PhysicsPair *pair);
+		void solve(Pair *pair);
 
-	void step(float dt);
+		void step(float dt);
 
-	void update(float dt);
-};
+		void update(float dt);
+	};
+}
 
 #endif

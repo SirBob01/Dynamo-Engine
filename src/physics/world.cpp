@@ -1,21 +1,21 @@
 #include "world.h"
 
-PhysicsWorld::PhysicsWorld(Vec2D forces) {
+Physics::World::World(Physics::Vec2D forces) {
 	world_forces = forces;
 }
 
-PhysicsWorld::~PhysicsWorld() {
+Physics::World::~World() {
 	clear_bodies();
 }
 
-PhysicsBody *PhysicsWorld::create_body(PhysicsBodyDef body_def) {
-	PhysicsBody *b = new PhysicsBody(body_def);
+Physics::Body *Physics::World::create_body(Physics::BodyDef body_def) {
+	Body *b = new Body(body_def);
 	bodies.push_back(b);
 
 	return b;
 }
 
-void PhysicsWorld::clear_bodies() {
+void Physics::World::clear_bodies() {
 	// Clear all bodies
 	for(auto &b : bodies) {
 		delete b;
@@ -23,21 +23,21 @@ void PhysicsWorld::clear_bodies() {
 	bodies.clear();
 }
 
-std::vector<PhysicsBody *> &PhysicsWorld::get_bodies() {
+std::vector<Physics::Body *> &Physics::World::get_bodies() {
 	return bodies;
 }
 
-void PhysicsWorld::update_pairs() {
+void Physics::World::update_pairs() {
 	// TODO: Implement dynamic bounding volume tree for broad phase
 	// Naive broad phase O(n^2) :(
 	pairs.clear();
 	for(int i = 0; i < bodies.size() - 1; i++) {
 		for(int j = i + 1; j < bodies.size(); j++) {
-			PhysicsBody *b1 = bodies[i];
-			PhysicsBody *b2 = bodies[j];
+			Body *b1 = bodies[i];
+			Body *b2 = bodies[j];
 
-			PhysicsAABB aabb1 = Physics_get_aabb(b1);
-			PhysicsAABB aabb2 = Physics_get_aabb(b2);
+			AABB aabb1 = get_aabb(b1);
+			AABB aabb2 = get_aabb(b2);
 			if(aabb1.is_colliding(aabb2)) {
 				pairs.push_back({b1, b2});
 			}
@@ -45,17 +45,17 @@ void PhysicsWorld::update_pairs() {
 	}
 }
 
-void PhysicsWorld::solve(PhysicsPair *pair) {
+void Physics::World::solve(Physics::Pair *pair) {
 	// Resolve pair collisions
-	for(PhysicsFixture *f1 = pair->a->get_fixtures(); f1; f1 = f1->next) {
-		for(PhysicsFixture *f2 = pair->b->get_fixtures(); f2; f2 = f2->next) {				
-			PhysicsManifold m = Physics_colliding(pair, f1, f2);
-			Physics_resolve_impulse(&m);
+	for(Fixture *f1 = pair->a->get_fixtures(); f1; f1 = f1->next) {
+		for(Fixture *f2 = pair->b->get_fixtures(); f2; f2 = f2->next) {				
+			Manifold m = colliding(pair, f1, f2);
+			resolve_impulse(&m);
 		}
 	}
 }
 
-void PhysicsWorld::step(float dt) {
+void Physics::World::step(float dt) {
 	for(auto &pair : pairs) {
 		solve(&pair);
 	}
@@ -68,7 +68,7 @@ void PhysicsWorld::step(float dt) {
 		float angle = b->get_angle();
 		float angular_vel = b->get_angular_vel();
 
-		if(b->get_type() == PHYSICS_BODY_DYNAMIC) {
+		if(b->get_type() == BODY_DYNAMIC) {
 			// Acceleration = force / net_mass of body
 			vel += world_forces / b->get_mass() * dt;
 		}
@@ -87,7 +87,7 @@ void PhysicsWorld::step(float dt) {
 	}
 }
 
-void PhysicsWorld::update(float dt) {
+void Physics::World::update(float dt) {
 	update_pairs();
 	step(dt);
 }
