@@ -36,7 +36,7 @@ namespace Dynamo {
 	SDL_Renderer *Display::get_renderer() {
 		return renderer_;
 	}
-	
+
 	int Display::get_width() {
 		return logic_w_;
 	}
@@ -59,12 +59,12 @@ namespace Dynamo {
 		SDL_SetWindowTitle(window_, title.c_str());
 	}
 
-	void Display::set_fill(uint32_t rgb_color) {
-		draw_rect(0, 0, logic_w_, logic_h_, rgb_color, true);
+	void Display::set_fill(Color color) {
+		draw_rect(0, 0, logic_w_, logic_h_, color, true);
 	}
 
-	void Display::set_borderfill(uint32_t rgb_color) {
-		border_color_ = hex_to_rgb(rgb_color);
+	void Display::set_borderfill(Color color) {
+		border_color_ = color;
 	}
 
 	void Display::draw_sprite(Sprite *sprite) {
@@ -81,33 +81,30 @@ namespace Dynamo {
 		}
 	}
 
-	void Display::draw_point(int x, int y, uint32_t rgb_color) {
-		SDL_Color color = hex_to_rgb(rgb_color);
+	void Display::draw_point(int x, int y, Color color) {
 		SDL_SetRenderDrawColor(
 			renderer_, 
-			color.r, color.g, color.b, 0xFF
+			color.r, color.g, color.b, color.a
 		);
 		SDL_RenderDrawPoint(renderer_, x, y);
 	}
 
 	void Display::draw_line(int x1, int y1, 
 							int x2, int y2, 
-							uint32_t rgb_color) {
-		SDL_Color color = hex_to_rgb(rgb_color);
+							Color color) {
 		SDL_SetRenderDrawColor(
 			renderer_, 
-			color.r, color.g, color.b, 0xFF
+			color.r, color.g, color.b, color.a
 		);
 		SDL_RenderDrawLine(renderer_, x1, y1, x2, y2);
 	}
 
 	void Display::draw_rect(int x, int y, int w, int h, 
-							uint32_t rgb_color, bool fill) {
+							Color color, bool fill) {
 		SDL_Rect rect = {x, y, w, h};
-		SDL_Color color = hex_to_rgb(rgb_color);
 		SDL_SetRenderDrawColor(
 			renderer_, 
-			color.r, color.g, color.b, 0xFF
+			color.r, color.g, color.b, color.a
 		);
 		if(fill) {
 			SDL_RenderFillRect(renderer_, &rect);
@@ -118,7 +115,7 @@ namespace Dynamo {
 	}
 
 	void Display::draw_circle(int cx, int cy, int r, 
-							  uint32_t rgb_color, bool fill) {
+							  Color color, bool fill) {
 		// Midpoint algorithm
 		int x = r;
 		int y = 0;
@@ -126,20 +123,20 @@ namespace Dynamo {
 
 		while(x >= y) {
 			if(!fill) {
-				draw_point(cx+x, cy+y, rgb_color);
-				draw_point(cx+x, cy-y, rgb_color);
-				draw_point(cx-x, cy+y, rgb_color);
-				draw_point(cx-x, cy-y, rgb_color);
-				draw_point(cx+y, cy+x, rgb_color);
-				draw_point(cx+y, cy-x, rgb_color);
-				draw_point(cx-y, cy+x, rgb_color);
-				draw_point(cx-y, cy-x, rgb_color);
+				draw_point(cx+x, cy+y, color);
+				draw_point(cx+x, cy-y, color);
+				draw_point(cx-x, cy+y, color);
+				draw_point(cx-x, cy-y, color);
+				draw_point(cx+y, cy+x, color);
+				draw_point(cx+y, cy-x, color);
+				draw_point(cx-y, cy+x, color);
+				draw_point(cx-y, cy-x, color);
 			}
 			else {
-				draw_line(cx+x, cy+y, cx-x, cy+y, rgb_color);
-				draw_line(cx+y, cy+x, cx-y, cy+x, rgb_color);
-				draw_line(cx+x, cy-y, cx-x, cy-y, rgb_color);
-				draw_line(cx+y, cy-x, cx-y, cy-x, rgb_color);
+				draw_line(cx+x, cy+y, cx-x, cy+y, color);
+				draw_line(cx+y, cy+x, cx-y, cy+x, color);
+				draw_line(cx+x, cy-y, cx-x, cy-y, color);
+				draw_line(cx+y, cy-x, cx-y, cy-x, color);
 			}
 			if(p <= 0) {
 				p += 2*y + 1;

@@ -4,15 +4,15 @@
 #include <SDL2/SDL.h>
 
 namespace Dynamo {
-	// Convert rgb(a) values to hexidecimal
-	uint32_t rgba_to_hex(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-	
-	uint32_t rgb_to_hex(uint8_t r, uint8_t g, uint8_t b);
+	struct Color {
+		uint8_t r, g, b; 
+		uint8_t a = 255; // Default alpha value
 
-	// Convert hexidecimal to SDL color values
-	SDL_Color hex_to_rgba(uint32_t rgba_color);
-	
-	SDL_Color hex_to_rgb(uint32_t rgb_color);
+		// Convert color to hexidecimal
+		uint32_t get_hex();
+	};
+
+	Color color_from_hex(uint32_t rgba);
 }
 
 

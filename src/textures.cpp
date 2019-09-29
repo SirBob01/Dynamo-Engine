@@ -46,7 +46,7 @@ namespace Dynamo {
 	}
 
 	void Textures::load_text(std::string id, std::string text, 
-							 std::string font_id, uint32_t rgb_color) {
+							 std::string font_id, Color color) {
 		if(texture_map_.count(id)) {
 			SDL_DestroyTexture(texture_map_[id]);
 		}
@@ -54,7 +54,7 @@ namespace Dynamo {
 		SDL_Surface *surf = TTF_RenderText_Solid(
 			fonts_[font_id], 
 			text.c_str(), 
-			hex_to_rgb(rgb_color)
+			{color.r, color.g, color.b, color.a}
 		);
 		texture_map_[id] = SDL_CreateTextureFromSurface(
 			renderer_, 

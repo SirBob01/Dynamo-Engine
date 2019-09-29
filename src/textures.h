@@ -25,7 +25,7 @@ namespace Dynamo {
 		// If texture exists, it is overwritten to prevent memory leaks
 		void load_surface(std::string id, int width, int height);
 		void load_image(std::string id, std::string filename);
-		void load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color);
+		void load_text(std::string id, std::string text, std::string font_id, Color color);
 		void load_font(std::string font_id, std::string filename, int size);
 
 		// Get a texture from an id key

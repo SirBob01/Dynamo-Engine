@@ -11,8 +11,8 @@ namespace Dynamo {
 
 	Scene::~Scene() {
 		// Default black fill
-		modules_->display->set_fill(0x000000);
-		modules_->display->set_borderfill(0x000000);
+		modules_->display->set_fill({0, 0, 0});
+		modules_->display->set_borderfill({0, 0, 0});
 	}
 
 	void Scene::kill() {
