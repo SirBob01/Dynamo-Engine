@@ -10,17 +10,18 @@
 
 namespace Dynamo::Physics {
 	class World {
-		std::vector<Body *> bodies;
-		std::vector<Pair> pairs;
+		std::vector<Body *> bodies_;
+		std::vector<Pair> pairs_;
 
-		Vec2D world_forces;
+		Vec2D world_forces_;
 
 	public:
 		World(Vec2D forces);
 
 		~World();
 
-		Body *create_body(BodyDef body_def);
+		// Create a new body in the world
+		Body *create_body(BodyDefinition body_def);
 
 		void clear_bodies();
 
@@ -28,10 +29,10 @@ namespace Dynamo::Physics {
 
 		void update_pairs();
 
+		// Do a collision solve for a single pair
 		void solve(Pair *pair);
 
-		void step(float dt);
-
+		// A single update frame
 		void update(float dt);
 	};
 }

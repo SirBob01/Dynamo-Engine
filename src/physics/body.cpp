@@ -1,141 +1,141 @@
 #include "body.h"
 
 namespace Dynamo::Physics {
-	Body::Body(BodyDef def) {
+	Body::Body(BodyDefinition def) {
 		// Default values
-		type = def.type;
+		type_ = def.type;
 
-		fixtures = nullptr;
-		net_mass = 0.0;
+		fixtures_ = nullptr;
+		net_mass_ = 0.0;
 
-		center = {0, 0};
-		offset = def.pos;
-		vel = def.vel;
+		center_ = {0, 0};
+		offset_ = def.pos;
+		vel_ = def.vel;
 
-		angular_vel = def.angular_vel;
-		inertia = 0.0;
+		angular_vel_ = def.angular_vel;
+		inertia_ = 0.0;
 
-		rotform = {1, 0,
+		rotform_ = {1, 0,
 				   0, 1};
 
 		set_angle(def.angle);
 	}
 
 	Body::~Body() {
-		Fixture *f = fixtures;
+		Fixture *f = fixtures_;
 		Fixture *next;
 		while(f != nullptr) {
 			next = f->next;
 			delete f;
 			f = next;
 		}
-		fixtures = nullptr;
+		fixtures_ = nullptr;
 	}
 
 	BODY_TYPE Body::get_type() {
-		return type;
+		return type_;
 	}
 
 	Fixture *Body::get_fixtures() {
-		return fixtures;
+		return fixtures_;
 	}
 
 	Vec2D Body::get_pos() {
-		return offset;
+		return offset_;
 	}
 
 	Vec2D Body::get_vel() {
-		return vel;
+		return vel_;
 	}
 
 	float Body::get_angle() {
-		return angle;
+		return angle_;
 	}
 
 	float Body::get_angular_vel() {
-		return angular_vel;
+		return angular_vel_;
 	}
 
 	float Body::get_inertia() {
-		return inertia;
+		return inertia_;
 	}
 
 	float Body::get_mass() {
-		return net_mass;
+		return net_mass_;
 	}
 
-	void Body::add_fixture(Fixture f) {
-		Fixture *fixture = new Fixture();
-		fixture->shape = f.shape;
-		fixture->density = f.density;
-		fixture->restitution = f.restitution;
-		fixture->friction = f.friction;
+	void Body::add_fixture(Fixture fixture) {
+		Fixture *new_f = new Fixture();
+		new_f->shape = fixture.shape;
+		new_f->density = fixture.density;
+		new_f->restitution = fixture.restitution;
+		new_f->friction = fixture.friction;
 
 		// Update net mass and center of mass
 		// center of mass = sum(centroid * m) / net_mass 
-		center *= net_mass;
-		float m = fixture->density * fixture->shape->get_volume();
-		center += fixture->shape->get_centroid() * m;
-		net_mass += m;
-		center /= net_mass;
+		center_ *= net_mass_;
+		float m = new_f->density * new_f->shape->get_volume();
+		center_ += new_f->shape->get_centroid() * m;
+		net_mass_ += m;
+		center_ /= net_mass_;
 
-		// Update inertia of fixture
-		fixture->inertia = f.shape->get_inertia(f.density);
+		// Update inertia of new_f
+		new_f->inertia = new_f->shape->get_inertia(fixture.density);
 
 		// Update inertia of body (parallel axis theorem)
-		Vec2D d = center - fixture->shape->get_centroid();
-		inertia = fixture->inertia - m*d.length_squared();
+		Vec2D d = center_ - new_f->shape->get_centroid();
+		inertia_ = new_f->inertia - m*d.length_squared();
 
-		if(fixtures == nullptr) {
-			fixtures = fixture;
+		if(fixtures_ == nullptr) {
+			fixtures_ = new_f;
 		}
 		else {
-			Fixture *current = fixtures;
+			Fixture *current = fixtures_;
 			while(current->next != nullptr) {
 				current = current->next;
 			}
-			current->next = fixture;
+			current->next = new_f;
 		}
 	}
 
-	void Body::set_pos(Vec2D v) {
-		offset = v;
+	void Body::set_pos(Vec2D pos) {
+		offset_ = pos;
 	}
 
-	void Body::set_vel(Vec2D v) {
-		vel = v;
+	void Body::set_vel(Vec2D vel) {
+		vel_ = vel;
 	}
 
 	void Body::set_angle(float radians) {
-		angle = wrap_val(radians, 0, 2*PI);
+		angle_ = wrap_val(radians, 0, 2*PI);
 
-		float s = sin(angle);
-		float c = cos(angle);
+		float s = sin(angle_);
+		float c = cos(angle_);
 
-		rotform.a = c;
-		rotform.b = -s;
-		rotform.c = s;
-		rotform.d = c;
+		rotform_.a = c;
+		rotform_.b = -s;
+		rotform_.c = s;
+		rotform_.d = c;
 	}
 
-	void Body::set_angular_vel(float radps) {
-		angular_vel = radps;
+	void Body::set_angular_vel(float rps) {
+		angular_vel_ = rps;
 	}
 
-	const Vec2D Body::convert_to_world(Vec2D local_point) {
-		local_point -= center;
-		return local_point.transform(rotform) + offset;
+	const Vec2D Body::convert_to_world(Vec2D local) {
+		local -= center_;
+		return local.transform(rotform_) + offset_;
 	}
 
-	const Vec2D Body::convert_to_local(Vec2D world_point) {
-		world_point -= offset;
-		return world_point.transform(rotform.inverse()) + center;
+	const Vec2D Body::convert_to_local(Vec2D world) {
+		world -= offset_;
+		return world.transform(rotform_.inverse()) + center_;
 	}
 
 	bool Body::is_stationary() {
 		// Body isn't moving in space
-		bool linear = (vel.x == 0 && vel.y == 0);
-		bool angular = (angular_vel == 0);
+		bool linear = (vel_.x == 0 && vel_.y == 0);
+		bool angular = (angular_vel_ == 0);
 		return linear && angular;
 	}
 }

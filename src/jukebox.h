@@ -10,16 +10,16 @@
 
 namespace Dynamo {
 	class Jukebox {
-		std::deque<std::pair<Mix_Music *, int>> music_stream;
-		std::deque<std::pair<Mix_Chunk *, int>> ambient_stream;
+		std::deque<std::pair<Mix_Music *, int>> music_stream_;
+		std::deque<std::pair<Mix_Chunk *, int>> ambient_stream_;
 
-		std::unordered_map<std::string, Mix_Music *> music_map;
-		std::unordered_map<std::string, Mix_Chunk *> chunk_map;
+		std::unordered_map<std::string, Mix_Music *> music_map_;
+		std::unordered_map<std::string, Mix_Chunk *> chunk_map_;
 		
-		int ambient_channel;
+		int ambient_channel_;
 
-		float master_volume;
-		float volume_conversion; // Conversion rate of SDL_Mixer volume
+		float master_volume_;
+		float volume_conversion_; // Conversion rate of SDL_Mixer volume
 		
 	public:
 		Jukebox();

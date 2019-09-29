@@ -7,7 +7,7 @@
 
 namespace Dynamo::Physics {
 	class Circle : public Shape {
-		float r;
+		float radius_;
 
 	public:
 		Circle(Vec2D center, float radius);

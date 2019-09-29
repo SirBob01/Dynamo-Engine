@@ -10,10 +10,10 @@
 
 namespace Dynamo {
 	class Engine {
-		Modules *modules;
-		std::stack<Scene *> scene_stack;
+		Modules *modules_;
+		std::stack<Scene *> scene_stack_;
 
-		bool running;
+		bool running_;
 
 	public:
 		Engine(int width, int height, std::string title);

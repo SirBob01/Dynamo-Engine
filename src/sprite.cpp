@@ -1,100 +1,100 @@
 #include "sprite.h"
 
 namespace Dynamo {
-	Sprite::Sprite(SDL_Texture *t, int frame_width, int frame_height) {
-		texture = t;
-		frame_w = frame_width;
-		frame_h = frame_height;
-		SDL_QueryTexture(texture, nullptr, nullptr, &texture_w, &texture_h);
+	Sprite::Sprite(SDL_Texture *texture, int frame_width, int frame_height) {
+		texture_ = texture;
+		frame_w_ = frame_width;
+		frame_h_ = frame_height;
+		SDL_QueryTexture(texture_, nullptr, nullptr, &texture_w_, &texture_h_);
 
-		target = new SDL_Rect();
+		target_ = new SDL_Rect();
 
-		accumulator = 0.0f;
-		if(!frame_w && !frame_h) {
-			max_frames = 1;
-			source.push_back(nullptr);
+		accumulator_ = 0.0f;
+		if(!frame_w_ && !frame_h_) {
+			max_frames_ = 1;
+			source_.push_back(nullptr);
 		}
 		else {
-			int hor_frames = texture_w / frame_w;
-			int ver_frames = texture_h / frame_h;
-			max_frames = hor_frames * ver_frames;
+			int hor_frames = texture_w_ / frame_w_;
+			int ver_frames = texture_h_ / frame_h_;
+			max_frames_ = hor_frames * ver_frames;
 
 			// Left to right, top to bottom
 			for(int j = 0; j < ver_frames; j++) {
 				for(int i = 0; i < hor_frames; i++) {
 					SDL_Rect *frame_rect = new SDL_Rect();
-					frame_rect->w = frame_w;
-					frame_rect->h = frame_h;
-					frame_rect->x = i*frame_w;
-					frame_rect->y = j*frame_h;
-					source.push_back(frame_rect);
+					frame_rect->w = frame_w_;
+					frame_rect->h = frame_h_;
+					frame_rect->x = i*frame_w_;
+					frame_rect->y = j*frame_h_;
+					source_.push_back(frame_rect);
 				}
 			}
 		}
 
-		current_frame = 0;
+		current_frame_ = 0;
 
-		finished = false;
+		finished_ = false;
 
-		angle = 0.0f;
-		hflip = false;
-		vflip = false;
-		visible = true;
+		angle_ = 0.0f;
+		hflip_ = false;
+		vflip_ = false;
+		visible_ = true;
 	}
 
 	Sprite::~Sprite() {
-		delete target;
-		for(auto &r : source) {
+		delete target_;
+		for(auto &r : source_) {
 			delete r;
 		}
-		source.clear();
+		source_.clear();
 	}
 
 	SDL_Texture *Sprite::get_texture() {
-		return texture;
+		return texture_;
 	}
 
 	int Sprite::get_width() {
-		return texture_w;
+		return texture_w_;
 	}
 
 	int Sprite::get_height() {
-		return texture_h;
+		return texture_h_;
 	}
 
 	int Sprite::get_frame_height() {
-		return frame_h;
+		return frame_h_;
 	}
 
 	int Sprite::get_frame_width() {
-		return frame_w;
+		return frame_w_;
 	}
 
 	SDL_Rect *Sprite::get_source() {
-		return source[current_frame];
+		return source_[current_frame_];
 	}
 
 	SDL_Rect *Sprite::get_target() {
-		return target;
+		return target_;
 	}
 
 	bool Sprite::get_visible() {
-		return visible;
+		return visible_;
 	}
 
 	float Sprite::get_angle() {
-		return angle;
+		return angle_;
 	}
 
 	SDL_RendererFlip Sprite::get_flip() {
 		SDL_RendererFlip flip = SDL_FLIP_NONE;
-		if(hflip && vflip) {
+		if(hflip_ && vflip_) {
 			flip = (SDL_RendererFlip)(SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
 		}
-		else if(hflip) {
+		else if(hflip_) {
 			flip = (SDL_RendererFlip)SDL_FLIP_HORIZONTAL;
 		}
-		else if(vflip) {
+		else if(vflip_) {
 			flip = (SDL_RendererFlip)SDL_FLIP_VERTICAL;
 		}
 		return flip;
@@ -102,33 +102,33 @@ namespace Dynamo {
 
 	uint8_t Sprite::get_alpha() {
 		uint8_t a;
-		SDL_GetTextureAlphaMod(texture, &a);
+		SDL_GetTextureAlphaMod(texture_, &a);
 		return a;
 	}
 
 	bool Sprite::get_finished() {
-		return finished;
+		return finished_;
 	}
 
-	void Sprite::set_visible(bool new_visible) {
-		visible = new_visible;
+	void Sprite::set_visible(bool visible) {
+		visible_ = visible;
 	}
 
-	void Sprite::set_angle(float new_angle) {
-		angle = new_angle;
+	void Sprite::set_angle(float angle) {
+		angle_ = angle;
 	}
 
-	void Sprite::set_flip(bool new_hflip, bool new_vflip) {
-		hflip = new_hflip;
-		vflip = new_vflip;
+	void Sprite::set_flip(bool hflip, bool vflip) {
+		hflip_ = hflip;
+		vflip_ = vflip;
 	}
 
-	void Sprite::set_alpha(uint8_t a) {
-		SDL_SetTextureAlphaMod(texture, a);
+	void Sprite::set_alpha(uint8_t alpha) {
+		SDL_SetTextureAlphaMod(texture_, alpha);
 	}
 
 	void Sprite::set_blend(SPRITE_BLEND mode) {
-		SDL_SetTextureBlendMode(texture, static_cast<SDL_BlendMode>(mode));
+		SDL_SetTextureBlendMode(texture_, static_cast<SDL_BlendMode>(mode));
 	}
 
 	void Sprite::set_target(int x, int y, int w, int h) {
@@ -137,26 +137,26 @@ namespace Dynamo {
 			set_visible(false);
 		}
 
-		target->x = x;
-		target->y = y;
-		target->w = w;
-		target->h = h;
+		target_->x = x;
+		target_->y = y;
+		target_->w = w;
+		target_->h = h;
 	}
 
 	void Sprite::animate(float dt, float fps, bool loop) {
-		accumulator += dt;
-		if(accumulator >= (1000.0/fps)) {
-			current_frame++;
-			accumulator = 0;
+		accumulator_ += dt;
+		if(accumulator_ >= (1000.0/fps)) {
+			current_frame_++;
+			accumulator_ = 0;
 		}
 
-		if(current_frame > max_frames-1) {
+		if(current_frame_ > max_frames_-1) {
 			if(loop) {
-				current_frame = 0;
+				current_frame_ = 0;
 			}
 			else {
-				current_frame = max_frames-1;
-				finished = true;
+				current_frame_ = max_frames_-1;
+				finished_ = true;
 			}
 		}
 	}

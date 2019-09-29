@@ -17,30 +17,30 @@ namespace Dynamo {
 	} SPRITE_BLEND;
 
 	class Sprite {
-		SDL_Texture *texture;
-		std::vector<SDL_Rect *> source;
+		SDL_Texture *texture_;
+		std::vector<SDL_Rect *> source_;
 
-		SDL_Rect *target;
+		SDL_Rect *target_;
 
-		int texture_w;
-		int texture_h;
-		int frame_w;
-		int frame_h;
+		int texture_w_;
+		int texture_h_;
+		int frame_w_;
+		int frame_h_;
 		
-		float accumulator;
-		int max_frames;
-		int current_frame;
+		float accumulator_;
+		int max_frames_;
+		int current_frame_;
 
-		bool finished;
+		bool finished_;
 		
 		// Draw modifiers
-		float angle;
-		bool hflip;
-		bool vflip;
-		bool visible;
+		float angle_;
+		bool hflip_;
+		bool vflip_;
+		bool visible_;
 
 	public:
-		Sprite(SDL_Texture *t, int frame_width, int frame_height);
+		Sprite(SDL_Texture *texture, int frame_width, int frame_height);
 		~Sprite();
 
 		// Get spritesheet texture (all frames)
@@ -76,16 +76,16 @@ namespace Dynamo {
 		bool get_finished();
 
 		// Set whether or not to draw the sprite
-		void set_visible(bool new_visible);
+		void set_visible(bool visible);
 
 		// Set angular rotation
-		void set_angle(float new_angle);
+		void set_angle(float angle);
 
 		// Set horizontal and vertical flip
-		void set_flip(bool new_hflip, bool new_vflip);
+		void set_flip(bool hflip, bool vflip);
 
 		// Set texture alpha channel
-		void set_alpha(uint8_t a);
+		void set_alpha(uint8_t alpha);
 
 		// Set texture blend mode
 		void set_blend(SPRITE_BLEND mode);

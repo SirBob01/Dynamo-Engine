@@ -1,22 +1,22 @@
 #include "shape.h"
 
 namespace Dynamo::Physics {
-	Shape::Shape(SHAPE_TYPE t) {
-		type = t;
-		centroid = {0, 0};
-		volume = 1;
+	Shape::Shape(SHAPE_TYPE type) {
+		type_ = type;
+		centroid_ = {0, 0};
+		volume_ = 1;
 	}
 
 	SHAPE_TYPE Shape::get_type() {
-		return type;
+		return type_;
 	}
 
 	Vec2D Shape::get_centroid() {
-		return centroid;
+		return centroid_;
 	}
 
 	float Shape::get_volume() {
-		return volume;
+		return volume_;
 	}
 
 	float Shape::get_inertia(float density) {

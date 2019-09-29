@@ -12,13 +12,13 @@
 
 namespace Dynamo {
 	class Textures {
-		SDL_Renderer *renderer;
+		SDL_Renderer *renderer_;
 		
-		std::unordered_map<std::string, TTF_Font *> fonts;
-		std::unordered_map<std::string, SDL_Texture *> texture_map;
+		std::unordered_map<std::string, TTF_Font *> fonts_;
+		std::unordered_map<std::string, SDL_Texture *> texture_map_;
 
 	public:
-		Textures(SDL_Renderer *r);
+		Textures(SDL_Renderer *renderer);
 		~Textures();
 
 		// Pre-load resources on Scene initialization

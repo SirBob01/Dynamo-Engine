@@ -5,19 +5,25 @@
 
 namespace Dynamo {
 	class Clock {
-		int frames;
-		int previous;
-		int current;
+		int frames_;
+		int previous_;
+		int current_;
 
-		float delta;
+		float delta_;
 
 	public:
 		Clock();
 
+		// Get the current number of frames
 		int get_frames();
+
+		// Get the delta time
 		float get_delta();
 
+		// Update the clock
 		void tick();
+
+		// Set the framerate cap
 		void set_fps(int fps);
 	};
 }

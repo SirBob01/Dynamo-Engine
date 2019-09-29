@@ -1,8 +1,8 @@
 #include "textures.h"
 
 namespace Dynamo {
-	Textures::Textures(SDL_Renderer *r) {
-		renderer = r;
+	Textures::Textures(SDL_Renderer *renderer) {
+		renderer_ = renderer;
 		TTF_Init();
 	}
 
@@ -12,8 +12,8 @@ namespace Dynamo {
 	}
 
 	void Textures::load_surface(std::string id, int width, int height) {
-		if(texture_map.count(id)) {
-			SDL_DestroyTexture(texture_map[id]);
+		if(texture_map_.count(id)) {
+			SDL_DestroyTexture(texture_map_[id]);
 		}
 
 		SDL_Surface *surface;
@@ -24,48 +24,48 @@ namespace Dynamo {
 			surface = SDL_CreateRGBSurface(0, width, height, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 		}
 		
-		texture_map[id] = SDL_CreateTextureFromSurface(renderer, surface);
+		texture_map_[id] = SDL_CreateTextureFromSurface(renderer_, surface);
 		SDL_FreeSurface(surface);
 	}
 
 	void Textures::load_image(std::string id, std::string filename) {
-		if(texture_map.count(id)) {
-			SDL_DestroyTexture(texture_map[id]);
+		if(texture_map_.count(id)) {
+			SDL_DestroyTexture(texture_map_[id]);
 		}
 
-		texture_map[id] = IMG_LoadTexture(renderer, filename.c_str());
+		texture_map_[id] = IMG_LoadTexture(renderer_, filename.c_str());
 	}
 
 	void Textures::load_text(std::string id, std::string text, std::string font_id, uint32_t rgb_color) {
-		if(texture_map.count(id)) {
-			SDL_DestroyTexture(texture_map[id]);
+		if(texture_map_.count(id)) {
+			SDL_DestroyTexture(texture_map_[id]);
 		}
 
-		SDL_Surface *surf = TTF_RenderText_Solid(fonts[font_id], text.c_str(), hex_to_rgb(rgb_color));
-		texture_map[id] = SDL_CreateTextureFromSurface(renderer, surf);
+		SDL_Surface *surf = TTF_RenderText_Solid(fonts_[font_id], text.c_str(), hex_to_rgb(rgb_color));
+		texture_map_[id] = SDL_CreateTextureFromSurface(renderer_, surf);
 		SDL_FreeSurface(surf);
 	}
 
 	void Textures::load_font(std::string font_id, std::string filename, int size) {
-		if(fonts.count(font_id)) {
-			TTF_CloseFont(fonts[font_id]);
+		if(fonts_.count(font_id)) {
+			TTF_CloseFont(fonts_[font_id]);
 		}
 
-		fonts[font_id] = TTF_OpenFont(filename.c_str(), size);
+		fonts_[font_id] = TTF_OpenFont(filename.c_str(), size);
 	}
 
 	SDL_Texture *Textures::get_texture(std::string id) {
-		return texture_map[id];
+		return texture_map_[id];
 	}
 
 	void Textures::clear_all() {
-		for(auto &item : texture_map) {
+		for(auto &item : texture_map_) {
 			SDL_DestroyTexture(item.second);
 		}
-		for(auto &font : fonts) {
+		for(auto &font : fonts_) {
 			TTF_CloseFont(font.second);
 		}
-		texture_map.clear();
-		fonts.clear();
+		texture_map_.clear();
+		fonts_.clear();
 	}
 }

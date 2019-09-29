@@ -21,16 +21,16 @@ namespace Dynamo {
 	};
 
 	class Scene {	
-		bool alive;
+		bool alive_;
 
 	protected:
-		Scene *parent_scene;
-		Scene *child_scene;
+		Scene *parent_;
+		Scene *child_;
 		
-		Modules *modules;
+		Modules *modules_;
 
 	public:
-		Scene(Scene *parent, Modules *mods);
+		Scene(Scene *parent, Modules *modules);
 		virtual ~Scene();
 
 		// Kill the current scene

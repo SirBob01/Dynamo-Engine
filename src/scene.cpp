@@ -1,39 +1,39 @@
 #include "scene.h"
 
 namespace Dynamo {
-	Scene::Scene(Scene *parent, Modules *m) {
-		modules = m;
+	Scene::Scene(Scene *parent, Modules *modules) {
+		modules_ = modules;
 		
-		parent_scene = parent;
-		child_scene = nullptr;
-		alive = true;
+		parent_ = parent;
+		child_ = nullptr;
+		alive_ = true;
 	}
 
 	Scene::~Scene() {
 		// Default black fill
-		modules->display->set_fill(0x000000);
-		modules->display->set_borderfill(0x000000);
+		modules_->display->set_fill(0x000000);
+		modules_->display->set_borderfill(0x000000);
 	}
 
 	void Scene::kill() {
 		// Allows engine to transition to next scene
-		alive = false;
+		alive_ = false;
 	}
 
 	bool Scene::get_alive() {
-		return alive;
+		return alive_;
 	}
 
 	Scene *Scene::get_parent() {
-		return parent_scene;
+		return parent_;
 	}
 
 	Scene *Scene::get_child() {
-		return child_scene;
+		return child_;
 	}
 
 	void Scene::set_child(Scene *next) {
-		child_scene = next;
+		child_ = next;
 	}
 
 	void Scene::update() {

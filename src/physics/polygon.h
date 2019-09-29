@@ -7,13 +7,13 @@
 
 namespace Dynamo::Physics {
 	class Polygon : public Shape {
-		Vec2D *vertexes;
-		Vec2D *normals;
+		Vec2D *vertexes_;
+		Vec2D *normals_;
 
-		int sides;
+		int sides_;
 
 	public:
-		Polygon(Vec2D verts[], int n);
+		Polygon(Vec2D vertexes[], int n);
 		
 		~Polygon();
 

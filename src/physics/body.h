@@ -24,7 +24,7 @@ namespace Dynamo::Physics {
 		Fixture *next = nullptr;
 	};
 
-	struct BodyDef {
+	struct BodyDefinition {
 		BODY_TYPE type;
 
 		Vec2D pos;
@@ -34,29 +34,30 @@ namespace Dynamo::Physics {
 	};
 
 	class Body {
-		BODY_TYPE type;
+		BODY_TYPE type_;
 
-		Fixture *fixtures;
-		float net_mass;
+		Fixture *fixtures_;
+		float net_mass_;
 
-		Vec2D center;
-		Vec2D offset;
-		Vec2D vel;
+		Vec2D center_;
+		Vec2D offset_;
+		Vec2D vel_;
 
-		float angle;
-		float angular_vel;
-		float inertia;
+		float angle_;
+		float angular_vel_;
+		float inertia_;
 
-		Mat2D rotform;
+		Mat2D rotform_;
 
 	public:
-		Body(BodyDef def);
+		Body(BodyDefinition def);
 		~Body();
 
 		BODY_TYPE get_type();
+
+		// Get the linked list of fixtures
 		Fixture *get_fixtures();
 
-		Vec2D get_center();
 		Vec2D get_pos();
 		Vec2D get_vel();
 
@@ -68,17 +69,18 @@ namespace Dynamo::Physics {
 
 		// Allows for more complex figures
 		// E.g. Multiple shapes can simulate concave/rounded polygons
-		void add_fixture(Fixture f);
+		void add_fixture(Fixture fixture);
 
 		// Hard-set linear and angular components
-		void set_pos(Vec2D v);
-		void set_vel(Vec2D v);
+		void set_pos(Vec2D pos);
+		void set_vel(Vec2D vel);
 
 		void set_angle(float radians);
-		void set_angular_vel(float radps);
+		void set_angular_vel(float rps);
 
-		const Vec2D convert_to_world(Vec2D local_point);
-		const Vec2D convert_to_local(Vec2D world_point);
+		// Convert between coordinate systems
+		const Vec2D convert_to_world(Vec2D local);
+		const Vec2D convert_to_local(Vec2D world);
 
 		bool is_stationary();
 	};

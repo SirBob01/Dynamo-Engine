@@ -262,18 +262,18 @@ namespace Dynamo {
 	} INPUT;
 
 	class Inputs {
-		SDL_Event event;
+		SDL_Event event_;
 
-		std::unordered_map<std::string, INPUT> binds;
+		std::unordered_map<std::string, INPUT> binds_;
 
-		bool pressed[INPUT_LEN + 1];
-		bool released[INPUT_LEN + 1];
+		bool pressed_[INPUT_LEN + 1];
+		bool released_[INPUT_LEN + 1];
 		
-		std::string text_input;
+		std::string text_input_;
 
-		int mouse_x;
-		int mouse_y;
-		bool quit;
+		int mouse_x_;
+		int mouse_y_;
+		bool quit_;
 
 	public:
 		Inputs();

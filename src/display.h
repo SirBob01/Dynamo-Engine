@@ -10,16 +10,16 @@
 
 namespace Dynamo {
 	class Display {
-		int logic_width;
-		int logic_height;
+		int logic_w_;
+		int logic_h_;
 
-		int window_w;
-		int window_h;
+		int window_w_;
+		int window_h_;
 
-		SDL_Color border_color;
+		SDL_Color border_color_;
 
-		SDL_Window *window;
-		SDL_Renderer *renderer;
+		SDL_Window *window_;
+		SDL_Renderer *renderer_;
 
 	public:
 		Display(int width, int height, std::string title);

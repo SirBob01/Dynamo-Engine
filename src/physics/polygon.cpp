@@ -1,67 +1,67 @@
 #include "polygon.h"
 
 namespace Dynamo::Physics {
-	Polygon::Polygon(Vec2D *verts, int n) : Shape(SHAPE_POLYGON) {
+	Polygon::Polygon(Vec2D *vertexes, int n) : Shape(SHAPE_POLYGON) {
 		// Set vertexes
-		vertexes = new Vec2D[n];
+		vertexes_ = new Vec2D[n];
 		for(int i = 0; i < n; i++) {
-			vertexes[i] = verts[i];
+			vertexes_[i] = vertexes[i];
 		}
 
 		// Calculate normals
-		normals = new Vec2D[n];
+		normals_ = new Vec2D[n];
 		for(int i = 0; i < n; i++) {
-			Vec2D edge = vertexes[(i+1)%n] - vertexes[i];
-			normals[i] = edge.left_normal();
+			Vec2D edge = vertexes_[(i+1)%n] - vertexes_[i];
+			normals_[i] = edge.left_normal();
 		}
 
 		// Calculate volume
-		volume = 0;
+		volume_ = 0;
 		for(int i = 0; i < n; i++) {
-			Vec2D a = vertexes[i];
-			Vec2D b = vertexes[(i+1)%n];
-			volume += (a.x + b.x) * (a.y - b.y);
+			Vec2D a = vertexes_[i];
+			Vec2D b = vertexes_[(i+1)%n];
+			volume_ += (a.x + b.x) * (a.y - b.y);
 		}
-		volume = abs(volume);
-		volume /= 2;
+		volume_ = abs(volume_);
+		volume_ /= 2;
 
 		// Calculate centroid
-		centroid = {0, 0};
+		centroid_ = {0, 0};
 		for(int i = 0; i < n; i++) {
-			Vec2D a = vertexes[(i+1)%n];
-			Vec2D b = vertexes[i];
+			Vec2D a = vertexes_[(i+1)%n];
+			Vec2D b = vertexes_[i];
 
-			centroid.x += (a.x + b.x)*((a.x * b.y) - (a.y * b.x));
-			centroid.y += (a.y + b.y)*((a.x * b.y) - (a.y * b.x));
+			centroid_.x += (a.x + b.x)*((a.x * b.y) - (a.y * b.x));
+			centroid_.y += (a.y + b.y)*((a.x * b.y) - (a.y * b.x));
 		}
-		centroid /= (6 * volume);
+		centroid_ /= (6 * volume_);
 		
-		sides = n;
+		sides_ = n;
 	}
 
 	Polygon::~Polygon() {
-		delete vertexes;
-		delete normals;
+		delete vertexes_;
+		delete normals_;
 	}
 
 	int Polygon::get_sides() {
-		return sides;
+		return sides_;
 	}
 
 	Vec2D *Polygon::get_vertexes() {
-		return vertexes;
+		return vertexes_;
 	}
 
 	Vec2D *Polygon::get_normals() {
-		return normals;
+		return normals_;
 	}
 
 	float Polygon::get_inertia(float density) {
 		float I = 0.0;
 
-		for(int i = 0; i < sides; i++) {
-			Vec2D a = vertexes[i] - centroid;
-			Vec2D b = vertexes[(i+1)%sides] - centroid;
+		for(int i = 0; i < sides_; i++) {
+			Vec2D a = vertexes_[i] - centroid_;
+			Vec2D b = vertexes_[(i+1)%sides_] - centroid_;
 			
 			float D = a.cross(b);
 			float x2 = a.x*a.x + b.x*a.x + b.x*b.x;
@@ -76,11 +76,12 @@ namespace Dynamo::Physics {
 	bool Polygon::is_in_bounds(Vec2D local) {
 		// Winding number algorithm
 		int wn = 0;
-		for(int i = 0; i < sides; i++) {
-			Vec2D a = vertexes[i];
-			Vec2D b = vertexes[(i+1)%sides];
+		for(int i = 0; i < sides_; i++) {
+			Vec2D a = vertexes_[i];
+			Vec2D b = vertexes_[(i+1)%sides_];
 
-			float det = (b.x - a.x) * (local.y - a.y) - (b.y - a.y) * (local.x - a.x);
+			float det = ((b.x - a.x) * (local.y - a.y) 
+					   - (b.y - a.y) * (local.x - a.x));
 			if(a.y <= local.y) {
 				if(b.y > local.y and det > 0) {
 					++wn;

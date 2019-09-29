@@ -2,79 +2,79 @@
 
 namespace Dynamo {
 	Inputs::Inputs() {
-		text_input = "";
-		quit = false;
+		text_input_ = "";
+		quit_ = false;
 	}
 
 	void Inputs::poll() {
-		std::memset(pressed, false, (INPUT_LEN + 1) * sizeof(bool));
-		std::memset(released, false, (INPUT_LEN + 1) * sizeof(bool));
+		std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
+		std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
 		
-		SDL_GetMouseState(&mouse_x, &mouse_y);
+		SDL_GetMouseState(&mouse_x_, &mouse_y_);
 
-		while(SDL_PollEvent(&event)) {
-			if(event.type == SDL_QUIT) {
-				quit = true;
+		while(SDL_PollEvent(&event_)) {
+			if(event_.type == SDL_QUIT) {
+				quit_ = true;
 			}
-			if(event.type == SDL_MOUSEBUTTONDOWN) {
-				pressed[INPUT_MOUSELEFT] = (event.button.button == SDL_BUTTON_LEFT);
-				pressed[INPUT_MOUSEMIDDLE] = (event.button.button == SDL_BUTTON_MIDDLE);
-				pressed[INPUT_MOUSERIGHT] = (event.button.button == SDL_BUTTON_RIGHT);
+			if(event_.type == SDL_MOUSEBUTTONDOWN) {
+				pressed_[INPUT_MOUSELEFT] = (event_.button.button == SDL_BUTTON_LEFT);
+				pressed_[INPUT_MOUSEMIDDLE] = (event_.button.button == SDL_BUTTON_MIDDLE);
+				pressed_[INPUT_MOUSERIGHT] = (event_.button.button == SDL_BUTTON_RIGHT);
 			}
-			if(event.type == SDL_MOUSEBUTTONUP) {
-				released[INPUT_MOUSELEFT] = (event.button.button == SDL_BUTTON_LEFT);
-				released[INPUT_MOUSEMIDDLE] = (event.button.button == SDL_BUTTON_MIDDLE);
-				released[INPUT_MOUSERIGHT] = (event.button.button == SDL_BUTTON_RIGHT);
+			if(event_.type == SDL_MOUSEBUTTONUP) {
+				released_[INPUT_MOUSELEFT] = (event_.button.button == SDL_BUTTON_LEFT);
+				released_[INPUT_MOUSEMIDDLE] = (event_.button.button == SDL_BUTTON_MIDDLE);
+				released_[INPUT_MOUSERIGHT] = (event_.button.button == SDL_BUTTON_RIGHT);
 			}
-			if(event.type == SDL_KEYDOWN && event.key.repeat == 0) {
-				pressed[event.key.keysym.scancode] = true;
+			if(event_.type == SDL_KEYDOWN && event_.key.repeat == 0) {
+				pressed_[event_.key.keysym.scancode] = true;
 
 				// Special backspace event
-				if(text_input.size()) {
-					if(event.key.keysym.sym == SDLK_BACKSPACE) {
-						text_input.erase(text_input.size()-1);
+				if(text_input_.size()) {
+					if(event_.key.keysym.sym == SDLK_BACKSPACE) {
+						text_input_.erase(text_input_.size()-1);
 					}
 				}
 			}
-			if(event.type == SDL_KEYUP) {
-				released[event.key.keysym.scancode] = true;
+			if(event_.type == SDL_KEYUP) {
+				released_[event_.key.keysym.scancode] = true;
 			}
-			if(event.type == SDL_TEXTINPUT) {
-				text_input += event.text.text;
+			if(event_.type == SDL_TEXTINPUT) {
+				text_input_ += event_.text.text;
 			}
 		}
 	}
 
 	std::string Inputs::get_text_input() {
-		return text_input;
+		return text_input_;
 	}
 
 	void Inputs::reset_text_input() {
-		text_input = "";
+		text_input_ = "";
 	}
 
 	void Inputs::bind(std::string command, INPUT input) {
-		binds[command] = input;
+		binds_[command] = input;
 	}
 
 	INPUT Inputs::get_bind(std::string command) {
-		return binds[command];
+		return binds_[command];
 	}
 
 	bool Inputs::get_pressed(std::string command) {
-		return get_pressed_raw(binds[command]);
+		return get_pressed_raw(binds_[command]);
 	}
 
 	bool Inputs::get_released(std::string command) {
-		return get_released_raw(binds[command]);
+		return get_released_raw(binds_[command]);
 	}
 
 	bool Inputs::get_pressed_raw(INPUT input) {
-		return pressed[input];
+		return pressed_[input];
 	}
 
 	bool Inputs::get_released_raw(INPUT input) {
-		return released[input];
+		return released_[input];
 	}
 
 	std::string Inputs::get_name(INPUT input) {
@@ -101,14 +101,14 @@ namespace Dynamo {
 	}
 
 	int Inputs::get_mouse_x() {
-		return mouse_x;
+		return mouse_x_;
 	}
 
 	int Inputs::get_mouse_y() {
-		return mouse_y;
+		return mouse_y_;
 	}
 
 	bool Inputs::get_quit() {
-		return quit;
+		return quit_;
 	}
 }

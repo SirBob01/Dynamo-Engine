@@ -5,37 +5,37 @@ namespace Dynamo {
 		SDL_Init(SDL_INIT_EVERYTHING);
 
 		// Ugly ass singleton code
-		modules = new Modules();
-		modules->display = new Display(width, height, title);
-		modules->textures = new Textures(modules->display->get_renderer());
-		modules->jukebox = new Jukebox();
-		modules->inputs = new Inputs();
-		modules->clock = new Clock();
+		modules_ = new Modules();
+		modules_->display = new Display(width, height, title);
+		modules_->textures = new Textures(modules_->display->get_renderer());
+		modules_->jukebox = new Jukebox();
+		modules_->inputs = new Inputs();
+		modules_->clock = new Clock();
 
-		running = false;
+		running_ = false;
 	}
 
 	bool Engine::get_running() {
-		return running;
+		return running_;
 	}
 
 	Modules *Engine::get_modules() {
-		return modules;
+		return modules_;
 	}
 
 	void Engine::push_scene(Scene *scene) {
-		scene_stack.push(scene);
+		scene_stack_.push(scene);
 	}
 
 	void Engine::run(int fps_cap) {
-		modules->clock->tick();
-		modules->inputs->poll();
+		modules_->clock->tick();
+		modules_->inputs->poll();
 		
-		if(scene_stack.empty() || modules->inputs->get_quit()) {
+		if(scene_stack_.empty() || modules_->inputs->get_quit()) {
 			stop();
 		}
 		else {
-			Scene *current_scene = scene_stack.top();
+			Scene *current_scene = scene_stack_.top();
 			current_scene->update();
 			current_scene->draw();
 
@@ -47,7 +47,7 @@ namespace Dynamo {
 			if(!current_scene->get_alive()) {
 				delete current_scene;
 				current_scene = nullptr;
-				scene_stack.pop();
+				scene_stack_.pop();
 
 				if(next_scene != nullptr) {
 					push_scene(next_scene);
@@ -56,28 +56,28 @@ namespace Dynamo {
 		}
 		
 		// Play music
-		modules->jukebox->stream_music();
-		modules->jukebox->stream_ambient();
+		modules_->jukebox->stream_music();
+		modules_->jukebox->stream_ambient();
 
-		modules->display->refresh();
-		modules->clock->set_fps(fps_cap);
+		modules_->display->refresh();
+		modules_->clock->set_fps(fps_cap);
 	}
 
 	void Engine::start() {
-		running = true;
+		running_ = true;
 	}
 
 	void Engine::stop() {
-		running = false;
+		running_ = false;
 	}
 
 	void Engine::quit() {
-		delete modules->display;
-		delete modules->textures;
-		delete modules->jukebox;
-		delete modules->inputs;
-		delete modules->clock;
-		delete modules;
+		delete modules_->display;
+		delete modules_->textures;
+		delete modules_->jukebox;
+		delete modules_->inputs;
+		delete modules_->clock;
+		delete modules_;
 
 		SDL_Quit();
 	}

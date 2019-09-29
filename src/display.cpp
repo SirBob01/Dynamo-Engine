@@ -2,10 +2,10 @@
 
 namespace Dynamo {
 	Display::Display(int width, int height, std::string title) {
-		logic_width = width;
-		logic_height = height;
+		logic_w_ = width;
+		logic_h_ = height;
 
-		window = SDL_CreateWindow(
+		window_ = SDL_CreateWindow(
 			title.c_str(),
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
@@ -14,59 +14,59 @@ namespace Dynamo {
 			SDL_WINDOW_RESIZABLE
 		);
 
-		border_color = {0, 0, 0};
+		border_color_ = {0, 0, 0};
 
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-		SDL_RenderSetLogicalSize(renderer, width, height);
+		renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
+		SDL_RenderSetLogicalSize(renderer_, width, height);
 	}
 
 	Display::~Display() {
-		SDL_DestroyRenderer(renderer);
-		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer_);
+		SDL_DestroyWindow(window_);
 	}
 
 	int Display::get_width() {
-		return logic_width;
+		return logic_w_;
 	}
 
 	int Display::get_height() {
-		return logic_height;
+		return logic_h_;
 	}
 
 	int Display::get_window_width() {
-		SDL_GetWindowSize(window, &window_w, nullptr);
-		return window_w;
+		SDL_GetWindowSize(window_, &window_w_, nullptr);
+		return window_w_;
 	}
 
 	int Display::get_window_height() {
-		SDL_GetWindowSize(window, nullptr, &window_h);
-		return window_h;
+		SDL_GetWindowSize(window_, nullptr, &window_h_);
+		return window_h_;
 	}
 
 	SDL_Window *Display::get_window() {
-		return window;
+		return window_;
 	}
 
 	SDL_Renderer *Display::get_renderer() {
-		return renderer;
+		return renderer_;
 	}
 
 	void Display::set_title(std::string title) {
-		SDL_SetWindowTitle(window, title.c_str());
+		SDL_SetWindowTitle(window_, title.c_str());
 	}
 
 	void Display::set_fill(uint32_t rgb_color) {
-		draw_rect(0, 0, logic_width, logic_height, rgb_color, true);
+		draw_rect(0, 0, logic_w_, logic_h_, rgb_color, true);
 	}
 
 	void Display::set_borderfill(uint32_t rgb_color) {
-		border_color = hex_to_rgb(rgb_color);
+		border_color_ = hex_to_rgb(rgb_color);
 	}
 
 	void Display::draw_sprite(Sprite *sprite) {
 		if(sprite->get_visible() && sprite->get_alpha()) {
 			SDL_RenderCopyEx(
-				renderer,
+				renderer_,
 				sprite->get_texture(),
 				sprite->get_source(),
 				sprite->get_target(),
@@ -79,25 +79,25 @@ namespace Dynamo {
 
 	void Display::draw_point(int x, int y, uint32_t rgb_color) {
 		SDL_Color color = hex_to_rgb(rgb_color);
-		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
-		SDL_RenderDrawPoint(renderer, x, y);
+		SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 0xFF);
+		SDL_RenderDrawPoint(renderer_, x, y);
 	}
 
 	void Display::draw_line(int x1, int y1, int x2, int y2, uint32_t rgb_color) {
 		SDL_Color color = hex_to_rgb(rgb_color);
-		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
-		SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+		SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 0xFF);
+		SDL_RenderDrawLine(renderer_, x1, y1, x2, y2);
 	}
 
 	void Display::draw_rect(int x, int y, int w, int h, uint32_t rgb_color, bool fill) {
 		SDL_Color color = hex_to_rgb(rgb_color);
-		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0xFF);
+		SDL_SetRenderDrawColor(renderer_, color.r, color.g, color.b, 0xFF);
 		SDL_Rect rect = {x, y, w, h};
 		if(fill) {
-			SDL_RenderFillRect(renderer, &rect);
+			SDL_RenderFillRect(renderer_, &rect);
 		}
 		else {
-			SDL_RenderDrawRect(renderer, &rect);
+			SDL_RenderDrawRect(renderer_, &rect);
 		}
 	}
 
@@ -135,8 +135,8 @@ namespace Dynamo {
 	}
 
 	void Display::refresh() {
-		SDL_SetRenderDrawColor(renderer, border_color.r, border_color.g, border_color.b, 0xFF);
-		SDL_RenderPresent(renderer);
-		SDL_RenderClear(renderer);
+		SDL_SetRenderDrawColor(renderer_, border_color_.r, border_color_.g, border_color_.b, 0xFF);
+		SDL_RenderPresent(renderer_);
+		SDL_RenderClear(renderer_);
 	}
 }

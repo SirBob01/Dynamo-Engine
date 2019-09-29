@@ -2,45 +2,45 @@
 
 namespace Dynamo::Physics {
 	World::World(Vec2D forces) {
-		world_forces = forces;
+		world_forces_ = forces;
 	}
 
 	World::~World() {
 		clear_bodies();
 	}
 
-	Body *World::create_body(BodyDef body_def) {
+	Body *World::create_body(BodyDefinition body_def) {
 		Body *b = new Body(body_def);
-		bodies.push_back(b);
+		bodies_.push_back(b);
 
 		return b;
 	}
 
 	void World::clear_bodies() {
 		// Clear all bodies
-		for(auto &b : bodies) {
+		for(auto &b : bodies_) {
 			delete b;
 		}
-		bodies.clear();
+		bodies_.clear();
 	}
 
 	std::vector<Body *> &World::get_bodies() {
-		return bodies;
+		return bodies_;
 	}
 
 	void World::update_pairs() {
 		// TODO: Implement dynamic bounding volume tree for broad phase
 		// Naive broad phase O(n^2) :(
-		pairs.clear();
-		for(int i = 0; i < bodies.size() - 1; i++) {
-			for(int j = i + 1; j < bodies.size(); j++) {
-				Body *b1 = bodies[i];
-				Body *b2 = bodies[j];
+		pairs_.clear();
+		for(int i = 0; i < bodies_.size() - 1; i++) {
+			for(int j = i + 1; j < bodies_.size(); j++) {
+				Body *b1 = bodies_[i];
+				Body *b2 = bodies_[j];
 
 				AABB aabb1 = get_aabb(b1);
 				AABB aabb2 = get_aabb(b2);
 				if(aabb1.is_colliding(aabb2)) {
-					pairs.push_back({b1, b2});
+					pairs_.push_back({b1, b2});
 				}
 			}
 		}
@@ -56,13 +56,15 @@ namespace Dynamo::Physics {
 		}
 	}
 
-	void World::step(float dt) {
-		for(auto &pair : pairs) {
+	void World::update(float dt) {
+		update_pairs();
+
+		for(auto &pair : pairs_) {
 			solve(&pair);
 		}
 
 		// Update all the bodies
-		for(auto &b : bodies) {
+		for(auto &b : bodies_) {
 			Vec2D pos = b->get_pos();
 			Vec2D vel = b->get_vel();
 
@@ -71,7 +73,7 @@ namespace Dynamo::Physics {
 
 			if(b->get_type() == BODY_DYNAMIC) {
 				// Acceleration = force / net_mass of body
-				vel += world_forces / b->get_mass() * dt;
+				vel += world_forces_ / b->get_mass() * dt;
 			}
 
 			pos += vel * dt;
@@ -86,10 +88,5 @@ namespace Dynamo::Physics {
 				b->set_angle(angle);
 			}
 		}
-	}
-
-	void World::update(float dt) {
-		update_pairs();
-		step(dt);
 	}
 }
