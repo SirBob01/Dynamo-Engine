@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-namespace Physics {
+namespace Dynamo::Physics {
 	struct Mat2D {
 		/*
 		[a, b

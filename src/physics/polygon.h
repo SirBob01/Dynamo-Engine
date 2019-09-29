@@ -5,7 +5,7 @@
 #include "vec2d.h"
 #include "common.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	class Polygon : public Shape {
 		Vec2D *vertexes;
 		Vec2D *normals;

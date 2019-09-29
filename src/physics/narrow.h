@@ -8,7 +8,7 @@
 #include "broad.h"
 #include "vec2d.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	struct Manifold {
 		// Participating bodies
 		Pair *pair;

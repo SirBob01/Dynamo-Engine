@@ -5,7 +5,7 @@
 #include "vec2d.h"
 #include "common.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	// TODO: Implement edges once done with polygons and circles
 	class Edge : public Shape {
 		Vec2D start;

@@ -30,7 +30,7 @@ namespace Dynamo {
 		Modules *modules;
 
 	public:
-		Scene(Scene *parent, Modules *m);
+		Scene(Scene *parent, Modules *mods);
 		virtual ~Scene();
 
 		// Kill the current scene

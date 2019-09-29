@@ -5,7 +5,7 @@
 #include "vec2d.h"
 #include "common.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	class Circle : public Shape {
 		float r;
 

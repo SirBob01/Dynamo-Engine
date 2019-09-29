@@ -8,7 +8,7 @@
 #include "broad.h"
 #include "vec2d.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	class World {
 		std::vector<Body *> bodies;
 		std::vector<Pair> pairs;

@@ -10,7 +10,7 @@
 #include "common.h"
 #include "vec2d.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	struct Pair {
 		Body *a;
 		Body *b;

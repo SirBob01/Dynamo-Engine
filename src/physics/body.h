@@ -5,7 +5,7 @@
 #include "vec2d.h"
 #include "common.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	typedef enum {
 		BODY_DYNAMIC,
 		BODY_STATIC,

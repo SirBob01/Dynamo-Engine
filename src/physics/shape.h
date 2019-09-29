@@ -3,7 +3,7 @@
 
 #include "vec2d.h"
 
-namespace Physics {
+namespace Dynamo::Physics {
 	typedef enum {
 		SHAPE_POLYGON,
 		SHAPE_CIRCLE,
