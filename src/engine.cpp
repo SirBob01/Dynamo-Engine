@@ -1,83 +1,83 @@
 #include "engine.h"
 
 namespace Dynamo {
-	Engine::Engine(int width, int height, std::string title) {
-		SDL_Init(SDL_INIT_EVERYTHING);
+    Engine::Engine(int width, int height, std::string title) {
+        SDL_Init(SDL_INIT_EVERYTHING);
 
-		// Initialize singleton modules
-		display_ = new Display(width, height, title);
-		textures_ = new Textures(display_->get_renderer());
-		jukebox_ = new Jukebox();
-		inputs_ = new Inputs();
-		clock_ = new Clock();
+        // Initialize singleton modules
+        display_ = new Display(width, height, title);
+        textures_ = new Textures(display_->get_renderer());
+        jukebox_ = new Jukebox();
+        inputs_ = new Inputs();
+        clock_ = new Clock();
 
-		running_ = false;
-	}
+        running_ = false;
+    }
 
-	bool Engine::get_running() {
-		return running_;
-	}
+    bool Engine::get_running() {
+        return running_;
+    }
 
-	Modules Engine::get_modules() {
-		return {display_, textures_, jukebox_, inputs_, clock_};
-	}
+    Modules Engine::get_modules() {
+        return {display_, textures_, jukebox_, inputs_, clock_};
+    }
 
-	void Engine::push_scene(Scene *scene) {
-		scene_stack_.push(scene);
-	}
+    void Engine::push_scene(Scene *scene) {
+        scene_stack_.push(scene);
+    }
 
-	void Engine::run(int fps_cap) {
-		clock_->tick();
-		inputs_->poll();
-		
-		if(scene_stack_.empty() || inputs_->get_quit()) {
-			stop();
-		}
-		else {
-			Scene *current_scene = scene_stack_.top();
-			current_scene->update();
-			current_scene->draw();
+    void Engine::run(int fps_cap) {
+        clock_->tick();
+        inputs_->poll();
+        
+        if(scene_stack_.empty() || inputs_->get_quit()) {
+            stop();
+        }
+        else {
+            Scene *current_scene = scene_stack_.top();
+            current_scene->update();
+            current_scene->draw();
 
-			Scene *next_scene = current_scene->get_child();
-			current_scene->set_child(nullptr);
+            Scene *next_scene = current_scene->get_child();
+            current_scene->set_child(nullptr);
 
-			// Only pop a scene if it is "dead" to
-			// allow scene layering (e.g. pause menu over gameplay)
-			if(!current_scene->get_alive()) {
-				delete current_scene;
-				current_scene = nullptr;
-				scene_stack_.pop();
+            // Only pop a scene if it is "dead" to
+            // allow scene layering (e.g. pause menu over gameplay)
+            if(!current_scene->get_alive()) {
+                delete current_scene;
+                current_scene = nullptr;
+                scene_stack_.pop();
 
-				if(next_scene != nullptr) {
-					push_scene(next_scene);
-				}
-			}
-		}
-		
-		// Play soundtracks
-		jukebox_->stream_music();
-		jukebox_->stream_ambient();
+                if(next_scene != nullptr) {
+                    push_scene(next_scene);
+                }
+            }
+        }
+        
+        // Play soundtracks
+        jukebox_->stream_music();
+        jukebox_->stream_ambient();
 
-		display_->refresh();
-		clock_->set_fps(fps_cap);
-	}
+        display_->refresh();
+        clock_->set_fps(fps_cap);
+    }
 
-	void Engine::start() {
-		running_ = true;
-	}
+    void Engine::start() {
+        running_ = true;
+    }
 
-	void Engine::stop() {
-		running_ = false;
-	}
+    void Engine::stop() {
+        running_ = false;
+    }
 
-	void Engine::quit() {
-		// Clean up
-		delete display_;
-		delete textures_;
-		delete jukebox_;
-		delete inputs_;
-		delete clock_;
+    void Engine::quit() {
+        // Clean up
+        delete display_;
+        delete textures_;
+        delete jukebox_;
+        delete inputs_;
+        delete clock_;
 
-		SDL_Quit();
-	}
+        SDL_Quit();
+    }
 }

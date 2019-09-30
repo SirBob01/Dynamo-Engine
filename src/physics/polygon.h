@@ -6,27 +6,27 @@
 #include "common.h"
 
 namespace Dynamo::Physics {
-	class Polygon : public Shape {
-		Vec2D *vertexes_;
-		Vec2D *normals_;
+    class Polygon : public Shape {
+        Vec2D *vertexes_;
+        Vec2D *normals_;
 
-		int sides_;
+        int sides_;
 
-	public:
-		Polygon(Vec2D vertexes[], int n);
-		
-		~Polygon();
+    public:
+        Polygon(Vec2D vertexes[], int n);
+        
+        ~Polygon();
 
-		int get_sides();
+        int get_sides();
 
-		Vec2D *get_vertexes();
+        Vec2D *get_vertexes();
 
-		Vec2D *get_normals();
+        Vec2D *get_normals();
 
-		float get_inertia(float density) override;
+        float get_inertia(float density) override;
 
-		bool is_in_bounds(Vec2D local) override;
-	};
+        bool is_in_bounds(Vec2D local) override;
+    };
 }
 
 #endif

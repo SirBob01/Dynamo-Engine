@@ -6,16 +6,16 @@
 #include "common.h"
 
 namespace Dynamo::Physics {
-	// TODO: Implement edges once done with polygons and circles
-	class Edge : public Shape {
-		Vec2D start_;
-		Vec2D end_;
+    // TODO: Implement edges once done with polygons and circles
+    class Edge : public Shape {
+        Vec2D start_;
+        Vec2D end_;
 
-	public:
-		Edge(Vec2D endpoints[2]);
+    public:
+        Edge(Vec2D endpoints[2]);
 
-		float get_inertia(float density) override;
-	};
+        float get_inertia(float density) override;
+    };
 }
 
 #endif

@@ -6,24 +6,24 @@
 #include <algorithm>
 
 namespace Dynamo {
-	struct Color {
-		uint8_t r, g, b; 
-		uint8_t a = 255; // Default alpha value
+    struct Color {
+        uint8_t r, g, b; 
+        uint8_t a = 255; // Default alpha value
 
-		// Convert color to hexidecimal
-		uint32_t get_hex();
+        // Convert color to hexidecimal
+        uint32_t get_hex();
 
-		// Scale components
-		Color &scale(float scalar);
+        // Scale components
+        Color &scale(float scalar);
 
-		// Restrict values to [0, 255]
-		Color &clamp();
+        // Restrict values to [0, 255]
+        Color &clamp();
 
-		// Interpolate between colors
-		const Color lerp(const Color &other, float rate) const;
-	};
+        // Interpolate between colors
+        const Color lerp(const Color &other, float rate) const;
+    };
 
-	Color hex_color(uint32_t rgba);
+    Color hex_color(uint32_t rgba);
 }
 
 

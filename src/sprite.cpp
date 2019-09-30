@@ -1,172 +1,172 @@
 #include "sprite.h"
 
 namespace Dynamo {
-	Sprite::Sprite(SDL_Texture *texture, int frame_width, int frame_height) {
-		texture_ = texture;
-		frame_w_ = frame_width;
-		frame_h_ = frame_height;
-		SDL_QueryTexture(
-			texture_, 
-			nullptr, nullptr, 
-			&texture_w_, &texture_h_
-		);
+    Sprite::Sprite(SDL_Texture *texture, int frame_width, int frame_height) {
+        texture_ = texture;
+        frame_w_ = frame_width;
+        frame_h_ = frame_height;
+        SDL_QueryTexture(
+            texture_, 
+            nullptr, nullptr, 
+            &texture_w_, &texture_h_
+        );
 
-		target_ = new SDL_Rect();
-		if(!frame_w_ && !frame_h_) {
-			max_frames_ = 1;
-			source_.push_back(nullptr);
-		}
-		else {
-			int hor_frames = texture_w_ / frame_w_;
-			int ver_frames = texture_h_ / frame_h_;
-			max_frames_ = hor_frames * ver_frames;
+        target_ = new SDL_Rect();
+        if(!frame_w_ && !frame_h_) {
+            max_frames_ = 1;
+            source_.push_back(nullptr);
+        }
+        else {
+            int hor_frames = texture_w_ / frame_w_;
+            int ver_frames = texture_h_ / frame_h_;
+            max_frames_ = hor_frames * ver_frames;
 
-			// Left to right, top to bottom
-			for(int j = 0; j < ver_frames; j++) {
-				for(int i = 0; i < hor_frames; i++) {
-					SDL_Rect *frame_rect = new SDL_Rect();
+            // Left to right, top to bottom
+            for(int j = 0; j < ver_frames; j++) {
+                for(int i = 0; i < hor_frames; i++) {
+                    SDL_Rect *frame_rect = new SDL_Rect();
 
-					frame_rect->w = frame_w_;
-					frame_rect->h = frame_h_;
-					frame_rect->x = i*frame_w_;
-					frame_rect->y = j*frame_h_;
-					
-					source_.push_back(frame_rect);
-				}
-			}
-		}
+                    frame_rect->w = frame_w_;
+                    frame_rect->h = frame_h_;
+                    frame_rect->x = i*frame_w_;
+                    frame_rect->y = j*frame_h_;
+                    
+                    source_.push_back(frame_rect);
+                }
+            }
+        }
 
-		accumulator_ = 0.0f;
-		current_frame_ = 0;
+        accumulator_ = 0.0f;
+        current_frame_ = 0;
 
-		finished_ = false;
+        finished_ = false;
 
-		angle_ = 0.0f;
-		hflip_ = false;
-		vflip_ = false;
-		visible_ = true;
-	}
+        angle_ = 0.0f;
+        hflip_ = false;
+        vflip_ = false;
+        visible_ = true;
+    }
 
-	Sprite::~Sprite() {
-		delete target_;
-		for(auto &r : source_) {
-			delete r;
-		}
-		source_.clear();
-	}
+    Sprite::~Sprite() {
+        delete target_;
+        for(auto &r : source_) {
+            delete r;
+        }
+        source_.clear();
+    }
 
-	SDL_Texture *Sprite::get_texture() {
-		return texture_;
-	}
+    SDL_Texture *Sprite::get_texture() {
+        return texture_;
+    }
 
-	int Sprite::get_width() {
-		return texture_w_;
-	}
+    int Sprite::get_width() {
+        return texture_w_;
+    }
 
-	int Sprite::get_height() {
-		return texture_h_;
-	}
+    int Sprite::get_height() {
+        return texture_h_;
+    }
 
-	int Sprite::get_frame_height() {
-		return frame_h_;
-	}
+    int Sprite::get_frame_height() {
+        return frame_h_;
+    }
 
-	int Sprite::get_frame_width() {
-		return frame_w_;
-	}
+    int Sprite::get_frame_width() {
+        return frame_w_;
+    }
 
-	SDL_Rect *Sprite::get_source() {
-		return source_[current_frame_];
-	}
+    SDL_Rect *Sprite::get_source() {
+        return source_[current_frame_];
+    }
 
-	SDL_Rect *Sprite::get_target() {
-		return target_;
-	}
+    SDL_Rect *Sprite::get_target() {
+        return target_;
+    }
 
-	bool Sprite::get_visible() {
-		return visible_;
-	}
+    bool Sprite::get_visible() {
+        return visible_;
+    }
 
-	float Sprite::get_angle() {
-		return angle_;
-	}
+    float Sprite::get_angle() {
+        return angle_;
+    }
 
-	SDL_RendererFlip Sprite::get_flip() {
-		int flip = SDL_FLIP_NONE;
-		if(hflip_ && vflip_) {
-			flip = (SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
-		}
-		else if(hflip_) {
-			flip = SDL_FLIP_HORIZONTAL;
-		}
-		else if(vflip_) {
-			flip = SDL_FLIP_VERTICAL;
-		}
-		
-		return (SDL_RendererFlip)flip;
-	}
+    SDL_RendererFlip Sprite::get_flip() {
+        int flip = SDL_FLIP_NONE;
+        if(hflip_ && vflip_) {
+            flip = (SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
+        }
+        else if(hflip_) {
+            flip = SDL_FLIP_HORIZONTAL;
+        }
+        else if(vflip_) {
+            flip = SDL_FLIP_VERTICAL;
+        }
+        
+        return (SDL_RendererFlip)flip;
+    }
 
-	uint8_t Sprite::get_alpha() {
-		uint8_t alpha;
-		SDL_GetTextureAlphaMod(texture_, &alpha);
-		return alpha;
-	}
+    uint8_t Sprite::get_alpha() {
+        uint8_t alpha;
+        SDL_GetTextureAlphaMod(texture_, &alpha);
+        return alpha;
+    }
 
-	bool Sprite::get_finished() {
-		return finished_;
-	}
+    bool Sprite::get_finished() {
+        return finished_;
+    }
 
-	void Sprite::set_visible(bool visible) {
-		visible_ = visible;
-	}
+    void Sprite::set_visible(bool visible) {
+        visible_ = visible;
+    }
 
-	void Sprite::set_angle(float angle) {
-		angle_ = angle;
-	}
+    void Sprite::set_angle(float angle) {
+        angle_ = angle;
+    }
 
-	void Sprite::set_flip(bool hflip, bool vflip) {
-		hflip_ = hflip;
-		vflip_ = vflip;
-	}
+    void Sprite::set_flip(bool hflip, bool vflip) {
+        hflip_ = hflip;
+        vflip_ = vflip;
+    }
 
-	void Sprite::set_alpha(uint8_t alpha) {
-		SDL_SetTextureAlphaMod(texture_, alpha);
-	}
+    void Sprite::set_alpha(uint8_t alpha) {
+        SDL_SetTextureAlphaMod(texture_, alpha);
+    }
 
-	void Sprite::set_blend(SPRITE_BLEND mode) {
-		SDL_SetTextureBlendMode(
-			texture_, 
-			static_cast<SDL_BlendMode>(mode)
-		);
-	}
+    void Sprite::set_blend(SPRITE_BLEND mode) {
+        SDL_SetTextureBlendMode(
+            texture_, 
+            static_cast<SDL_BlendMode>(mode)
+        );
+    }
 
-	void Sprite::set_target(int x, int y, int w, int h) {
-		// One may pass the fields of a bounding box or something
-		if(w < 1 || h < 1) {
-			set_visible(false);
-		}
+    void Sprite::set_target(int x, int y, int w, int h) {
+        // One may pass the fields of a bounding box or something
+        if(w < 1 || h < 1) {
+            set_visible(false);
+        }
 
-		target_->x = x;
-		target_->y = y;
-		target_->w = w;
-		target_->h = h;
-	}
+        target_->x = x;
+        target_->y = y;
+        target_->w = w;
+        target_->h = h;
+    }
 
-	void Sprite::animate(float dt, float fps, bool loop) {
-		accumulator_ += dt;
-		if(accumulator_ >= (1000.0/fps)) {
-			current_frame_++;
-			accumulator_ = 0;
-		}
+    void Sprite::animate(float dt, float fps, bool loop) {
+        accumulator_ += dt;
+        if(accumulator_ >= (1000.0/fps)) {
+            current_frame_++;
+            accumulator_ = 0;
+        }
 
-		if(current_frame_ > max_frames_-1) {
-			if(loop) {
-				current_frame_ = 0;
-			}
-			else {
-				current_frame_ = max_frames_-1;
-				finished_ = true;
-			}
-		}
-	}
+        if(current_frame_ > max_frames_-1) {
+            if(loop) {
+                current_frame_ = 0;
+            }
+            else {
+                current_frame_ = max_frames_-1;
+                finished_ = true;
+            }
+        }
+    }
 }

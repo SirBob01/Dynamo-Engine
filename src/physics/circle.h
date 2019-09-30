@@ -6,18 +6,18 @@
 #include "common.h"
 
 namespace Dynamo::Physics {
-	class Circle : public Shape {
-		float radius_;
+    class Circle : public Shape {
+        float radius_;
 
-	public:
-		Circle(Vec2D center, float radius);
+    public:
+        Circle(Vec2D center, float radius);
 
-		float get_radius();
+        float get_radius();
 
-		float get_inertia(float density) override;
+        float get_inertia(float density) override;
 
-		bool is_in_bounds(Vec2D local) override;
-	};
+        bool is_in_bounds(Vec2D local) override;
+    };
 }
 
 #endif

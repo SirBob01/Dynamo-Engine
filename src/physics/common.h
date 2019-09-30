@@ -5,11 +5,11 @@
 #include <math.h>
 
 namespace Dynamo::Physics {
-	float max(float a, float b);
+    float max(float a, float b);
 
-	float min(float a, float b);
+    float min(float a, float b);
 
-	float wrap_val(float v, float min, float max);
+    float wrap_val(float v, float min, float max);
 }
 
 #endif

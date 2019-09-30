@@ -11,32 +11,32 @@
 #include "color.h"
 
 namespace Dynamo {
-	class Textures {
-		SDL_Renderer *renderer_;
-		
-		std::unordered_map<std::string, TTF_Font *> fonts_;
-		std::unordered_map<std::string, SDL_Texture *> texture_map_;
+    class Textures {
+        SDL_Renderer *renderer_;
+        
+        std::unordered_map<std::string, TTF_Font *> fonts_;
+        std::unordered_map<std::string, SDL_Texture *> texture_map_;
 
-	public:
-		Textures(SDL_Renderer *renderer);
-		~Textures();
+    public:
+        Textures(SDL_Renderer *renderer);
+        ~Textures();
 
-		// Pre-load resources on Scene initialization
-		// If texture id exists, it is overwritten to prevent memory leaks
-		void load_surface(std::string id, int width, int height);
-		void load_image(std::string id, std::string filename);
-		void load_text(std::string id, std::string text, 
-					   std::string font_id, Color color);
+        // Pre-load resources on Scene initialization
+        // If texture id exists, it is overwritten to prevent memory leaks
+        void load_surface(std::string id, int width, int height);
+        void load_image(std::string id, std::string filename);
+        void load_text(std::string id, std::string text, 
+                       std::string font_id, Color color);
 
-		// Load a TTF font file into the local database
-		void load_font(std::string font_id, std::string filename, int size);
+        // Load a TTF font file into the local database
+        void load_font(std::string font_id, std::string filename, int size);
 
-		// Get a texture from an id key
-		SDL_Texture *get_texture(std::string id);
+        // Get a texture from an id key
+        SDL_Texture *get_texture(std::string id);
 
-		// Free all loaded textures from memory
-		void clear_all();
-	};	
+        // Free all loaded textures from memory
+        void clear_all();
+    };    
 }
 
 #endif
