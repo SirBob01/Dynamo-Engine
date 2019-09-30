@@ -31,11 +31,14 @@ namespace Dynamo::Physics {
 	Projection project_edge(Edge *edge, Vec2D axis, Body *body);
 
 	// Manifold generation
-	bool colliding_polygons(Polygon *a, Polygon *b, Pair *pair, Manifold *m);
+	bool colliding_polygons(Polygon *a, Polygon *b, 
+							Pair *pair, Manifold *m);
 
-	bool colliding_circles(Circle *a, Circle *b, Pair *pair, Manifold *m);
+	bool colliding_circles(Circle *a, Circle *b, 
+						   Pair *pair, Manifold *m);
 
-	bool colliding_polygon_circle(Polygon *p, Circle *c, Pair *pair, Manifold *m);
+	bool colliding_polygon_circle(Polygon *p, Circle *c, 
+								  Pair *pair, Manifold *m);
 
 	// Collision wrapper
 	Manifold colliding(Pair *pair, Fixture *a, Fixture *b);

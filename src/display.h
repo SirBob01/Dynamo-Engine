@@ -58,7 +58,8 @@ namespace Dynamo {
 		void draw_point(int x, int y, Color color);
 		
 		// Draw a line between two points (x1, y1) - (x2, y2)
-		void draw_line(int x1, int y1, int x2, int y2, 
+		void draw_line(int x1, int y1, 
+					   int x2, int y2, 
 					   Color color);
 		
 		// Draw a rectangle with upperleft corner at (x, y)

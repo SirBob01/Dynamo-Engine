@@ -10,6 +10,8 @@
 
 namespace Dynamo {
 	class Jukebox {
+		// Unfortunately, SDL_Mixer does not allow multiple
+		// concurrent music streams for ambient noise
 		std::deque<std::pair<Mix_Music *, int>> music_stream_;
 		std::deque<std::pair<Mix_Chunk *, int>> ambient_stream_;
 

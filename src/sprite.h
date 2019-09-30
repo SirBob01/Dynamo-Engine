@@ -6,7 +6,6 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace Dynamo {
 	typedef enum {
@@ -18,9 +17,8 @@ namespace Dynamo {
 
 	class Sprite {
 		SDL_Texture *texture_;
-		std::vector<SDL_Rect *> source_;
-
 		SDL_Rect *target_;
+		std::vector<SDL_Rect *> source_;
 
 		int texture_w_;
 		int texture_h_;

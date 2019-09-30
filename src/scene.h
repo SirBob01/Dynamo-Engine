@@ -11,7 +11,7 @@
 #include "clock.h"
 
 namespace Dynamo {
-	// Singleton objects that need to be passed from scene to scene
+	// Holds references to singleton modules
 	struct Modules {
 		Display *display;
 		Textures *textures;
@@ -27,11 +27,18 @@ namespace Dynamo {
 		Scene *parent_;
 		Scene *child_;
 		
-		Modules *modules_;
+		Display *display_;
+		Textures *textures_;
+		Jukebox *jukebox_;
+		Inputs *inputs_;
+		Clock *clock_;
 
 	public:
-		Scene(Scene *parent, Modules *modules);
+		Scene(Scene *parent, Modules modules);
 		virtual ~Scene();
+
+		// Repackage modules to transition between scenes
+		Modules get_modules();
 
 		// Kill the current scene
 		void kill();
@@ -49,10 +56,10 @@ namespace Dynamo {
 		void set_child(Scene *next);
 
 		// Handle scene logic
-		virtual void update();
+		virtual void update() = 0;
 
 		// Draw all renderable scene objects
-		virtual void draw();
+		virtual void draw() = 0;
 	};
 }
 

@@ -38,11 +38,13 @@ namespace Dynamo::Physics {
 	}
 
 	// Manifold generation
-	bool colliding_polygons(Polygon *a, Polygon *b, Pair *pair, Manifold *m) {
+	bool colliding_polygons(Polygon *a, Polygon *b, 
+							Pair *pair, Manifold *m) {
 		return false;
 	}
 
-	bool colliding_circles(Circle *a, Circle *b, Pair *pair, Manifold *m) {
+	bool colliding_circles(Circle *a, Circle *b, 
+						   Pair *pair, Manifold *m) {
 		Vec2D a_pos = pair->a->convert_to_world(a->get_centroid());
 		Vec2D b_pos = pair->b->convert_to_world(b->get_centroid());
 
@@ -73,7 +75,8 @@ namespace Dynamo::Physics {
 		}
 	}
 
-	bool colliding_polygon_circle(Polygon *p, Circle *c, Pair *pair, Manifold *m) {
+	bool colliding_polygon_circle(Polygon *p, Circle *c, 
+								  Pair *pair, Manifold *m) {
 		return false;
 	}
 
@@ -89,19 +92,23 @@ namespace Dynamo::Physics {
 
 		if(a_type == SHAPE_POLYGON && b_type == SHAPE_POLYGON) {
 			// Polygon - polygon
-			colliding_polygons((Polygon *)a->shape, (Polygon *)b->shape, pair, &m);
+			colliding_polygons((Polygon *)a->shape, (Polygon *)b->shape,
+							   pair, &m);
 		}
 		else if(a_type == SHAPE_CIRCLE && b_type == SHAPE_CIRCLE) {
 			// Circle - circle
-			colliding_circles((Circle *)a->shape, (Circle *)b->shape, pair, &m);
+			colliding_circles((Circle *)a->shape, (Circle *)b->shape,
+							  pair, &m);
 		}
 		else if(a_type == SHAPE_POLYGON && b_type == SHAPE_CIRCLE) {
 			// Polygon - circle
-			colliding_polygon_circle((Polygon *)a->shape, (Circle *)b->shape, pair, &m);
+			colliding_polygon_circle((Polygon *)a->shape, (Circle *)b->shape,
+									 pair, &m);
 		}
 		else if(a_type == SHAPE_CIRCLE && b_type == SHAPE_POLYGON) {
 			// Circle - polygon
-			colliding_polygon_circle((Polygon *)b->shape, (Circle *)a->shape, pair, &m);
+			colliding_polygon_circle((Polygon *)b->shape, (Circle *)a->shape,
+									 pair, &m);
 		}
 
 		return m;
@@ -147,7 +154,8 @@ namespace Dynamo::Physics {
 
 		// Friction vector
 		// Relative velocity projected onto tangent of collision
-		Vec2D f_vec = m->normal.left_normal() * ((b_ivel - a_ivel) * m->normal.left_normal());
+		Vec2D f_vec = m->normal.left_normal() * 
+					  ((b_ivel - a_ivel) * m->normal.left_normal());
 
 		// Impulse vector
 		Vec2D impulse = m->normal - f_vec * f;

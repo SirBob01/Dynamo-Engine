@@ -4,14 +4,12 @@ namespace Dynamo {
 	Engine::Engine(int width, int height, std::string title) {
 		SDL_Init(SDL_INIT_EVERYTHING);
 
-		modules_ = new Modules();
-
-		// Initialize
-		modules_->display = new Display(width, height, title);
-		modules_->textures = new Textures(modules_->display->get_renderer());
-		modules_->jukebox = new Jukebox();
-		modules_->inputs = new Inputs();
-		modules_->clock = new Clock();
+		// Initialize singleton modules
+		display_ = new Display(width, height, title);
+		textures_ = new Textures(display_->get_renderer());
+		jukebox_ = new Jukebox();
+		inputs_ = new Inputs();
+		clock_ = new Clock();
 
 		running_ = false;
 	}
@@ -20,8 +18,8 @@ namespace Dynamo {
 		return running_;
 	}
 
-	Modules *Engine::get_modules() {
-		return modules_;
+	Modules Engine::get_modules() {
+		return {display_, textures_, jukebox_, inputs_, clock_};
 	}
 
 	void Engine::push_scene(Scene *scene) {
@@ -29,10 +27,10 @@ namespace Dynamo {
 	}
 
 	void Engine::run(int fps_cap) {
-		modules_->clock->tick();
-		modules_->inputs->poll();
+		clock_->tick();
+		inputs_->poll();
 		
-		if(scene_stack_.empty() || modules_->inputs->get_quit()) {
+		if(scene_stack_.empty() || inputs_->get_quit()) {
 			stop();
 		}
 		else {
@@ -57,11 +55,11 @@ namespace Dynamo {
 		}
 		
 		// Play soundtracks
-		modules_->jukebox->stream_music();
-		modules_->jukebox->stream_ambient();
+		jukebox_->stream_music();
+		jukebox_->stream_ambient();
 
-		modules_->display->refresh();
-		modules_->clock->set_fps(fps_cap);
+		display_->refresh();
+		clock_->set_fps(fps_cap);
 	}
 
 	void Engine::start() {
@@ -74,12 +72,11 @@ namespace Dynamo {
 
 	void Engine::quit() {
 		// Clean up
-		delete modules_->display;
-		delete modules_->textures;
-		delete modules_->jukebox;
-		delete modules_->inputs;
-		delete modules_->clock;
-		delete modules_;
+		delete display_;
+		delete textures_;
+		delete jukebox_;
+		delete inputs_;
+		delete clock_;
 
 		SDL_Quit();
 	}

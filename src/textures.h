@@ -22,10 +22,13 @@ namespace Dynamo {
 		~Textures();
 
 		// Pre-load resources on Scene initialization
-		// If texture exists, it is overwritten to prevent memory leaks
+		// If texture id exists, it is overwritten to prevent memory leaks
 		void load_surface(std::string id, int width, int height);
 		void load_image(std::string id, std::string filename);
-		void load_text(std::string id, std::string text, std::string font_id, Color color);
+		void load_text(std::string id, std::string text, 
+					   std::string font_id, Color color);
+
+		// Load a TTF font file into the local database
 		void load_font(std::string font_id, std::string filename, int size);
 
 		// Get a texture from an id key

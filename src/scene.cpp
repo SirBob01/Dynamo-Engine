@@ -1,9 +1,14 @@
 #include "scene.h"
 
 namespace Dynamo {
-	Scene::Scene(Scene *parent, Modules *modules) {
-		modules_ = modules;
-		
+	Scene::Scene(Scene *parent, Modules modules) {
+		// Unpack modules
+		display_ = modules.display;
+		textures_ = modules.textures;
+		jukebox_ = modules.jukebox;
+		inputs_ = modules.inputs;
+		clock_ = modules.clock;
+
 		parent_ = parent;
 		child_ = nullptr;
 		alive_ = true;
@@ -11,8 +16,12 @@ namespace Dynamo {
 
 	Scene::~Scene() {
 		// Default black fill
-		modules_->display->set_fill({0, 0, 0});
-		modules_->display->set_borderfill({0, 0, 0});
+		display_->set_fill({0, 0, 0});
+		display_->set_borderfill({0, 0, 0});
+	}
+
+	Modules Scene::get_modules() {
+		return {display_, textures_, jukebox_, inputs_, clock_};
 	}
 
 	void Scene::kill() {

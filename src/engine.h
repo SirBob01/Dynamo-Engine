@@ -10,7 +10,12 @@
 
 namespace Dynamo {
 	class Engine {
-		Modules *modules_;
+		Display *display_;
+		Textures *textures_;
+		Jukebox *jukebox_;
+		Inputs *inputs_;
+		Clock *clock_;
+
 		std::stack<Scene *> scene_stack_;
 
 		bool running_;
@@ -22,7 +27,7 @@ namespace Dynamo {
 		bool get_running();
 
 		// Get the module components for each scene
-		Modules *get_modules();
+		Modules get_modules();
 
 		// Add a new scene to the stack
 		void push_scene(Scene *scene);
