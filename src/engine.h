@@ -11,7 +11,7 @@
 namespace Dynamo {
     class Engine {
         Display *display_;
-        Textures *textures_;
+        TextureManager *textures_;
         Jukebox *jukebox_;
         Inputs *inputs_;
         Clock *clock_;

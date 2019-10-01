@@ -7,7 +7,9 @@
 #include <string>
 #include <vector>
 
+#include "textures.h"
 #include "vec2d.h"
+#include "color.h"
 
 namespace Dynamo {
     typedef enum {
@@ -19,6 +21,8 @@ namespace Dynamo {
 
     class Sprite {
         SDL_Texture *texture_;
+        SDL_TextureAccess access_;
+
         SDL_Rect *target_;
         std::vector<SDL_Rect *> source_;
 
@@ -27,6 +31,9 @@ namespace Dynamo {
 
         int frame_w_;
         int frame_h_;
+
+        Color color_;
+        bool fill_;
         
         float accumulator_;
         int max_frames_;
@@ -41,7 +48,7 @@ namespace Dynamo {
         bool visible_;
 
     public:
-        Sprite(SDL_Texture *texture, Vec2D frame_dimensions);
+        Sprite(Texture texture, Vec2D frame_dimensions);
         ~Sprite();
 
         // Get spritesheet texture (all frames)
@@ -59,6 +66,12 @@ namespace Dynamo {
         // Get the draw target rectangle
         SDL_Rect *get_target();
 
+        // Get the sprite's fill color
+        Color get_color();
+
+        // Should the renderer fill the sprite?
+        bool get_fill();
+
         // Check whether or not to draw the sprite
         bool get_visible();
 
@@ -73,6 +86,13 @@ namespace Dynamo {
 
         // Check if the current sprite animation is finished
         bool get_finished();
+
+        // Fill the texture with a color
+        void set_color(Color color);
+
+        // Toggle whether to fill the texture
+        // Does not work with textures loaded from an image
+        void set_fill(bool fill);
 
         // Set whether or not to draw the sprite
         void set_visible(bool visible);

@@ -8,22 +8,29 @@
 #include <unordered_map>
 #include <string>
 
+#include "vec2d.h"
 #include "color.h"
+#include "error.h"
 
 namespace Dynamo {
-    class Textures {
+    struct Texture {
+        SDL_Texture *texture;
+        SDL_TextureAccess access;
+    };
+
+    class TextureManager {
         SDL_Renderer *renderer_;
         
         std::unordered_map<std::string, TTF_Font *> fonts_;
-        std::unordered_map<std::string, SDL_Texture *> texture_map_;
+        std::unordered_map<std::string, Texture> texture_map_;
 
     public:
-        Textures(SDL_Renderer *renderer);
-        ~Textures();
+        TextureManager(SDL_Renderer *renderer);
+        ~TextureManager();
 
         // Pre-load resources on Scene initialization
         // If texture id exists, it is overwritten to prevent memory leaks
-        void load_surface(std::string id, int width, int height);
+        void load_surface(std::string id, Vec2D dimensions);
         void load_image(std::string id, std::string filename);
         void load_text(std::string id, std::string text, 
                        std::string font_id, Color color);
@@ -32,7 +39,7 @@ namespace Dynamo {
         void load_font(std::string font_id, std::string filename, int size);
 
         // Get a texture from an id key
-        SDL_Texture *get_texture(std::string id);
+        Texture &get_texture(std::string id);
 
         // Free all loaded textures from memory
         void clear_all();

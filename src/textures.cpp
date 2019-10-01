@@ -1,54 +1,47 @@
 #include "textures.h"
 
 namespace Dynamo {
-    Textures::Textures(SDL_Renderer *renderer) {
+    TextureManager::TextureManager(SDL_Renderer *renderer) {
         renderer_ = renderer;
         TTF_Init();
     }
 
-    Textures::~Textures() {
+    TextureManager::~TextureManager() {
         clear_all();
         TTF_Quit();
     }
 
-    void Textures::load_surface(std::string id, int width, int height) {
+    void TextureManager::load_surface(std::string id, Vec2D dimensions) {
+        int width = dimensions.x;
+        int height = dimensions.y;
+        
         if(texture_map_.count(id)) {
-            SDL_DestroyTexture(texture_map_[id]);
-        }
-
-        SDL_Surface *surface;
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-            surface = SDL_CreateRGBSurface(
-                0, width, height, 32, 
-                0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF
-            );
-        }
-        else {
-            surface = SDL_CreateRGBSurface(
-                0, width, height, 32, 
-                0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000
-            );
+            SDL_DestroyTexture(texture_map_[id].texture);
         }
         
-        texture_map_[id] = SDL_CreateTextureFromSurface(
+        // Create a colorless, blank canvas texture
+        SDL_Texture *texture = SDL_CreateTexture(
             renderer_, 
-            surface
+            SDL_PIXELFORMAT_RGBA32,
+            SDL_TEXTUREACCESS_TARGET,
+            width, height
         );
-        SDL_FreeSurface(surface);
+        texture_map_[id] = {texture, SDL_TEXTUREACCESS_TARGET};
     }
 
-    void Textures::load_image(std::string id, std::string filename) {
+    void TextureManager::load_image(std::string id, std::string filename) {
         if(texture_map_.count(id)) {
-            SDL_DestroyTexture(texture_map_[id]);
+            SDL_DestroyTexture(texture_map_[id].texture);
         }
 
-        texture_map_[id] = IMG_LoadTexture(renderer_, filename.c_str());
+        SDL_Texture *texture = IMG_LoadTexture(renderer_, filename.c_str());
+        texture_map_[id] = {texture, SDL_TEXTUREACCESS_STATIC};
     }
 
-    void Textures::load_text(std::string id, std::string text, 
+    void TextureManager::load_text(std::string id, std::string text, 
                              std::string font_id, Color color) {
         if(texture_map_.count(id)) {
-            SDL_DestroyTexture(texture_map_[id]);
+            SDL_DestroyTexture(texture_map_[id].texture);
         }
 
         SDL_Surface *surf = TTF_RenderText_Solid(
@@ -56,14 +49,15 @@ namespace Dynamo {
             text.c_str(), 
             {color.r, color.g, color.b, color.a}
         );
-        texture_map_[id] = SDL_CreateTextureFromSurface(
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(
             renderer_, 
             surf
         );
+        texture_map_[id] = {texture, SDL_TEXTUREACCESS_STATIC};
         SDL_FreeSurface(surf);
     }
 
-    void Textures::load_font(std::string font_id, 
+    void TextureManager::load_font(std::string font_id, 
                              std::string filename, int size) {
         if(fonts_.count(font_id)) {
             TTF_CloseFont(fonts_[font_id]);
@@ -72,13 +66,16 @@ namespace Dynamo {
         fonts_[font_id] = TTF_OpenFont(filename.c_str(), size);
     }
 
-    SDL_Texture *Textures::get_texture(std::string id) {
+    Texture &TextureManager::get_texture(std::string id) {
+        if(!texture_map_.count(id)) {
+            throw InvalidKey(id, "texture_map_");
+        }
         return texture_map_[id];
     }
 
-    void Textures::clear_all() {
+    void TextureManager::clear_all() {
         for(auto &item : texture_map_) {
-            SDL_DestroyTexture(item.second);
+            SDL_DestroyTexture(item.second.texture);
         }
         for(auto &font : fonts_) {
             TTF_CloseFont(font.second);

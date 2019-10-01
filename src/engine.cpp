@@ -6,7 +6,7 @@ namespace Dynamo {
 
         // Initialize singleton modules
         display_ = new Display(width, height, title);
-        textures_ = new Textures(display_->get_renderer());
+        textures_ = new TextureManager(display_->get_renderer());
         jukebox_ = new Jukebox();
         inputs_ = new Inputs();
         clock_ = new Clock();

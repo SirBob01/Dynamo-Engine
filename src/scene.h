@@ -14,13 +14,13 @@ namespace Dynamo {
     // Holds references to singleton modules
     struct Modules {
         Display *display;
-        Textures *textures;
+        TextureManager *textures;
         Jukebox *jukebox;
         Inputs *inputs;
         Clock *clock;
     };
 
-    class Scene {    
+    class Scene {
         bool alive_;
 
     protected:
@@ -28,7 +28,7 @@ namespace Dynamo {
         Scene *child_;
         
         Display *display_;
-        Textures *textures_;
+        TextureManager *textures_;
         Jukebox *jukebox_;
         Inputs *inputs_;
         Clock *clock_;
