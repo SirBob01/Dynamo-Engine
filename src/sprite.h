@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "vec2d.h"
+
 namespace Dynamo {
     typedef enum {
         SPRITE_BLEND_NONE = SDL_BLENDMODE_NONE,
@@ -22,6 +24,7 @@ namespace Dynamo {
 
         int texture_w_;
         int texture_h_;
+
         int frame_w_;
         int frame_h_;
         
@@ -38,19 +41,17 @@ namespace Dynamo {
         bool visible_;
 
     public:
-        Sprite(SDL_Texture *texture, int frame_width, int frame_height);
+        Sprite(SDL_Texture *texture, Vec2D frame_dimensions);
         ~Sprite();
 
         // Get spritesheet texture (all frames)
         SDL_Texture *get_texture();
 
-        // Get texture dimensions
-        int get_width();
-        int get_height();
+        // Get the whole texture's dimensions
+        Vec2D get_texture_dimensions();
 
-        // Get individual frame dimensions
-        int get_frame_width();
-        int get_frame_height();
+        // Get an individual frame's dimensions
+        Vec2D get_dimensions();
 
         // Get the rectangle of an individual animation frame
         SDL_Rect *get_source();
@@ -89,7 +90,8 @@ namespace Dynamo {
         void set_blend(SPRITE_BLEND mode);
 
         // Set the draw target position and dimensions
-        void set_target(int x, int y, int w, int h);
+        // Allows dynamic sprite resizing
+        void set_target(Vec2D pos, Vec2D dimensions);
 
         // Animate the frames of the sprite
         void animate(float dt, float fps, bool loop);

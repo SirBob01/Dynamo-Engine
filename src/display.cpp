@@ -2,8 +2,10 @@
 
 namespace Dynamo {
     Display::Display(int width, int height, std::string title) {
-        logic_w_ = width;
-        logic_h_ = height;
+        logic_dim_ = {
+            static_cast<float>(width), 
+            static_cast<float>(height)
+        };
 
         window_ = SDL_CreateWindow(
             title.c_str(),
@@ -37,22 +39,16 @@ namespace Dynamo {
         return renderer_;
     }
 
-    int Display::get_width() {
-        return logic_w_;
+    Vec2D Display::get_dimensions() {
+        return logic_dim_;
     }
 
-    int Display::get_height() {
-        return logic_h_;
-    }
-
-    int Display::get_window_width() {
-        SDL_GetWindowSize(window_, &window_w_, nullptr);
-        return window_w_;
-    }
-
-    int Display::get_window_height() {
-        SDL_GetWindowSize(window_, nullptr, &window_h_);
-        return window_h_;
+    Vec2D Display::get_window_dimensions() {
+        SDL_GetWindowSize(window_, &window_x_, &window_y_);
+        return {
+            static_cast<float>(window_x_), 
+            static_cast<float>(window_y_)
+        };
     }
 
     void Display::set_title(std::string title) {
@@ -60,7 +56,7 @@ namespace Dynamo {
     }
 
     void Display::set_fill(Color color) {
-        draw_rect(0, 0, logic_w_, logic_h_, color, true);
+        draw_rect({0, 0}, logic_dim_, color, true);
     }
 
     void Display::set_borderfill(Color color) {
@@ -81,27 +77,37 @@ namespace Dynamo {
         }
     }
 
-    void Display::draw_point(int x, int y, Color color) {
+    void Display::draw_point(Vec2D point, Color color) {
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
         );
-        SDL_RenderDrawPoint(renderer_, x, y);
+        SDL_RenderDrawPoint(
+            renderer_, 
+            static_cast<int>(point.x), static_cast<int>(point.y)
+        );
     }
 
-    void Display::draw_line(int x1, int y1, 
-                            int x2, int y2, 
+    void Display::draw_line(Vec2D point1, Vec2D point2, 
                             Color color) {
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
         );
-        SDL_RenderDrawLine(renderer_, x1, y1, x2, y2);
+        SDL_RenderDrawLine(
+            renderer_, 
+            static_cast<int>(point1.x), static_cast<int>(point1.y), 
+            static_cast<int>(point2.x), static_cast<int>(point2.y)
+        );
     }
 
-    void Display::draw_rect(int x, int y, int w, int h, 
+    void Display::draw_rect(Vec2D top_left, Vec2D dimensions, 
                             Color color, bool fill) {
-        SDL_Rect rect = {x, y, w, h};
+        SDL_Rect rect = {
+            static_cast<int>(top_left.x), static_cast<int>(top_left.y), 
+            static_cast<int>(dimensions.x), static_cast<int>(dimensions.y)
+        };
+
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
@@ -114,29 +120,32 @@ namespace Dynamo {
         }
     }
 
-    void Display::draw_circle(int cx, int cy, int r, 
+    void Display::draw_circle(Vec2D center, int radius, 
                               Color color, bool fill) {
         // Midpoint algorithm
-        int x = r;
+        int x = radius;
         int y = 0;
-        int p = 1 - r;
+        int p = 1 - radius;
+
+        float cx = center.x;
+        float cy = center.y;
 
         while(x >= y) {
             if(!fill) {
-                draw_point(cx+x, cy+y, color);
-                draw_point(cx+x, cy-y, color);
-                draw_point(cx-x, cy+y, color);
-                draw_point(cx-x, cy-y, color);
-                draw_point(cx+y, cy+x, color);
-                draw_point(cx+y, cy-x, color);
-                draw_point(cx-y, cy+x, color);
-                draw_point(cx-y, cy-x, color);
+                draw_point({cx + x, cy + y}, color);
+                draw_point({cx + x, cy - y}, color);
+                draw_point({cx - x, cy + y}, color);
+                draw_point({cx - x, cy - y}, color);
+                draw_point({cx + y, cy + x}, color);
+                draw_point({cx + y, cy - x}, color);
+                draw_point({cx - y, cy + x}, color);
+                draw_point({cx - y, cy - x}, color);
             }
             else {
-                draw_line(cx+x, cy+y, cx-x, cy+y, color);
-                draw_line(cx+y, cy+x, cx-y, cy+x, color);
-                draw_line(cx+x, cy-y, cx-x, cy-y, color);
-                draw_line(cx+y, cy-x, cx-y, cy-x, color);
+                draw_line({cx + x, cy + y}, {cx - x, cy + y}, color);
+                draw_line({cx + y, cy + x}, {cx - y, cy + x}, color);
+                draw_line({cx + x, cy - y}, {cx - x, cy - y}, color);
+                draw_line({cx + y, cy - x}, {cx - y, cy - x}, color);
             }
             if(p <= 0) {
                 p += 2*y + 1;

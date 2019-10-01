@@ -1,6 +1,6 @@
 #include "vec2d.h"
 
-namespace Dynamo::Physics {
+namespace Dynamo {
     float Mat2D::determinant() const {
         return a * d - b * c;
     }

@@ -1,10 +1,10 @@
 #include "sprite.h"
 
 namespace Dynamo {
-    Sprite::Sprite(SDL_Texture *texture, int frame_width, int frame_height) {
+    Sprite::Sprite(SDL_Texture *texture, Vec2D frame_dimensions) {
         texture_ = texture;
-        frame_w_ = frame_width;
-        frame_h_ = frame_height;
+        frame_w_ = frame_dimensions.x;
+        frame_h_ = frame_dimensions.y;
         SDL_QueryTexture(
             texture_, 
             nullptr, nullptr, 
@@ -59,20 +59,18 @@ namespace Dynamo {
         return texture_;
     }
 
-    int Sprite::get_width() {
-        return texture_w_;
+    Vec2D Sprite::get_texture_dimensions() {
+        return {
+            static_cast<float>(texture_w_),
+            static_cast<float>(texture_h_),
+        };
     }
 
-    int Sprite::get_height() {
-        return texture_h_;
-    }
-
-    int Sprite::get_frame_height() {
-        return frame_h_;
-    }
-
-    int Sprite::get_frame_width() {
-        return frame_w_;
+    Vec2D Sprite::get_dimensions() {
+        return {
+            static_cast<float>(frame_w_),
+            static_cast<float>(frame_h_),
+        };
     }
 
     SDL_Rect *Sprite::get_source() {
@@ -140,16 +138,16 @@ namespace Dynamo {
         );
     }
 
-    void Sprite::set_target(int x, int y, int w, int h) {
+    void Sprite::set_target(Vec2D pos, Vec2D dimensions) {
         // One may pass the fields of a bounding box or something
-        if(w < 1 || h < 1) {
+        if(dimensions.x < 1 || dimensions.y < 1) {
             set_visible(false);
         }
 
-        target_->x = x;
-        target_->y = y;
-        target_->w = w;
-        target_->h = h;
+        target_->x = static_cast<int>(pos.x);
+        target_->y = static_cast<int>(pos.y);
+        target_->w = static_cast<int>(dimensions.x);
+        target_->h = static_cast<int>(dimensions.y);
     }
 
     void Sprite::animate(float dt, float fps, bool loop) {

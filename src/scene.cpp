@@ -44,14 +44,4 @@ namespace Dynamo {
     void Scene::set_child(Scene *next) {
         child_ = next;
     }
-
-    void Scene::update() {
-        // Override
-        // Update modules of this scene
-    }
-
-    void Scene::draw() {
-        // Override
-        // Draw scene sprites
-    }
 }

@@ -1,9 +1,9 @@
-#ifndef DYNAMO_PHYSICS_VEC2D_H_
-#define DYNAMO_PHYSICS_VEC2D_H_
+#ifndef DYNAMO_VEC2D_H_
+#define DYNAMO_VEC2D_H_
 
 #include <math.h>
 
-namespace Dynamo::Physics {
+namespace Dynamo {
     struct Mat2D {
         /*
         [a, b

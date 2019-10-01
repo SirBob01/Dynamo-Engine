@@ -8,6 +8,8 @@
 #include <string>
 #include <cstring>
 
+#include "vec2d.h"
+
 namespace Dynamo {
     typedef enum { 
         // Adapted from SDL_Scancode enum
@@ -259,12 +261,12 @@ namespace Dynamo {
         INPUT_MOUSERIGHT = 515,
 
         INPUT_LEN = 515 // Not an input, just the highest value
-    } INPUT;
+    } INPUT_CODE;
 
     class Inputs {
         SDL_Event event_;
 
-        std::unordered_map<std::string, INPUT> binds_;
+        std::unordered_map<std::string, INPUT_CODE> binds_;
 
         bool pressed_[INPUT_LEN + 1];
         bool released_[INPUT_LEN + 1];
@@ -288,8 +290,8 @@ namespace Dynamo {
         void reset_text_input();
 
         // Set and get the input bindings
-        void bind(std::string command, INPUT input);
-        INPUT get_bind(std::string command);
+        void bind(std::string command, INPUT_CODE input);
+        INPUT_CODE get_bind(std::string command);
 
         // Check the pressed state of an input
         bool get_pressed(std::string command);
@@ -298,17 +300,16 @@ namespace Dynamo {
         bool get_released(std::string command);
 
         // Get the pressed state of a raw input constant
-        bool get_pressed_raw(INPUT input);
+        bool get_pressed_raw(INPUT_CODE input);
 
         // Get the released state of a raw input constant
-        bool get_released_raw(INPUT input);
+        bool get_released_raw(INPUT_CODE input);
 
         // Get the name string of an input event
-        std::string get_name(INPUT input);
+        std::string get_name(INPUT_CODE input);
         
         // Get mouse position
-        int get_mouse_x();
-        int get_mouse_y();
+        Vec2D get_mouse_pos();
 
         // Test if the event handler quit
         bool get_quit();

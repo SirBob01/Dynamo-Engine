@@ -23,11 +23,11 @@ namespace Dynamo {
     public:
         Engine(int width, int height, std::string title);
 
-        // Check if the engine is running
-        bool get_running();
-
         // Get the module components for each scene
         Modules get_modules();
+
+        // Check if the engine is running
+        bool get_running();
 
         // Add a new scene to the stack
         void push_scene(Scene *scene);

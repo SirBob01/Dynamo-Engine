@@ -62,11 +62,11 @@ namespace Dynamo {
         text_input_ = "";
     }
 
-    void Inputs::bind(std::string command, INPUT input) {
+    void Inputs::bind(std::string command, INPUT_CODE input) {
         binds_[command] = input;
     }
 
-    INPUT Inputs::get_bind(std::string command) {
+    INPUT_CODE Inputs::get_bind(std::string command) {
         return binds_[command];
     }
 
@@ -78,15 +78,15 @@ namespace Dynamo {
         return get_released_raw(binds_[command]);
     }
 
-    bool Inputs::get_pressed_raw(INPUT input) {
+    bool Inputs::get_pressed_raw(INPUT_CODE input) {
         return pressed_[input];
     }
 
-    bool Inputs::get_released_raw(INPUT input) {
+    bool Inputs::get_released_raw(INPUT_CODE input) {
         return released_[input];
     }
 
-    std::string Inputs::get_name(INPUT input) {
+    std::string Inputs::get_name(INPUT_CODE input) {
         std::string s = " ";
         if(input < INPUT_MOUSELEFT) {
             s = SDL_GetScancodeName(static_cast<SDL_Scancode>(input));
@@ -109,12 +109,11 @@ namespace Dynamo {
         return s;
     }
 
-    int Inputs::get_mouse_x() {
-        return mouse_x_;
-    }
-
-    int Inputs::get_mouse_y() {
-        return mouse_y_;
+    Vec2D Inputs::get_mouse_pos() {
+        return {
+            static_cast<float>(mouse_x_),
+            static_cast<float>(mouse_y_),
+        };
     }
 
     bool Inputs::get_quit() {

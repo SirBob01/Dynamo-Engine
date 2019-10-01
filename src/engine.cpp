@@ -14,12 +14,12 @@ namespace Dynamo {
         running_ = false;
     }
 
-    bool Engine::get_running() {
-        return running_;
-    }
-
     Modules Engine::get_modules() {
         return {display_, textures_, jukebox_, inputs_, clock_};
+    }
+
+    bool Engine::get_running() {
+        return running_;
     }
 
     void Engine::push_scene(Scene *scene) {

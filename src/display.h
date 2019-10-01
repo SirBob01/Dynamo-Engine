@@ -6,15 +6,15 @@
 #include <string>
 
 #include "sprite.h"
+#include "vec2d.h"
 #include "color.h"
 
 namespace Dynamo {
     class Display {
-        int logic_w_;
-        int logic_h_;
+        int window_x_;
+        int window_y_;
 
-        int window_w_;
-        int window_h_;
+        Vec2D logic_dim_;
 
         Color border_color_;
 
@@ -29,12 +29,10 @@ namespace Dynamo {
         SDL_Renderer *get_renderer();
 
         // Get the draw port dimensions
-        int get_width();
-        int get_height();
+        Vec2D get_dimensions();
 
         // Get the physical GUI window dimentions
-        int get_window_width();
-        int get_window_height();
+        Vec2D get_window_dimensions();
 
         // Set the GUI bar title
         void set_title(std::string title);
@@ -47,31 +45,32 @@ namespace Dynamo {
 
         std::string get_title();
 
+        // Get the color of the draw port
         Color get_fill();
 
+        // Get the color of the stretched border 
         Color get_borderfill();
 
         // Draw a single sprite
         void draw_sprite(Sprite *sprite);
 
         // Draw a single point
-        void draw_point(int x, int y, Color color);
+        void draw_point(Vec2D point, Color color);
         
-        // Draw a line between two points (x1, y1) - (x2, y2)
-        void draw_line(int x1, int y1, 
-                       int x2, int y2, 
-                       Color color);
+        // Draw a line between two points
+        void draw_line(Vec2D point1, Vec2D point2, 
+                          Color color);
         
-        // Draw a rectangle with upperleft corner at (x, y)
-        void draw_rect(int x, int y, int w, int h, 
-                       Color color, bool fill);
+        // Draw a rectangle from the upperleft corner point
+        void draw_rect(Vec2D top_left, Vec2D dim, 
+                          Color color, bool fill);
 
-        // Draw a circle of radius r with center (cx, cy)
-        void draw_circle(int cx, int cy, int r, 
-                         Color color, bool fill);
+        // Draw a circle
+        void draw_circle(Vec2D center, int radius, 
+                             Color color, bool fill);
         
         // Draw a polygon of n sides
-        void draw_polygon(int points[][2], int n, Color color);
+        void draw_polygon(Vec2D points[], int n, Color color);
 
         // Refresh the display after each game-loop iteration
         void refresh();
