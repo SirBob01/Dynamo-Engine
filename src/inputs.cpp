@@ -1,15 +1,23 @@
 #include "inputs.h"
-
+#include <iostream>
 namespace Dynamo {
     Inputs::Inputs() {
         text_input_ = "";
         quit_ = false;
+        std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
+        std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
     }
 
     void Inputs::poll() {
-        std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
-        std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
-        
+        for(auto &key : pressed_change_) {
+            pressed_[key] = false;
+        }
+        for(auto &key : released_change_) {
+            released_[key] = false;
+        }
+        pressed_change_.clear();
+        released_change_.clear();
+
         SDL_GetMouseState(&mouse_x_, &mouse_y_);
 
         while(SDL_PollEvent(&event_)) {
@@ -19,22 +27,28 @@ namespace Dynamo {
             
             if(event_.type == SDL_MOUSEBUTTONDOWN) {
                 uint8_t button = event_.button.button;
-
-                pressed_[INPUT_MOUSELEFT] = (button == SDL_BUTTON_LEFT);
-                pressed_[INPUT_MOUSEMIDDLE] = (button == SDL_BUTTON_MIDDLE);
-                pressed_[INPUT_MOUSERIGHT] = (button == SDL_BUTTON_RIGHT);
+                for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
+                    pressed_[i] = (button - 1 == i - INPUT_MOUSELEFT);
+                    if(pressed_[i]) {
+                        pressed_change_.push_back(i);
+                    }
+                }
             }
             
             if(event_.type == SDL_MOUSEBUTTONUP) {
                 uint8_t button = event_.button.button;
-                
-                released_[INPUT_MOUSELEFT] = (button == SDL_BUTTON_LEFT);
-                released_[INPUT_MOUSEMIDDLE] = (button == SDL_BUTTON_MIDDLE);
-                released_[INPUT_MOUSERIGHT] = (button == SDL_BUTTON_RIGHT);
+                for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
+                    released_[i] = (button - 1 == i - INPUT_MOUSELEFT);
+                    if(released_[i]) {
+                        released_change_.push_back(i);
+                    }
+                }
             }
 
             if(event_.type == SDL_KEYDOWN && event_.key.repeat == 0) {
-                pressed_[event_.key.keysym.scancode] = true;
+                int scancode = event_.key.keysym.scancode;
+                pressed_[scancode] = true;
+                pressed_change_.push_back(scancode);
 
                 // Special backspace event
                 if(text_input_.size()) {
@@ -45,7 +59,9 @@ namespace Dynamo {
             }
 
             if(event_.type == SDL_KEYUP) {
-                released_[event_.key.keysym.scancode] = true;
+                int scancode = event_.key.keysym.scancode;
+                released_[scancode] = true;
+                released_change_.push_back(scancode);
             }
             
             if(event_.type == SDL_TEXTINPUT) {

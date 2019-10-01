@@ -270,6 +270,9 @@ namespace Dynamo {
 
         bool pressed_[INPUT_LEN + 1];
         bool released_[INPUT_LEN + 1];
+
+        std::vector<int>pressed_change_;
+        std::vector<int>released_change_;
         
         std::string text_input_;
 
