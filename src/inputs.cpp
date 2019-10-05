@@ -1,5 +1,5 @@
 #include "inputs.h"
-#include <iostream>
+
 namespace Dynamo {
     Inputs::Inputs() {
         text_input_ = "";
@@ -9,10 +9,10 @@ namespace Dynamo {
     }
 
     void Inputs::poll() {
-        for(auto &key : pressed_change_) {
+        for(int key : pressed_change_) {
             pressed_[key] = false;
         }
-        for(auto &key : released_change_) {
+        for(int key : released_change_) {
             released_[key] = false;
         }
         pressed_change_.clear();

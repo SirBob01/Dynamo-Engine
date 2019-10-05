@@ -1,5 +1,5 @@
 #include "display.h"
-#include <iostream>
+
 namespace Dynamo {
     Display::Display(int width, int height, std::string title) {
         logic_dim_ = {

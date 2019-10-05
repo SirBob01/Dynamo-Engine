@@ -2,6 +2,7 @@
 #define DYNAMO_ENGINE_H_
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 
 #include <string>
 #include <stack>

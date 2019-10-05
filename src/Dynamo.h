@@ -12,5 +12,7 @@
 #include "color.h"
 #include "vec2d.h"
 #include "error.h"
+#include "net/client.h"
+#include "net/server.h"
 
 #endif

@@ -2,7 +2,12 @@
 
 namespace Dynamo {
     Engine::Engine(int width, int height, std::string title) {
-        SDL_Init(SDL_INIT_EVERYTHING);
+        if(SDL_Init(SDL_INIT_EVERYTHING) == -1) {
+            throw SDLError(SDL_GetError());
+        }
+        if(SDLNet_Init() == -1) {
+            throw SDLError(SDLNet_GetError());
+        }
 
         // Initialize singleton modules
         display_ = new Display(width, height, title);
@@ -78,6 +83,7 @@ namespace Dynamo {
         delete inputs_;
         delete clock_;
 
+        SDLNet_Quit();
         SDL_Quit();
     }
 }
