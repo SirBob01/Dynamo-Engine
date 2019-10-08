@@ -3,46 +3,37 @@
 
 #include <SDL2/SDL_net.h>
 
-#include <string>
-#include <cstring>
+#include <chrono>
 
-#include "server.h"
+#include "node.h"
 
 namespace Dynamo::Net {
-    class Client {
-        UDPsocket socket_;
+    class Client : public Node {
+        IPaddress server_;
+        std::string server_name_;
+        std::string server_ip_;
 
-        IPaddress host_;
-        std::string hostname_;
-        std::string ip_string_;
-
-        UDPpacket *recv_;
-        size_t packet_size_;
-
-        bool connected_;
+        long long int timestamp_;
+        int timeout_;
 
     public:
-        Client(std::string ip, int port, size_t packet_size);
-        ~Client();
+        // Timeout in seconds
+        Client(std::string ip, int port, int packet_size, int timeout_s);
 
-        // Get host name (normally the name on the computer)
-        std::string get_hostname();
+        // Get the server ip address
+        uint32_t get_server_ip();
 
-        // Get server address as a domain string (i.e. XXX.XX.XX.X)
-        std::string get_ip();
+        // Get the server ip address as a readable string (XXX.XX.XX.X)
+        std::string get_server_ip_string();
 
-        // Update the client
-        void tick();
+        // Get the name of the server
+        std::string get_server_name();
 
-        // Send to the server
+        // Send data to the server
         int send(void *data, int len, int protocol);
 
-        // Listen for server packets
-        int listen();
-
-        // What do to with packet received
-        // Custom protocols must not override NET_PROTOCOL
-        virtual void action(void *data, int len, int protocol) = 0;
+        // Update the client, returns whether a packet was received
+        bool tick();
     };
 }
 
