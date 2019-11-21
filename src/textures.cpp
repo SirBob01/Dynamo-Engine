@@ -44,10 +44,16 @@ namespace Dynamo {
             SDL_DestroyTexture(texture_map_[id].texture);
         }
 
+        color.clamp();
+        uint8_t r = color.r;
+        uint8_t g = color.g;
+        uint8_t b = color.b;
+        uint8_t a = color.a;
+
         SDL_Surface *surf = TTF_RenderText_Solid(
             fonts_[font_id], 
-            text.c_str(), 
-            {color.r, color.g, color.b, color.a}
+            text.c_str(),
+            {r, g, b, a}
         );
         SDL_Texture *texture = SDL_CreateTextureFromSurface(
             renderer_, 

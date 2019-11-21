@@ -111,7 +111,8 @@ namespace Dynamo {
 
         // Set the draw target position and dimensions
         // Allows dynamic sprite resizing
-        void set_target(Vec2D pos, Vec2D dimensions);
+        // If center is true, sprite is positioned at pos-(dimensions/2)
+        void set_target(Vec2D pos, Vec2D dimensions, bool center);
 
         // Animate the frames of the sprite
         void animate(float dt, float fps, bool loop);

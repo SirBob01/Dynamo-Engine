@@ -177,12 +177,14 @@ namespace Dynamo {
         );
     }
 
-    void Sprite::set_target(Vec2D pos, Vec2D dimensions) {
+    void Sprite::set_target(Vec2D pos, Vec2D dimensions, bool center) {
         // One may pass the fields of a bounding box or something
         if(dimensions.x < 1 || dimensions.y < 1) {
             set_visible(false);
         }
-
+        if(center) {
+            pos -= dimensions/2;
+        }
         target_->x = static_cast<int>(pos.x);
         target_->y = static_cast<int>(pos.y);
         target_->w = static_cast<int>(dimensions.x);

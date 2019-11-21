@@ -17,6 +17,9 @@ namespace Dynamo {
         // Get the current number of frames
         int get_frames();
 
+        // Get milliseconds since SDL init
+        int get_time();
+
         // Get the delta time
         float get_delta();
 

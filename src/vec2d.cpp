@@ -183,4 +183,18 @@ namespace Dynamo {
     bool Vec2D::operator!=(const Vec2D &rhs) const {
         return (x != rhs.x || y != rhs.y);
     }
+
+    std::size_t HashMat2D::operator()(Mat2D const &m) const noexcept {
+        std::size_t h1 = std::hash<float>{}(m.a);
+        std::size_t h2 = std::hash<float>{}(m.b);
+        std::size_t h3 = std::hash<float>{}(m.c);
+        std::size_t h4 = std::hash<float>{}(m.d);
+        return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+    }
+
+    std::size_t HashVec2D::operator()(Vec2D const &v) const noexcept {
+        std::size_t h1 = std::hash<float>{}(v.x);
+        std::size_t h2 = std::hash<float>{}(v.y);
+        return h1 ^ (h2 << 1);
+    }
 }

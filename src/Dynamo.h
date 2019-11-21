@@ -15,5 +15,6 @@
 #include "net/node.h"
 #include "net/client.h"
 #include "net/server.h"
+#include "net/packet.h"
 
 #endif

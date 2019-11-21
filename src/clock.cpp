@@ -13,6 +13,10 @@ namespace Dynamo {
         return frames_;
     }
 
+    int Clock::get_time() {
+        return current_;
+    }
+
     float Clock::get_delta() {
         return delta_;
     }
