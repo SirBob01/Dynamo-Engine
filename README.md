@@ -21,3 +21,4 @@ This engine wraps around SDL2 and its extensions:
 
 # TODO
 - Add support for dynamic 2D lighting
+- Implement GUI widgets (buttons, textboxes, sliders)
