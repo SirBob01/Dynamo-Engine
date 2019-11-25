@@ -270,6 +270,7 @@ namespace Dynamo {
 
         bool pressed_[INPUT_LEN + 1];
         bool released_[INPUT_LEN + 1];
+        bool state_[INPUT_LEN + 1];
 
         std::vector<int>pressed_change_;
         std::vector<int>released_change_;
@@ -285,6 +286,9 @@ namespace Dynamo {
 
         // Update the input handler
         void poll();
+
+        // Reset pressed and released state arrays
+        void reset_states();
 
         // Get the value of a text input event
         std::string get_text_input();
@@ -302,11 +306,17 @@ namespace Dynamo {
         // Check the released state of an input
         bool get_released(std::string command);
 
+        // Get the state of the command bind (held down or relased)
+        bool get_state(std::string command);
+
         // Get the pressed state of a raw input constant
         bool get_pressed_raw(INPUT_CODE input);
 
         // Get the released state of a raw input constant
         bool get_released_raw(INPUT_CODE input);
+
+        // Get the state of the button
+        bool get_state_raw(INPUT_CODE input);
 
         // Get the name string of an input event
         std::string get_name(INPUT_CODE input);

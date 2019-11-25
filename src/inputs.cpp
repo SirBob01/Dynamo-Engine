@@ -6,18 +6,11 @@ namespace Dynamo {
         quit_ = false;
         std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
         std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
+        std::memset(state_, false, (INPUT_LEN + 1) * sizeof(bool));
     }
 
     void Inputs::poll() {
-        for(int key : pressed_change_) {
-            pressed_[key] = false;
-        }
-        for(int key : released_change_) {
-            released_[key] = false;
-        }
-        pressed_change_.clear();
-        released_change_.clear();
-
+        reset_states();
         SDL_GetMouseState(&mouse_x_, &mouse_y_);
 
         while(SDL_PollEvent(&event_)) {
@@ -28,6 +21,7 @@ namespace Dynamo {
             if(event_.type == SDL_MOUSEBUTTONDOWN) {
                 uint8_t button = event_.button.button;
                 for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
+                    state_[i] = (button - 1 == i - INPUT_MOUSELEFT);
                     pressed_[i] = (button - 1 == i - INPUT_MOUSELEFT);
                     if(pressed_[i]) {
                         pressed_change_.push_back(i);
@@ -38,6 +32,7 @@ namespace Dynamo {
             if(event_.type == SDL_MOUSEBUTTONUP) {
                 uint8_t button = event_.button.button;
                 for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
+                    state_[i] = (button - 1 != i - INPUT_MOUSELEFT);
                     released_[i] = (button - 1 == i - INPUT_MOUSELEFT);
                     if(released_[i]) {
                         released_change_.push_back(i);
@@ -47,6 +42,7 @@ namespace Dynamo {
 
             if(event_.type == SDL_KEYDOWN && event_.key.repeat == 0) {
                 int scancode = event_.key.keysym.scancode;
+                state_[scancode] = true;
                 pressed_[scancode] = true;
                 pressed_change_.push_back(scancode);
 
@@ -60,6 +56,7 @@ namespace Dynamo {
 
             if(event_.type == SDL_KEYUP) {
                 int scancode = event_.key.keysym.scancode;
+                state_[scancode] = false;
                 released_[scancode] = true;
                 released_change_.push_back(scancode);
             }
@@ -68,6 +65,17 @@ namespace Dynamo {
                 text_input_ += event_.text.text;
             }
         }
+    }
+
+    void Inputs::reset_states() {
+        for(int key : pressed_change_) {
+            pressed_[key] = false;
+        }
+        for(int key : released_change_) {
+            released_[key] = false;
+        }
+        pressed_change_.clear();
+        released_change_.clear();
     }
 
     std::string Inputs::get_text_input() {
@@ -94,12 +102,20 @@ namespace Dynamo {
         return get_released_raw(binds_[command]);
     }
 
+    bool Inputs::get_state(std::string command) {
+        return get_state_raw(binds_[command]);
+    }
+
     bool Inputs::get_pressed_raw(INPUT_CODE input) {
         return pressed_[input];
     }
 
     bool Inputs::get_released_raw(INPUT_CODE input) {
         return released_[input];
+    }
+
+    bool Inputs::get_state_raw(INPUT_CODE input) {
+        return state_[input];
     }
 
     std::string Inputs::get_name(INPUT_CODE input) {

@@ -43,6 +43,9 @@ namespace Dynamo {
         if(texture_map_.count(id)) {
             SDL_DestroyTexture(texture_map_[id].texture);
         }
+        if(!fonts_.count(font_id)) {
+            throw InvalidKey(id, "fonts_");
+        }
 
         color.clamp();
         uint8_t r = color.r;

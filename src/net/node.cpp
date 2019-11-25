@@ -1,16 +1,6 @@
 #include "node.h"
 
 namespace Dynamo::Net {
-    Packet::Packet(int packet_size) {
-        data = new char[packet_size];
-        size = 0;
-        source = {};
-    }
-
-    Packet::~Packet() {
-        delete data;
-    }
-
     Node::Node(int socket_port, int packet_size) {
         // Initialize SDL_net
         if(SDLNet_Init() == -1) {
@@ -61,7 +51,7 @@ namespace Dynamo::Net {
     }
 
     int Node::send_to(IPaddress *target, void *data, int len, int protocol) {
-        size_t header = sizeof(int);
+        std::size_t header = sizeof(int);
         if(header + len > packet_size_) {
             throw PacketOverflow(packet_size_, len);
         }
@@ -83,14 +73,14 @@ namespace Dynamo::Net {
     }
 
     int Node::listen() {
-        size_t bytes = SDLNet_UDP_Recv(socket_, recv_);
-        size_t header = sizeof(int);
-        size_t size = recv_->len - header;
+        std::size_t bytes = SDLNet_UDP_Recv(socket_, recv_);
+        std::size_t header = sizeof(int);
+        std::size_t size = recv_->len - header;
         
         if(bytes) {
             // Copy data to formatted packet for interfacing
             std::memcpy(&packet_->protocol, recv_->data, header);
-            std::memcpy(&packet_->data, recv_->data + header, size);
+            std::memcpy(packet_->data, recv_->data + header, size);
             packet_->size = size;
             packet_->source.host = recv_->address.host;
             packet_->source.port = recv_->address.port;

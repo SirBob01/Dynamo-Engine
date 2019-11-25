@@ -5,35 +5,44 @@ namespace Dynamo::Net {
     : Node(port, packet_size) {
         port_ = static_cast<uint16_t>(port);
         timeout_ = timeout_s;
+        time_ = 0;
     }
 
     int Server::get_port() {
         return port_;
     }
 
-    int Server::get_num_connected() {
+    int Server::get_num_clients() {
         return connected_.size();
     }
 
     bool Server::is_connected(uint32_t address) {
-        for(auto &conn : connected_) {
-            if(conn.first == address) {
-                return true;
-            }
-        }
-        return false;
+        return connected_.find(address) != connected_.end();
     }
 
-    void Server::cull_connected(long long int time) {
+    void Server::cull_clients() {
         auto it = connected_.begin();
         while(it != connected_.end()) {
-            if(time - it->second.timestamp > timeout_) {
+            if(time_ - it->second.timestamp > timeout_ * 1000) {
                 it = connected_.erase(it);
             }
             else {
                 it++;
             }
         }
+    }
+
+    void Server::add_client(IPaddress *address) {
+        connected_[address->host] = {
+            address->port, 
+            time_
+        };
+        send_to(address, nullptr, 0, NET_CONNECT);
+    }
+
+    void Server::reset_client(IPaddress *address) {
+        connected_[address->host].timestamp = time_;
+        send_to(address, nullptr, 0, NET_ALIVE);
     }
 
     void Server::send_all(void *data, int len, int protocol) {
@@ -46,36 +55,31 @@ namespace Dynamo::Net {
         }
     }
 
-    bool Server::tick() {
-        auto time = std::chrono::time_point_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now()
-        );
-        long long int current = time.time_since_epoch().count();
-
-        cull_connected(current);
+    bool Server::update(int dt) {
+        time_ += dt;
+        cull_clients();
         
         // Handle default protocols
         bool new_packet = listen();
         if(new_packet) {
-            if(!is_connected(packet_->source.port)) {
+            bool member = is_connected(packet_->source.host);
+            if(!member) {
                 if(packet_->protocol == NET_CONNECT) {
-                    connected_[packet_->source.host] = {
-                        packet_->source.port, 
-                        current
-                    };
-                    return true;
+                    add_client(&packet_->source);
+                    member = true;
                 }
             }
             else {
                 if(packet_->protocol == NET_ALIVE) {
-                    connected_[packet_->source.host].timestamp = current;
+                    reset_client(&packet_->source);
                 }
                 else if(packet_->protocol == NET_DISCONNECT) {
                     connected_.erase(packet_->source.host);
+                    member = false;
                 }
-                return true;
             }
+            return member;
         }
-        return false;
+        return new_packet;
     }
 }

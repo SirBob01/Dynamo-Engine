@@ -1,8 +1,6 @@
 #ifndef DYNAMO_VEC2D_H_
 #define DYNAMO_VEC2D_H_
 
-#include <functional>
-
 #include <math.h>
 
 namespace Dynamo {
@@ -64,14 +62,6 @@ namespace Dynamo {
 
         bool operator==(const Vec2D &rhs) const;
         bool operator!=(const Vec2D &rhs) const;
-    };
-
-    struct HashMat2D {
-        std::size_t operator()(Mat2D const &m) const noexcept;
-    };
-    
-    struct HashVec2D {
-        std::size_t operator()(Vec2D const &v) const noexcept;
     };
 }
 

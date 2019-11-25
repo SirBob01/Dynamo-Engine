@@ -48,6 +48,7 @@ namespace Dynamo {
         bool visible_;
 
     public:
+        // TODO: Create deep copy of SDL_Texture pointer
         Sprite(Texture texture, Vec2D frame_dimensions);
         ~Sprite();
 
@@ -65,6 +66,12 @@ namespace Dynamo {
 
         // Get the draw target rectangle
         SDL_Rect *get_target();
+
+        // Get number of animation frames
+        int get_num_frames();
+
+        // Get current frame index
+        int get_frame_index();
 
         // Get the sprite's fill color
         Color get_color();
@@ -111,8 +118,13 @@ namespace Dynamo {
 
         // Set the draw target position and dimensions
         // Allows dynamic sprite resizing
-        // If center is true, sprite is positioned at pos-(dimensions/2)
         void set_target(Vec2D pos, Vec2D dimensions, bool center);
+
+        // Set the current animation frame
+        void set_frame(int index);
+
+        // Shift animation frame by 1 unit
+        void shift_frame(int direction);
 
         // Animate the frames of the sprite
         void animate(float dt, float fps, bool loop);

@@ -64,6 +64,10 @@ namespace Dynamo {
     }
 
     Sprite::~Sprite() {
+        // Reset texture properties
+        set_alpha(0xFF);
+        set_blend(SPRITE_BLEND_BLEND);
+
         delete target_;
         for(auto &r : source_) {
             delete r;
@@ -95,6 +99,14 @@ namespace Dynamo {
 
     SDL_Rect *Sprite::get_target() {
         return target_;
+    }
+
+    int Sprite::get_num_frames() {
+        return max_frames_;
+    }
+
+    int Sprite::get_frame_index() {
+        return current_frame_;
     }
 
     Color Sprite::get_color() {
@@ -189,6 +201,26 @@ namespace Dynamo {
         target_->y = static_cast<int>(pos.y);
         target_->w = static_cast<int>(dimensions.x);
         target_->h = static_cast<int>(dimensions.y);
+    }
+
+    void Sprite::set_frame(int index) {
+        current_frame_ = index;
+        if(current_frame_ < 0 || current_frame_ >= max_frames_) {
+            current_frame_ %= max_frames_;
+        }
+    }
+
+    void Sprite::shift_frame(int direction) {
+        if(direction < 0) {
+            current_frame_--;
+        }
+        else {
+            current_frame_++;
+        }
+
+        if(current_frame_ < 0 || current_frame_ >= max_frames_) {
+            current_frame_ %= max_frames_;
+        }
     }
 
     void Sprite::animate(float dt, float fps, bool loop) {

@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 
+#include "packet.h"
 #include "../error.h"
 
 namespace Dynamo::Net {    
@@ -14,17 +15,6 @@ namespace Dynamo::Net {
         NET_DISCONNECT = 1, // Disconnection request
         NET_ALIVE = 2,      // Status packet
     } NET_PROTOCOL;
-
-    // Formatted packet
-    struct Packet {
-        int protocol;
-        char *data;
-        int size;
-        IPaddress source;
-
-        Packet(int packet_size);
-        ~Packet();
-    };
 
     class Node {
     protected:
@@ -38,7 +28,7 @@ namespace Dynamo::Net {
         // Receive packet
         Packet *packet_;
         UDPpacket *recv_;
-        size_t packet_size_;
+        std::size_t packet_size_;
 
     public:
         Node(int socket_port, int packet_size);
@@ -62,8 +52,8 @@ namespace Dynamo::Net {
         // Listen for incoming packets
         int listen();
 
-        // Update the connector
-        virtual bool tick() = 0;
+        // Update the connector at the same rate as the rest of the application
+        virtual bool update(int dt) = 0;
     };
 
     // Convert 32-bit integer to human readable IP addresss

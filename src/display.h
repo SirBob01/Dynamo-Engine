@@ -6,6 +6,7 @@
 #include <string>
 
 #include "sprite.h"
+#include "aabb.h"
 #include "vec2d.h"
 #include "color.h"
 
@@ -62,8 +63,7 @@ namespace Dynamo {
                           Color color);
         
         // Draw a rectangle from the upperleft corner point
-        void draw_rect(Vec2D top_left, Vec2D dim, 
-                          Color color, bool fill);
+        void draw_rect(AABB bound, Color color, bool fill);
 
         // Draw a circle
         void draw_circle(Vec2D center, int radius, 

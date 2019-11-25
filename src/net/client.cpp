@@ -1,4 +1,5 @@
 #include "client.h"
+#include <iostream>
 
 namespace Dynamo::Net {
     Client::Client(std::string ip, int port, int packet_size, int timeout_s) 
@@ -7,11 +8,10 @@ namespace Dynamo::Net {
         if(SDLNet_ResolveHost(&server_, ip.c_str(), port) == -1) {
             throw SDLError(SDLNet_GetError());
         }
-
-        server_name_ = std::string(SDLNet_ResolveIP(&server_));
         server_ip_ = ip;
-
-        timestamp_ = -1; // Indicates no connection to server
+        
+        time_ = 0;
+        timestamp_ = 0; // Indicates no connection to server
         timeout_ = timeout_s;
     }
 
@@ -23,35 +23,53 @@ namespace Dynamo::Net {
         return server_ip_;
     }
 
-    std::string Client::get_server_name() {
-        return server_name_;
-    }
-
     int Client::send(void *data, int len, int protocol) {
         return send_to(&server_, data, len, protocol);
     }
 
-    bool Client::tick() {
-        auto time = std::chrono::time_point_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now()
-        );
-        long long int current = time.time_since_epoch().count();
+    bool Client::is_connected() {
+        return !timestamp_;
+    }
 
-        bool server_update = listen();
+    bool Client::server_message() {
+        if(listen()) {
+            return packet_->source.host == server_.host;
+        }
+        return false;
+    }
 
-        if(current - timestamp_ > timeout_ * 1000) {
-            // 20 seconds, then terminate connection
+    bool Client::update(int dt) {
+        time_ += dt;
+        bool comm_packet = server_message();
+
+        if(time_ - timestamp_ > timeout_ * 1000) {
+            // Terminate timed-out connection
             timestamp_ = 0;
-        }
-        else if(server_update) {
-            if(packet_->protocol == NET_CONNECT || 
-               packet_->protocol == NET_ALIVE) {
-                timestamp_ = current;
+            if(time_ % 2000 < 10) {
+                std::cout << "Attempting connection...\n";
+                send(nullptr, 0, NET_CONNECT);
             }
-            else if(packet_->protocol == NET_DISCONNECT) {
-                timestamp_ = 0;
+            if(comm_packet && packet_->protocol == NET_CONNECT) {
+                std::cout << "Connected!";
+                timestamp_ = time_;
             }
         }
-        return server_update;
+        else {
+            // TODO: This is very wonky. I'll work on this some other time
+            // Send a status packet roughly every 2 seconds
+            if(time_ % 2000 < 10) {
+                std::cout << "Send status packet\n";
+                send(nullptr, 0, NET_ALIVE);
+            }
+            if(comm_packet) {
+                if(packet_->protocol == NET_ALIVE) {
+                    timestamp_ = time_;
+                }
+                else if(packet_->protocol == NET_DISCONNECT) {
+                    timestamp_ = 0;
+                }
+            }
+        }
+        return comm_packet;
     }
 }
