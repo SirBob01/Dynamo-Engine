@@ -10,6 +10,7 @@ Features:
 - Audio streaming (separate channels for music, ambience, and sound effects)
 - Rasterizing primitives
 - Custom networking protocol
+- GUI Widgets
 
 # Dependencies
 
@@ -21,4 +22,4 @@ This engine wraps around SDL2 and its extensions:
 
 # TODO
 - Add support for dynamic 2D lighting
-- Implement GUI widgets (buttons, textboxes, sliders)
+- Implement GUI textboxes and sliders
