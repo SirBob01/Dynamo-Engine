@@ -117,11 +117,11 @@ namespace Dynamo {
         );
     }
 
-    void Display::draw_rect(AABB bound, Color color, bool fill) {
-        Vec2D min = bound.get_min();
+    void Display::draw_rect(AABB box, Color color, bool fill) {
+        Vec2D min = box.get_min();
         SDL_Rect rect = {
             static_cast<int>(min.x), static_cast<int>(min.y), 
-            static_cast<int>(bound.dim.x), static_cast<int>(bound.dim.y)
+            static_cast<int>(box.dim.x), static_cast<int>(box.dim.y)
         };
 
         SDL_SetRenderDrawColor(

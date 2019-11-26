@@ -63,7 +63,7 @@ namespace Dynamo {
                           Color color);
         
         // Draw a rectangle from the upperleft corner point
-        void draw_rect(AABB bound, Color color, bool fill);
+        void draw_rect(AABB box, Color color, bool fill);
 
         // Draw a circle
         void draw_circle(Vec2D center, int radius, 

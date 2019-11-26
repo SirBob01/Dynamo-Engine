@@ -1,7 +1,7 @@
 #include "aabb.h"
 
 namespace Dynamo {
-    const bool AABB::get_colliding(const AABB &other) const {
+    const bool AABB::is_colliding(const AABB &other) const {
         Vec2D min = get_min();
         Vec2D max = get_max();
 
@@ -14,7 +14,7 @@ namespace Dynamo {
         return hor && ver;
     }
 
-    const bool AABB::get_in_bounds(const Vec2D &point) const {
+    const bool AABB::is_in_bounds(const Vec2D &point) const {
         Vec2D min = get_min();
         Vec2D max = get_max();
 

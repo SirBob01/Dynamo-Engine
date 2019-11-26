@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "textures.h"
+#include "aabb.h"
 #include "vec2d.h"
 #include "color.h"
 
@@ -118,7 +119,7 @@ namespace Dynamo {
 
         // Set the draw target position and dimensions
         // Allows dynamic sprite resizing
-        void set_target(Vec2D pos, Vec2D dimensions, bool center);
+        void set_target(AABB box);
 
         // Set the current animation frame
         void set_frame(int index);
@@ -127,7 +128,7 @@ namespace Dynamo {
         void shift_frame(int direction);
 
         // Animate the frames of the sprite
-        void animate(float dt, float fps, bool loop);
+        void animate(int dt, int fps, bool loop);
     };
 }
 

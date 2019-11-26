@@ -12,6 +12,8 @@
 #include "color.h"
 #include "vec2d.h"
 #include "error.h"
+#include "gui/widget.h"
+#include "gui/button.h"
 #include "net/node.h"
 #include "net/client.h"
 #include "net/server.h"

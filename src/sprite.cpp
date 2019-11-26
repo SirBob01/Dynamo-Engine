@@ -189,18 +189,16 @@ namespace Dynamo {
         );
     }
 
-    void Sprite::set_target(Vec2D pos, Vec2D dimensions, bool center) {
+    void Sprite::set_target(AABB box) {
         // One may pass the fields of a bounding box or something
-        if(dimensions.x < 1 || dimensions.y < 1) {
+        if(box.dim.x < 1 || box.dim.y < 1) {
             set_visible(false);
         }
-        if(center) {
-            pos -= dimensions/2;
-        }
-        target_->x = static_cast<int>(pos.x);
-        target_->y = static_cast<int>(pos.y);
-        target_->w = static_cast<int>(dimensions.x);
-        target_->h = static_cast<int>(dimensions.y);
+        Vec2D top_left = box.get_min();
+        target_->x = static_cast<int>(top_left.x);
+        target_->y = static_cast<int>(top_left.y);
+        target_->w = static_cast<int>(box.dim.x);
+        target_->h = static_cast<int>(box.dim.y);
     }
 
     void Sprite::set_frame(int index) {
@@ -223,7 +221,7 @@ namespace Dynamo {
         }
     }
 
-    void Sprite::animate(float dt, float fps, bool loop) {
+    void Sprite::animate(int dt, int fps, bool loop) {
         accumulator_ += dt;
         if(accumulator_ >= (1000.0/fps)) {
             current_frame_++;
