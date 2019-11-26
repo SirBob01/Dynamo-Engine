@@ -6,6 +6,7 @@
 #include "../textures.h"
 
 namespace Dynamo::GUI {
+    // Simplest type of GUI widget
     class Button : public Widget {
         Sprite *sprites_[2];
         int sprite_count_;

@@ -190,10 +190,6 @@ namespace Dynamo {
     }
 
     void Sprite::set_target(AABB box) {
-        // One may pass the fields of a bounding box or something
-        if(box.dim.x < 1 || box.dim.y < 1) {
-            set_visible(false);
-        }
         Vec2D top_left = box.get_min();
         target_->x = static_cast<int>(top_left.x);
         target_->y = static_cast<int>(top_left.y);

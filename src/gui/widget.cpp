@@ -42,6 +42,7 @@ namespace Dynamo::GUI {
         bool mouse_bounds = is_in_bounds(inputs->get_mouse_pos());
         bool click = inputs->get_state_raw(INPUT_MOUSELEFT);
         
+        // Handle different states
         if(click) {
             if(mouse_bounds) {
                 state_ = WIDGET_CLICK;

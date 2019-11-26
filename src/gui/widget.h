@@ -13,10 +13,10 @@ namespace Dynamo::GUI {
     } WIDGET_STATE;
 
     class Widget {    
+    protected:
         void (* on_hover_)();
         void (* on_click_)();
-
-    protected:
+        
         AABB bounds_;
         Vec2D click_pos_;
 

@@ -26,4 +26,12 @@ namespace Dynamo {
     const char *InvalidKey::what() const throw() {
         return message_.c_str();
     }
+
+    ValueExists::ValueExists(std::string key, std::string map_name) {
+        message_ = key + " already exists in " + map_name;
+    }
+
+    const char *ValueExists::what() const throw() {
+        return message_.c_str();
+    }
 }

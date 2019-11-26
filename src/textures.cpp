@@ -16,7 +16,7 @@ namespace Dynamo {
         int height = dimensions.y;
         
         if(texture_map_.count(id)) {
-            SDL_DestroyTexture(texture_map_[id].texture);
+            throw ValueExists(id, "texture_map_");
         }
         
         // Create a colorless, blank canvas texture
@@ -31,7 +31,7 @@ namespace Dynamo {
 
     void TextureManager::load_image(std::string id, std::string filename) {
         if(texture_map_.count(id)) {
-            SDL_DestroyTexture(texture_map_[id].texture);
+            throw ValueExists(id, "texture_map_");
         }
 
         SDL_Texture *texture = IMG_LoadTexture(renderer_, filename.c_str());
@@ -41,10 +41,10 @@ namespace Dynamo {
     void TextureManager::load_text(std::string id, std::string text, 
                              std::string font_id, Color color) {
         if(texture_map_.count(id)) {
-            SDL_DestroyTexture(texture_map_[id].texture);
+            throw ValueExists(id, "texture_map_");
         }
         if(!fonts_.count(font_id)) {
-            throw InvalidKey(id, "fonts_");
+            throw InvalidKey(font_id, "fonts_");
         }
 
         color.clamp();
@@ -69,10 +69,26 @@ namespace Dynamo {
     void TextureManager::load_font(std::string font_id, 
                              std::string filename, int size) {
         if(fonts_.count(font_id)) {
-            TTF_CloseFont(fonts_[font_id]);
+            throw ValueExists(font_id, "fonts_");
         }
 
         fonts_[font_id] = TTF_OpenFont(filename.c_str(), size);
+    }
+
+    void TextureManager::unload_texture(std::string id) {
+        if(!texture_map_.count(id)) {
+            throw InvalidKey(id, "texture_map_");
+        }
+        SDL_DestroyTexture(texture_map_[id].texture);
+        texture_map_.erase(id);
+    }
+
+    void TextureManager::unload_font(std::string font_id) {
+        if(!fonts_.count(font_id)) {
+            throw InvalidKey(font_id, "fonts_");
+        }
+        TTF_CloseFont(fonts_[font_id]);
+        fonts_.erase(font_id);
     }
 
     Texture &TextureManager::get_texture(std::string id) {

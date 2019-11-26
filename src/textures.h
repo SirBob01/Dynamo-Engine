@@ -29,7 +29,7 @@ namespace Dynamo {
         ~TextureManager();
 
         // Pre-load resources on Scene initialization
-        // If texture id exists, it is overwritten to prevent memory leaks
+        // If texture id exists, throw error
         void load_surface(std::string id, Vec2D dimensions);
         void load_image(std::string id, std::string filename);
         void load_text(std::string id, std::string text, 
@@ -37,6 +37,12 @@ namespace Dynamo {
 
         // Load a TTF font file into the local database
         void load_font(std::string font_id, std::string filename, int size);
+
+        // Unload a texture to reuse the id key
+        void unload_texture(std::string id);
+
+        // Unload a font to reuse the id key
+        void unload_font(std::string font_id);
 
         // Get a texture from an id key
         Texture &get_texture(std::string id);
