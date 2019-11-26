@@ -8,9 +8,6 @@ namespace Dynamo::GUI {
         };
         state_ = WIDGET_DEFAULT;
         selected_ = false;
-
-        on_hover_ = nullptr;
-        on_click_ = nullptr;
     }
 
     bool Widget::is_in_bounds(Vec2D point) {
@@ -25,14 +22,6 @@ namespace Dynamo::GUI {
         return selected_;
     }
 
-    void Widget::set_hover_call(void (* func)()) {
-        on_hover_ = func;
-    }
-
-    void Widget::set_click_call(void (* func)()) {
-        on_click_ = func;
-    }
-
     void Widget::set_target(Vec2D pos, Vec2D dim) {
         bounds_.center = pos;
         bounds_.dim = dim;
@@ -42,14 +31,11 @@ namespace Dynamo::GUI {
         bool mouse_bounds = is_in_bounds(inputs->get_mouse_pos());
         bool click = inputs->get_state_raw(INPUT_MOUSELEFT);
         
-        // Handle different states
+        // Handle
         if(click) {
             if(mouse_bounds) {
                 state_ = WIDGET_CLICK;
                 selected_ = true;
-                if(on_click_) {
-                    on_click_();
-                }
             }
             else {
                 state_ = WIDGET_DEFAULT;
@@ -59,9 +45,6 @@ namespace Dynamo::GUI {
         else {
             if(mouse_bounds) {
                 state_ = WIDGET_HOVER;
-                if(on_hover_) {
-                    on_hover_();
-                }
             }
             else {
                 state_ = WIDGET_DEFAULT;

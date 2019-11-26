@@ -1,6 +1,7 @@
 #ifndef DYNAMO_GUI_WIDGET_H_
 #define DYNAMO_GUI_WIDGET_H_
 
+#include "../scene.h"
 #include "../inputs.h"
 #include "../vec2d.h"
 #include "../aabb.h"
@@ -14,9 +15,6 @@ namespace Dynamo::GUI {
 
     class Widget {    
     protected:
-        void (* on_hover_)();
-        void (* on_click_)();
-        
         AABB bounds_;
         Vec2D click_pos_;
 
@@ -34,12 +32,6 @@ namespace Dynamo::GUI {
 
         // Get selected status of widget
         bool get_selected();
-
-        // Set command when mouse is hovered over widget
-        void set_hover_call(void (* func)());
-
-        // Set command when widget is clicked on
-        void set_click_call(void (* func)());
 
         // Center and resize the button
         void set_target(Vec2D pos, Vec2D dim);
