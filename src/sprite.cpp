@@ -1,9 +1,8 @@
 #include "sprite.h"
 
 namespace Dynamo {
-    Sprite::Sprite(Texture texture, Vec2D frame_dimensions) {
-        texture_ = texture.texture;
-        access_ = texture.access;
+    Sprite::Sprite(SDL_Texture *texture, Vec2D frame_dimensions) {
+        texture_ = texture;
         SDL_QueryTexture(
             texture_, 
             nullptr, nullptr, 
@@ -64,9 +63,7 @@ namespace Dynamo {
     }
 
     Sprite::~Sprite() {
-        // Reset texture properties
-        set_alpha(0xFF);
-        set_blend(SPRITE_BLEND_BLEND);
+        SDL_DestroyTexture(texture_);
 
         delete target_;
         for(auto &r : source_) {

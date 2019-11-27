@@ -279,6 +279,8 @@ namespace Dynamo {
 
         int mouse_x_;
         int mouse_y_;
+        Vec2D scaled_mouse_;
+
         bool quit_;
 
     public:
@@ -323,6 +325,9 @@ namespace Dynamo {
         
         // Get mouse position
         Vec2D get_mouse_pos();
+
+        // Scale mouse position to fit logical render display
+        void scale_mouse_pos(Vec2D window_dim, Vec2D logic_dim);
 
         // Test if the event handler quit
         bool get_quit();

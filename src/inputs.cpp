@@ -4,6 +4,9 @@ namespace Dynamo {
     Inputs::Inputs() {
         text_input_ = "";
         quit_ = false;
+
+        scaled_mouse_ = {0, 0};
+
         std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
         std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
         std::memset(state_, false, (INPUT_LEN + 1) * sizeof(bool));
@@ -142,10 +145,15 @@ namespace Dynamo {
     }
 
     Vec2D Inputs::get_mouse_pos() {
-        return {
-            static_cast<float>(mouse_x_),
-            static_cast<float>(mouse_y_),
-        };
+        return scaled_mouse_;
+    }
+
+    void Inputs::scale_mouse_pos(Vec2D window_dim, Vec2D logic_dim) {
+        float scale_x = window_dim.x / logic_dim.x;
+        float scale_y = window_dim.y / logic_dim.y;
+
+        scaled_mouse_.x = mouse_x_ / scale_x;
+        scaled_mouse_.y = mouse_y_ / scale_y;
     }
 
     bool Inputs::get_quit() {

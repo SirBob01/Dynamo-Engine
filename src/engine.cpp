@@ -31,6 +31,10 @@ namespace Dynamo {
     void Engine::run(int fps_cap) {
         clock_->tick();
         inputs_->poll();
+        inputs_->scale_mouse_pos(
+            display_->get_window_dimensions(), 
+            display_->get_dimensions()
+        );
         
         if(scene_stack_.empty() || inputs_->get_quit()) {
             stop();

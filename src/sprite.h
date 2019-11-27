@@ -50,7 +50,7 @@ namespace Dynamo {
 
     public:
         // TODO: Create deep copy of SDL_Texture pointer
-        Sprite(Texture texture, Vec2D frame_dimensions);
+        Sprite(SDL_Texture *texture, Vec2D frame_dimensions);
         ~Sprite();
 
         // Get spritesheet texture (all frames)

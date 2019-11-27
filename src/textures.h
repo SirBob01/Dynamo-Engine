@@ -13,16 +13,11 @@
 #include "error.h"
 
 namespace Dynamo {
-    struct Texture {
-        SDL_Texture *texture;
-        SDL_TextureAccess access;
-    };
-
     class TextureManager {
         SDL_Renderer *renderer_;
         
         std::unordered_map<std::string, TTF_Font *> fonts_;
-        std::unordered_map<std::string, Texture> texture_map_;
+        std::unordered_map<std::string, SDL_Surface *> surface_map_;
 
     public:
         TextureManager(SDL_Renderer *renderer);
@@ -39,13 +34,13 @@ namespace Dynamo {
         void load_font(std::string font_id, std::string filename, int size);
 
         // Unload a texture to reuse the id key
-        void unload_texture(std::string id);
+        void unload_surface(std::string id);
 
         // Unload a font to reuse the id key
         void unload_font(std::string font_id);
 
         // Get a texture from an id key
-        Texture &get_texture(std::string id);
+        SDL_Texture *get_texture(std::string id);
 
         // Free all loaded textures from memory
         void clear_all();
