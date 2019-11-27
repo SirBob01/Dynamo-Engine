@@ -40,6 +40,9 @@ namespace Dynamo {
             32,
             rmask, gmask, bmask, amask
         );
+        if(!surf) {
+            throw SDLError(SDL_GetError());
+        }
         surface_map_[id] = surf;
     }
 
@@ -49,6 +52,9 @@ namespace Dynamo {
         }
 
         SDL_Surface *surf = IMG_Load(filename.c_str());
+        if(!surf) {
+            throw SDLError(SDL_GetError());
+        }
         surface_map_[id] = surf;
     }
 
@@ -72,6 +78,9 @@ namespace Dynamo {
             text.c_str(),
             {r, g, b, a}
         );
+        if(!surf) {
+            throw SDLError(SDL_GetError());
+        }
         surface_map_[id] = surf;
     }
 
@@ -81,7 +90,11 @@ namespace Dynamo {
             throw ValueExists(font_id, "fonts_");
         }
 
-        fonts_[font_id] = TTF_OpenFont(filename.c_str(), size);
+        TTF_Font *font = TTF_OpenFont(filename.c_str(), size);
+        if(!font) {
+            throw SDLError(SDL_GetError());
+        }
+        fonts_[font_id] = font;
     }
 
     void TextureManager::unload_surface(std::string id) {
@@ -108,6 +121,9 @@ namespace Dynamo {
             renderer_, 
             surface_map_[id]
         );
+        if(!texture) {
+            throw SDLError(SDL_GetError());
+        }
         return texture;
     }
 
