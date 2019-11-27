@@ -118,7 +118,7 @@ namespace Dynamo {
 
         // Set the draw target position and dimensions
         // Allows dynamic sprite resizing
-        void set_target(AABB box);
+        void set_target(AABB box, bool center=true);
 
         // Set the current animation frame
         void set_frame(int index);

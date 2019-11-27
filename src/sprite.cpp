@@ -181,8 +181,14 @@ namespace Dynamo {
         );
     }
 
-    void Sprite::set_target(AABB box) {
-        Vec2D top_left = box.get_min();
+    void Sprite::set_target(AABB box, bool center) {
+        Vec2D top_left;
+        if(center) {
+            top_left = box.get_min();
+        }
+        else {
+            top_left = box.center;
+        }
         target_->x = static_cast<int>(top_left.x);
         target_->y = static_cast<int>(top_left.y);
         target_->w = static_cast<int>(box.dim.x);
