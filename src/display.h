@@ -44,6 +44,7 @@ namespace Dynamo {
         // Set the fill of the stretched border
         void set_borderfill(Color color);
 
+        // Get the title of the window
         std::string get_title();
 
         // Get the color of the draw port

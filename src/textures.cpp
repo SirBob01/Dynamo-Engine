@@ -11,41 +11,6 @@ namespace Dynamo {
         TTF_Quit();
     }
 
-    void TextureManager::load_surface(std::string id, Vec2D dimensions) {
-        int width = dimensions.x;
-        int height = dimensions.y;
-        
-        if(surface_map_.count(id)) {
-            throw ValueExists(id, "surface_map_");
-        }
-        
-        // Colormask is byte order dependent
-        uint32_t rmask, gmask, bmask, amask;
-        #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-            rmask = 0xff000000;
-            gmask = 0x00ff0000;
-            bmask = 0x0000ff00;
-            amask = 0x000000ff;
-        #else
-            rmask = 0x000000ff;
-            gmask = 0x0000ff00;
-            bmask = 0x00ff0000;
-            amask = 0xff000000;
-        #endif
-
-        // Create a colorless, blank canvas
-        SDL_Surface *surf = SDL_CreateRGBSurface(
-            0,
-            width, height,
-            32,
-            rmask, gmask, bmask, amask
-        );
-        if(!surf) {
-            throw SDLError(SDL_GetError());
-        }
-        surface_map_[id] = surf;
-    }
-
     void TextureManager::load_image(std::string id, std::string filename) {
         if(surface_map_.count(id)) {
             throw ValueExists(id, "surface_map_");

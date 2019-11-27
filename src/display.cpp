@@ -94,6 +94,7 @@ namespace Dynamo {
     }
 
     void Display::draw_point(Vec2D point, Color color) {
+        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
@@ -106,6 +107,7 @@ namespace Dynamo {
 
     void Display::draw_line(Vec2D point1, Vec2D point2, 
                             Color color) {
+        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
@@ -124,6 +126,7 @@ namespace Dynamo {
             static_cast<int>(box.dim.x), static_cast<int>(box.dim.y)
         };
 
+        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
@@ -175,6 +178,7 @@ namespace Dynamo {
     }
 
     void Display::refresh() {
+        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_NONE);
         SDL_SetRenderDrawColor(
             renderer_, 
             border_color_.r, border_color_.g, border_color_.b, 0xFF

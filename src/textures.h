@@ -25,7 +25,6 @@ namespace Dynamo {
 
         // Pre-load resources on Scene initialization
         // If texture id exists, throw error
-        void load_surface(std::string id, Vec2D dimensions);
         void load_image(std::string id, std::string filename);
         void load_text(std::string id, std::string text, 
                        std::string font_id, Color color);
