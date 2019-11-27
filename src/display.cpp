@@ -56,7 +56,7 @@ namespace Dynamo {
     }
 
     void Display::set_fill(Color color) {
-        draw_rect({logic_dim_/2, logic_dim_}, color, true);
+        draw_rect({{0, 0}, logic_dim_}, color, true, false);
     }
 
     void Display::set_borderfill(Color color) {
@@ -119,8 +119,14 @@ namespace Dynamo {
         );
     }
 
-    void Display::draw_rect(AABB box, Color color, bool fill) {
-        Vec2D min = box.get_min();
+    void Display::draw_rect(AABB box, Color color, bool fill, bool center) {
+        Vec2D min;
+        if(center) {
+            min = box.get_min();
+        }
+        else {
+            min = box.center;
+        }
         SDL_Rect rect = {
             static_cast<int>(min.x), static_cast<int>(min.y), 
             static_cast<int>(box.dim.x), static_cast<int>(box.dim.y)
