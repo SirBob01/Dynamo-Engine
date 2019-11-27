@@ -153,12 +153,7 @@ namespace Dynamo {
     }
 
     void Sprite::set_fill(bool fill) {
-        if(access_ == SDL_TEXTUREACCESS_TARGET) {
-            fill_ = fill;   
-        }
-        else {
-            fill_ = false;
-        }
+        fill_ = fill;
     }
 
     void Sprite::set_visible(bool visible) {

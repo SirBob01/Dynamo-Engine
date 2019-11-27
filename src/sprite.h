@@ -22,7 +22,6 @@ namespace Dynamo {
 
     class Sprite {
         SDL_Texture *texture_;
-        SDL_TextureAccess access_;
 
         SDL_Rect *target_;
         std::vector<SDL_Rect *> source_;
