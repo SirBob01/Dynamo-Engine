@@ -47,10 +47,7 @@ namespace Dynamo {
                 source_.push_back(frame_rect);
             }
         }
-
-        color_ = {0, 0, 0, 255};
-        fill_ = false;
-
+        
         accumulator_ = 0.0f;
         current_frame_ = 0;
 
@@ -106,14 +103,6 @@ namespace Dynamo {
         return current_frame_;
     }
 
-    Color Sprite::get_color() {
-        return color_;
-    }
-
-    bool Sprite::get_fill() {
-        return fill_;
-    }
-
     bool Sprite::get_visible() {
         return visible_;
     }
@@ -147,15 +136,6 @@ namespace Dynamo {
         return finished_;
     }
 
-    void Sprite::set_color(Color color) {
-        color_ = color;
-        set_alpha(color.a);
-    }
-
-    void Sprite::set_fill(bool fill) {
-        fill_ = fill;
-    }
-
     void Sprite::set_visible(bool visible) {
         visible_ = visible;
     }
@@ -170,8 +150,7 @@ namespace Dynamo {
     }
 
     void Sprite::set_alpha(uint8_t alpha) {
-        int mod_alpha = alpha * color_.a / 0xFF;
-        SDL_SetTextureAlphaMod(texture_, mod_alpha);
+        SDL_SetTextureAlphaMod(texture_, alpha);
     }
 
     void Sprite::set_blend(SPRITE_BLEND mode) {

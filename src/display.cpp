@@ -64,26 +64,10 @@ namespace Dynamo {
     }
 
     void Display::draw_sprite(Sprite *sprite) {
-        Color color = sprite->get_color();
-        int alpha = sprite->get_alpha();
-
-        if(sprite->get_visible() && alpha) {
-            SDL_Texture *texture = sprite->get_texture();
-            
-            if(sprite->get_fill()) {
-                SDL_SetRenderTarget(renderer_, texture);
-                SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_NONE);
-                SDL_SetRenderDrawColor(
-                    renderer_, 
-                    color.r, color.g, color.b, alpha
-                );
-                SDL_RenderFillRect(renderer_, nullptr);
-                SDL_SetRenderTarget(renderer_, nullptr);
-            }
-
+        if(sprite->get_visible() && sprite->get_alpha() > 0) {
             SDL_RenderCopyEx(
                 renderer_,
-                texture,
+                sprite->get_texture(),
                 sprite->get_source(),
                 sprite->get_target(),
                 sprite->get_angle(),
