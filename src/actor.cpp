@@ -3,12 +3,6 @@
 namespace Dynamo {
     Actor::Actor(AABB hitbox, bool solid) {
         alive_ = true;
-        
-        direction_ = {
-            NO_DIRECTION,
-            NO_DIRECTION
-        };
-
         body_ = {
             hitbox,
             {0, 0},
@@ -16,10 +10,19 @@ namespace Dynamo {
             false,
             solid
         };
+        direction_ = {
+            NO_DIRECTION,
+            NO_DIRECTION
+        };
+
     }
 
     bool Actor::is_alive() {
         return alive_;
+    }
+
+    RigidBody &Actor::get_body() {
+        return body_;
     }
 
     ACTOR_DIRECTION Actor::get_direction() {

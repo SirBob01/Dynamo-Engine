@@ -3,7 +3,8 @@
 A 2D game engine powered by SDL2.
 
 Features:
-- Layered Scene Stack
+- Game Actors and Finite State Machines (AI)
+- Layered Scene management
 - Input binding
 - Animated sprites
 - Texture manager
@@ -21,5 +22,6 @@ This engine wraps around SDL2 and its extensions:
 - SDL2_net
 
 # TODO
+- Add support for ECS architecture
 - Add support for dynamic 2D lighting
 - Implement GUI textboxes and sliders

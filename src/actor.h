@@ -34,18 +34,19 @@ namespace Dynamo {
     // Actor represents game objects
     // Can hold state machines for compartmentalizing processes
     class Actor {
-        bool alive_;
-
     protected:
+        bool alive_;
+        RigidBody body_;
         Direction direction_;
 
     public:
-        RigidBody body_;
-
         Actor(AABB hitbox, bool solid);
 
         // Check if the actor is alive
         bool is_alive();
+
+        // Get a reference to the physical body of the actor
+        RigidBody &get_body();
 
         // Get the current direction of the actor
         ACTOR_DIRECTION get_direction();
