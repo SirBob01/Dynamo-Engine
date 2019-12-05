@@ -6,10 +6,11 @@ namespace Dynamo {
     }
 
     FSM::~FSM() {
-        if(current_) {
-            current_->destroy_ancestors();        
-            delete current_;
+        if(!current_) {
+            return;
         }
+        current_->destroy_ancestors();        
+        delete current_;
     }
 
     State *FSM::get_current() {
@@ -21,23 +22,25 @@ namespace Dynamo {
     }
 
     void FSM::update(int dt) {
-        if(current_) {
-            current_->update(dt);
-            State *next = current_->get_next();
-            State *parent = current_->get_parent();
-            current_->set_next(nullptr);
+        if(!current_) {
+            return;
+        }
+        
+        current_->update(dt);
+        State *next = current_->get_next();
+        State *parent = current_->get_parent();
 
-            if(!current_->is_active()) {
-                delete current_;
-                current_ = nullptr;
-            }
+        current_->set_next(nullptr);
+        if(!current_->is_active()) {
+            delete current_;
+            current_ = nullptr;
+        }
 
-            if(next) {
-                if(next != parent) {
-                    next->set_parent(current_);
-                }
-                push_state(next);
+        if(next) {
+            if(next != parent) {
+                next->set_parent(current_);
             }
+            push_state(next);
         }
     }
 }

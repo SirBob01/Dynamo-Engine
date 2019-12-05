@@ -10,10 +10,10 @@ namespace Dynamo {
     }
 
     Color &Color::scale(float scalar) {
-        r = (int)(r * scalar);
-        g = (int)(g * scalar);
-        b = (int)(b * scalar);
-        a = (int)(a * scalar);
+        r = static_cast<int>(r * scalar);
+        g = static_cast<int>(g * scalar);
+        b = static_cast<int>(b * scalar);
+        a = static_cast<int>(a * scalar);
         clamp();
         return *this;
     }

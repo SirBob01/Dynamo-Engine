@@ -123,7 +123,7 @@ namespace Dynamo {
             flip = SDL_FLIP_VERTICAL;
         }
         
-        return (SDL_RendererFlip)flip;
+        return static_cast<SDL_RendererFlip>(flip);
     }
 
     uint8_t Sprite::get_alpha() {
