@@ -30,7 +30,7 @@ namespace Dynamo {
         Clock *clock_;
 
     public:
-        Scene(Scene *parent, Modules modules);
+        Scene(Modules modules);
         virtual ~Scene();
 
         // Repackage modules to transition between scenes

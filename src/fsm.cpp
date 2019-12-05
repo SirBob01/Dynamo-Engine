@@ -3,11 +3,13 @@
 namespace Dynamo {
     FSM::FSM() {
         current_ = nullptr;
+        last_ = nullptr;
     }
 
     FSM::~FSM() {
-        while(!is_empty()) {
-            state_stack_.pop();
+        if(current_) {
+            current_->destroy_ancestors();        
+            delete current_;
         }
     }
 
@@ -15,12 +17,8 @@ namespace Dynamo {
         return current_;
     }
 
-    bool FSM::is_empty() {
-        return state_stack_.empty();
-    }
-
     void FSM::push_state(State *state) {
-        state_stack_.push(state);
+        last_ = current_;
         current_ = state;
     }
 
@@ -28,19 +26,20 @@ namespace Dynamo {
         if(current_) {
             current_->update(dt);
             State *next = current_->get_next();
+            State *parent = current_->get_parent();
             current_->set_next(nullptr);
 
             if(!current_->is_active()) {
-                state_stack_.pop();
+                delete current_;
                 current_ = nullptr;
             }
 
             if(next) {
+                if(next != parent) {
+                    next->set_parent(current_);
+                }
                 push_state(next);
             }
-        }
-        else if(!is_empty()) {
-            current_ = state_stack_.top();
         }
     }
 }

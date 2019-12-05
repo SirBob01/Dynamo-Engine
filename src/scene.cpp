@@ -1,7 +1,7 @@
 #include "scene.h"
 
 namespace Dynamo {
-    Scene::Scene(Scene *parent, Modules modules) : State(parent) {
+    Scene::Scene(Modules modules) : State() {
         // Unpack modules
         display_ = modules.display;
         textures_ = modules.textures;
