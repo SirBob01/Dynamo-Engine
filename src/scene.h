@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <unordered_set>
 
+#include "state.h"
 #include "display.h"
 #include "textures.h"
 #include "jukebox.h"
@@ -20,13 +21,8 @@ namespace Dynamo {
         Clock *clock;
     };
 
-    class Scene {
-        bool alive_;
-
+    class Scene : public State {
     protected:
-        Scene *parent_;
-        Scene *child_;
-        
         Display *display_;
         TextureManager *textures_;
         Jukebox *jukebox_;
@@ -39,24 +35,6 @@ namespace Dynamo {
 
         // Repackage modules to transition between scenes
         Modules get_modules();
-
-        // Kill the current scene
-        void kill();
-
-        // Check if the current scene is alive
-        bool get_alive();
-
-        // Get the previus scene
-        Scene *get_parent();
-        
-        // Get the next scene
-        Scene *get_child();
-
-        // Set the next scene after this one dies
-        void set_child(Scene *next);
-
-        // Handle scene logic
-        virtual void update() = 0;
 
         // Draw all renderable scene objects
         virtual void draw() = 0;

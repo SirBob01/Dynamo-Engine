@@ -13,6 +13,8 @@ namespace Dynamo {
         inputs_ = new Inputs();
         clock_ = new Clock();
 
+        scene_manager_ = new FSM();
+
         running_ = false;
     }
 
@@ -25,7 +27,7 @@ namespace Dynamo {
     }
 
     void Engine::push_scene(Scene *scene) {
-        scene_stack_.push(scene);
+        scene_manager_->push_state(scene);
     }
 
     void Engine::run(int fps_cap) {
@@ -36,28 +38,13 @@ namespace Dynamo {
             display_->get_dimensions()
         );
         
-        if(scene_stack_.empty() || inputs_->get_quit()) {
+        scene_manager_->update(clock_->get_delta());
+        State *scene_state = scene_manager_->get_current();
+        if(!scene_state || inputs_->get_quit()) {
             stop();
         }
         else {
-            Scene *current_scene = scene_stack_.top();
-            current_scene->update();
-            current_scene->draw();
-
-            Scene *next_scene = current_scene->get_child();
-            current_scene->set_child(nullptr);
-
-            // Only pop a scene if it is "dead" to
-            // allow scene layering (e.g. pause menu over gameplay)
-            if(!current_scene->get_alive()) {
-                delete current_scene;
-                current_scene = nullptr;
-                scene_stack_.pop();
-
-                if(next_scene != nullptr) {
-                    push_scene(next_scene);
-                }
-            }
+            dynamic_cast<Scene *>(scene_state)->draw();
         }
         
         // Play soundtracks
@@ -78,6 +65,7 @@ namespace Dynamo {
 
     void Engine::quit() {
         // Clean up
+        delete scene_manager_;
         delete display_;
         delete textures_;
         delete jukebox_;

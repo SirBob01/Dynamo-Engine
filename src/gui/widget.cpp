@@ -22,6 +22,10 @@ namespace Dynamo::GUI {
         return selected_;
     }
 
+    void Widget::set_state(WIDGET_STATE state) {
+        state_ = state;
+    }
+
     void Widget::set_target(Vec2D pos, Vec2D dim) {
         bounds_.center = pos;
         bounds_.dim = dim;

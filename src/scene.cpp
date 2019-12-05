@@ -1,17 +1,13 @@
 #include "scene.h"
 
 namespace Dynamo {
-    Scene::Scene(Scene *parent, Modules modules) {
+    Scene::Scene(Scene *parent, Modules modules) : State(parent) {
         // Unpack modules
         display_ = modules.display;
         textures_ = modules.textures;
         jukebox_ = modules.jukebox;
         inputs_ = modules.inputs;
         clock_ = modules.clock;
-
-        parent_ = parent;
-        child_ = nullptr;
-        alive_ = true;
     }
 
     Scene::~Scene() {
@@ -22,26 +18,5 @@ namespace Dynamo {
 
     Modules Scene::get_modules() {
         return {display_, textures_, jukebox_, inputs_, clock_};
-    }
-
-    void Scene::kill() {
-        // Allows engine to transition to next scene
-        alive_ = false;
-    }
-
-    bool Scene::get_alive() {
-        return alive_;
-    }
-
-    Scene *Scene::get_parent() {
-        return parent_;
-    }
-
-    Scene *Scene::get_child() {
-        return child_;
-    }
-
-    void Scene::set_child(Scene *next) {
-        child_ = next;
     }
 }

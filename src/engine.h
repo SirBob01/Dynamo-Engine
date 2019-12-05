@@ -4,9 +4,9 @@
 #include <SDL2/SDL.h>
 
 #include <string>
-#include <stack>
 
 #include "scene.h"
+#include "fsm.h"
 
 namespace Dynamo {
     class Engine {
@@ -16,7 +16,7 @@ namespace Dynamo {
         Inputs *inputs_;
         Clock *clock_;
 
-        std::stack<Scene *> scene_stack_;
+        FSM *scene_manager_;
 
         bool running_;
 

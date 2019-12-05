@@ -33,6 +33,9 @@ namespace Dynamo::GUI {
         // Get selected status of widget
         bool get_selected();
 
+        // Hard set the state of the widget
+        void set_state(WIDGET_STATE state);
+
         // Center and resize the button
         void set_target(Vec2D pos, Vec2D dim);
 
