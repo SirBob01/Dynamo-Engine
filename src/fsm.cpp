@@ -3,7 +3,6 @@
 namespace Dynamo {
     FSM::FSM() {
         current_ = nullptr;
-        last_ = nullptr;
     }
 
     FSM::~FSM() {
@@ -18,7 +17,6 @@ namespace Dynamo {
     }
 
     void FSM::push_state(State *state) {
-        last_ = current_;
         current_ = state;
     }
 

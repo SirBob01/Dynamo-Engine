@@ -6,7 +6,6 @@
 namespace Dynamo {
     class FSM {
         State *current_;
-        State *last_;
 
     public:
         FSM();
