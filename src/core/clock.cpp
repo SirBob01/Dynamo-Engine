@@ -6,18 +6,18 @@ namespace Dynamo {
         previous_ = 0;
         current_ = 0;
 
-        delta_ = 0.0f;
+        delta_ = 0;
     }
 
-    int Clock::get_frames() {
+    unsigned Clock::get_frames() {
         return frames_;
     }
 
-    int Clock::get_time() {
+    unsigned Clock::get_time() {
         return current_;
     }
 
-    float Clock::get_delta() {
+    unsigned Clock::get_delta() {
         return delta_;
     }
 
@@ -28,9 +28,9 @@ namespace Dynamo {
         delta_ = current_ - previous_;
     }
 
-    void Clock::set_fps(int fps) {
+    void Clock::set_fps(unsigned fps) {
         // Delay each loop iteration to maintain framerate
-        float cap_time = 1000.0/(float)fps;
+        float cap_time = 1000.0/fps;
         if(delta_ < cap_time) {
             SDL_Delay(cap_time - delta_);
         }

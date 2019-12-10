@@ -21,7 +21,7 @@ namespace Dynamo {
         current_ = state;
     }
 
-    void FSM::update(int dt) {
+    void FSM::update(unsigned dt) {
         if(!current_) {
             return;
         }

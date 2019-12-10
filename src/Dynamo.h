@@ -1,25 +1,34 @@
 #ifndef DYANMO_MAIN_H_
 #define DYNAMO_MAIN_H_
 
-#include "engine.h"
-#include "scene.h"
-#include "sprite.h"
-#include "actor.h"
-#include "state.h"
-#include "fsm.h"
-#include "textures.h"
-#include "jukebox.h"
-#include "display.h"
-#include "inputs.h"
-#include "clock.h"
-#include "color.h"
-#include "vec2d.h"
-#include "error.h"
+#include "main/engine.h"
+#include "main/scene.h"
+
+#include "core/textures.h"
+#include "core/jukebox.h"
+#include "core/display.h"
+#include "core/inputs.h"
+#include "core/clock.h"
+
+#include "sprite/sprite.h"
+
+#include "actor/actor.h"
+
+#include "state/state.h"
+#include "state/fsm.h"
+
 #include "gui/widget.h"
 #include "gui/button.h"
+
 #include "net/node.h"
 #include "net/client.h"
 #include "net/server.h"
 #include "net/packet.h"
+
+#include "util/color.h"
+#include "util/vec2d.h"
+#include "util/aabb.h"
+
+#include "log/error.h"
 
 #endif

@@ -5,29 +5,29 @@
 
 namespace Dynamo {
     class Clock {
-        int frames_;
-        int previous_;
-        int current_;
+        unsigned frames_;
+        unsigned previous_;
+        unsigned current_;
 
-        float delta_;
+        unsigned delta_;
 
     public:
         Clock();
 
         // Get the current number of frames
-        int get_frames();
+        unsigned get_frames();
 
         // Get milliseconds since SDL init
-        int get_time();
+        unsigned get_time();
 
         // Get the delta time
-        float get_delta();
+        unsigned get_delta();
 
         // Update the clock
         void tick();
 
         // Set the framerate cap
-        void set_fps(int fps);
+        void set_fps(unsigned fps);
     };
 }
 

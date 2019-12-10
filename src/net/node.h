@@ -7,7 +7,7 @@
 #include <cstring>
 
 #include "packet.h"
-#include "../error.h"
+#include "../log/error.h"
 
 namespace Dynamo::Net {    
     typedef enum {          // Default protocols
@@ -53,7 +53,7 @@ namespace Dynamo::Net {
         int listen();
 
         // Update the connector at the same rate as the rest of the application
-        virtual bool update(int dt) = 0;
+        virtual bool update(unsigned dt) = 0;
     };
 
     // Convert 32-bit integer to human readable IP addresss

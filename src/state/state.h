@@ -35,7 +35,7 @@ namespace Dynamo {
         void destroy_ancestors();
 
         // Process over instance lifetime
-        virtual void update(int dt);
+        virtual void update(unsigned dt);
     };
 }
 

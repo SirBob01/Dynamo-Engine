@@ -50,7 +50,7 @@ namespace Dynamo::Net {
         void send_all(void *data, int len, int protocol);
 
         // Update the server
-        bool update(int dt);
+        bool update(unsigned dt);
     };
 }
 

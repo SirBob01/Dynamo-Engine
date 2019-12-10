@@ -4,12 +4,12 @@
 #include <SDL2/SDL.h>
 #include <unordered_set>
 
-#include "state.h"
-#include "display.h"
-#include "textures.h"
-#include "jukebox.h"
-#include "inputs.h"
-#include "clock.h"
+#include "../state/state.h"
+#include "../core/display.h"
+#include "../core/textures.h"
+#include "../core/jukebox.h"
+#include "../core/inputs.h"
+#include "../core/clock.h"
 
 namespace Dynamo {
     // Holds references to singleton modules

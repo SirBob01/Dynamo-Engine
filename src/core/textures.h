@@ -8,9 +8,9 @@
 #include <unordered_map>
 #include <string>
 
-#include "vec2d.h"
-#include "color.h"
-#include "error.h"
+#include "../util/color.h"
+#include "../util/vec2d.h"
+#include "../log/error.h"
 
 namespace Dynamo {
     class TextureManager {

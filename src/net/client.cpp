@@ -38,7 +38,7 @@ namespace Dynamo::Net {
         return false;
     }
 
-    bool Client::update(int dt) {
+    bool Client::update(unsigned dt) {
         time_ += dt;
         bool comm_packet = server_message();
 

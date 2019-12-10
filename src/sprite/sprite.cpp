@@ -194,7 +194,7 @@ namespace Dynamo {
         }
     }
 
-    void Sprite::animate(int dt, int fps, bool loop) {
+    void Sprite::animate(unsigned dt, unsigned fps, bool loop) {
         accumulator_ += dt;
         if(accumulator_ >= (1000.0/fps)) {
             current_frame_++;

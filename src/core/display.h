@@ -5,10 +5,10 @@
 
 #include <string>
 
-#include "sprite.h"
-#include "aabb.h"
-#include "vec2d.h"
-#include "color.h"
+#include "../sprite/sprite.h"
+#include "../util/color.h"
+#include "../util/aabb.h"
+#include "../util/vec2d.h"
 
 namespace Dynamo {
     class Display {

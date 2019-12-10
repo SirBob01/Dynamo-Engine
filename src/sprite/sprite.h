@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "textures.h"
-#include "aabb.h"
-#include "vec2d.h"
+#include "../core/textures.h"
+#include "../util/aabb.h"
+#include "../util/vec2d.h"
 
 namespace Dynamo {
     typedef enum {
@@ -110,7 +110,7 @@ namespace Dynamo {
         void shift_frame(int direction);
 
         // Animate the frames of the sprite
-        void animate(int dt, int fps, bool loop);
+        void animate(unsigned dt, unsigned fps, bool loop);
     };
 }
 

@@ -18,7 +18,7 @@ namespace Dynamo {
         void push_state(State *state);
 
         // Update the state machine
-        void update(int dt);
+        void update(unsigned dt);
     };
 }
 

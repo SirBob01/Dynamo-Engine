@@ -55,7 +55,7 @@ namespace Dynamo::Net {
         }
     }
 
-    bool Server::update(int dt) {
+    bool Server::update(unsigned dt) {
         time_ += dt;
         cull_clients();
         

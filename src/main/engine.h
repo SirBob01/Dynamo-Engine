@@ -6,7 +6,7 @@
 #include <string>
 
 #include "scene.h"
-#include "fsm.h"
+#include "../state/fsm.h"
 
 namespace Dynamo {
     class Engine {

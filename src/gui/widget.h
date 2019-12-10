@@ -1,10 +1,10 @@
 #ifndef DYNAMO_GUI_WIDGET_H_
 #define DYNAMO_GUI_WIDGET_H_
 
-#include "../scene.h"
-#include "../inputs.h"
-#include "../vec2d.h"
-#include "../aabb.h"
+#include "../main/scene.h"
+#include "../core/inputs.h"
+#include "../util/vec2d.h"
+#include "../util/aabb.h"
 
 namespace Dynamo::GUI {
     typedef enum {

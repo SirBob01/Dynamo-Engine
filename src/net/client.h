@@ -34,7 +34,7 @@ namespace Dynamo::Net {
         bool server_message();
 
         // Update the client
-        bool update(int dt);
+        bool update(unsigned dt);
     };
 }
 

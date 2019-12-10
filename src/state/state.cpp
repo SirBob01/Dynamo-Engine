@@ -45,7 +45,7 @@ namespace Dynamo {
         }
     }
 
-    void State::update(int dt) {
+    void State::update(unsigned dt) {
         return;
     }
 }

@@ -2,8 +2,8 @@
 #define DYNAMO_GUI_BUTTON_H_
 
 #include "widget.h"
-#include "../sprite.h"
-#include "../textures.h"
+#include "../sprite/sprite.h"
+#include "../core/textures.h"
 
 namespace Dynamo::GUI {
     // Simplest type of GUI widget
