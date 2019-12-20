@@ -270,7 +270,7 @@ namespace Dynamo {
 
         bool pressed_[INPUT_LEN + 1];
         bool released_[INPUT_LEN + 1];
-        bool state_[INPUT_LEN + 1];
+        const uint8_t *state_;
 
         std::vector<int>pressed_change_;
         std::vector<int>released_change_;
