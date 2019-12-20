@@ -9,14 +9,13 @@ namespace Dynamo {
 
         std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
         std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
-        state_ = SDL_GetKeyboardState(NULL);
+        std::memset(state_, false, (INPUT_LEN + 1) * sizeof(bool));
     }
 
     void Inputs::poll() {
         reset_states();
         SDL_GetMouseState(&mouse_x_, &mouse_y_);
         
-
         while(SDL_PollEvent(&event_)) {
             if(event_.type == SDL_QUIT) {
                 quit_ = true;
@@ -29,6 +28,9 @@ namespace Dynamo {
                     if(pressed_[i]) {
                         pressed_change_.push_back(i);
                     }
+                    if(button - 1 == i - INPUT_MOUSELEFT) {
+                        state_[i] = true;
+                    }
                 }
             }
             
@@ -39,11 +41,15 @@ namespace Dynamo {
                     if(released_[i]) {
                         released_change_.push_back(i);
                     }
+                    if(button - 1 == i - INPUT_MOUSELEFT) {
+                        state_[i] = false;
+                    }
                 }
             }
 
             if(event_.type == SDL_KEYDOWN && event_.key.repeat == 0) {
                 int scancode = event_.key.keysym.scancode;
+                state_[scancode] = true;
                 pressed_[scancode] = true;
                 pressed_change_.push_back(scancode);
 
@@ -57,6 +63,7 @@ namespace Dynamo {
 
             if(event_.type == SDL_KEYUP) {
                 int scancode = event_.key.keysym.scancode;
+                state_[scancode] = false;
                 released_[scancode] = true;
                 released_change_.push_back(scancode);
             }
