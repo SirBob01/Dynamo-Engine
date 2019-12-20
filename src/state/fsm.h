@@ -9,7 +9,6 @@ namespace Dynamo {
 
     public:
         FSM();
-        ~FSM();
 
         // Get current state
         State *get_current();

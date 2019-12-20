@@ -15,23 +15,29 @@ namespace Dynamo {
             SDL_BLENDMODE_BLEND
         );
 
+        texture_dimensions_ = {
+            static_cast<float>(texture_w_),
+            static_cast<float>(texture_h_)
+        };
+
         if(frame_dimensions.x) {
-            frame_w_ = frame_dimensions.x;    
+            frame_dimensions_.x = frame_dimensions.x;
         }
         else {
-            frame_w_ = texture_w_;
+            frame_dimensions_.x = texture_dimensions_.x;
         }
 
         if(frame_dimensions.y) {
-            frame_h_ = frame_dimensions.y;
+            frame_dimensions_.y = frame_dimensions.y;
         }
         else {
-            frame_h_ = texture_h_;
+            frame_dimensions_.y = texture_dimensions_.y;
         }
 
-        target_ = new SDL_Rect();
-        int hor_frames = texture_w_ / frame_w_;
-        int ver_frames = texture_h_ / frame_h_;
+        target_dimensions_ = frame_dimensions_;
+
+        int hor_frames = texture_dimensions_.x / frame_dimensions_.x;
+        int ver_frames = texture_dimensions_.y / frame_dimensions_.y;
         max_frames_ = hor_frames * ver_frames;
 
         // Left to right, top to bottom
@@ -39,10 +45,10 @@ namespace Dynamo {
             for(int i = 0; i < hor_frames; i++) {
                 SDL_Rect *frame_rect = new SDL_Rect();
 
-                frame_rect->w = frame_w_;
-                frame_rect->h = frame_h_;
-                frame_rect->x = i*frame_w_;
-                frame_rect->y = j*frame_h_;
+                frame_rect->w = frame_dimensions_.x;
+                frame_rect->h = frame_dimensions_.y;
+                frame_rect->x = i*frame_dimensions_.x;
+                frame_rect->y = j*frame_dimensions_.y;
                 
                 source_.push_back(frame_rect);
             }
@@ -62,7 +68,6 @@ namespace Dynamo {
     Sprite::~Sprite() {
         SDL_DestroyTexture(texture_);
 
-        delete target_;
         for(auto &r : source_) {
             delete r;
         }
@@ -74,25 +79,19 @@ namespace Dynamo {
     }
 
     Vec2D Sprite::get_texture_dimensions() {
-        return {
-            static_cast<float>(texture_w_),
-            static_cast<float>(texture_h_),
-        };
+        return texture_dimensions_;
+    }
+
+    Vec2D Sprite::get_frame_dimensions() {
+        return frame_dimensions_;
     }
 
     Vec2D Sprite::get_dimensions() {
-        return {
-            static_cast<float>(frame_w_),
-            static_cast<float>(frame_h_),
-        };
+        return target_dimensions_;
     }
 
     SDL_Rect *Sprite::get_source() {
         return source_[current_frame_];
-    }
-
-    SDL_Rect *Sprite::get_target() {
-        return target_;
     }
 
     int Sprite::get_num_frames() {
@@ -160,18 +159,8 @@ namespace Dynamo {
         );
     }
 
-    void Sprite::set_target(AABB box, bool center) {
-        Vec2D top_left;
-        if(center) {
-            top_left = box.get_min();
-        }
-        else {
-            top_left = box.center;
-        }
-        target_->x = static_cast<int>(top_left.x);
-        target_->y = static_cast<int>(top_left.y);
-        target_->w = static_cast<int>(box.dim.x);
-        target_->h = static_cast<int>(box.dim.y);
+    void Sprite::set_dimensions(Vec2D dimensions) {
+        target_dimensions_ = dimensions;
     }
 
     void Sprite::set_frame(int index) {

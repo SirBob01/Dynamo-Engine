@@ -1,6 +1,13 @@
 #include "actor.h"
 
 namespace Dynamo {
+    void Collision::reset() {
+        top = false;
+        bottom = false;
+        left = false;
+        right = false;
+    }
+
     Actor::Actor(AABB hitbox, bool solid) {
         alive_ = true;
         body_ = {
@@ -10,11 +17,15 @@ namespace Dynamo {
             
             solid
         };
-        brain_ = new FSM();
+
         sprite_ = nullptr;
+        brain_ = new FSM();
     }
 
     Actor::~Actor() {
+        for(auto &state : states_) {
+            delete state.second;
+        }
         delete brain_;
     }
 
@@ -30,12 +41,29 @@ namespace Dynamo {
         return sprite_;
     }
 
-    void Actor::push_state(State *state) {
-        brain_->push_state(state);
+    State *Actor::get_state(std::string state_id) {
+        if(!states_.count(state_id)) {
+            throw InvalidKey(state_id, "states_");
+        }
+        return states_[state_id];
     }
 
     void Actor::set_sprite(Sprite *sprite) {
         sprite_ = sprite;
+    }
+
+    void Actor::set_state(std::string state_id) {
+        State *current = brain_->get_current();
+        State *next = get_state(state_id);
+        if(!next) {
+            return; // Null states not allowed!
+        }
+        if(current) {
+            current->set_next(next);
+        }
+        else {
+            brain_->push_state(next);
+        }
     }
 
     void Actor::kill() {

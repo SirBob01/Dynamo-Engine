@@ -27,6 +27,9 @@ namespace Dynamo::GUI {
         // Check if a point (e.g. mouse cursor) is within bounds
         bool is_in_bounds(Vec2D point);
 
+        // Get the position of the widget
+        Vec2D get_position();
+
         // Get state of the widget
         WIDGET_STATE get_state();
 
@@ -36,7 +39,7 @@ namespace Dynamo::GUI {
         // Hard set the state of the widget
         void set_state(WIDGET_STATE state);
 
-        // Center and resize the button
+        // Center and resize the widget
         void set_target(Vec2D pos, Vec2D dim);
 
         // Update the state of the widget

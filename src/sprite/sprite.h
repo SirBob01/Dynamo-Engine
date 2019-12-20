@@ -21,15 +21,14 @@ namespace Dynamo {
 
     class Sprite {
         SDL_Texture *texture_;
-
-        SDL_Rect *target_;
-        std::vector<SDL_Rect *> source_;
-
         int texture_w_;
         int texture_h_;
 
-        int frame_w_;
-        int frame_h_;
+        Vec2D texture_dimensions_;
+        Vec2D frame_dimensions_;
+        Vec2D target_dimensions_;
+
+        std::vector<SDL_Rect *> source_;
         
         float accumulator_;
         int max_frames_;
@@ -45,7 +44,7 @@ namespace Dynamo {
 
     public:
         // TODO: Create deep copy of SDL_Texture pointer
-        Sprite(SDL_Texture *texture, Vec2D frame_dimensions);
+        Sprite(SDL_Texture *texture, Vec2D frame_dimensions={0, 0});
         ~Sprite();
 
         // Get spritesheet texture (all frames)
@@ -55,13 +54,13 @@ namespace Dynamo {
         Vec2D get_texture_dimensions();
 
         // Get an individual frame's dimensions
+        Vec2D get_frame_dimensions();
+
+        // Get the target dimensions
         Vec2D get_dimensions();
 
         // Get the rectangle of an individual animation frame
         SDL_Rect *get_source();
-
-        // Get the draw target rectangle
-        SDL_Rect *get_target();
 
         // Get number of animation frames
         int get_num_frames();
@@ -99,9 +98,8 @@ namespace Dynamo {
         // Set texture blend mode
         void set_blend(SPRITE_BLEND mode);
 
-        // Set the draw target position and dimensions
-        // Allows dynamic sprite resizing
-        void set_target(AABB box, bool center=true);
+        // Set the draw target dimension
+        void set_dimensions(Vec2D dimensions);
 
         // Set the current animation frame
         void set_frame(int index);

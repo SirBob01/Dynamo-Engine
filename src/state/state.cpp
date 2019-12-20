@@ -45,6 +45,14 @@ namespace Dynamo {
         }
     }
 
+    void State::on_entry() {
+        return;
+    }
+
+    void State::on_exit() {
+        return;
+    }
+
     void State::update(unsigned dt) {
         return;
     }

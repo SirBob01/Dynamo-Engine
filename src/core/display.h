@@ -54,7 +54,7 @@ namespace Dynamo {
         Color get_borderfill();
 
         // Draw a single sprite
-        void draw_sprite(Sprite *sprite);
+        void draw_sprite(Sprite *sprite, Vec2D position, bool center=true);
 
         // Draw a single point
         void draw_point(Vec2D point, Color color);

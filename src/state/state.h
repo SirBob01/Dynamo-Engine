@@ -34,6 +34,12 @@ namespace Dynamo {
         // Destroy this state's ancestors
         void destroy_ancestors();
 
+        // Process on entry
+        virtual void on_entry();
+
+        // Process on exit
+        virtual void on_exit();
+
         // Process over instance lifetime
         virtual void update(unsigned dt);
     };

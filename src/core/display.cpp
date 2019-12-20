@@ -63,18 +63,36 @@ namespace Dynamo {
         border_color_ = color;
     }
 
-    void Display::draw_sprite(Sprite *sprite) {
-        if(sprite->get_visible() && sprite->get_alpha() > 0) {
-            SDL_RenderCopyEx(
-                renderer_,
-                sprite->get_texture(),
-                sprite->get_source(),
-                sprite->get_target(),
-                sprite->get_angle(),
-                nullptr,
-                sprite->get_flip()
-            );
+    void Display::draw_sprite(Sprite *sprite, Vec2D position, bool center) {
+        if(!sprite->get_visible() || sprite->get_alpha() <= 0) {
+            return;
         }
+
+        Vec2D dimensions = sprite->get_dimensions();
+        Vec2D ref_point;
+        if(center) {
+            ref_point = position - dimensions/2;
+        }
+        else {
+            ref_point = position;
+        }
+
+        SDL_Rect target = {
+            static_cast<int>(ref_point.x),
+            static_cast<int>(ref_point.y),
+            static_cast<int>(dimensions.x),
+            static_cast<int>(dimensions.y)
+        };
+
+        SDL_RenderCopyEx(
+            renderer_,
+            sprite->get_texture(),
+            sprite->get_source(),
+            &target,
+            sprite->get_angle(),
+            nullptr,
+            sprite->get_flip()
+        );
     }
 
     void Display::draw_point(Vec2D point, Color color) {

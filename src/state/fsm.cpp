@@ -5,14 +5,6 @@ namespace Dynamo {
         current_ = nullptr;
     }
 
-    FSM::~FSM() {
-        if(!current_) {
-            return;
-        }
-        current_->destroy_ancestors();        
-        delete current_;
-    }
-
     State *FSM::get_current() {
         return current_;
     }
@@ -32,14 +24,19 @@ namespace Dynamo {
 
         current_->set_next(nullptr);
         if(!current_->is_active()) {
+            current_->on_exit();
             delete current_;
             current_ = nullptr;
         }
 
         if(next) {
+            if(current_) {
+                current_->on_exit();
+            }
             if(next != parent) {
                 next->set_parent(current_);
             }
+            next->on_entry();
             push_state(next);
         }
     }

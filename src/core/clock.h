@@ -10,6 +10,7 @@ namespace Dynamo {
         unsigned current_;
 
         unsigned delta_;
+        unsigned delta_cap_;
 
     public:
         Clock();

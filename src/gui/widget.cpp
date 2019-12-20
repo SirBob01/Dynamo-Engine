@@ -14,6 +14,10 @@ namespace Dynamo::GUI {
         return bounds_.is_in_bounds(point);
     }
 
+    Vec2D Widget::get_position() {
+        return bounds_.center;
+    }
+
     WIDGET_STATE Widget::get_state() {
         return state_;
     }

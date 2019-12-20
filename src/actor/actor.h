@@ -1,11 +1,15 @@
 #ifndef DYNAMO_ACTOR_H_
 #define DYNAMO_ACTOR_H_
 
+#include <unordered_map>
+#include <string>
+
 #include "../sprite/sprite.h"
 #include "../state/fsm.h"
 #include "../state/state.h"
 #include "../util/aabb.h"
 #include "../util/vec2d.h"
+#include "../log/error.h"
 
 namespace Dynamo {
     // Collision flags
@@ -14,6 +18,8 @@ namespace Dynamo {
         bool bottom;
         bool left;
         bool right;
+
+        void reset();
     };
 
     // Physics component
@@ -30,9 +36,12 @@ namespace Dynamo {
     protected:
         bool alive_;
         RigidBody body_;
-        FSM *brain_;
+
         Sprite *sprite_;
 
+        FSM *brain_;
+        std::unordered_map<std::string, Dynamo::State *> states_;
+        
     public:
         Actor(AABB hitbox, bool solid);
         ~Actor();
@@ -46,11 +55,14 @@ namespace Dynamo {
         // Get the sprite of the actor
         Sprite *get_sprite();
 
-        // Set the state of the actor
-        void push_state(State *state);
+        // Get a possible state of the actor
+        State *get_state(std::string state_id);
 
         // Set the sprite of the actor
         void set_sprite(Sprite *sprite);
+
+        // Set the state of the actor
+        void set_state(std::string state_id);
 
         // Kill the actor
         void kill();

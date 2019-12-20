@@ -7,6 +7,7 @@ namespace Dynamo {
         current_ = 0;
 
         delta_ = 0;
+        delta_cap_ = 30;
     }
 
     unsigned Clock::get_frames() {
@@ -26,6 +27,9 @@ namespace Dynamo {
         frames_++;
         current_ = SDL_GetTicks();
         delta_ = current_ - previous_;
+        if(delta_ > delta_cap_) { // Protect integration from breaking
+            delta_ = delta_cap_;
+        }
     }
 
     void Clock::set_fps(unsigned fps) {
