@@ -78,10 +78,10 @@ namespace Dynamo {
         }
 
         SDL_Rect target = {
-            static_cast<int>(ref_point.x),
-            static_cast<int>(ref_point.y),
-            static_cast<int>(dimensions.x),
-            static_cast<int>(dimensions.y)
+            static_cast<int>(std::round(ref_point.x)),
+            static_cast<int>(std::round(ref_point.y)),
+            static_cast<int>(std::round(dimensions.x)),
+            static_cast<int>(std::round(dimensions.y))
         };
 
         SDL_RenderCopyEx(
@@ -103,7 +103,8 @@ namespace Dynamo {
         );
         SDL_RenderDrawPoint(
             renderer_, 
-            static_cast<int>(point.x), static_cast<int>(point.y)
+            static_cast<int>(std::round(point.x)), 
+            static_cast<int>(std::round(point.y))
         );
     }
 
@@ -116,8 +117,10 @@ namespace Dynamo {
         );
         SDL_RenderDrawLine(
             renderer_, 
-            static_cast<int>(point1.x), static_cast<int>(point1.y), 
-            static_cast<int>(point2.x), static_cast<int>(point2.y)
+            static_cast<int>(std::round(point1.x)), 
+            static_cast<int>(std::round(point1.y)), 
+            static_cast<int>(std::round(point2.x)), 
+            static_cast<int>(std::round(point2.y))
         );
     }
 
@@ -130,8 +133,10 @@ namespace Dynamo {
             min = box.center;
         }
         SDL_Rect rect = {
-            static_cast<int>(min.x), static_cast<int>(min.y), 
-            static_cast<int>(box.dim.x), static_cast<int>(box.dim.y)
+            static_cast<int>(std::round(min.x)), 
+            static_cast<int>(std::round(min.y)), 
+            static_cast<int>(std::round(box.dim.x)), 
+            static_cast<int>(std::round(box.dim.y))
         };
 
         SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
