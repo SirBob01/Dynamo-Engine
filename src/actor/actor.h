@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <string>
 
+#include "../core/textures.h"
+#include "../core/jukebox.h"
 #include "../sprite/sprite.h"
 #include "../state/fsm.h"
 #include "../state/state.h"
@@ -31,9 +33,18 @@ namespace Dynamo {
         bool solid;
     };
 
+    // Resource managers
+    struct Resources {
+        TextureManager *textures;
+        Jukebox *jukebox;
+    };
+
     // Actor represents game objects
     class Actor {
     protected:
+        TextureManager *textures_;
+        Jukebox *jukebox_;
+        
         bool alive_;
         RigidBody body_;
 
@@ -43,7 +54,7 @@ namespace Dynamo {
         std::unordered_map<std::string, Dynamo::State *> states_;
         
     public:
-        Actor(AABB hitbox, bool solid);
+        Actor(AABB hitbox, bool solid, Resources resources);
         ~Actor();
 
         // Check if the actor is alive

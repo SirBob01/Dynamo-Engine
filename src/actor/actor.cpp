@@ -8,7 +8,10 @@ namespace Dynamo {
         right = false;
     }
 
-    Actor::Actor(AABB hitbox, bool solid) {
+    Actor::Actor(AABB hitbox, bool solid, Resources resources) {
+        textures_ = resources.textures;
+        jukebox_ = resources.jukebox;
+        
         alive_ = true;
         body_ = {
             hitbox,
@@ -49,6 +52,12 @@ namespace Dynamo {
     }
 
     void Actor::set_sprite(Sprite *sprite) {
+        if(sprite_ == sprite) {
+            return;
+        }
+        if(sprite_) {
+            sprite_->set_frame(0);
+        }
         sprite_ = sprite;
     }
 

@@ -20,14 +20,14 @@ namespace Dynamo {
             static_cast<float>(texture_h_)
         };
 
-        if(frame_dimensions.x) {
+        if(frame_dimensions.x && frame_dimensions.x <= texture_dimensions_.x) {
             frame_dimensions_.x = frame_dimensions.x;
         }
         else {
             frame_dimensions_.x = texture_dimensions_.x;
         }
 
-        if(frame_dimensions.y) {
+        if(frame_dimensions.y && frame_dimensions.y <= texture_dimensions_.y) {
             frame_dimensions_.y = frame_dimensions.y;
         }
         else {
@@ -53,6 +53,8 @@ namespace Dynamo {
                 source_.push_back(frame_rect);
             }
         }
+
+        scale_ = 1.0;
         
         accumulator_ = 0.0f;
         current_frame_ = 0;
@@ -87,7 +89,7 @@ namespace Dynamo {
     }
 
     Vec2D Sprite::get_dimensions() {
-        return target_dimensions_;
+        return target_dimensions_ * scale_;
     }
 
     SDL_Rect *Sprite::get_source() {
@@ -161,6 +163,10 @@ namespace Dynamo {
 
     void Sprite::set_dimensions(Vec2D dimensions) {
         target_dimensions_ = dimensions;
+    }
+
+    void Sprite::set_scale(float scale) {
+        scale_ = scale;
     }
 
     void Sprite::set_frame(int index) {

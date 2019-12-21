@@ -29,6 +29,8 @@ namespace Dynamo {
         Vec2D target_dimensions_;
 
         std::vector<SDL_Rect *> source_;
+
+        float scale_;
         
         float accumulator_;
         int max_frames_;
@@ -100,6 +102,9 @@ namespace Dynamo {
 
         // Set the draw target dimension
         void set_dimensions(Vec2D dimensions);
+
+        // Scale the target dimensions of the sprite by a multiplier
+        void set_scale(float scale);
 
         // Set the current animation frame
         void set_frame(int index);
