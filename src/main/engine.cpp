@@ -6,6 +6,9 @@ namespace Dynamo {
             throw SDLError(SDL_GetError());
         }
 
+        // Seed the random number generator
+        Random::seed(std::time(nullptr));
+
         // Initialize singleton modules
         display_ = new Display(width, height, title);
         textures_ = new TextureManager(display_->get_renderer());

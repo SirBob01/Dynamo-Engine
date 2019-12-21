@@ -28,6 +28,7 @@
 #include "util/color.h"
 #include "util/vec2d.h"
 #include "util/aabb.h"
+#include "util/random.h"
 
 #include "log/error.h"
 

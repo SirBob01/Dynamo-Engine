@@ -4,9 +4,11 @@
 #include <SDL2/SDL.h>
 
 #include <string>
+#include <ctime>
 
 #include "scene.h"
 #include "../state/fsm.h"
+#include "../util/random.h"
 
 namespace Dynamo {
     class Engine {
