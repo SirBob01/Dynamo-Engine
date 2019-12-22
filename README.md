@@ -23,7 +23,7 @@ This engine wraps around SDL2 and its extensions:
 
 # TODO
 - Add logo
-- Refactor TextureManager
+- Refactor TextureManager and Jukebox
 - Add support for ECS architecture
 - Add support for dynamic 2D lighting
 - Implement GUI textboxes and sliders
