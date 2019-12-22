@@ -22,14 +22,8 @@ namespace Dynamo {
         return delta_;
     }
 
-    void Clock::tick() {
-        // Call once only at the start of the game loop
-        frames_++;
-        current_ = SDL_GetTicks();
-        delta_ = current_ - previous_;
-        if(delta_ > delta_cap_) { // Protect integration from breaking
-            delta_ = delta_cap_;
-        }
+    float Clock::get_fps() {
+        return frames_ / (current_ / 1000.0);
     }
 
     void Clock::set_fps(unsigned fps) {
@@ -40,5 +34,15 @@ namespace Dynamo {
         }
         
         previous_ = current_;
+    }
+
+    void Clock::tick() {
+        // Call once only at the start of the game loop
+        frames_++;
+        current_ = SDL_GetTicks();
+        delta_ = current_ - previous_;
+        if(delta_ > delta_cap_) { // Protect integration from breaking
+            delta_ = delta_cap_;
+        }
     }
 }

@@ -61,14 +61,14 @@ namespace Dynamo {
         
         // Draw a line between two points
         void draw_line(Vec2D point1, Vec2D point2, 
-                          Color color);
+                       Color color);
         
         // Draw a rectangle from the upperleft corner point
         void draw_rect(AABB box, Color color, bool fill, bool center=true);
 
         // Draw a circle
         void draw_circle(Vec2D center, int radius, 
-                             Color color, bool fill);
+                         Color color, bool fill);
         
         // Draw a polygon of n sides
         void draw_polygon(Vec2D points[], int n, Color color);

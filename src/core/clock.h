@@ -24,11 +24,15 @@ namespace Dynamo {
         // Get the delta time
         unsigned get_delta();
 
-        // Update the clock
-        void tick();
+        // Get the average fps
+        float get_fps();
 
         // Set the framerate cap
         void set_fps(unsigned fps);
+        
+        // Update the clock
+        void tick();
+
     };
 }
 

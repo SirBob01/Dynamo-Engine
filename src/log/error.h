@@ -30,14 +30,6 @@ namespace Dynamo {
         InvalidKey(std::string key, std::string map_name);
         virtual const char *what() const throw();
     };
-
-    class ValueExists : public std::exception {
-        std::string message_;
-
-    public:
-        ValueExists(std::string key, std::string map_name);
-        virtual const char *what() const throw();
-    };
 }
 
 #endif

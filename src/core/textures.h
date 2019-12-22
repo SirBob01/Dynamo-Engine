@@ -15,34 +15,41 @@
 namespace Dynamo {
     class TextureManager {
         SDL_Renderer *renderer_;
-        
+
+        std::string default_image_path_;
+        std::string default_font_path_;
+
         std::unordered_map<std::string, TTF_Font *> fonts_;
-        std::unordered_map<std::string, SDL_Surface *> surface_map_;
+        std::unordered_map<std::string, SDL_Texture *> texture_map_;
+
+        // Convert a surface to a texture
+        SDL_Texture *convert_surface(SDL_Surface *surface);
 
     public:
         TextureManager(SDL_Renderer *renderer);
         ~TextureManager();
 
-        // Pre-load resources on Scene initialization
-        // If texture id exists, throw error
-        void load_image(std::string id, std::string filename);
-        void load_text(std::string id, std::string text, 
-                       std::string font_id, Color color);
+        // Load an image texture
+        SDL_Texture *load_image(std::string filename);
 
-        // Load a TTF font file into the local database
+        // Load a renderable-text texture
+        SDL_Texture *load_text(std::string text, 
+                               std::string font_id, Color color);
+
+        // Load a TTF font file
         void load_font(std::string font_id, std::string filename, int size);
 
-        // Unload a texture to reuse the id key
-        void unload_surface(std::string id);
+        // Set the default path for images
+        void set_image_path(std::string path);
 
-        // Unload a font to reuse the id key
-        void unload_font(std::string font_id);
-
-        // Get a texture from an id key
-        SDL_Texture *get_texture(std::string id);
+        // Set the default path for fonts
+        void set_font_path(std::string path);
 
         // Free all loaded textures from memory
-        void clear_all();
+        void clear_textures();
+
+        // Free all loaded fonts from memory
+        void clear_fonts();
     };    
 }
 

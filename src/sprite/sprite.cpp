@@ -68,8 +68,6 @@ namespace Dynamo {
     }
 
     Sprite::~Sprite() {
-        SDL_DestroyTexture(texture_);
-
         for(auto &r : source_) {
             delete r;
         }
