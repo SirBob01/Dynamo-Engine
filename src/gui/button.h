@@ -12,7 +12,7 @@ namespace Dynamo::GUI {
         int sprite_count_;
 
     public:
-        Button(SDL_Texture *base, SDL_Texture *hover, Vec2D frame_size);
+        Button(Texture base, Texture hover, Vec2D frame_size);
         ~Button();
 
         // Get current sprite

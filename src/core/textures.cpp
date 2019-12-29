@@ -27,7 +27,7 @@ namespace Dynamo {
         TTF_Quit();
     }
 
-    SDL_Texture *TextureManager::load_image(std::string filename) {
+    Texture TextureManager::load_image(std::string filename) {
         std::string full_path = default_image_path_+filename;
         if(!texture_map_.count(full_path)) {
             SDL_Surface *surf = IMG_Load(filename.c_str());
@@ -37,10 +37,11 @@ namespace Dynamo {
             texture_map_[full_path] = convert_surface(surf);
             SDL_FreeSurface(surf);
         }
-        return texture_map_[full_path];
+
+        return {renderer_, texture_map_[full_path]};
     }
 
-    SDL_Texture *TextureManager::load_text(std::string text, 
+    Texture TextureManager::load_text(std::string text, 
                                            std::string font_id, Color color) {
         if(!fonts_.count(font_id)) {
             throw InvalidKey(font_id, "fonts_");
@@ -67,7 +68,7 @@ namespace Dynamo {
             texture_map_[id] = convert_surface(surf);
             SDL_FreeSurface(surf);
         }
-        return texture_map_[id];
+        return {renderer_, texture_map_[id]};
     }
 
     void TextureManager::load_font(std::string font_id, 

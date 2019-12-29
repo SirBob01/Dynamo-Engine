@@ -56,43 +56,42 @@ namespace Dynamo {
     }
 
     void Display::set_fill(Color color) {
-        draw_rect({{0, 0}, logic_dim_}, color, true, false);
+        draw_rect({get_dimensions()/2, logic_dim_}, color, true);
     }
 
     void Display::set_borderfill(Color color) {
         border_color_ = color;
     }
 
-    void Display::draw_sprite(Sprite *sprite, Vec2D position, bool center) {
-        if(!sprite->get_visible() || sprite->get_alpha() <= 0) {
+    void Display::draw_sprite(Sprite *source, Sprite *dest, Vec2D position) {
+        if(!source->get_visible() || source->get_alpha() <= 0) {
             return;
         }
 
-        Vec2D dimensions = sprite->get_dimensions();
-        Vec2D ref_point;
-        if(center) {
-            ref_point = position - dimensions/2;
+        AABB aabb = {position, source->get_dimensions()};
+        SDL_Rect target_rect = aabb.convert_to_rect();
+        SDL_Rect source_rect = *(source->get_source());
+        
+        if(dest) {
+            SDL_SetRenderTarget(renderer_, dest->get_base());
         }
         else {
-            ref_point = position;
+            SDL_SetRenderTarget(renderer_, nullptr);
         }
-
-        SDL_Rect target = {
-            static_cast<int>(std::round(ref_point.x)),
-            static_cast<int>(std::round(ref_point.y)),
-            static_cast<int>(std::round(dimensions.x)),
-            static_cast<int>(std::round(dimensions.y))
-        };
-
+        
         SDL_RenderCopyEx(
             renderer_,
-            sprite->get_texture(),
-            sprite->get_source(),
-            &target,
-            sprite->get_angle(),
+            source->get_base(),
+            &source_rect,
+            &target_rect,
+            source->get_angle(),
             nullptr,
-            sprite->get_flip()
+            source->get_flip()
         );
+
+        SDL_SetRenderTarget(renderer_, source->get_base());
+        SDL_RenderCopy(renderer_, source->get_texture(), nullptr, nullptr);
+        SDL_SetRenderTarget(renderer_, nullptr);
     }
 
     void Display::draw_point(Vec2D point, Color color) {
@@ -101,10 +100,12 @@ namespace Dynamo {
             renderer_, 
             color.r, color.g, color.b, color.a
         );
+
+        SDL_Point sdl_point = point.convert_to_point();
         SDL_RenderDrawPoint(
             renderer_, 
-            static_cast<int>(std::round(point.x)), 
-            static_cast<int>(std::round(point.y))
+            sdl_point.x,
+            sdl_point.y
         );
     }
 
@@ -115,30 +116,20 @@ namespace Dynamo {
             renderer_, 
             color.r, color.g, color.b, color.a
         );
+
+        SDL_Point sdl_p1 = point1.convert_to_point();
+        SDL_Point sdl_p2 = point2.convert_to_point();
         SDL_RenderDrawLine(
             renderer_, 
-            static_cast<int>(std::round(point1.x)), 
-            static_cast<int>(std::round(point1.y)), 
-            static_cast<int>(std::round(point2.x)), 
-            static_cast<int>(std::round(point2.y))
+            sdl_p1.x,
+            sdl_p1.y, 
+            sdl_p2.x,
+            sdl_p2.y
         );
     }
 
-    void Display::draw_rect(AABB box, Color color, bool fill, bool center) {
-        Vec2D min;
-        if(center) {
-            min = box.get_min();
-        }
-        else {
-            min = box.center;
-        }
-        SDL_Rect rect = {
-            static_cast<int>(std::round(min.x)), 
-            static_cast<int>(std::round(min.y)), 
-            static_cast<int>(std::round(box.dim.x)), 
-            static_cast<int>(std::round(box.dim.y))
-        };
-
+    void Display::draw_rect(AABB box, Color color, bool fill) {
+        SDL_Rect rect = box.convert_to_rect();
         SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(
             renderer_, 

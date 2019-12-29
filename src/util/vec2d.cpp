@@ -5,36 +5,36 @@ namespace Dynamo {
         return a * d - b * c;
     }
 
-    const Mat2D Mat2D::operator+(const Mat2D &rhs) const {
+    Mat2D Mat2D::operator+(const Mat2D &rhs) const {
         return {a+rhs.a, b+rhs.b, 
                 c+rhs.c, d+rhs.d};
     }
 
-    const Mat2D Mat2D::operator-(const Mat2D &rhs) const {
+    Mat2D Mat2D::operator-(const Mat2D &rhs) const {
         return {a-rhs.a, b-rhs.b, 
                 c-rhs.c, d-rhs.d};
     }
 
-    const Mat2D Mat2D::operator*(const Mat2D &rhs) const {
+    Mat2D Mat2D::operator*(const Mat2D &rhs) const {
         return {a*rhs.a + b*rhs.c, a*rhs.b + b*rhs.d,
                 c*rhs.a + d*rhs.c, c*rhs.b + d*rhs.d};
     }
 
-    const Mat2D Mat2D::operator*(float scalar) const {
+    Mat2D Mat2D::operator*(float scalar) const {
         return {a * scalar, b * scalar,
                 c * scalar, d * scalar};
     }
 
-    const Mat2D Mat2D::operator/(float scalar) const {
+    Mat2D Mat2D::operator/(float scalar) const {
         return {a / scalar, b / scalar,
                 c / scalar, d / scalar};
     }
 
-    const Mat2D Mat2D::operator-() const {
+    Mat2D Mat2D::operator-() const {
         return {-a, -b, -c, -d};
     };
 
-    const Mat2D Mat2D::inverse() const {
+    Mat2D Mat2D::inverse() const {
         Mat2D inv = {d, -b, -c, a};
         return inv / determinant();
     }
@@ -99,31 +99,31 @@ namespace Dynamo {
         return sqrt(length_squared());
     }
 
-    const Vec2D Vec2D::left_normal() {
+    Vec2D Vec2D::left_normal() {
         return {-y, x};
     }
 
-    const Vec2D Vec2D::right_normal() {
+    Vec2D Vec2D::right_normal() {
         return {y, -x};
     }
 
-    const Vec2D Vec2D::operator+(const Vec2D &rhs) const {
+    Vec2D Vec2D::operator+(const Vec2D &rhs) const {
         return {x + rhs.x, y + rhs.y};
     }
 
-    const Vec2D Vec2D::operator-(const Vec2D &rhs) const {
+    Vec2D Vec2D::operator-(const Vec2D &rhs) const {
         return {x - rhs.x, y - rhs.y};
     }
 
-    const Vec2D Vec2D::operator*(float scalar) const {
+    Vec2D Vec2D::operator*(float scalar) const {
         return {scalar * x, scalar * y};
     }
 
-    const Vec2D Vec2D::operator/(float scalar) const {
+    Vec2D Vec2D::operator/(float scalar) const {
         return {x / scalar, y / scalar};
     }
 
-    const Vec2D Vec2D::operator-() const {
+    Vec2D Vec2D::operator-() const {
         return {-x, -y};
     }
 
@@ -182,5 +182,12 @@ namespace Dynamo {
 
     bool Vec2D::operator!=(const Vec2D &rhs) const {
         return (x != rhs.x || y != rhs.y);
+    }
+
+    SDL_Point Vec2D::convert_to_point() {
+        return {
+            static_cast<int>(std::round(x)), 
+            static_cast<int>(std::round(y))
+        };
     }
 }

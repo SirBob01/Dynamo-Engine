@@ -28,6 +28,7 @@ namespace Dynamo {
     struct RigidBody {
         AABB hitbox;
         Vec2D vel;
+        Vec2D accel;
         Collision collision;
 
         bool solid;

@@ -53,8 +53,8 @@ namespace Dynamo {
         // Get the color of the stretched border 
         Color get_borderfill();
 
-        // Draw a single sprite
-        void draw_sprite(Sprite *sprite, Vec2D position, bool center=true);
+        // Draw a sprite either directly to the display or another sprite
+        void draw_sprite(Sprite *source, Sprite *dest, Vec2D position);
 
         // Draw a single point
         void draw_point(Vec2D point, Color color);
@@ -63,8 +63,8 @@ namespace Dynamo {
         void draw_line(Vec2D point1, Vec2D point2, 
                        Color color);
         
-        // Draw a rectangle from the upperleft corner point
-        void draw_rect(AABB box, Color color, bool fill, bool center=true);
+        // Draw a rectangle
+        void draw_rect(AABB box, Color color, bool fill);
 
         // Draw a circle
         void draw_circle(Vec2D center, int radius, 

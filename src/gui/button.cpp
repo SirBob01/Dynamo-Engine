@@ -1,7 +1,7 @@
 #include "button.h"
 
 namespace Dynamo::GUI {
-    Button::Button(SDL_Texture *base, SDL_Texture *hover, Vec2D frame_size) {
+    Button::Button(Texture base, Texture hover, Vec2D frame_size) {
         sprites_[0] = new Sprite(base, frame_size);
         sprites_[1] = new Sprite(hover, frame_size);
 

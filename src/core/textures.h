@@ -13,6 +13,11 @@
 #include "../log/error.h"
 
 namespace Dynamo {
+    struct Texture {
+        SDL_Renderer *renderer;
+        SDL_Texture *texture;
+    };
+    
     class TextureManager {
         SDL_Renderer *renderer_;
 
@@ -30,11 +35,11 @@ namespace Dynamo {
         ~TextureManager();
 
         // Load an image texture
-        SDL_Texture *load_image(std::string filename);
+        Texture load_image(std::string filename);
 
         // Load a renderable-text texture
-        SDL_Texture *load_text(std::string text, 
-                               std::string font_id, Color color);
+        Texture load_text(std::string text, 
+                          std::string font_id, Color color);
 
         // Load a TTF font file
         void load_font(std::string font_id, std::string filename, int size);

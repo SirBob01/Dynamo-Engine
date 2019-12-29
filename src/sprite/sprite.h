@@ -21,6 +21,8 @@ namespace Dynamo {
 
     class Sprite {
         SDL_Texture *texture_;
+        SDL_Texture *base_;
+
         int texture_w_;
         int texture_h_;
 
@@ -45,12 +47,14 @@ namespace Dynamo {
         bool visible_;
 
     public:
-        // TODO: Create deep copy of SDL_Texture pointer
-        Sprite(SDL_Texture *texture, Vec2D frame_dimensions={0, 0});
+        Sprite(Texture texture, Vec2D frame_dimensions={0, 0});
         ~Sprite();
 
         // Get spritesheet texture (all frames)
         SDL_Texture *get_texture();
+
+        // Get the base texture (for blending)
+        SDL_Texture *get_base();
 
         // Get the whole texture's dimensions
         Vec2D get_texture_dimensions();

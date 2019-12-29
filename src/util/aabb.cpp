@@ -31,4 +31,15 @@ namespace Dynamo {
     const Vec2D AABB::get_max() const {
         return center + (dim/2);
     }
+
+    SDL_Rect AABB::convert_to_rect() {
+        SDL_Point sdl_dim = dim.convert_to_point();
+        SDL_Point sdl_center = (center - dim/2).convert_to_point();
+        return {
+            sdl_center.x,
+            sdl_center.y,
+            sdl_dim.x,
+            sdl_dim.y
+        };
+    }
 }

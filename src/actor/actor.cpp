@@ -16,6 +16,7 @@ namespace Dynamo {
         body_ = {
             hitbox,
             {0, 0},
+            {0, 0},
             {false, false, false, false},
             
             solid

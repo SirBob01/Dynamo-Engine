@@ -1,6 +1,8 @@
 #ifndef DYNAMO_AABB_H_
 #define DYNAMO_AABB_H_
 
+#include <SDL2/SDL.h>
+
 #include "vec2d.h"
 
 namespace Dynamo {
@@ -13,6 +15,8 @@ namespace Dynamo {
         
         const Vec2D get_min() const;
         const Vec2D get_max() const;
+
+        SDL_Rect convert_to_rect();
     };
 }
 

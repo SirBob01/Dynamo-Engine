@@ -1,6 +1,8 @@
 #ifndef DYNAMO_VEC2D_H_
 #define DYNAMO_VEC2D_H_
 
+#include <SDL2/SDL.h>
+
 #include <math.h>
 
 namespace Dynamo {
@@ -14,14 +16,14 @@ namespace Dynamo {
 
         float determinant() const;
 
-        const Mat2D operator+(const Mat2D &rhs) const;
-        const Mat2D operator-(const Mat2D &rhs) const;
-        const Mat2D operator*(const Mat2D &rhs) const;
-        const Mat2D operator*(float scalar) const;
-        const Mat2D operator/(float scalar) const;
-        const Mat2D operator-() const;
+        Mat2D operator+(const Mat2D &rhs) const;
+        Mat2D operator-(const Mat2D &rhs) const;
+        Mat2D operator*(const Mat2D &rhs) const;
+        Mat2D operator*(float scalar) const;
+        Mat2D operator/(float scalar) const;
+        Mat2D operator-() const;
 
-        const Mat2D inverse() const;
+        Mat2D inverse() const;
 
         Mat2D &operator+=(const Mat2D &rhs);
         Mat2D &operator-=(const Mat2D &rhs);
@@ -40,14 +42,14 @@ namespace Dynamo {
         float length_squared();
         float length();
 
-        const Vec2D left_normal();
-        const Vec2D right_normal();
+        Vec2D left_normal();
+        Vec2D right_normal();
 
-        const Vec2D operator+(const Vec2D &rhs) const;
-        const Vec2D operator-(const Vec2D &rhs) const;
-        const Vec2D operator*(float scalar) const;
-        const Vec2D operator/(float scalar) const;
-        const Vec2D operator-() const; // Negation
+        Vec2D operator+(const Vec2D &rhs) const;
+        Vec2D operator-(const Vec2D &rhs) const;
+        Vec2D operator*(float scalar) const;
+        Vec2D operator/(float scalar) const;
+        Vec2D operator-() const; // Negation
 
         Vec2D &operator+=(const Vec2D &rhs);
         Vec2D &operator-=(const Vec2D &rhs);
@@ -62,6 +64,8 @@ namespace Dynamo {
 
         bool operator==(const Vec2D &rhs) const;
         bool operator!=(const Vec2D &rhs) const;
+
+        SDL_Point convert_to_point();
     };
 }
 
