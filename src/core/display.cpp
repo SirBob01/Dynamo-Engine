@@ -31,6 +31,17 @@ namespace Dynamo {
         SDL_DestroyWindow(window_);
     }
 
+    void Display::set_render_target(Sprite *dest) {
+        if(dest) {
+            // Blend rendering over target sprite
+            SDL_SetRenderTarget(renderer_, dest->get_base());
+        }
+        else {
+            // Default render target is the main display
+            SDL_SetRenderTarget(renderer_, nullptr);
+        }
+    }
+
     SDL_Window *Display::get_window() {
         return window_;
     }
@@ -56,67 +67,83 @@ namespace Dynamo {
     }
 
     void Display::set_fill(Color color) {
-        draw_rect({get_dimensions()/2, logic_dim_}, color, true);
+        draw_rect(nullptr, {get_dimensions()/2, logic_dim_}, color, true);
     }
 
     void Display::set_borderfill(Color color) {
         border_color_ = color;
     }
 
-    void Display::draw_sprite(Sprite *source, Sprite *dest, Vec2D position) {
+    void Display::draw_sprite(Sprite *dest, Sprite *source, Vec2D position,
+                              RENDER_BLEND mode) {
         if(!source->get_visible() || source->get_alpha() <= 0) {
             return;
         }
+        SDL_SetTextureBlendMode(
+            source->get_base(),
+            static_cast<SDL_BlendMode>(mode)
+        );
 
+        // Render source on dest
+        set_render_target(dest);
         AABB aabb = {position, source->get_dimensions()};
         SDL_Rect target_rect = aabb.convert_to_rect();
-        SDL_Rect source_rect = *(source->get_source());
-        
-        if(dest) {
-            SDL_SetRenderTarget(renderer_, dest->get_base());
-        }
-        else {
-            SDL_SetRenderTarget(renderer_, nullptr);
-        }
-        
         SDL_RenderCopyEx(
             renderer_,
             source->get_base(),
-            &source_rect,
+            nullptr,
             &target_rect,
             source->get_angle(),
             nullptr,
             source->get_flip()
         );
 
-        SDL_SetRenderTarget(renderer_, source->get_base());
-        SDL_RenderCopy(renderer_, source->get_texture(), nullptr, nullptr);
-        SDL_SetRenderTarget(renderer_, nullptr);
+        // Render actual source texture on its base
+        set_render_target(source);
+        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 0);
+        SDL_RenderClear(renderer_);
+        SDL_RenderCopy(
+            renderer_, 
+            source->get_texture(), 
+            source->get_source(), 
+            nullptr
+        );
+        set_render_target(nullptr);
     }
 
-    void Display::draw_point(Vec2D point, Color color) {
-        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
+    void Display::draw_point(Sprite *dest, Vec2D point, 
+                             Color color, RENDER_BLEND mode) {
+        SDL_SetRenderDrawBlendMode(
+            renderer_,
+            static_cast<SDL_BlendMode>(mode)
+        );
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
         );
 
+        set_render_target(dest);
         SDL_Point sdl_point = point.convert_to_point();
         SDL_RenderDrawPoint(
             renderer_, 
             sdl_point.x,
             sdl_point.y
         );
+        set_render_target(nullptr);
     }
 
-    void Display::draw_line(Vec2D point1, Vec2D point2, 
-                            Color color) {
-        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
+    void Display::draw_line(Sprite *dest, Vec2D point1, Vec2D point2, 
+                            Color color, RENDER_BLEND mode) {
+        SDL_SetRenderDrawBlendMode(
+            renderer_,
+            static_cast<SDL_BlendMode>(mode)
+        );
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
         );
 
+        set_render_target(dest);
         SDL_Point sdl_p1 = point1.convert_to_point();
         SDL_Point sdl_p2 = point2.convert_to_point();
         SDL_RenderDrawLine(
@@ -126,25 +153,33 @@ namespace Dynamo {
             sdl_p2.x,
             sdl_p2.y
         );
+        set_render_target(nullptr);
     }
 
-    void Display::draw_rect(AABB box, Color color, bool fill) {
-        SDL_Rect rect = box.convert_to_rect();
-        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
+    void Display::draw_rect(Sprite *dest, AABB box, 
+                            Color color, bool fill, RENDER_BLEND mode) {
+        SDL_SetRenderDrawBlendMode(
+            renderer_,
+            static_cast<SDL_BlendMode>(mode)
+        );
         SDL_SetRenderDrawColor(
             renderer_, 
             color.r, color.g, color.b, color.a
         );
+
+        set_render_target(dest);
+        SDL_Rect rect = box.convert_to_rect();
         if(fill) {
             SDL_RenderFillRect(renderer_, &rect);
         }
         else {
             SDL_RenderDrawRect(renderer_, &rect);
         }
+        set_render_target(nullptr);
     }
 
-    void Display::draw_circle(Vec2D center, int radius, 
-                              Color color, bool fill) {
+    void Display::draw_circle(Sprite *dest, Vec2D center, int radius, 
+                              Color color, bool fill, RENDER_BLEND mode) {
         // Midpoint algorithm
         int x = radius;
         int y = 0;
@@ -155,20 +190,36 @@ namespace Dynamo {
 
         while(x >= y) {
             if(!fill) {
-                draw_point({cx + x, cy + y}, color);
-                draw_point({cx + x, cy - y}, color);
-                draw_point({cx - x, cy + y}, color);
-                draw_point({cx - x, cy - y}, color);
-                draw_point({cx + y, cy + x}, color);
-                draw_point({cx + y, cy - x}, color);
-                draw_point({cx - y, cy + x}, color);
-                draw_point({cx - y, cy - x}, color);
+                draw_point(dest, {cx + x, cy + y}, color, mode);
+                draw_point(dest, {cx + x, cy - y}, color, mode);
+                draw_point(dest, {cx - x, cy + y}, color, mode);
+                draw_point(dest, {cx - x, cy - y}, color, mode);
+                draw_point(dest, {cx + y, cy + x}, color, mode);
+                draw_point(dest, {cx + y, cy - x}, color, mode);
+                draw_point(dest, {cx - y, cy + x}, color, mode);
+                draw_point(dest, {cx - y, cy - x}, color, mode);
             }
             else {
-                draw_line({cx + x, cy + y}, {cx - x, cy + y}, color);
-                draw_line({cx + y, cy + x}, {cx - y, cy + x}, color);
-                draw_line({cx + x, cy - y}, {cx - x, cy - y}, color);
-                draw_line({cx + y, cy - x}, {cx - y, cy - x}, color);
+                draw_line(
+                    dest,
+                    {cx + x, cy + y}, {cx - x, cy + y}, 
+                    color, mode
+                );
+                draw_line(
+                    dest,
+                    {cx + y, cy + x}, {cx - y, cy + x}, 
+                    color, mode
+                );
+                draw_line(
+                    dest,
+                    {cx + x, cy - y}, {cx - x, cy - y}, 
+                    color, mode
+                );
+                draw_line(
+                    dest,
+                    {cx + y, cy - x}, {cx - y, cy - x}, 
+                    color, mode
+                );
             }
             if(p <= 0) {
                 p += 2*y + 1;
@@ -178,6 +229,13 @@ namespace Dynamo {
                 p += 2*y - 2*x + 1;
             }
             y++;
+        }
+    }
+
+    void Display::draw_polygon(Sprite *dest, Vec2D points[], int n, 
+                               Color color, RENDER_BLEND mode) {
+        for(int i = 1; i < n; i++) {
+            draw_line(dest, points[i-1], points[i], color, mode);
         }
     }
 

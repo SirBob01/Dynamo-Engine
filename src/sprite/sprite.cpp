@@ -8,31 +8,12 @@ namespace Dynamo {
             nullptr, nullptr, 
             &texture_w_, &texture_h_
         );
-        base_ = SDL_CreateTexture(
-            texture.renderer, 
-            SDL_PIXELFORMAT_RGBA8888, 
-            SDL_TEXTUREACCESS_TARGET, 
-            texture_w_, texture_h_
-        );
-        if(!base_) {
-            throw SDLError(SDL_GetError());
-        }
-
-        // Default blend mode
-        SDL_SetTextureBlendMode(
-            base_, 
-            SDL_BLENDMODE_BLEND
-        );
-        SDL_SetTextureBlendMode(
-            texture_, 
-            SDL_BLENDMODE_BLEND
-        );
-
         texture_dimensions_ = {
             static_cast<float>(texture_w_),
             static_cast<float>(texture_h_)
         };
 
+        // Calculate frame_dimensions
         if(frame_dimensions.x && frame_dimensions.x <= texture_dimensions_.x) {
             frame_dimensions_.x = frame_dimensions.x;
         }
@@ -45,6 +26,18 @@ namespace Dynamo {
         }
         else {
             frame_dimensions_.y = texture_dimensions_.y;
+        }
+
+        // Generate base texture
+        SDL_Point sdl_frame = frame_dimensions_.convert_to_point();
+        base_ = SDL_CreateTexture(
+            texture.renderer, 
+            SDL_PIXELFORMAT_RGBA8888, 
+            SDL_TEXTUREACCESS_TARGET, 
+            sdl_frame.x, sdl_frame.y
+        );
+        if(!base_) {
+            throw SDLError(SDL_GetError());
         }
 
         target_dimensions_ = frame_dimensions_;
@@ -168,13 +161,6 @@ namespace Dynamo {
 
     void Sprite::set_alpha(uint8_t alpha) {
         SDL_SetTextureAlphaMod(base_, alpha);
-    }
-
-    void Sprite::set_blend(SPRITE_BLEND mode) {
-        SDL_SetTextureBlendMode(
-            base_, 
-            static_cast<SDL_BlendMode>(mode)
-        );
     }
 
     void Sprite::set_dimensions(Vec2D dimensions) {

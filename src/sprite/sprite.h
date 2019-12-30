@@ -12,13 +12,6 @@
 #include "../util/vec2d.h"
 
 namespace Dynamo {
-    typedef enum {
-        SPRITE_BLEND_NONE = SDL_BLENDMODE_NONE,
-        SPRITE_BLEND_BLEND = SDL_BLENDMODE_BLEND,
-        SPRITE_BLEND_ADD = SDL_BLENDMODE_ADD,
-        SPRITE_BLEND_MOD = SDL_BLENDMODE_MOD,
-    } SPRITE_BLEND;
-
     class Sprite {
         SDL_Texture *texture_;
         SDL_Texture *base_;
@@ -100,9 +93,6 @@ namespace Dynamo {
 
         // Set texture alpha channel
         void set_alpha(uint8_t alpha);
-
-        // Set texture blend mode
-        void set_blend(SPRITE_BLEND mode);
 
         // Set the draw target dimension
         void set_dimensions(Vec2D dimensions);
