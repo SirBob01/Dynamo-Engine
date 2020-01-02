@@ -5,7 +5,8 @@ namespace Dynamo {
         text_input_ = "";
         quit_ = false;
 
-        scaled_mouse_ = {0, 0};
+        mouse_pos_ = {0, 0};
+        window_event_ = WINDOW_NONE;
 
         std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
         std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
@@ -14,13 +15,26 @@ namespace Dynamo {
 
     void Inputs::poll() {
         reset_states();
-        SDL_GetMouseState(&mouse_x_, &mouse_y_);
         
         while(SDL_PollEvent(&event_)) {
             if(event_.type == SDL_QUIT) {
                 quit_ = true;
             }
             
+            if(event_.type == SDL_WINDOWEVENT) {
+                window_event_ = static_cast<WINDOW_CODE>(
+                    event_.window.event
+                );
+            }
+            else {
+                window_event_ = WINDOW_NONE;
+            }
+
+            if(event_.type == SDL_MOUSEMOTION) {
+                mouse_pos_.x = event_.motion.x;
+                mouse_pos_.y = event_.motion.y;
+            }
+
             if(event_.type == SDL_MOUSEBUTTONDOWN) {
                 uint8_t button = event_.button.button;
                 for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
@@ -148,16 +162,12 @@ namespace Dynamo {
         return s;
     }
 
-    Vec2D Inputs::get_mouse_pos() {
-        return scaled_mouse_;
+    WINDOW_CODE Inputs::get_window_event() {
+        return window_event_;
     }
 
-    void Inputs::scale_mouse_pos(Vec2D window_dim, Vec2D logic_dim) {
-        float scale_x = window_dim.x / logic_dim.x;
-        float scale_y = window_dim.y / logic_dim.y;
-
-        scaled_mouse_.x = mouse_x_ / scale_x;
-        scaled_mouse_.y = mouse_y_ / scale_y;
+    Vec2D Inputs::get_mouse_pos() {
+        return mouse_pos_;
     }
 
     bool Inputs::get_quit() {

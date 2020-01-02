@@ -9,6 +9,7 @@
 #include "../util/color.h"
 #include "../util/aabb.h"
 #include "../util/vec2d.h"
+#include "../log/error.h"
 
 namespace Dynamo {
     typedef enum {
@@ -32,17 +33,26 @@ namespace Dynamo {
         void set_render_target(Sprite *dest);
 
     public:
-        Display(int width, int height, std::string title);
+        Display(int width, int height, std::string title, bool fullscreen);
         ~Display();
 
+        // Check if the display is on fullscreen mode
+        bool is_fullscreen();
+
+        // Get the pointer to the main window
         SDL_Window *get_window();
+
+        // Get the pointer to the main renderer
         SDL_Renderer *get_renderer();
 
-        // Get the draw port dimensions
+        // Get the logical dimensions of the renderer
         Vec2D get_dimensions();
 
         // Get the physical GUI window dimentions
         Vec2D get_window_dimensions();
+
+        // Get the color of the stretched border 
+        Color get_borderfill();
 
         // Set the GUI bar title
         void set_title(std::string title);
@@ -53,14 +63,14 @@ namespace Dynamo {
         // Set the fill of the stretched border
         void set_borderfill(Color color);
 
-        // Get the title of the window
-        std::string get_title();
+        // Set the logical dimensions of the renderer
+        void set_dimensions(int x, int y);
 
-        // Get the color of the draw port
-        Color get_fill();
+        // Toggle fullscreen mode
+        void set_fullscreen(bool mode);
 
-        // Get the color of the stretched border 
-        Color get_borderfill();
+        // Set the cursor visibility
+        void set_cursor_visibility(bool mode);
 
         // Draw a sprite
         // TODO: Fix weird blending between sprites

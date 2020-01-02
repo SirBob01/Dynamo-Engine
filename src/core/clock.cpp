@@ -7,7 +7,7 @@ namespace Dynamo {
         current_ = 0;
 
         delta_ = 0;
-        delta_cap_ = 30;
+        delta_cap_ = 100;
     }
 
     unsigned Clock::get_frames() {
@@ -28,11 +28,13 @@ namespace Dynamo {
 
     void Clock::set_fps(unsigned fps) {
         // Delay each loop iteration to maintain framerate
-        float cap_time = 1000.0/fps;
-        if(delta_ < cap_time) {
-            SDL_Delay(cap_time - delta_);
+        // FPS cap 0 allows machine to run app as fast as possible
+        if(fps) {
+            float cap_time = 1000.0/fps;
+            if(delta_ < cap_time) {
+                SDL_Delay(cap_time - delta_);
+            }
         }
-        
         previous_ = current_;
     }
 

@@ -23,7 +23,8 @@ namespace Dynamo {
         bool running_;
 
     public:
-        Engine(int width, int height, std::string title);
+        Engine(std::string title, bool fullscreen, 
+               int width=0, int height=0);
 
         // Get the module components for each scene
         Modules get_modules();
@@ -35,7 +36,7 @@ namespace Dynamo {
         void push_scene(Scene *scene);
         
         // Perform a single frame update
-        void run(int fps_cap);
+        void run(int fps_cap=0);
 
         // Start the application
         void start();

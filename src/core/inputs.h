@@ -263,6 +263,24 @@ namespace Dynamo {
         INPUT_LEN = 515 // Not an input, just the highest value
     } INPUT_CODE;
 
+    typedef enum {
+        WINDOW_NONE = -1,
+        WINDOW_SHOWN = SDL_WINDOWEVENT_SHOWN,
+        WINDOW_HIDDEN = SDL_WINDOWEVENT_HIDDEN,
+        WINDOW_EXPOSED = SDL_WINDOWEVENT_EXPOSED,
+        WINDOW_MOVE = SDL_WINDOWEVENT_MOVED,
+        WINDOW_RESIZE = SDL_WINDOWEVENT_RESIZED,
+        WINDOW_SIZECHANGE = SDL_WINDOWEVENT_SIZE_CHANGED,
+        WINDOW_MINIMIZE = SDL_WINDOWEVENT_MINIMIZED,
+        WINDOW_MAXIMIZE = SDL_WINDOWEVENT_MAXIMIZED,
+        WINDOW_RESTORE = SDL_WINDOWEVENT_RESTORED,
+        WINDOW_ENTER = SDL_WINDOWEVENT_ENTER,
+        WINDOW_LEAVE = SDL_WINDOWEVENT_LEAVE,
+        WINDOW_FOCUSGAIN = SDL_WINDOWEVENT_FOCUS_GAINED,
+        WINDOW_FOCUSLOSS = SDL_WINDOWEVENT_FOCUS_LOST,
+        WINDOW_CLOSE = SDL_WINDOWEVENT_CLOSE
+    } WINDOW_CODE;
+
     class Inputs {
         SDL_Event event_;
 
@@ -277,9 +295,9 @@ namespace Dynamo {
         
         std::string text_input_;
 
-        int mouse_x_;
-        int mouse_y_;
-        Vec2D scaled_mouse_;
+        Vec2D mouse_pos_;
+
+        WINDOW_CODE window_event_;
 
         bool quit_;
 
@@ -298,8 +316,10 @@ namespace Dynamo {
         // Reset the text input string field
         void reset_text_input();
 
-        // Set and get the input bindings
+        // Bind a string command to an input
         void bind(std::string command, INPUT_CODE input);
+
+        // Get the input mapped to a command
         INPUT_CODE get_bind(std::string command);
 
         // Check the pressed state of an input
@@ -323,11 +343,11 @@ namespace Dynamo {
         // Get the name string of an input event
         std::string get_name(INPUT_CODE input);
         
+        // Check for a window event
+        WINDOW_CODE get_window_event();
+
         // Get mouse position
         Vec2D get_mouse_pos();
-
-        // Scale mouse position to fit logical render display
-        void scale_mouse_pos(Vec2D window_dim, Vec2D logic_dim);
 
         // Test if the event handler quit
         bool get_quit();

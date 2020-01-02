@@ -1,7 +1,8 @@
 #include "engine.h"
 
 namespace Dynamo {
-    Engine::Engine(int width, int height, std::string title) {
+    Engine::Engine(std::string title, bool fullscreen, 
+                   int width, int height) {
         if(SDL_Init(SDL_INIT_EVERYTHING) == -1) {
             throw SDLError(SDL_GetError());
         }
@@ -10,7 +11,7 @@ namespace Dynamo {
         Random::seed(std::time(nullptr));
 
         // Initialize singleton modules
-        display_ = new Display(width, height, title);
+        display_ = new Display(width, height, title, fullscreen);
         textures_ = new TextureManager(display_->get_renderer());
         jukebox_ = new Jukebox();
         inputs_ = new Inputs();
@@ -36,10 +37,6 @@ namespace Dynamo {
     void Engine::run(int fps_cap) {
         clock_->tick();
         inputs_->poll();
-        inputs_->scale_mouse_pos(
-            display_->get_window_dimensions(), 
-            display_->get_dimensions()
-        );
         
         scene_manager_->update(clock_->get_delta());
         State *scene_state = scene_manager_->get_current();

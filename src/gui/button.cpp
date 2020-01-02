@@ -6,7 +6,7 @@ namespace Dynamo::GUI {
         sprites_[1] = new Sprite(hover, frame_size);
 
         sprite_count_ = 2;
-        bounds_.dim = sprites_[0]->get_frame_dimensions();
+        bounds_.dim = sprites_[0]->get_dimensions();
     }
 
     Button::~Button() {

@@ -1,7 +1,20 @@
 #include "display.h"
 
 namespace Dynamo {
-    Display::Display(int width, int height, std::string title) {
+    Display::Display(int width, int height, 
+                     std::string title, bool fullscreen) {
+        SDL_DisplayMode dm;
+        if(SDL_GetDesktopDisplayMode(0, &dm)) {
+            throw SDLError(SDL_GetError());
+        }
+
+        if(!width) {
+            width = fullscreen ? dm.w : dm.w * 0.75;
+        }
+        if(!height) {
+            height = fullscreen ? dm.h : dm.h * 0.75;
+        }
+
         logic_dim_ = {
             static_cast<float>(width), 
             static_cast<float>(height)
@@ -13,7 +26,7 @@ namespace Dynamo {
             SDL_WINDOWPOS_CENTERED,
             width,
             height,
-            SDL_WINDOW_RESIZABLE
+            fullscreen ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE
         );
 
         border_color_ = {0, 0, 0};
@@ -21,7 +34,7 @@ namespace Dynamo {
         renderer_ = SDL_CreateRenderer(
             window_, 
             -1, 
-            SDL_RENDERER_ACCELERATED
+            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
         );
         SDL_RenderSetLogicalSize(renderer_, width, height);
     }
@@ -40,6 +53,10 @@ namespace Dynamo {
             // Default render target is the main display
             SDL_SetRenderTarget(renderer_, nullptr);
         }
+    }
+
+    bool Display::is_fullscreen() {
+        return SDL_GetWindowFlags(window_) & SDL_WINDOW_FULLSCREEN;
     }
 
     SDL_Window *Display::get_window() {
@@ -62,6 +79,10 @@ namespace Dynamo {
         };
     }
 
+    Color Display::get_borderfill() {
+        return border_color_;
+    }
+
     void Display::set_title(std::string title) {
         SDL_SetWindowTitle(window_, title.c_str());
     }
@@ -72,6 +93,28 @@ namespace Dynamo {
 
     void Display::set_borderfill(Color color) {
         border_color_ = color;
+    }
+
+    void Display::set_dimensions(int width, int height) {
+        logic_dim_ = {
+            static_cast<float>(width), 
+            static_cast<float>(height)
+        };
+        SDL_RenderSetLogicalSize(renderer_, width, height);
+    }
+
+    void Display::set_fullscreen(bool mode) {
+        if(is_fullscreen() && mode) {
+            return;
+        }
+        SDL_SetWindowFullscreen(
+            window_, 
+            mode ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE
+        );
+    }
+
+    void Display::set_cursor_visibility(bool mode) {
+        SDL_ShowCursor(mode);
     }
 
     void Display::draw_sprite(Sprite *dest, Sprite *source, Vec2D position,
