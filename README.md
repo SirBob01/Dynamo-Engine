@@ -23,6 +23,7 @@ This engine wraps around SDL2 and its extensions:
 
 # TODO
 - Add logo
+- Use shared pointers
 - Refactor Jukebox
 - Add support for ECS architecture
 - Add support for dynamic 2D lighting
