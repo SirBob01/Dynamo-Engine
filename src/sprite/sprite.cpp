@@ -2,6 +2,7 @@
 
 namespace Dynamo {
     Sprite::Sprite(Texture texture, Vec2D frame_dimensions) {
+        renderer_ = texture.renderer;
         texture_ = texture.texture;
         SDL_QueryTexture(
             texture_, 
@@ -31,7 +32,7 @@ namespace Dynamo {
         // Generate base texture
         SDL_Point sdl_frame = frame_dimensions_.convert_to_point();
         base_ = SDL_CreateTexture(
-            texture.renderer, 
+            renderer_, 
             SDL_PIXELFORMAT_RGBA8888, 
             SDL_TEXTUREACCESS_TARGET, 
             sdl_frame.x, sdl_frame.y
@@ -207,5 +208,12 @@ namespace Dynamo {
                 finished_ = true;
             }
         }
+    }
+
+    void Sprite::clear() {
+        SDL_SetRenderTarget(renderer_, base_);
+        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 0);
+        SDL_RenderClear(renderer_);
+        SDL_SetRenderTarget(renderer_, nullptr);
     }
 }

@@ -13,6 +13,7 @@
 
 namespace Dynamo {
     class Sprite {
+        SDL_Renderer *renderer_;
         SDL_Texture *texture_;
         SDL_Texture *base_;
 
@@ -108,6 +109,9 @@ namespace Dynamo {
 
         // Animate the frames of the sprite
         void animate(unsigned dt, unsigned fps, bool loop);
+
+        // Clean the sprite texture
+        void clear();
     };
 }
 

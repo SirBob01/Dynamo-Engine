@@ -57,6 +57,7 @@ namespace Dynamo {
             return;
         }
         if(sprite_) {
+            sprite_->clear();
             sprite_->set_frame(0);
         }
         sprite_ = sprite;
@@ -69,7 +70,9 @@ namespace Dynamo {
             return; // Null states not allowed!
         }
         if(current) {
-            current->set_next(next);
+            if(!current->get_next()) {
+                current->set_next(next);            
+            }
         }
         else {
             brain_->push_state(next);
