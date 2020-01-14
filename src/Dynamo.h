@@ -12,7 +12,9 @@
 
 #include "sprite/sprite.h"
 
-#include "actor/actor.h"
+#include "ecs/entity.h"
+#include "ecs/component.h"
+#include "ecs/system.h"
 
 #include "state/state.h"
 #include "state/fsm.h"
