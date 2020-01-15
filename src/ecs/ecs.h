@@ -6,9 +6,6 @@
 #include <typeinfo>
 
 namespace Dynamo {
-    // Forward declaration
-    class EventManager;
-
     // Implicit maximum of 2^32 - 1 possible unique entities
     typedef unsigned long EntityID;
 
@@ -16,10 +13,15 @@ namespace Dynamo {
 
     };
 
-    struct Component {
+    struct BaseComponent {
         EntityID owner;
 
-        Component(EntityID owner_id) : owner(owner_id);
+        BaseComponent(EntityID owner_id) : owner(owner_id);
+    };
+
+    template <typename T>
+    struct Component : BaseComponent {
+
     };
 
     // Keeps track of entities and components
@@ -39,11 +41,7 @@ namespace Dynamo {
 
     // Base class for systems
     class System {
-        EventManager *event_manager_;
-
     public:
-        void handle_event(Event event, unsigned dt);
-        
         virtual void update(unsigned dt) = 0;
     };
 }
