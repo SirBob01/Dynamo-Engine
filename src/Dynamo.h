@@ -13,6 +13,7 @@
 #include "sprite/sprite.h"
 
 #include "ecs/ecs.h"
+#include "ecs/event.h"
 
 #include "state/state.h"
 #include "state/fsm.h"
