@@ -3,45 +3,88 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <typeinfo>
+#include <typeindex>
+#include <cstdlib>
+#include <iostream>
 
 namespace Dynamo {
     // Implicit maximum of 2^32 - 1 possible unique entities
-    typedef unsigned long EntityID;
-
-    struct EntityDefinition {
-
-    };
+    typedef unsigned long Entity;
 
     struct BaseComponent {
-        EntityID owner;
+        Entity owner = -1;
 
-        BaseComponent(EntityID owner_id) : owner(owner_id);
+        virtual ~BaseComponent() = default;
     };
 
-    template <typename T>
+    template <class T>
     struct Component : BaseComponent {
+        std::type_index name;
 
+        Component() : name(typeid(T)) {};
     };
 
     // Keeps track of entities and components
-    class EntityManager {
-        EntityID entities_;
+    class EntityRegistry {
+        Entity unique_id_;
 
-        // Should map a Component type to its own array
-        std::map<std::type_info, std::vector<Component>>
+        std::map<Entity, std::map<std::type_index, BaseComponent *>> entities_;
+        std::map<std::type_index, std::vector<BaseComponent *>> components_;
 
     public:
-        EntityManager() : entities_(0);
+        EntityRegistry();
 
-        EntityID create_entity(EntityDefinition def);
+        Entity create_entity();
 
-        void destroy_entity();
+        void destroy_entity(Entity id);
+
+        template <typename T>
+        void set_component(Entity entity, T prefab) {
+            std::type_index component_type = typeid(T);
+            if(entities_[entity].count(component_type)) {
+                return;
+            }
+
+            T *component;
+            memcpy(component, &prefab, sizeof(prefab));
+            component->owner = entity;
+
+            entities_[entity][component_type] = component;
+            components_[component_type].push_back(component);
+        };
+
+        template <typename T>
+        T *get_component(Entity entity) {
+            std::type_index component_type = typeid(T);
+            if(!entities_[entity].count(component_type)) {
+                return nullptr;
+            }
+
+            BaseComponent *base = entities_[entity][component_type];
+            return static_cast<T *>(base);
+        }
     };
 
-    // Base class for systems
     class System {
+        EntityRegistry *entities_;
+        std::vector<std::type_index> registered_;    
+        
     public:
+        System(EntityRegistry *entities);
+
+        template <typename T>
+        void register_component() {
+            std::type_index component_type = typeid(T);
+            for(auto &type : registered_) {
+                if(component_type == type) {
+                    return;
+                }
+            }
+            registered_.push_back(component_type);
+        }
+
         virtual void update(unsigned dt) = 0;
     };
 }
