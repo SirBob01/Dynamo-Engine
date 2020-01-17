@@ -29,7 +29,7 @@ namespace Dynamo {
 
     Texture TextureManager::load_image(std::string filename) {
         std::string full_path = default_image_path_+filename;
-        if(!texture_map_.count(full_path)) {
+        if(texture_map_.find(full_path) == texture_map_.end()) {
             SDL_Surface *surf = IMG_Load(filename.c_str());
             if(!surf) {
                 throw SDLError(SDL_GetError());
@@ -43,14 +43,14 @@ namespace Dynamo {
 
     Texture TextureManager::load_text(std::string text, 
                                            std::string font_id, Color color) {
-        if(!fonts_.count(font_id)) {
+        if(fonts_.find(font_id) == fonts_.end()) {
             throw InvalidKey(font_id, "fonts_");
         }
         
         // Unique combination of text, font, and color
         std::string id = text+" "+font_id+std::to_string(color.get_hex());
 
-        if(!texture_map_.count(id)) {
+        if(texture_map_.find(id) == texture_map_.end()) {
             color.clamp();
             uint8_t r = color.r;
             uint8_t g = color.g;
@@ -73,7 +73,7 @@ namespace Dynamo {
 
     void TextureManager::load_font(std::string font_id, 
                                    std::string filename, int size) {
-        if(fonts_.count(font_id)) {
+        if(fonts_.find(font_id) != fonts_.end()) {
             return;
         }
         std::string full_path = default_font_path_ + filename;

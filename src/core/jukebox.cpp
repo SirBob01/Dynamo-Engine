@@ -54,7 +54,7 @@ namespace Dynamo {
     }
 
     void Jukebox::queue_music(std::string filename, int ms) {
-        if(!music_map_.count(filename)) {
+        if(music_map_.find(filename) == music_map_.end()) {
             music_map_[filename] = Mix_LoadMUS(filename.c_str());
         }
         music_stream_.push_back(
@@ -101,7 +101,7 @@ namespace Dynamo {
     }
 
     void Jukebox::queue_ambient(std::string filename, int ms) {
-        if(!chunk_map_.count(filename)) {
+        if(chunk_map_.find(filename) == chunk_map_.end()) {
             chunk_map_[filename] = Mix_LoadWAV(filename.c_str());
         }
         ambient_stream_.push_back(
@@ -122,7 +122,7 @@ namespace Dynamo {
     }
 
     void Jukebox::play_sfx(std::string filename, int loops) {
-        if(!chunk_map_.count(filename)) {
+        if(chunk_map_.find(filename) == chunk_map_.end()) {
             chunk_map_[filename] = Mix_LoadWAV(filename.c_str());
         }
         Mix_PlayChannel(-1, chunk_map_[filename], loops);
