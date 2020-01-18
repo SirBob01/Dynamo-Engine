@@ -11,9 +11,11 @@
 #include "system.h"
 
 namespace Dynamo {
+    // TODO: Move ComponentRegistry methods to World
+    // Component responsibilities will be delegated to world
     class World {
-        EntityTracker entities_;
-        ComponentRegistry registry_;
+        IDTracker entities_;
+        ComponentRegistry components_;
 
         std::vector<std::type_index> system_types_;
         std::vector<System *> systems_;
@@ -25,8 +27,11 @@ namespace Dynamo {
 
         void kill_entity(Entity entity);
 
-        template <class Component>
+        template <typename Component>
         void add_component(Entity entity, Component prefab);
+
+        template <typename Component>
+        void remove_component(Entity entity);
 
         template <class S>
         void register_system();

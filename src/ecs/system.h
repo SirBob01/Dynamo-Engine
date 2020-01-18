@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <functional>
 
 #include "entity.h"
 #include "component.h"
@@ -26,7 +27,6 @@ namespace Dynamo {
         // Loop through entities and apply tick method
         void update(unsigned dt);
 
-        // Perform actual game logic on registered entities
         virtual void tick(Entity entity, unsigned dt) = 0;
     };
 }
