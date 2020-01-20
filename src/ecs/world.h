@@ -2,41 +2,97 @@
 #define DYNAMO_WORLD_H_
 
 #include <vector>
-#include <algorithm>
-#include <typeinfo>
-#include <typeindex>
+#include <cstdlib>
+#include <iostream>
 
 #include "entity.h"
 #include "component.h"
-#include "system.h"
 
 namespace Dynamo {
-    // TODO: Move ComponentRegistry methods to World
-    // Component responsibilities will be delegated to world
     class World {
-        IDTracker entities_;
-        ComponentRegistry components_;
+        EntityTracker entities_;
 
-        std::vector<std::type_index> system_types_;
-        std::vector<System *> systems_;
+        std::vector<BasePool *> components_;
 
     public:
-        ~World();
-
+        // Create an new entity
         Entity create_entity();
 
-        void kill_entity(Entity entity);
+        // Destroy an entity
+        void destroy_entity(Entity entity);
 
+        // Get an entity's component
         template <typename Component>
-        void add_component(Entity entity, Component prefab);
+        Component *get_component(Entity entity) {
+            unsigned type_index = TypeID::get_id<Component>();
+            if(type_index >= components_.size()) {
+                return nullptr;
+            }
+            if(!entities_.is_active(entity)) {
+                return nullptr;
+            }
 
+            ComponentPool<Component> *pool = dynamic_cast<
+                ComponentPool<Component> *>(
+                components_[type_index]
+            );
+            int component_index = pool->search(
+                EntityTracker::get_index(entity)
+            );
+
+            if(component_index == -1) {
+                return nullptr;
+            }
+            return pool->get_at(component_index);
+        }
+
+        // Add a component to an entity
         template <typename Component>
-        void remove_component(Entity entity);
+        void add_component(Entity entity, Component prefab) {
+            unsigned type_index = TypeID::get_id<Component>();
+            if(type_index >= components_.size()) {
+                components_.push_back(new ComponentPool<Component>());
+            }
+            if(!entities_.is_active(entity)) {
+                return;
+            }
+            ComponentPool<Component> *pool;
+            pool = dynamic_cast<ComponentPool<Component> *>(
+                components_[type_index]
+            );
+            pool->insert(entity, prefab);
+        }
 
-        template <class S>
-        void register_system();
+        // Remove a component from an entity
+        template <typename Component>
+        void remove_component(Entity entity) {
+            unsigned type_index = TypeID::get_id<Component>();
+            if(type_index >= components_.size()) {
+                return;
+            }
+            if(!entities_.is_active(entity)) {
+                return;
+            }
 
-        void update(unsigned dt);
+            ComponentPool<Component> *pool;
+            pool = dynamic_cast<ComponentPool<Component> *>(
+                components_[type_index]
+            );
+            pool->remove(EntityTracker::get_index(entity));
+        }
+        
+        template <typename Component>
+        void clear() {
+            unsigned type_index = TypeID::get_id<Component>();
+            if(type_index >= components_.size()) {
+                return;
+            }
+            ComponentPool<Component> *pool = dynamic_cast<
+                ComponentPool<Component> *>(
+                components_[type_index]
+            );
+            pool->clear();
+        }
     };
 }
 

@@ -9,14 +9,20 @@ namespace Dynamo {
     // 2^32 - 1 possible unique entities at any instance
     typedef uint64_t Entity;
 
-    class IDTracker {
+    class EntityTracker {
         uint32_t index_counter_;
 
         std::vector<uint32_t> versions_;
         std::queue<uint32_t> free_pool_;
 
     public:
-        IDTracker();
+        EntityTracker();
+
+        // Get the entity index
+        static uint32_t get_index(Entity entity);
+
+        // Get the entity version number
+        static uint32_t get_version(Entity entity);
 
         // Check if an entity is still active
         bool is_active(Entity entity);

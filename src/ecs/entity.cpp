@@ -1,14 +1,22 @@
 #include "entity.h"
 
 namespace Dynamo {
-    IDTracker::IDTracker() {
+    EntityTracker::EntityTracker() {
         index_counter_ = 0;
     }
 
-    bool IDTracker::is_active(Entity entity) {
+    uint32_t EntityTracker::get_index(Entity entity) {
+        return entity >> 32;
+    }
+
+    uint32_t EntityTracker::get_version(Entity entity) {
+        return entity & 0xFFFFFFFF;
+    }
+
+    bool EntityTracker::is_active(Entity entity) {
         uint32_t index, version;
-        index = entity >> 32;
-        version = entity & 0xFFFFFFFF;
+        index = EntityTracker::get_index(entity);
+        version = EntityTracker::get_version(entity);
 
         if(index + 1 > index_counter_) {
             return false;
@@ -19,7 +27,7 @@ namespace Dynamo {
         return true;
     }
 
-    Entity IDTracker::generate_id() {
+    Entity EntityTracker::generate_id() {
         Entity entity = 0;
         uint32_t index, version;
 
@@ -36,16 +44,16 @@ namespace Dynamo {
         return (entity << 32) | version;
     }
 
-    void IDTracker::invalidate_id(Entity entity) {
+    void EntityTracker::invalidate_id(Entity entity) {
         if(!is_active(entity)) {
             return;
         }
-        uint32_t index = entity >> 32;
+        uint32_t index = EntityTracker::get_index(entity);
         versions_[index]++;
         free_pool_.push(index);
     }
 
-    void IDTracker::clear() {
+    void EntityTracker::clear() {
         index_counter_ = 0;
         versions_.clear();
         free_pool_ = {};
