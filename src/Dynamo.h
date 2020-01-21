@@ -16,6 +16,8 @@
 #include "ecs/component.h"
 #include "ecs/world.h"
 
+#include "actor/actor.h"
+
 #include "state/state.h"
 #include "state/fsm.h"
 

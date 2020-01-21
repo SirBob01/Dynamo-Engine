@@ -3,7 +3,9 @@
 A 2D game engine powered by SDL2.
 
 Features:
-- Game Actors and Finite State Machines (AI)
+- ECS Framework (DOD architecture)
+- Game Actor (OOP architecture)
+- Finite State Machines (AI)
 - Layered Scene management
 - Input binding
 - Animated sprites
@@ -25,6 +27,6 @@ This engine wraps around SDL2 and its extensions:
 - Add logo
 - Use shared pointers
 - Refactor Jukebox
-- Add support for ECS architecture
+- Implement method to filter entities based on components list
 - Add support for dynamic 2D lighting
 - Implement GUI textboxes and sliders
