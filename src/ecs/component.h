@@ -2,6 +2,7 @@
 #define DYNAMO_COMPONENT_H_
 
 #include <vector>
+#include <algorithm>
 #include <cstring>
 #include <cinttypes>
 
@@ -10,9 +11,9 @@
 
 namespace Dynamo {
     template <typename Component>
-    struct ComponentHandle {
-        Entity owner;
-        Component data;
+    struct ComponentWrapper {
+        int entity_index;
+        Component *data;
     };
 
     // Static methods for generating unique type IDs
@@ -45,7 +46,9 @@ namespace Dynamo {
         uint32_t capacity_;
 
         uint32_t *sparse_;
-        ComponentHandle<Component> *dense_;
+        std::vector<uint32_t> dense_;
+
+        Component *pool_;
     
     public:
         ComponentPool() {
@@ -54,11 +57,14 @@ namespace Dynamo {
             capacity_ = 2;
 
             sparse_ = new uint32_t[max_value_];
-            dense_ = new ComponentHandle<Component>[capacity_];
+            pool_ = static_cast<Component *>(
+                std::malloc(sizeof(Component) * capacity_)
+            );
         }
 
         ~ComponentPool() {
-            delete[] dense_;
+            clear();
+            std::free(pool_);
             delete[] sparse_;
         }
 
@@ -69,11 +75,18 @@ namespace Dynamo {
 
         // Get a pointer to a component instance 
         // Use for iteration
-        Component *get_at(int index) {        
+        Component *get_at(int index) {
             if(index < 0 || index >= get_length()) {
                 return nullptr;
             }
-            return &dense_[index].data;
+            return &pool_[index];
+        }
+
+        ComponentWrapper<Component> get_pair(int index) {
+            if(index < 0 || index >= get_length()) {
+                return {-1, nullptr};
+            }
+            return {dense_[index], &pool_[index]};
         }
 
         // Search the index of the component instance owned by the entity
@@ -82,34 +95,26 @@ namespace Dynamo {
             if(entity_id > max_value_) {
                 return -1;
             }
-            if(sparse_[entity_id] < get_length()) {
-                uint32_t index = EntityTracker::get_index(
-                    dense_[sparse_[entity_id]].owner
-                );
-                if(index == entity_id) {
-                    return sparse_[entity_id];
-                }
+            if(sparse_[entity_id] < get_length() && 
+               dense_[sparse_[entity_id]] == entity_id) {
+                return sparse_[entity_id];
             }
             return -1;
         }
 
         // Add a new component
-        void insert(Entity entity, Component prefab) {
+        template <typename ... Fields>
+        void insert(Entity entity, Fields ... params) {
             uint32_t entity_id = EntityTracker::get_index(entity);
             if(search(entity_id) != -1) {
                 return;
             }
             if(length_+1 >= capacity_) {
-                // Reallocate dense array
+                // Reallocate component array
                 capacity_ *= 2;
-                ComponentHandle<Component> *new_dense;
-                new_dense = new ComponentHandle<Component>[capacity_];
-                for(int i = 0; i < length_; i++) {
-                    new_dense[i] = dense_[i];
-                }
-
-                delete[] dense_;
-                dense_ = new_dense;
+                pool_ = static_cast<Component *>(
+                    std::realloc(pool_, sizeof(Component) * capacity_)
+                );
             }
             if(entity_id >= max_value_) {
                 // Reallocate sparse array
@@ -124,7 +129,8 @@ namespace Dynamo {
             }
 
             sparse_[entity_id] = get_length();
-            dense_[length_++] = {entity, prefab};
+            dense_.push_back(entity_id);
+            pool_[length_++] = {params ...};
         }
 
         // Destroy a component instance if it exists
@@ -134,17 +140,24 @@ namespace Dynamo {
                 return;
             }
 
-            // Perform the swap to remove holes
-            ComponentHandle<Component> temp = dense_[get_length()-1];
-            dense_[index] = temp;
+            // Destoroy target and fill its place
+            pool_[index].~Component();
+            pool_[index] = pool_[get_length()-1];
 
-            uint32_t entity_index = EntityTracker::get_index(temp.owner);
-            sparse_[entity_index] = sparse_[entity_id];
+            // Rearrange indices
+            uint32_t temp = dense_.back();
+            dense_[index] = temp;
+            sparse_[temp] = sparse_[entity_id];
             length_--;
+            dense_.pop_back();
         }
 
         // Clear the pool
         void clear() {
+            dense_.clear();
+            for(int i = 0; i < length_; i++) {
+                pool_[i].~Component();
+            }
             length_ = 0;
         }
     };

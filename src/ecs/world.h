@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <cstdlib>
-#include <iostream>
 
 #include "entity.h"
 #include "component.h"
@@ -15,6 +14,8 @@ namespace Dynamo {
         std::vector<BasePool *> components_;
 
     public:
+        ~World();
+
         // Create an new entity
         Entity create_entity();
 
@@ -47,8 +48,8 @@ namespace Dynamo {
         }
 
         // Add a component to an entity
-        template <typename Component>
-        void add_component(Entity entity, Component prefab) {
+        template <typename Component, typename ... Fields>
+        void add_component(Entity entity, Fields ... params) {
             unsigned type_index = TypeID::get_id<Component>();
             if(type_index >= components_.size()) {
                 components_.push_back(new ComponentPool<Component>());
@@ -56,11 +57,12 @@ namespace Dynamo {
             if(!entities_.is_active(entity)) {
                 return;
             }
+
             ComponentPool<Component> *pool;
             pool = dynamic_cast<ComponentPool<Component> *>(
                 components_[type_index]
             );
-            pool->insert(entity, prefab);
+            pool->insert(entity, params ...);
         }
 
         // Remove a component from an entity
@@ -80,7 +82,7 @@ namespace Dynamo {
             );
             pool->remove(EntityTracker::get_index(entity));
         }
-        
+
         template <typename Component>
         void clear() {
             unsigned type_index = TypeID::get_id<Component>();

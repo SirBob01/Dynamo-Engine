@@ -1,6 +1,12 @@
 #include "world.h"
 
 namespace Dynamo {
+    World::~World() {
+        for(auto &pool : components_) {
+            delete pool;
+        }
+    }
+
     Entity World::create_entity() {
         return entities_.generate_id();
     }
