@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <algorithm>
 #include <string>
 
 #include "../sprite/sprite.h"
@@ -97,8 +98,8 @@ namespace Dynamo {
                          RENDER_BLEND mode=RENDER_BLEND_BLEND);
         
         // Draw a polygon of n sides
-        // TODO: Implement filled polygons
-        void draw_polygon(Sprite *dest, Vec2D points[], int n, Color color, 
+        void draw_polygon(Sprite *dest, Vec2D points[], int n, 
+                          Color color, bool fill, 
                           RENDER_BLEND mode=RENDER_BLEND_BLEND);
 
         // Refresh the display after each game-loop iteration

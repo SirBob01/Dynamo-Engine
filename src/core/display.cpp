@@ -276,9 +276,86 @@ namespace Dynamo {
     }
 
     void Display::draw_polygon(Sprite *dest, Vec2D points[], int n, 
-                               Color color, RENDER_BLEND mode) {
-        for(int i = 1; i < n; i++) {
-            draw_line(dest, points[i-1], points[i], color, mode);
+                               Color color, bool fill, RENDER_BLEND mode) {
+        if(!fill) {
+            for(int i = 0; i < n; i++) {
+                draw_line(dest, points[i], points[(i+1)%n], color, mode);
+            }            
+        }
+        else {
+            float nodes_x[n]; 
+            int nodes, row, i, j;
+            Vec2D min = points[0], max = points[0];
+            
+            // Find minimum and maximum coordinates in polygon
+            for(i = 0; i < n; i++) {
+                if(points[i].y < min.y) {
+                    min.y = points[i].y;
+                }
+                if(points[i].y > max.y) {
+                    max.y = points[i].y;
+                }
+
+                if(points[i].x < min.x) {
+                    min.x = points[i].x;
+                }
+                if(points[i].x > max.x) {
+                    max.x = points[i].x;
+                }
+            }
+
+            // Generate and draw lines between nodes
+            for(row = min.y; row < max.y; row++) {
+                nodes = 0;
+                j = n - 1;
+                for(i = 0; i < n; i++) {
+                    if(points[i].y < row && points[j].y >= row ||
+                       points[j].y < row && points[i].y >= row) {
+                        nodes_x[nodes++] = (
+                            (points[i].x + (row - points[i].y) /
+                            (points[j].y - points[i].y) *
+                            (points[j].x - points[i].x))
+                        );
+                    }
+                    j = i;
+                }
+
+                for(i = 0; i < nodes - 1;) {
+                    if(nodes_x[i] > nodes_x[i + 1]) {
+                        std::swap(nodes_x[i], nodes_x[i + 1]);
+                        if(i) {
+                            i--;
+                        }
+                    }
+                    else {
+                        i++;
+                    }
+                }
+
+                for(i = 0; i < nodes; i += 2) {
+                    if(nodes_x[i] >= max.x) {
+                        break;
+                    }
+                    if(nodes_x[i + 1] > min.x) {
+                        if(nodes_x[i] < min.x) {
+                            nodes_x[i] = min.x;
+                        }
+                        if(nodes_x[i + 1] > max.x) {
+                            nodes_x[i + 1] = max.x;
+                        }
+
+                        Vec2D start = {
+                            nodes_x[i], 
+                            static_cast<float>(row)
+                        };
+                        Vec2D end = {
+                            nodes_x[i + 1], 
+                            static_cast<float>(row)
+                        };
+                        draw_line(dest, start, end, color, mode);
+                    }
+                }
+            }
         }
     }
 
