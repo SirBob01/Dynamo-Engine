@@ -12,7 +12,6 @@ Features:
 - Texture manager
 - Audio streaming (separate channels for music, ambience, and sound effects)
 - Rasterizing primitives
-- Custom networking protocol
 - GUI Widgets
 
 # Dependencies
@@ -27,6 +26,7 @@ This engine wraps around SDL2 and its extensions:
 - Add logo
 - Use shared pointers
 - Refactor Jukebox
-- Implement method to filter entities based on components list
+- Implement custom network protocol
 - Add support for dynamic 2D lighting
 - Implement GUI textboxes and sliders
+- Add documentation for usage (sample games)
