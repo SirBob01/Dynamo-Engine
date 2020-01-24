@@ -10,12 +10,6 @@
 #include "../log/error.h"
 
 namespace Dynamo {
-    template <typename Component>
-    struct ComponentWrapper {
-        int entity_index;
-        Component *data;
-    };
-
     // Static methods for generating unique type IDs
     class TypeID {
         static unsigned increment_id();
@@ -32,7 +26,13 @@ namespace Dynamo {
     public:
         virtual ~BasePool() = default;
 
-        virtual void remove(uint32_t entity_id) = 0;
+        virtual int get_length() = 0;
+
+        virtual int search(Entity entity) = 0;
+
+        virtual Entity get_entity(int index) = 0;
+
+        virtual void remove(Entity entity) = 0;
 
         virtual void clear() = 0;
     };
@@ -41,20 +41,20 @@ namespace Dynamo {
     // Allows quick iteration and search-by-Entity
     template <typename Component>
     class ComponentPool : public BasePool {
-        uint32_t length_;
+        int length_;
+        int capacity_;
         uint32_t max_value_;
-        uint32_t capacity_;
 
-        uint32_t *sparse_;
-        std::vector<uint32_t> dense_;
+        uint32_t *sparse_; // Holdes indices to dense_ and pool_
+        std::vector<Entity> dense_; // Holds indices to sparse_
 
         Component *pool_;
     
     public:
         ComponentPool() {
             length_ = 0;
-            max_value_ = 4;
             capacity_ = 2;
+            max_value_ = 4;
 
             sparse_ = new uint32_t[max_value_];
             pool_ = static_cast<Component *>(
@@ -76,28 +76,24 @@ namespace Dynamo {
         // Get a pointer to a component instance 
         // Use for iteration
         Component *get_at(int index) {
-            if(index < 0 || index >= get_length()) {
-                return nullptr;
-            }
-            return &pool_[index];
+            return pool_ + index;
         }
 
-        ComponentWrapper<Component> get_pair(int index) {
-            if(index < 0 || index >= get_length()) {
-                return {-1, nullptr};
-            }
-            return {dense_[index], &pool_[index]};
+        // Get the entity at an index
+        Entity get_entity(int index) {
+            return dense_[index];
         }
 
         // Search the index of the component instance owned by the entity
         // Returns -1 on failure
-        int search(uint32_t entity_id) {
-            if(entity_id > max_value_) {
+        int search(Entity entity) {
+            uint32_t entity_index = EntityTracker::get_index(entity);
+            if(entity_index > max_value_) {
                 return -1;
             }
-            if(sparse_[entity_id] < get_length() && 
-               dense_[sparse_[entity_id]] == entity_id) {
-                return sparse_[entity_id];
+            if(sparse_[entity_index] < get_length() &&
+               dense_[sparse_[entity_index]] == entity) {
+                return sparse_[entity_index];
             }
             return -1;
         }
@@ -105,8 +101,8 @@ namespace Dynamo {
         // Add a new component
         template <typename ... Fields>
         void insert(Entity entity, Fields ... params) {
-            uint32_t entity_id = EntityTracker::get_index(entity);
-            if(search(entity_id) != -1) {
+            uint32_t entity_index = EntityTracker::get_index(entity);
+            if(search(entity) != -1) {
                 return;
             }
             if(length_+1 >= capacity_) {
@@ -116,26 +112,26 @@ namespace Dynamo {
                     std::realloc(pool_, sizeof(Component) * capacity_)
                 );
             }
-            if(entity_id >= max_value_) {
+            if(entity_index >= max_value_) {
                 // Reallocate sparse array
-                uint32_t *new_sparse = new uint32_t[entity_id * 2];
+                uint32_t *new_sparse = new uint32_t[entity_index * 2];
                 for(int i = 0; i < max_value_; i++) {
                     new_sparse[i] = sparse_[i];
                 }
 
                 delete[] sparse_;
                 sparse_ = new_sparse;
-                max_value_ = entity_id * 2;
+                max_value_ = entity_index * 2;
             }
 
-            sparse_[entity_id] = get_length();
-            dense_.push_back(entity_id);
+            sparse_[entity_index] = get_length();
+            dense_.push_back(entity);
             pool_[length_++] = {params ...};
         }
 
         // Destroy a component instance if it exists
-        void remove(uint32_t entity_id) {
-            int index = search(entity_id);
+        void remove(Entity entity) {
+            int index = search(entity);
             if(index < 0) {
                 return;
             }
@@ -145,9 +141,12 @@ namespace Dynamo {
             pool_[index] = pool_[get_length()-1];
 
             // Rearrange indices
-            uint32_t temp = dense_.back();
+            Entity temp = dense_.back();
+            uint32_t entity_index = EntityTracker::get_index(entity);
+            uint32_t temp_index = EntityTracker::get_index(temp);
+
             dense_[index] = temp;
-            sparse_[temp] = sparse_[entity_id];
+            sparse_[temp_index] = sparse_[entity_index];
             length_--;
             dense_.pop_back();
         }

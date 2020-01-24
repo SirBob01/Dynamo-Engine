@@ -2,7 +2,7 @@
 
 namespace Dynamo {
     World::~World() {
-        for(auto &pool : components_) {
+        for(auto &pool : pools_) {
             delete pool;
         }
     }
@@ -16,9 +16,10 @@ namespace Dynamo {
         if(!entities_.is_active(entity)) {
             return;
         }
-        for(auto &pool : components_) {
-            pool->remove(EntityTracker::get_index(entity));
+        for(auto &type : owned_[entity]) {
+            pools_[type]->remove(entity);
         }
         entities_.invalidate_id(entity);
+        owned_.erase(entity);
     }
 }

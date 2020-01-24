@@ -2,64 +2,54 @@
 #define DYNAMO_SYSTEM_H_
 
 #include <vector>
+#include <algorithm>
 
-#include "entity.h"
+#include "component.h"
+#include "world.h"
 
 namespace Dynamo {
-    class Entity;
-    class World;
-
     template <typename ... Component>
     class System {
-        std::vector<unsigned> id_filter_;
-        std::vector<Entity> registered_;
+        std::vector<BasePool *> pools_;
 
     protected:
         World *world_;
 
     public:
-        /* TODO: Iterate through world entities 
-        and check if they contain components
-        listed in id_filter_ */
         System(World *world) {
             world_ = world;
+            // Grab the pools of each component type
+            std::initializer_list<int>{
+                ((void)pools_.push_back(
+                    world_->get_pool<Component>()
+                ), 0)...
+            };
         }
 
-        ~System() {
-            world_->unregister_system(this);
-        }
-
-        bool is_compatible(Entity entity) {
-            return true;
-        }
-
-        // Add a new entity to be handled by the system
-        void add_entity(Entity entity) {
-            if(!world_->is_alive(entity) || !is_compatible(entity)) {
-                return;
-            }
-            registered_.push_back(entity);
-        }
-
-        // Remove an entity from the system
-        void remove_entity(Entity entity) {
-            registered_.erase(
-                std::remove(
-                    registered_.begin(), 
-                    registered_.end(), 
-                    entity
-                ),
-                registered_.end();
-            );
-        }
-
-        // Update the entity registration list perform the actions
+        // Perform tick on all entities that match component configuration
         void update(unsigned dt) {
-            for(auto &entity : registered_) {
-                if(!world_->is_alive(entity)) {
-                    remove_entity(entity);
+            // Get minimum length pool
+            for(auto &pool : pools_) {
+                if(pool->get_length() < pools_[0]->get_length()) {
+                    std::swap(pools_[0], pool);
                 }
-                tick(dt, entity);
+            }
+
+            // Loop through entities in min and check if 
+            // they exist in the other pools
+            BasePool *min = pools_[0];
+            for(int i = 0; i < min->get_length(); i++) {
+                Entity entity = min->get_entity(i);
+                
+                bool match = true;
+                for(int j = 1; j < pools_.size() && match; j++) {
+                    if(pools_[j]->search(entity) == -1) {
+                        match = false;
+                    }
+                }
+                if(match) {
+                    tick(dt, entity);
+                }
             }
         }
 
