@@ -8,6 +8,7 @@
 #include "component.h"
 
 namespace Dynamo {
+    // ECS World manages all entities and component groups
     class World {
         EntityTracker entities_;
 
@@ -23,14 +24,48 @@ namespace Dynamo {
         // Destroy an entity
         void destroy_entity(Entity entity);
 
-        template <typename Component>
-        BasePool *get_pool() {
-            unsigned type_index = TypeID::get_id<Component>();
-            if(type_index >= pools_.size()) {
-                return nullptr;
+        // Get a vector of entities belonging to a component group
+        template <typename ... Component>
+        std::vector<Entity> get_group() {
+            std::vector<BasePool *> group_pools;
+            std::vector<Entity> group;
+
+            // Grab the pools of each component type
+            // Uses initializer-list trick to unpack variadic-args
+            std::initializer_list<int>{
+                ((void)group_pools.push_back(
+                    pools_[TypeID::get_id<Component>()]
+                ), 0)...
+            };
+
+            // Get minimum length pool
+            BasePool *min = group_pools[0];
+            for(auto &pool : group_pools) {
+                if(pool->get_length() < min->get_length()) {
+                    min = pool;
+                }
             }
-            return pools_[type_index];
-        } 
+
+            // Loop through entities in min and check if 
+            // they exist in the other pools
+            for(int i = 0; i < min->get_length(); i++) {
+                Entity entity = min->get_entity(i);
+                
+                bool match = true;
+                for(int j = 0; j < group_pools.size() && match; j++) {
+                    if(group_pools[j] == min) {
+                        continue;
+                    }
+                    if(group_pools[j]->search(entity) == -1) {
+                        match = false;
+                    }
+                }
+                if(match) {
+                    group.push_back(entity);
+                }
+            }
+            return group;
+        }
 
         // Get an entity's component
         template <typename Component>
@@ -100,6 +135,7 @@ namespace Dynamo {
             );
         }
 
+        // Clear a component pool
         template <typename Component>
         void clear() {
             unsigned type_index = TypeID::get_id<Component>();

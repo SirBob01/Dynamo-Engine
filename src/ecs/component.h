@@ -22,6 +22,7 @@ namespace Dynamo {
         }
     };
 
+    // Common base-class for templated ComponentPools
     class BasePool {
     public:
         virtual ~BasePool() = default;

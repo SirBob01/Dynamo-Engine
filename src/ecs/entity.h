@@ -9,6 +9,7 @@ namespace Dynamo {
     // 2^32 - 1 possible unique entities at any instance
     typedef uint64_t Entity;
 
+    // Keeps track of entity index versioning
     class EntityTracker {
         uint32_t index_counter_;
 

@@ -14,7 +14,6 @@
 
 #include "ecs/entity.h"
 #include "ecs/component.h"
-#include "ecs/system.h"
 #include "ecs/world.h"
 
 #include "actor/actor.h"
