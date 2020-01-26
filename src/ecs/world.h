@@ -135,6 +135,20 @@ namespace Dynamo {
             );
         }
 
+        // Perform a function on a particular pool of components
+        template <typename Component, class F>
+        void each(F function) {
+            unsigned type_index = TypeID::get_id<Component>();
+            if(type_index >= pools_.size()) {
+                return;
+            }
+            ComponentPool<Component> *pool = dynamic_cast<
+                ComponentPool<Component> *>(
+                pools_[type_index]
+            );
+            pool->each(function);
+        }
+
         // Clear a component pool
         template <typename Component>
         void clear() {

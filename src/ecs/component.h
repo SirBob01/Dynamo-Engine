@@ -152,10 +152,18 @@ namespace Dynamo {
             dense_.pop_back();
         }
 
+        // Perform a function on each component
+        template <class F>
+        void each(F function) {
+            for(int i = 0; i < length_; i++) {
+                function(pool_ + i);
+            }
+        }
+
         // Clear the pool
         void clear() {
             dense_.clear();
-            for(int i = 0; i < length_; i++) {
+            for(int i = 0; i < get_length(); i++) {
                 pool_[i].~Component();
             }
             length_ = 0;
