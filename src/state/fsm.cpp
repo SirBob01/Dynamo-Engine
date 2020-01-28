@@ -11,6 +11,7 @@ namespace Dynamo {
 
     void FSM::push_state(State *state) {
         current_ = state;
+        state->on_entry();
     }
 
     void FSM::update(unsigned dt) {
@@ -36,7 +37,6 @@ namespace Dynamo {
             if(next != parent) {
                 next->set_parent(current_);
             }
-            next->on_entry();
             push_state(next);
         }
     }

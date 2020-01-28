@@ -4,24 +4,33 @@
 #include <SDL2/SDL.h>
 #include <unordered_set>
 
+#include "../state/fsm.h"
 #include "../state/state.h"
 #include "../core/display.h"
 #include "../core/textures.h"
 #include "../core/jukebox.h"
 #include "../core/inputs.h"
 #include "../core/clock.h"
+#include "../util/typeid.h"
 
 namespace Dynamo {
-    // Holds references to singleton modules
-    struct Modules {
+    // Holds references to core data passed between scenes
+    struct Core {
         Display *display;
         TextureManager *textures;
         Jukebox *jukebox;
         Inputs *inputs;
         Clock *clock;
+
+        TypeID *scene_registry_;
+        std::vector<State *> *scenes_;
     };
 
+    // Base class for game scenes (menus, cutscenes, gameplay)
     class Scene : public State {
+        TypeID *scene_registry_;
+        std::vector<State *> *scenes_;
+
     protected:
         Display *display_;
         TextureManager *textures_;
@@ -30,11 +39,32 @@ namespace Dynamo {
         Clock *clock_;
 
     public:
-        Scene(Modules modules);
+        Scene(Core modules);
         virtual ~Scene();
 
-        // Repackage modules to transition between scenes
-        Modules get_modules();
+        // Set the next scene
+        template <class S, typename ... Arg>
+        void set_scene(Arg ... args) {
+            unsigned type_id = scene_registry_->get_id<S>();
+            if(type_id >= scenes_->size()) {
+                scenes_->push_back(
+                    new S(
+                        {
+                            display_, 
+                            textures_, 
+                            jukebox_, 
+                            inputs_, 
+                            clock_,
+
+                            scene_registry_,
+                            scenes_
+                        }, 
+                        args ...
+                    )
+                );
+            }
+            set_next((*scenes_)[type_id]);
+        }
 
         // Draw all renderable scene objects
         virtual void draw() = 0;

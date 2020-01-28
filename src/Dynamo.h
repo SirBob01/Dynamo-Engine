@@ -33,6 +33,7 @@
 #include "util/vec2d.h"
 #include "util/aabb.h"
 #include "util/random.h"
+#include "util/typeid.h"
 
 #include "log/error.h"
 

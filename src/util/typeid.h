@@ -2,7 +2,7 @@
 #define DYNAMO_TYPEID_H_
 
 namespace Dynamo {
-    // Static methods for generating unique type IDs
+    // Methods for generating unique type IDs
     class TypeID {
         unsigned id_counter_;
 

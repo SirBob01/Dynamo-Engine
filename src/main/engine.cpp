@@ -22,16 +22,8 @@ namespace Dynamo {
         running_ = false;
     }
 
-    Modules Engine::get_modules() {
-        return {display_, textures_, jukebox_, inputs_, clock_};
-    }
-
     bool Engine::get_running() {
         return running_;
-    }
-
-    void Engine::push_scene(Scene *scene) {
-        scene_manager_->push_state(scene);
     }
 
     void Engine::run(int fps_cap) {
@@ -65,6 +57,9 @@ namespace Dynamo {
 
     void Engine::quit() {
         // Clean up
+        for(auto &scene : scenes_) {
+            delete scene;
+        }
         delete scene_manager_;
         delete display_;
         delete textures_;
