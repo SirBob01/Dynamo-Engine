@@ -10,18 +10,6 @@
 #include "../log/error.h"
 
 namespace Dynamo {
-    // Static methods for generating unique type IDs
-    class TypeID {
-        static unsigned increment_id();
-
-    public:
-        template <typename T>
-        static unsigned get_id() {
-            static const unsigned id = increment_id();
-            return id;
-        }
-    };
-
     // Common base-class for templated ComponentPools
     class BasePool {
     public:
