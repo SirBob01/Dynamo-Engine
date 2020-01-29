@@ -67,7 +67,7 @@ namespace Dynamo {
                 }
             }
             return group;
-        }
+        };
 
         // Get an entity's component
         template <typename Component>
@@ -90,7 +90,7 @@ namespace Dynamo {
                 return nullptr;
             }
             return pool->get_at(component_index);
-        }
+        };
 
         // Add a component to an entity
         template <typename Component, typename ... Fields>
@@ -109,7 +109,7 @@ namespace Dynamo {
             );
             pool->insert(entity, params ...);
             owned_[entity].push_back(type_index);
-        }
+        };
 
         // Remove a component from an entity
         template <typename Component>
@@ -135,7 +135,7 @@ namespace Dynamo {
                 ),
                 owned_[entity].end()
             );
-        }
+        };
 
         // Perform a function on a particular pool of components
         template <typename Component, class F>
@@ -149,7 +149,7 @@ namespace Dynamo {
                 pools_[type_index]
             );
             pool->each(function);
-        }
+        };
 
         // Clear a component pool
         template <typename Component>
@@ -163,7 +163,7 @@ namespace Dynamo {
                 pools_[type_index]
             );
             pool->clear();
-        }
+        };
     };
 }
 

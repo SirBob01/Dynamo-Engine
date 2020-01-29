@@ -43,28 +43,25 @@ namespace Dynamo {
         virtual ~Scene();
 
         // Set the next scene
-        template <class S, typename ... Arg>
-        void set_scene(Arg ... args) {
+        template <class S>
+        void set_scene() {
             unsigned type_id = scene_registry_->get_id<S>();
             if(type_id >= scenes_->size()) {
                 scenes_->push_back(
-                    new S(
-                        {
-                            display_, 
-                            textures_, 
-                            jukebox_, 
-                            inputs_, 
-                            clock_,
+                    new S({
+                        display_, 
+                        textures_, 
+                        jukebox_, 
+                        inputs_, 
+                        clock_,
 
-                            scene_registry_,
-                            scenes_
-                        }, 
-                        args ...
-                    )
+                        scene_registry_,
+                        scenes_
+                    })
                 );
             }
             set_next((*scenes_)[type_id]);
-        }
+        };
 
         // Draw all renderable scene objects
         virtual void draw() = 0;

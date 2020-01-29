@@ -49,29 +49,29 @@ namespace Dynamo {
             pool_ = static_cast<Component *>(
                 std::malloc(sizeof(Component) * capacity_)
             );
-        }
+        };
 
         ~ComponentPool() {
             clear();
             std::free(pool_);
             delete[] sparse_;
-        }
+        };
 
         // Get the length of the sparse set
         int get_length() {
             return length_;
-        }
+        };
 
         // Get a pointer to a component instance 
         // Use for iteration
         Component *get_at(int index) {
             return pool_ + index;
-        }
+        };
 
         // Get the entity at an index
         Entity get_entity(int index) {
             return dense_[index];
-        }
+        };
 
         // Search the index of the component instance owned by the entity
         // Returns -1 on failure
@@ -85,7 +85,7 @@ namespace Dynamo {
                 return sparse_[entity_index];
             }
             return -1;
-        }
+        };
 
         // Add a new component
         template <typename ... Fields>
@@ -116,7 +116,7 @@ namespace Dynamo {
             sparse_[entity_index] = get_length();
             dense_.push_back(entity);
             pool_[length_++] = {params ...};
-        }
+        };
 
         // Destroy a component instance if it exists
         void remove(Entity entity) {
@@ -138,7 +138,7 @@ namespace Dynamo {
             sparse_[temp_index] = sparse_[entity_index];
             length_--;
             dense_.pop_back();
-        }
+        };
 
         // Perform a function on each component
         template <class F>
@@ -146,7 +146,7 @@ namespace Dynamo {
             for(int i = 0; i < length_; i++) {
                 function(pool_ + i);
             }
-        }
+        };
 
         // Clear the pool
         void clear() {
@@ -155,7 +155,7 @@ namespace Dynamo {
                 pool_[i].~Component();
             }
             length_ = 0;
-        }
+        };
     };
 }
 

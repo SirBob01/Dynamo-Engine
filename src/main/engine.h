@@ -30,31 +30,28 @@ namespace Dynamo {
                int width=0, int height=0);
 
         // Check if the engine is running
-        bool get_running();
+        bool is_running();
 
         // Add a new scene to the stack
-        template <class S, typename ... Arg>
-        void push_scene(Arg ... args) {
+        template <class S>
+        void push_scene() {
             unsigned type_id = scene_registry_.get_id<S>();
             if(type_id >= scenes_.size()) {
                 scenes_.push_back(
-                    new S(
-                        {
-                            display_, 
-                            textures_, 
-                            jukebox_, 
-                            inputs_, 
-                            clock_,
+                    new S({
+                        display_, 
+                        textures_, 
+                        jukebox_, 
+                        inputs_, 
+                        clock_,
 
-                            &scene_registry_,
-                            &scenes_
-                        }, 
-                        args ...
-                    )
+                        &scene_registry_,
+                        &scenes_
+                    })
                 );
             }
             scene_manager_->push_state(scenes_[type_id]);
-        }
+        };
         
         // Perform a single frame update
         void run(int fps_cap=0);

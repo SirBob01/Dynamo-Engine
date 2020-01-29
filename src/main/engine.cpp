@@ -22,7 +22,7 @@ namespace Dynamo {
         running_ = false;
     }
 
-    bool Engine::get_running() {
+    bool Engine::is_running() {
         return running_;
     }
 
