@@ -1,4 +1,4 @@
-# Dynamo Engine
+<img src="./media/logo.png" alt="Dynamo Engine" width="500"/>
 
 A 2D game engine powered by SDL2.
 
@@ -23,7 +23,6 @@ This engine wraps around SDL2 and its extensions:
 - SDL2_net
 
 # TODO
-- Add logo
 - Use shared pointers
 - Refactor Jukebox
 - Implement custom network protocol
