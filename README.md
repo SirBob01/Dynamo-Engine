@@ -28,5 +28,5 @@ This engine wraps around SDL2 and its extensions:
 - Refactor Jukebox
 - Implement custom network protocol
 - Add support for dynamic 2D lighting
-- Implement GUI textboxes and sliders
+- Refactor GUI framework
 - Add documentation for usage (sample games)
