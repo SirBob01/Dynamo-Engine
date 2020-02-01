@@ -31,6 +31,7 @@ This engine wraps around SDL2 and its extensions:
 # TODO
 - Use smart pointers
 - Refactor Jukebox and implment custom streaming algorithm with SDL_Audio
+- Implement custom texture loader
 - Implement custom network protocol
 - Add support for dynamic 2D lighting
 - Implement AI utilities for 2D pathfinding (A* with nodes)
