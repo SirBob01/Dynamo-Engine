@@ -16,7 +16,7 @@ namespace Dynamo {
     AudioFile::AudioFile(std::string filename) {
         file = fopen(filename.c_str(), "rb");
         valid = ov_open_callbacks(
-            file, &vb, NULL, 0, OV_CALLBACKS_NOCLOSE
+            file, &vb, nullptr, 0, OV_CALLBACKS_NOCLOSE
         ) >= 0;
     }
 
@@ -34,6 +34,7 @@ namespace Dynamo {
     }
 
     Jukebox::Jukebox() {
+        // Initialize audio device
         SDL_memset(&device_spec_, 0, sizeof(SDL_AudioSpec));
         device_spec_.channels = 2;
         device_spec_.freq = 44100;
@@ -82,6 +83,8 @@ namespace Dynamo {
 
             sample *= volume;
             target += sample;
+
+            // Clip to prevent distortion
             if(target > 32767) {
                 target = 32767;
             }
@@ -104,13 +107,14 @@ namespace Dynamo {
 
     Sound *Jukebox::load_sound(std::string filename) {
         AudioFile *file = load_file(filename);
-        if(file == nullptr) {
+        if(!file) {
             return nullptr;
         }
         vorbis_info *meta = ov_info(file->get_encoded(), -1);
         char buffer[4096];
         std::vector<char> temp;
 
+        ov_raw_seek(file->get_encoded(), 0);
         int eof = 0;
         while(!eof) {
             long bytes_read = ov_read(
@@ -143,6 +147,9 @@ namespace Dynamo {
     }
 
     void Jukebox::play_sound(Sound *sound, float volume) {
+        if(!sound) {
+            return;
+        }
         chunks_.push_back(
             {{sound->samples, sound->length},
              volume}
@@ -190,7 +197,10 @@ namespace Dynamo {
         if(!is_playing()) {
             return;
         }
+        // Lock device to prevent race conditions
         SDL_LockAudioDevice(device_);
+
+        // Mix all active chunks before pushing to device buffer
         int max_copy = 0;
         auto it = chunks_.begin();
         while(it != chunks_.end()) {
@@ -203,7 +213,13 @@ namespace Dynamo {
                 ++it;
             }
         }
+
+        // Only update written bytes after all chunks are mixed
         base_.written += max_copy;
         SDL_UnlockAudioDevice(device_);
+    }
+
+    void Jukebox::clear() {
+        chunks_.clear();
     }
 }
