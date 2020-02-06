@@ -44,7 +44,6 @@ namespace Dynamo {
         OggVorbis_File *get_encoded();
     };
 
-
     class Jukebox {
         Track base_;
 
