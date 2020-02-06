@@ -1,108 +1,94 @@
 #ifndef DYNAMO_JUKEBOX_H_
 #define DYNAMO_JUKEBOX_H_
 
-#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL.h>
 
 #include <unordered_map>
-#include <deque>
-#include <utility>
+#include <vector>
 #include <string>
 
+#include "../sound/oggvorbis/vorbis/codec.h"
+#include "../sound/oggvorbis/vorbis/vorbisfile.h"
+
 namespace Dynamo {
-    /** Jukebox Engine Specs
-     *
-     * Objects:
-     *      AudioFile - Opaque holder for Ogg file data of a long track
-     *      Sound - Holds raw PCM samples
-     *      Track - A layer that can queue sound samples
-     *      Jukebox - Main engine class
-     *
-     * Members:
-     *  
-     * Methods:
-     *  private:
-     *      void mix(uint16 *src, int length, float volume);
-     *      static void callback(void *userdata, uint8_t *stream, int length);
-     *
-     *      AudioFile *load_file(std::string filename);
-     * 
-     *  public:
-     *      Jukebox()
-     *      ~Jukebox()
-     *
-     *      float get_volume()
-     *
-     *      Sound *load_sound(std::string filename)
-     *      void destroy_sound(Sound *sound);
-     *      
-     *      void play_sound(Sound *sound, float volume)
-     *      
-     *      int generate_stream()
-     *      
-     *      void queue_stream(std::string filename, float volume, int stream_id)
-     *      
-     *      void play_stream(int stream_id)
-     *      void pause_stream(int stream_id)
-     *      void stop_stream(int stream_id)
-     *
-     *      void set_volume(float volume)
-     *
-     *      void play()
-     *      void stop()
-     *
-     *      void update()
-     */
+    struct Sound {
+        char *samples;
+        uint32_t length;
+    };
+
+    struct Chunk {
+        Sound sound;
+        float volume;
+    };
+
+    struct Track {
+        char *buffer;
+        int length;
+        int written;
+
+        Track();
+        ~Track();
+    };
+
+    class AudioFile {
+        FILE *file;         // Byte file
+        OggVorbis_File vb;  // Encoded Ogg file
+        bool valid;
+
+    public:
+        AudioFile(std::string filename);
+        ~AudioFile();
+
+        bool is_valid();
+
+        OggVorbis_File *get_encoded();
+    };
+
+
     class Jukebox {
-        // Unfortunately, SDL_Mixer does not allow multiple
-        // concurrent music streams for ambient noise
-        std::deque<std::pair<Mix_Music *, int>> music_stream_;
-        std::deque<std::pair<Mix_Chunk *, int>> ambient_stream_;
+        Track base_;
 
-        std::unordered_map<std::string, Mix_Music *> music_map_;
-        std::unordered_map<std::string, Mix_Chunk *> chunk_map_;
-        
-        int ambient_channel_;
+        SDL_AudioSpec device_spec_;
+        SDL_AudioDeviceID device_;
 
-        float master_vol_;
-        float vol_convert_; // Conversion rate of SDL_Mixer volume
-        
+        std::unordered_map<std::string, AudioFile *> bank_;
+        std::vector<Chunk> chunks_;
+
+        float master_volume_;
+
+        static void callback(void *data, uint8_t *stream, int length);
+
+        // Load an audio file
+        AudioFile *load_file(std::string filename);
+
+        // Mix src into dst and clip the amplitude
+        void mix_raw(char *dst, char *src, int length, float volume);
+
     public:
         Jukebox();
         ~Jukebox();
 
-        // Get current volume
-        float get_master_volume();
-        float get_music_volume();
-        float get_sfx_volume();
+        bool is_playing();
 
-        // Set volume to a value between 0.0 and 1.0
-        void set_master_volume(float vol);
-        void set_music_volume(float vol);
-        void set_sfx_volume(float vol);
+        float get_volume();
 
-        // Stream audio (called in main engine game-loop)
-        void stream_music();
-        void stream_ambient();
-        
-        // Clear the audio streams
-        void clear_music_stream();
-        void clear_ambient_stream();
+        Sound *load_sound(std::string filename);
 
-        // Music handling
-        void queue_music(std::string filename, int ms);
-        void pause_music();
-        void resume_music();
-        void skip_music(int ms);
+        void destroy_sound(Sound *sound);
 
-        // Ambient noise handling
-        void queue_ambient(std::string filename, int ms);
-        void pause_ambient();
-        void resume_ambient();
-        void skip_ambient(int ms);
+        void play_sound(Sound *sound, float volume=1.0);
 
-        // SFx handling
-        void play_sfx(std::string filename, int loops);
+        void set_volume(float volume);
+
+        void play();
+
+        void pause();
+
+        void mix_chunk(Chunk *chunk, int *max_copy);
+
+        void update();
     };
+
 }
 
 #endif

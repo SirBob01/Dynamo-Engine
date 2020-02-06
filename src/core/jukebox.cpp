@@ -1,138 +1,209 @@
 #include "jukebox.h"
 
 namespace Dynamo {
-    Jukebox::Jukebox() {
-        Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048);
-        
-        ambient_channel_ = 1;
+    Track::Track() {
+        length = 4096;
+        buffer = new char[length];
+        SDL_memset(buffer, 0, length);
 
-        master_vol_ = 1.0;
-        vol_convert_ = 128.0;
+        written = 0;
+    }
+
+    Track::~Track() {
+        delete[] buffer;
+    }
+
+    AudioFile::AudioFile(std::string filename) {
+        file = fopen(filename.c_str(), "rb");
+        valid = ov_open_callbacks(
+            file, &vb, NULL, 0, OV_CALLBACKS_NOCLOSE
+        ) >= 0;
+    }
+
+    AudioFile::~AudioFile() {
+        ov_clear(&vb);
+        fclose(file);
+    }
+
+    bool AudioFile::is_valid() {
+        return valid;
+    }
+
+    OggVorbis_File *AudioFile::get_encoded() {
+        return &vb;
+    }
+
+    Jukebox::Jukebox() {
+        SDL_memset(&device_spec_, 0, sizeof(SDL_AudioSpec));
+        device_spec_.channels = 2;
+        device_spec_.freq = 44100;
+        device_spec_.format = AUDIO_S16LSB;
+        device_spec_.samples = 1024;
+        device_spec_.userdata = &base_;
+        device_spec_.callback = callback;
+
+        device_ = SDL_OpenAudioDevice(
+            nullptr, 0, &device_spec_, nullptr, 0
+        );
+        play();
     }
 
     Jukebox::~Jukebox() {
-        skip_music(0);
-        skip_ambient(0);
-
-        clear_music_stream();
-        clear_ambient_stream();
-
-        for(auto &item : music_map_) {
-            Mix_FreeMusic(item.second);
+        for(auto &pair : bank_) {
+            delete pair.second;
         }
-        for(auto &item : chunk_map_) {
-            Mix_FreeChunk(item.second);
+    }
+
+    void Jukebox::callback(void *data, uint8_t *stream, int length) {
+        Track *base = static_cast<Track *>(data);
+
+        SDL_memset(stream+base->written, 0, length-base->written);
+        SDL_memcpy(stream, base->buffer, base->written);
+        SDL_memset(base->buffer, 0, base->written);
+        base->written = 0;
+    }
+
+    AudioFile *Jukebox::load_file(std::string filename) {
+        if(!bank_.count(filename)) {
+            AudioFile *file = new AudioFile(filename);
+            if(!file->is_valid()) {
+                delete file;
+                file = nullptr;
+            }
+            bank_[filename] = file;
+        }
+        return bank_[filename];
+    }
+
+    void Jukebox::mix_raw(char *dst, char *src, int length, float volume) {
+        for(int i = 0; i < length; i += 2) {
+            float target = (dst[i+1] << 8) | (dst[i] & 0xFF);
+            float sample = (src[i+1] << 8) | (src[i] & 0xFF);
+
+            sample *= volume;
+            target += sample;
+            if(target > 32767) {
+                target = 32767;
+            }
+            if(target < -32768) {
+                target = -32768;
+            }
+
+            dst[i] = target;
+            dst[i+1] = static_cast<short>(target) >> 8;
+        }
+    }
+
+    bool Jukebox::is_playing() {
+        return SDL_GetAudioDeviceStatus(device_) == SDL_AUDIO_PLAYING;
+    }
+
+    float Jukebox::get_volume() {
+        return master_volume_;
+    }
+
+    Sound *Jukebox::load_sound(std::string filename) {
+        AudioFile *file = load_file(filename);
+        if(file == nullptr) {
+            return nullptr;
+        }
+        vorbis_info *meta = ov_info(file->get_encoded(), -1);
+        char buffer[4096];
+        std::vector<char> temp;
+
+        int eof = 0;
+        while(!eof) {
+            long bytes_read = ov_read(
+                file->get_encoded(), 
+                buffer, sizeof(buffer), 
+                0, 2, 1, 
+                nullptr
+            );
+            for(int i = 0; i < bytes_read; i++) {
+                temp.push_back(buffer[i]);
+            }
+            if(bytes_read == 0) {
+                eof = 1;
+            }
+            else if(bytes_read == OV_EBADLINK) {
+                return nullptr;
+            }
         }
 
-        music_map_.clear();
-        chunk_map_.clear();
-        Mix_CloseAudio();
+        Sound *sound = new Sound();
+        sound->length = temp.size();
+        sound->samples = new char[sound->length];
+        SDL_memcpy(sound->samples, &(temp[0]), sound->length);
+        return sound;
     }
 
-    float Jukebox::get_master_volume() {
-        return master_vol_;
+    void Jukebox::destroy_sound(Sound *sound) {
+        delete[] sound->samples;
+        delete sound;
     }
 
-    float Jukebox::get_music_volume() {
-        return Mix_VolumeMusic(-1) / vol_convert_;
-    }
-
-    float Jukebox::get_sfx_volume() {
-        return Mix_Volume(-1, -1) / vol_convert_;
-    }
-
-    void Jukebox::set_master_volume(float vol) {
-        master_vol_ = vol;
-    }
-
-    void Jukebox::set_music_volume(float vol) {
-        Mix_VolumeMusic(master_vol_ * vol* vol_convert_);
-    }
-
-    void Jukebox::set_sfx_volume(float vol) {
-        Mix_Volume(-1, master_vol_ * vol* vol_convert_);
-    }
-
-    void Jukebox::queue_music(std::string filename, int ms) {
-        if(music_map_.find(filename) == music_map_.end()) {
-            music_map_[filename] = Mix_LoadMUS(filename.c_str());
-        }
-        music_stream_.push_back(
-            std::make_pair(music_map_[filename], ms)
+    void Jukebox::play_sound(Sound *sound, float volume) {
+        chunks_.push_back(
+            {{sound->samples, sound->length},
+             volume}
         );
     }
 
-    void Jukebox::stream_music() {
-        // Play the first track in the queue
-        if(!Mix_PlayingMusic() && !music_stream_.empty()) {
-            std::pair<Mix_Music *, int> &track = music_stream_.front();
-            Mix_FadeInMusic(
-                track.first, 
-                -1, 
-                track.second
-            );
-            music_stream_.pop_front();
+    void Jukebox::set_volume(float volume) {
+        if(volume > 1.0) {
+            volume = 1.0;
         }
-    }
-
-    void Jukebox::stream_ambient() {
-        if(!Mix_Playing(ambient_channel_) && !ambient_stream_.empty()) {
-            std::pair<Mix_Chunk *, int> &track = ambient_stream_.front();
-            Mix_FadeInChannel(
-                ambient_channel_, 
-                track.first, 
-                -1, 
-                track.second
-            );
-            ambient_stream_.pop_front();
+        if(volume <= 0) {
+            volume = 0;
         }
+        master_volume_ = volume;
     }
 
-    void Jukebox::pause_music() {
-        Mix_PauseMusic();
+    void Jukebox::play() {
+        SDL_PauseAudioDevice(device_, 0);
     }
 
-    void Jukebox::resume_music() {
-        Mix_ResumeMusic();
+    void Jukebox::pause() {
+        SDL_PauseAudioDevice(device_, 1);
     }
 
-    void Jukebox::skip_music(int ms) {
-        Mix_FadeOutMusic(ms);
-    }
-
-    void Jukebox::queue_ambient(std::string filename, int ms) {
-        if(chunk_map_.find(filename) == chunk_map_.end()) {
-            chunk_map_[filename] = Mix_LoadWAV(filename.c_str());
+    void Jukebox::mix_chunk(Chunk *chunk, int *max_copy) {
+        int length = chunk->sound.length;
+        if(length > base_.length - base_.written) {
+            length = base_.length - base_.written;
         }
-        ambient_stream_.push_back(
-            std::make_pair(chunk_map_[filename], ms)
+        if(*max_copy < length) {
+            *max_copy = length;
+        }
+
+        mix_raw(
+            base_.buffer + base_.written,
+            chunk->sound.samples,
+            length,
+            chunk->volume
         );
+        chunk->sound.samples += length;
+        chunk->sound.length -= length;
     }
 
-    void Jukebox::pause_ambient() {
-        Mix_Pause(ambient_channel_);
-    }
-
-    void Jukebox::resume_ambient() {
-        Mix_Resume(ambient_channel_);
-    }
-
-    void Jukebox::skip_ambient(int ms) {
-        Mix_FadeOutChannel(ambient_channel_, ms);
-    }
-
-    void Jukebox::play_sfx(std::string filename, int loops) {
-        if(chunk_map_.find(filename) == chunk_map_.end()) {
-            chunk_map_[filename] = Mix_LoadWAV(filename.c_str());
+    void Jukebox::update() {
+        if(!is_playing()) {
+            return;
         }
-        Mix_PlayChannel(-1, chunk_map_[filename], loops);
-    }
-
-    void Jukebox::clear_music_stream() {
-        music_stream_.clear();
-    }
-
-    void Jukebox::clear_ambient_stream() {
-        ambient_stream_.clear();
+        SDL_LockAudioDevice(device_);
+        int max_copy = 0;
+        auto it = chunks_.begin();
+        while(it != chunks_.end()) {
+            Chunk &chunk = *it;
+            if(!chunk.sound.length) {
+                it = chunks_.erase(it);
+            }
+            else {
+                mix_chunk(&chunk, &max_copy);
+                ++it;
+            }
+        }
+        base_.written += max_copy;
+        SDL_UnlockAudioDevice(device_);
     }
 }

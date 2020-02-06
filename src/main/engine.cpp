@@ -39,10 +39,7 @@ namespace Dynamo {
             dynamic_cast<Scene *>(scene_state)->draw();
         }
         
-        // Play soundtracks
-        jukebox_->stream_music();
-        jukebox_->stream_ambient();
-
+        jukebox_->update();
         display_->refresh();
         clock_->set_fps(fps_cap);
     }
