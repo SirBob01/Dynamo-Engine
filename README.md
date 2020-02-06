@@ -16,24 +16,21 @@ game objects.
 - A simplified Scene management system (menus, gameplay, etc.)
 - GUI widgets
 - Artificial Intelligence utilities like Finite State Machines
-- Sprite animation and rasterizing primitives
-- Distinct audio channels for ambience, music, and sound effects.
+- Sprite animation and rasterizing primitives and TTF fonts
+- Audio engine that allows multiple streaming tracks and raw PCM manipulation
 - Network capabilities with custom protocol **(unstable, under development)**
 
 # Dependencies
 
 This engine wraps around SDL2 and its extensions:
 - SDL2_image
-- SDL2_mixer
 - SDL2_ttf
 - SDL2_net
 
 # TODO
 - Use smart pointers
-- Refactor Jukebox and implment custom streaming algorithm with SDL_Audio
-- Implement custom texture loader
 - Implement custom network protocol
 - Add support for dynamic 2D lighting
-- Implement AI utilities for 2D pathfinding (A* with nodes)
+- Implement AI utilities for 2D pathfinding (A* with generic nodes)
 - Refactor GUI framework
 - Add documentation for usage (sample games, wiki)
