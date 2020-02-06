@@ -9,6 +9,49 @@
 #include <string>
 
 namespace Dynamo {
+    /** Jukebox Engine Specs
+     *
+     * Objects:
+     *      AudioFile - Opaque holder for Ogg file data of a long track
+     *      Sound - Holds raw PCM samples
+     *      Track - A layer that can queue sound samples
+     *      Jukebox - Main engine class
+     *
+     * Members:
+     *  
+     * Methods:
+     *  private:
+     *      void mix(uint16 *src, int length, float volume);
+     *      static void callback(void *userdata, uint8_t *stream, int length);
+     *
+     *      AudioFile *load_file(std::string filename);
+     * 
+     *  public:
+     *      Jukebox()
+     *      ~Jukebox()
+     *
+     *      float get_volume()
+     *
+     *      Sound *load_sound(std::string filename)
+     *      void destroy_sound(Sound *sound);
+     *      
+     *      void play_sound(Sound *sound, float volume)
+     *      
+     *      int generate_stream()
+     *      
+     *      void queue_stream(std::string filename, float volume, int stream_id)
+     *      
+     *      void play_stream(int stream_id)
+     *      void pause_stream(int stream_id)
+     *      void stop_stream(int stream_id)
+     *
+     *      void set_volume(float volume)
+     *
+     *      void play()
+     *      void stop()
+     *
+     *      void update()
+     */
     class Jukebox {
         // Unfortunately, SDL_Mixer does not allow multiple
         // concurrent music streams for ambient noise
