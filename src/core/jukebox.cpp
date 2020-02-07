@@ -15,18 +15,18 @@ namespace Dynamo {
 
     AudioFile::AudioFile(std::string filename) {
         file = fopen(filename.c_str(), "rb");
-        valid = ov_open_callbacks(
-            file, &vb, nullptr, 0, OV_CALLBACKS_NOCLOSE
-        ) >= 0;
+        if(!file) {
+            throw GenericError(filename + " file doesn't exist");
+        }
+        else if(ov_open_callbacks(file, &vb, nullptr, 
+                                  0, OV_CALLBACKS_NOCLOSE) < 0) {
+            throw GenericError(filename + " is not an Ogg Vorbis file");
+        }
     }
 
     AudioFile::~AudioFile() {
         ov_clear(&vb);
         fclose(file);
-    }
-
-    bool AudioFile::is_valid() {
-        return valid;
     }
 
     OggVorbis_File *AudioFile::get_encoded() {
@@ -67,10 +67,6 @@ namespace Dynamo {
     AudioFile *Jukebox::load_file(std::string filename) {
         if(!bank_.count(filename)) {
             AudioFile *file = new AudioFile(filename);
-            if(!file->is_valid()) {
-                delete file;
-                file = nullptr;
-            }
             bank_[filename] = file;
         }
         return bank_[filename];

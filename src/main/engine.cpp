@@ -4,7 +4,7 @@ namespace Dynamo {
     Engine::Engine(std::string title, bool fullscreen, 
                    int width, int height) {
         if(SDL_Init(SDL_INIT_EVERYTHING) == -1) {
-            throw SDLError(SDL_GetError());
+            throw SDLError();
         }
 
         // Seed the random number generator

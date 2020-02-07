@@ -1,11 +1,15 @@
 #include "error.h"
 
 namespace Dynamo {
-    SDLError::SDLError(const char *str) {
-        message_ = std::string(str);
+    const char *SDLError::what() const throw() {
+        return SDL_GetError();
     }
 
-    const char *SDLError::what() const throw() {
+    GenericError::GenericError(std::string message) {
+        message_ = message;
+    }
+
+    const char *GenericError::what() const throw() {
         return message_.c_str();
     }
 

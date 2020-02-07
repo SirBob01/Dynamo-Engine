@@ -4,20 +4,20 @@ namespace Dynamo::Net {
     Node::Node(int socket_port, int packet_size) {
         // Initialize SDL_net
         if(SDLNet_Init() == -1) {
-            throw SDLError(SDLNet_GetError());
+            throw GenericError(SDLNet_GetError());
         }
 
         // Open the socket
         socket_ = SDLNet_UDP_Open(socket_port);
         if(!socket_) {
-            throw SDLError(SDLNet_GetError());
+            throw GenericError(SDLNet_GetError());
         }
 
         // Get local address information
         host_ = {};
         hostname_ = std::string(SDLNet_ResolveIP(&host_));
         if(SDLNet_ResolveHost(&host_, hostname_.c_str(), 0) == -1) {
-            throw SDLError(SDLNet_GetError());
+            throw GenericError(SDLNet_GetError());
         }
         ip_string_ = ip_to_string(host_.host);
 

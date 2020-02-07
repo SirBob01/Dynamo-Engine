@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 
+#include "../log/error.h"
 #include "../sound/oggvorbis/vorbis/codec.h"
 #include "../sound/oggvorbis/vorbis/vorbisfile.h"
 
@@ -37,13 +38,10 @@ namespace Dynamo {
     class AudioFile {
         FILE *file;         // Byte file
         OggVorbis_File vb;  // Encoded Ogg file
-        bool valid;
 
     public:
         AudioFile(std::string filename);
         ~AudioFile();
-
-        bool is_valid();
 
         OggVorbis_File *get_encoded();
     };

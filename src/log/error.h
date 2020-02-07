@@ -1,15 +1,22 @@
 #ifndef DYNAMO_ERROR_H_
 #define DYNAMO_ERROR_H_
 
+#include <SDL2/SDL.h>
+
 #include <exception>
 #include <string>
 
 namespace Dynamo {
     class SDLError : public std::exception {
+    public:
+        virtual const char *what() const throw();
+    };
+
+    class GenericError : public std::exception {
         std::string message_;
 
     public:
-        SDLError(const char *str);
+        GenericError(std::string message);
         virtual const char *what() const throw();
     };
     

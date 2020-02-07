@@ -5,7 +5,7 @@ namespace Dynamo {
                      std::string title, bool fullscreen) {
         SDL_DisplayMode dm;
         if(SDL_GetDesktopDisplayMode(0, &dm)) {
-            throw SDLError(SDL_GetError());
+            throw SDLError();
         }
 
         if(!width) {

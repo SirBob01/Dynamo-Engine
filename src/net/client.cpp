@@ -6,7 +6,7 @@ namespace Dynamo::Net {
     : Node(0, packet_size) {
         server_ = {};
         if(SDLNet_ResolveHost(&server_, ip.c_str(), port) == -1) {
-            throw SDLError(SDLNet_GetError());
+            throw GenericError(SDLNet_GetError());
         }
         server_ip_ = ip;
         

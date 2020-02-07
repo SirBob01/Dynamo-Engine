@@ -7,7 +7,7 @@ namespace Dynamo {
             surface
         );
         if(!texture) {
-            throw SDLError(SDL_GetError());
+            throw SDLError();
         }
         return texture;
     }
@@ -32,7 +32,7 @@ namespace Dynamo {
         if(texture_map_.find(full_path) == texture_map_.end()) {
             SDL_Surface *surf = IMG_Load(filename.c_str());
             if(!surf) {
-                throw SDLError(SDL_GetError());
+                throw SDLError();
             }
             texture_map_[full_path] = convert_surface(surf);
             SDL_FreeSurface(surf);
@@ -63,7 +63,7 @@ namespace Dynamo {
                 {r, g, b, a}
             );
             if(!surf) {
-                throw SDLError(SDL_GetError());
+                throw SDLError();
             }
             texture_map_[id] = convert_surface(surf);
             SDL_FreeSurface(surf);
@@ -79,7 +79,7 @@ namespace Dynamo {
         std::string full_path = default_font_path_ + filename;
         TTF_Font *font = TTF_OpenFont(full_path.c_str(), size);
         if(!font) {
-            throw SDLError(SDL_GetError());
+            throw SDLError();
         }
         fonts_[font_id] = font;
     }

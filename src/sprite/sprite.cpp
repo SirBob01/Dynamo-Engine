@@ -38,7 +38,7 @@ namespace Dynamo {
             sdl_frame.x, sdl_frame.y
         );
         if(!base_) {
-            throw SDLError(SDL_GetError());
+            throw SDLError();
         }
 
         target_dimensions_ = frame_dimensions_;
