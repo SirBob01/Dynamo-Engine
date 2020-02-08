@@ -1,18 +1,6 @@
 #include "jukebox.h"
 
 namespace Dynamo {
-    Track::Track() {
-        length = 4096;
-        buffer = new char[length];
-        SDL_memset(buffer, 0, length);
-
-        written = 0;
-    }
-
-    Track::~Track() {
-        delete[] buffer;
-    }
-
     AudioFile::AudioFile(std::string filename) {
         file = fopen(filename.c_str(), "rb");
         if(!file) {
@@ -31,6 +19,26 @@ namespace Dynamo {
 
     OggVorbis_File *AudioFile::get_encoded() {
         return &vb;
+    }
+
+    Track::Track() {
+        length = 4096;
+        buffer = new char[length];
+        SDL_memset(buffer, 0, length);
+
+        written = 0;
+    }
+
+    Track::~Track() {
+        delete[] buffer;
+    }
+
+    Stream::Stream() {
+        position = 0;
+        volume = 1.0;
+        fadeout = 0;
+        fadein = 0;
+        playing = true;
     }
 
     Jukebox::Jukebox() {
@@ -93,12 +101,57 @@ namespace Dynamo {
         }
     }
 
+    void Jukebox::check_stream_validity(int stream) {
+        if(stream >= streams_.size()) {
+            throw InvalidKey(
+                "Stream ID "+std::to_string(stream),
+                "streams_");
+        }
+    }
+
     bool Jukebox::is_playing() {
         return SDL_GetAudioDeviceStatus(device_) == SDL_AUDIO_PLAYING;
     }
 
     float Jukebox::get_volume() {
         return master_volume_;
+    }
+
+    int Jukebox::generate_stream() {
+        streams_.push_back(Stream());
+        return streams_.size() - 1;
+    }
+
+    float Jukebox::get_stream_volume(int stream) {
+        check_stream_validity(stream);
+        return streams_[stream].volume;
+    }
+
+    void Jukebox::set_stream_volume(int stream, float volume) {
+        check_stream_validity(stream);
+        streams_[stream].volume = volume;
+    }
+
+    void Jukebox::queue_stream(std::string filename, int stream,
+                               int fadein_ms, int fadeout_ms) {
+        check_stream_validity(stream);
+    }
+
+    void Jukebox::play_stream(int stream, int fadein_ms) {
+        check_stream_validity(stream);
+    }
+
+    void Jukebox::pause_stream(int stream, int fadeout_ms) {
+        check_stream_validity(stream);
+    }
+
+    void Jukebox::skip_stream(int stream, int fadeout_ms) {
+        check_stream_validity(stream);
+    }
+
+    void Jukebox::clear_stream(int stream) {
+        check_stream_validity(stream);
+        streams_[stream].queue = {};
     }
 
     Sound *Jukebox::load_sound(std::string filename) {
