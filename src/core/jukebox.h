@@ -31,13 +31,7 @@ namespace Dynamo {
         uint32_t length;
     };
 
-    // An instance of playing sound
-    struct Chunk {
-        Sound sound;
-        float volume;
-    };
-
-    // Holds a buffer of mixed samples
+    // Holds a buffer of mixed samples sent to device
     struct Track {
         char *buffer;
         int length;
@@ -47,17 +41,20 @@ namespace Dynamo {
         ~Track();
     };
 
+    // An instance of playing sound
+    struct Chunk {
+        Sound sound;
+        float volume;
+    };
+
     // A sound stream
     struct Stream {
         Track track;
-        long position;
-
         std::queue<AudioFile *> queue;
-        float volume;
         
+        float volume;
         int fadeout;
         int fadein;
-        
         bool playing;
 
         Stream();
@@ -71,7 +68,7 @@ namespace Dynamo {
         SDL_AudioDeviceID device_;
 
         std::unordered_map<std::string, AudioFile *> bank_;
-        std::vector<Stream> streams_;
+        std::vector<Stream *> streams_;
         std::vector<Chunk> chunks_;
 
         float master_volume_;
@@ -85,10 +82,20 @@ namespace Dynamo {
         // Mix src into dst and clip the amplitude
         void mix_raw(char *dst, char *src, int length, float volume);
 
+        // Mix a chunk of sound onto the main track
+        void mix_chunk(Chunk *chunk, int *max_copy);
+
+        // Mix a streaming track onto main track
+        void mix_stream(Stream *stream, int *max_copy);
+
         // Sanity check for stream IDs
         void check_stream_validity(int stream);
 
     public:
+        /**
+         * TODO:
+         * Implement fading effects
+         */
         Jukebox();
         ~Jukebox();
 
@@ -97,6 +104,9 @@ namespace Dynamo {
 
         // Get the master volume
         float get_volume();
+
+        // Set the master volume
+        void set_volume(float volume);
 
         // Generate a streaming track
         // Return the index to the stream
@@ -125,6 +135,8 @@ namespace Dynamo {
         void clear_stream(int stream);
 
         // Load a sound bite
+        // Do not lose the reference to this pointer
+        // -- Jukebox will not destroy it for you
         Sound *load_sound(std::string filename);
 
         // Destroy a sound bite
@@ -133,22 +145,16 @@ namespace Dynamo {
         // Play a sound bite
         void play_sound(Sound *sound, float volume=1.0);
 
-        // Set the master volume
-        void set_volume(float volume);
-
         // Resume all audio playback
         void play();
 
         // Pause all audio playback
         void pause();
 
-        // Mix a chunk of sound onto the main track
-        void mix_chunk(Chunk *chunk, int *max_copy);
-
         // Update tick
         void update();
 
-        // Clear all active chunks
+        // Clear all active chunks and streams
         void clear();
     };
 
