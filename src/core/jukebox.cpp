@@ -34,13 +34,17 @@ namespace Dynamo {
     }
 
     Stream::Stream() {
-        volume = 1.0;
-        fadeout = 0;
-        fadein = 0;
+        volume = 0;
+        max_volume = 1.0;
+
+        // So we can measure time starting from 0
+        time = -1;
+        loop_counter = 0;
+        
         playing = true;
     }
 
-    Jukebox::Jukebox() {
+    Jukebox::Jukebox(Clock *clock) {
         // Initialize audio device
         SDL_memset(&device_spec_, 0, sizeof(SDL_AudioSpec));
         device_spec_.channels = 2;
@@ -54,6 +58,7 @@ namespace Dynamo {
             nullptr, 0, &device_spec_, nullptr, 0
         );
         master_volume_ = 1.0;
+        clock_ = clock;
         play();
     }
 
@@ -91,12 +96,7 @@ namespace Dynamo {
             target += sample;
 
             // Clip to prevent distortion
-            if(target > 32767) {
-                target = 32767;
-            }
-            if(target < -32768) {
-                target = -32768;
-            }
+            target = Util::clamp(target, -32768.0f, 32767.0f);
 
             dst[i] = target;
             dst[i+1] = static_cast<short>(target) >> 8;
@@ -171,9 +171,24 @@ namespace Dynamo {
         return streams_.size() - 1;
     }
 
+    bool Jukebox::is_stream_playing(int stream) {
+        check_stream_validity(stream);
+        return streams_[stream]->playing;
+    }
+
+    bool Jukebox::is_stream_empty(int stream) {
+        check_stream_validity(stream);
+        return streams_[stream]->queue.size() == 0;
+    }
+
+    bool Jukebox::is_stream_transition(int stream) {
+        check_stream_validity(stream);
+        return streams_[stream]->time == -1;
+    }
+
     float Jukebox::get_stream_volume(int stream) {
         check_stream_validity(stream);
-        return streams_[stream]->volume;
+        return streams_[stream]->max_volume;
     }
 
     void Jukebox::set_stream_volume(int stream, float volume) {
@@ -184,30 +199,48 @@ namespace Dynamo {
         if(volume <= 0) {
             volume = 0;
         }
-        streams_[stream]->volume = volume;
+        streams_[stream]->max_volume = volume;
     }
 
     void Jukebox::queue_stream(std::string filename, int stream,
-                               int fadein_ms, int fadeout_ms) {
+                               double fadein, double fadeout,
+                               int loops) {
         check_stream_validity(stream);
-        streams_[stream]->queue.push(load_file(filename));
+        AudioFile *file = load_file(filename);
+        double duration = ov_time_total(file->get_encoded(), -1);
+
+        streams_[stream]->queue.push({
+            file,
+            duration,
+            fadein,
+            fadeout,
+            loops,
+            0,
+        });
     }
 
-    void Jukebox::play_stream(int stream, int fadein_ms) {
+    void Jukebox::play_stream(int stream) {
         check_stream_validity(stream);
         streams_[stream]->playing = true;
     }
 
-    void Jukebox::pause_stream(int stream, int fadeout_ms) {
+    void Jukebox::pause_stream(int stream) {
         check_stream_validity(stream);
         streams_[stream]->playing = false;
     }
 
-    void Jukebox::skip_stream(int stream, int fadeout_ms) {
+    void Jukebox::skip_stream(int stream, double fadeout) {
         check_stream_validity(stream);
-        if(streams_[stream]->queue.size()) {
-            streams_[stream]->queue.pop();
+        Stream *stream_ptr = streams_[stream];
+        if(is_stream_empty(stream) || is_stream_transition(stream)) {
+            return;
         }
+        StreamMeta &current = stream_ptr->queue.front();
+        
+        // Seamless transition if fading out in the middle of fade in
+        float t = stream_ptr->volume / stream_ptr->max_volume;
+        current.fadeout = fadeout;
+        current.duration = stream_ptr->time + (fadeout * t);
     }
 
     void Jukebox::clear_stream(int stream) {
@@ -284,11 +317,37 @@ namespace Dynamo {
             if(!stream->playing || !stream->queue.size()) {
                 continue;
             }
-            AudioFile *current = stream->queue.front();
 
+            StreamMeta &current = stream->queue.front();
+            OggVorbis_File *ogg = current.file->get_encoded();
+            if(stream->time < 0) {
+                current.start_time = clock_->get_time();
+            }
+
+            // Fade in and out of stream track
+            stream->time = (clock_->get_time() - current.start_time) / 1000.0;
+            if(!current.fadein) {
+                stream->volume = stream->max_volume;
+            }
+            else if(stream->time <= current.fadein) {
+                stream->volume = Util::lerp(
+                    0.0f, stream->max_volume,
+                    1.0 - (current.fadein - stream->time) / current.fadein
+                );
+            }
+
+            if(stream->time >= current.duration - current.fadeout) {
+                stream->volume = Util::lerp(
+                    stream->max_volume, 0.0f,
+                    (stream->time - current.duration + current.fadeout) /
+                                                       current.fadeout
+                );
+            }
+            
+            // Write to stream buffer
             while(stream->track.written < stream->track.length) {
                 long bytes_read = ov_read(
-                    current->get_encoded(), 
+                    ogg, 
                     stream->track.buffer + stream->track.written,
                     stream->track.length - stream->track.written, 
                     0, 2, 1, 
@@ -296,12 +355,27 @@ namespace Dynamo {
                 );
                 stream->track.written += bytes_read;
                 
+                // EOF
                 if(!bytes_read) {
-                    ov_raw_seek(current->get_encoded(), 0);
+                    break;
+                }
+            }
+
+            // End of track... loop or change?
+            if(stream->time >= current.duration) {
+                ov_raw_seek(ogg, 0);
+                current.duration = ov_time_total(ogg, -1);
+                
+                stream->volume = 0;
+                stream->time = -1;
+                if(++stream->loop_counter == current.loops) {
+                    stream->loop_counter = 0;
                     stream->queue.pop();
                 }
             }
-            mix_stream(stream, &max_copy);
+            else {
+                mix_stream(stream, &max_copy);
+            }
         }
 
         // Mix all active chunks before pushing to device buffer
@@ -326,6 +400,9 @@ namespace Dynamo {
         chunks_.clear();
         for(auto &stream : streams_) {
             delete stream;
+        }
+        for(auto &file : bank_) {
+            ov_raw_seek(file.second->get_encoded(), 0);
         }
         streams_.clear();
     }

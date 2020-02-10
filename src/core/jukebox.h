@@ -8,6 +8,8 @@
 #include <queue>
 #include <string>
 
+#include "clock.h"
+#include "../util/util.h"
 #include "../log/error.h"
 #include "../sound/oggvorbis/vorbis/codec.h"
 #include "../sound/oggvorbis/vorbis/vorbisfile.h"
@@ -47,14 +49,30 @@ namespace Dynamo {
         float volume;
     };
 
+    // A queued stream unit
+    struct StreamMeta {
+        AudioFile *file;
+
+        // Time measures in seconds
+        double duration;
+        double fadein;
+        double fadeout;
+        
+        int loops;
+        unsigned start_time; // Millisecond marker
+    };
+
     // A sound stream
     struct Stream {
         Track track;
-        std::queue<AudioFile *> queue;
+        std::queue<StreamMeta> queue;
         
         float volume;
-        int fadeout;
-        int fadein;
+        float max_volume;
+
+        double time; // Time position on current track
+        int loop_counter;
+
         bool playing;
 
         Stream();
@@ -72,6 +90,8 @@ namespace Dynamo {
         std::vector<Chunk> chunks_;
 
         float master_volume_;
+
+        Clock *clock_;
 
         // SDL_Audio callback function
         static void callback(void *data, uint8_t *stream, int length);
@@ -92,11 +112,7 @@ namespace Dynamo {
         void check_stream_validity(int stream);
 
     public:
-        /**
-         * TODO:
-         * Implement fading effects
-         */
-        Jukebox();
+        Jukebox(Clock *clock);
         ~Jukebox();
 
         // Check if the audio device is playing or paused
@@ -112,6 +128,15 @@ namespace Dynamo {
         // Return the index to the stream
         int generate_stream();
 
+        // Is the stream playing
+        bool is_stream_playing(int stream);
+
+        // Is there anything on the stream's queue
+        bool is_stream_empty(int stream);
+
+        // Check if stream is transitioning between files
+        bool is_stream_transition(int stream);
+
         // Get the volume of a stream
         float get_stream_volume(int stream);
 
@@ -119,17 +144,21 @@ namespace Dynamo {
         void set_stream_volume(int stream, float volume);
 
         // Queue a new audio into a streaming track
+        // Allows fading in and out timing in seconds
+        // Allows looping tracks (-1 for infinite loops)
+        // Infinite loops can only terminate with clear_stream()
         void queue_stream(std::string filename, int stream, 
-                          int fadein_ms=0, int fadeout_ms=0);
+                          double fadein=0, double fadeout=0, 
+                          int loops=1);
 
         // Play a stream
-        void play_stream(int stream, int fadein_ms=0);
+        void play_stream(int stream);
 
         // Pause a stream
-        void pause_stream(int stream, int fadeout_ms=0);
+        void pause_stream(int stream);
 
         // Skip current playing track on stream
-        void skip_stream(int stream, int fadeout_ms=0);
+        void skip_stream(int stream, double fadeout=0);
 
         // Clear all tracks on the stream
         void clear_stream(int stream);

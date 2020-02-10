@@ -11,11 +11,11 @@ namespace Dynamo {
         Random::seed(std::time(nullptr));
 
         // Initialize singleton modules
+        clock_ = new Clock();
         display_ = new Display(width, height, title, fullscreen);
         textures_ = new TextureManager(display_->get_renderer());
-        jukebox_ = new Jukebox();
+        jukebox_ = new Jukebox(clock_);
         inputs_ = new Inputs();
-        clock_ = new Clock();
 
         scene_manager_ = new FSM();
 
