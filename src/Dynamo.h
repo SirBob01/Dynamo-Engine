@@ -34,6 +34,7 @@
 #include "util/aabb.h"
 #include "util/random.h"
 #include "util/typeid.h"
+#include "util/util.h"
 
 #include "log/error.h"
 

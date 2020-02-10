@@ -19,18 +19,18 @@ namespace Dynamo {
     }
 
     Color &Color::clamp() {
-        r = std::max(0, std::min(r, 255));
-        g = std::max(0, std::min(g, 255));
-        b = std::max(0, std::min(b, 255));
-        a = std::max(0, std::min(a, 255));
+        r = Util::clamp(r, 0, 255);
+        g = Util::clamp(g, 0, 255);
+        b = Util::clamp(b, 0, 255);
+        a = Util::clamp(a, 0, 255);
         return *this;
     }
 
     const Color Color::lerp(const Color &other, float rate) const {
-        int new_r = r + (other.r - r) * rate;
-        int new_g = g + (other.g - g) * rate;
-        int new_b = b + (other.b - b) * rate;
-        int new_a = a + (other.a - a) * rate;
+        int new_r = Util::lerp(r, other.r, rate);
+        int new_g = Util::lerp(g, other.g, rate);
+        int new_b = Util::lerp(b, other.b, rate);
+        int new_a = Util::lerp(a, other.a, rate);
         return {new_r, new_g, new_b, new_a};
     }
 

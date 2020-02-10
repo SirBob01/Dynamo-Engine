@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-#include <algorithm>
+#include "util.h"
 
 namespace Dynamo {
     struct Color {
