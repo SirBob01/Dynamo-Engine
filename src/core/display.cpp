@@ -15,9 +15,13 @@ namespace Dynamo {
             height = fullscreen ? dm.h : dm.h * 0.75;
         }
 
-        logic_dim_ = {
+        Vec2D logic_dim = {
             static_cast<float>(width), 
             static_cast<float>(height)
+        };
+        logic_bounds_ = {
+            logic_dim/2,
+            logic_dim
         };
 
         window_ = SDL_CreateWindow(
@@ -68,7 +72,7 @@ namespace Dynamo {
     }
 
     Vec2D Display::get_dimensions() {
-        return logic_dim_;
+        return logic_bounds_.dim;
     }
 
     Vec2D Display::get_window_dimensions() {
@@ -88,7 +92,7 @@ namespace Dynamo {
     }
 
     void Display::set_fill(Color color) {
-        draw_rect(nullptr, {get_dimensions()/2, logic_dim_}, color, true);
+        draw_rect(nullptr, logic_bounds_, color, true);
     }
 
     void Display::set_borderfill(Color color) {
@@ -96,9 +100,13 @@ namespace Dynamo {
     }
 
     void Display::set_dimensions(int width, int height) {
-        logic_dim_ = {
+        Vec2D logic_dim = {
             static_cast<float>(width), 
             static_cast<float>(height)
+        };
+        logic_bounds_ = {
+            logic_dim/2,
+            logic_dim
         };
         SDL_RenderSetLogicalSize(renderer_, width, height);
     }
@@ -119,7 +127,10 @@ namespace Dynamo {
 
     void Display::draw_sprite(Sprite *dest, Sprite *source, Vec2D position,
                               RENDER_BLEND mode) {
-        if(!source->get_visible() || source->get_alpha() <= 0) {
+        AABB aabb = {position, source->get_dimensions()};
+        if(!source->get_visible() || 
+           source->get_alpha() <= 0 ||
+           !aabb.is_colliding(logic_bounds_)) {
             return;
         }
         SDL_SetTextureBlendMode(
@@ -129,7 +140,6 @@ namespace Dynamo {
 
         // Render source on dest
         set_render_target(dest);
-        AABB aabb = {position, source->get_dimensions()};
         SDL_Rect target_rect = aabb.convert_to_rect();
         SDL_RenderCopyEx(
             renderer_,
@@ -156,6 +166,9 @@ namespace Dynamo {
 
     void Display::draw_point(Sprite *dest, Vec2D point, 
                              Color color, RENDER_BLEND mode) {
+        if(!logic_bounds_.is_in_bounds(point)) {
+            return;
+        }
         SDL_SetRenderDrawBlendMode(
             renderer_,
             static_cast<SDL_BlendMode>(mode)
@@ -177,6 +190,10 @@ namespace Dynamo {
 
     void Display::draw_line(Sprite *dest, Vec2D point1, Vec2D point2, 
                             Color color, RENDER_BLEND mode) {
+        if(!logic_bounds_.is_in_bounds(point1) && 
+           !logic_bounds_.is_in_bounds(point2)) {
+            return;
+        }
         SDL_SetRenderDrawBlendMode(
             renderer_,
             static_cast<SDL_BlendMode>(mode)
@@ -201,6 +218,9 @@ namespace Dynamo {
 
     void Display::draw_rect(Sprite *dest, AABB box, 
                             Color color, bool fill, RENDER_BLEND mode) {
+        if(!box.is_colliding(logic_bounds_)) {
+            return;
+        }
         SDL_SetRenderDrawBlendMode(
             renderer_,
             static_cast<SDL_BlendMode>(mode)

@@ -24,7 +24,7 @@ namespace Dynamo {
         int window_x_;
         int window_y_;
 
-        Vec2D logic_dim_;
+        AABB logic_bounds_;
 
         Color border_color_;
 
