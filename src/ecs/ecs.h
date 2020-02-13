@@ -1,5 +1,5 @@
-#ifndef DYNAMO_WORLD_H_
-#define DYNAMO_WORLD_H_
+#ifndef DYNAMO_ECS_H_
+#define DYNAMO_ECS_H_
 
 #include <vector>
 #include <unordered_map>
@@ -9,8 +9,8 @@
 #include "../util/typeid.h"
 
 namespace Dynamo {
-    // ECS World manages all entities and component groups
-    class World {
+    // ECS class manages all entities and component groups
+    class ECS {
         EntityTracker entities_;
         TypeID registry_;
 
@@ -18,7 +18,7 @@ namespace Dynamo {
         std::vector<BasePool *> pools_;
 
     public:
-        ~World();
+        ~ECS();
 
         // Create an new entity
         Entity create_entity();

@@ -1,17 +1,17 @@
-#include "world.h"
+#include "ecs.h"
 
 namespace Dynamo {
-    World::~World() {
+    ECS::~ECS() {
         for(auto &pool : pools_) {
             delete pool;
         }
     }
 
-    Entity World::create_entity() {
+    Entity ECS::create_entity() {
         return entities_.generate_id();
     }
 
-    void World::destroy_entity(Entity entity) {
+    void ECS::destroy_entity(Entity entity) {
         // Destroy all component instances
         if(!entities_.is_active(entity)) {
             return;
