@@ -243,47 +243,25 @@ namespace Dynamo {
 
     void Display::draw_circle(Sprite *dest, Vec2D center, int radius, 
                               Color color, bool fill, RENDER_BLEND mode) {
-        // Midpoint algorithm
+        // Midpoint algorithm generates circle points
         int x = radius;
         int y = 0;
         int p = 1 - radius;
 
-        float cx = center.x;
-        float cy = center.y;
+        int cx = center.x;
+        int cy = center.y;
 
+        std::vector<SDL_Point> points;
         while(x >= y) {
-            if(!fill) {
-                draw_point(dest, {cx + x, cy + y}, color, mode);
-                draw_point(dest, {cx + x, cy - y}, color, mode);
-                draw_point(dest, {cx - x, cy + y}, color, mode);
-                draw_point(dest, {cx - x, cy - y}, color, mode);
-                draw_point(dest, {cx + y, cy + x}, color, mode);
-                draw_point(dest, {cx + y, cy - x}, color, mode);
-                draw_point(dest, {cx - y, cy + x}, color, mode);
-                draw_point(dest, {cx - y, cy - x}, color, mode);
-            }
-            else {
-                draw_line(
-                    dest,
-                    {cx + x, cy + y}, {cx - x, cy + y}, 
-                    color, mode
-                );
-                draw_line(
-                    dest,
-                    {cx + y, cy + x}, {cx - y, cy + x}, 
-                    color, mode
-                );
-                draw_line(
-                    dest,
-                    {cx + x, cy - y}, {cx - x, cy - y}, 
-                    color, mode
-                );
-                draw_line(
-                    dest,
-                    {cx + y, cy - x}, {cx - y, cy - x}, 
-                    color, mode
-                );
-            }
+            points.push_back({cx + x, cy + y});
+            points.push_back({cx - x, cy + y});
+            points.push_back({cx + y, cy + x});
+            points.push_back({cx - y, cy + x});
+            points.push_back({cx + x, cy - y});
+            points.push_back({cx - x, cy - y});
+            points.push_back({cx + y, cy - x});
+            points.push_back({cx - y, cy - x});
+
             if(p <= 0) {
                 p += 2*y + 1;
             }
@@ -293,6 +271,33 @@ namespace Dynamo {
             }
             y++;
         }
+
+        // Batch render the points
+        SDL_SetRenderDrawBlendMode(
+            renderer_,
+            static_cast<SDL_BlendMode>(mode)
+        );
+        SDL_SetRenderDrawColor(
+            renderer_, 
+            color.r, color.g, color.b, color.a
+        );
+
+        set_render_target(dest);
+        if(!fill) {
+            SDL_RenderDrawPoints(
+                renderer_,
+                &points[0],
+                points.size()
+            );
+        }
+        else {
+            SDL_RenderDrawLines(
+                renderer_,
+                &points[0],
+                points.size()
+            );
+        }
+        set_render_target(nullptr);
     }
 
     void Display::draw_polygon(Sprite *dest, Vec2D points[], int n, 
@@ -300,7 +305,7 @@ namespace Dynamo {
         if(!fill) {
             for(int i = 0; i < n; i++) {
                 draw_line(dest, points[i], points[(i+1)%n], color, mode);
-            }            
+            }
         }
         else {
             float nodes_x[n]; 
