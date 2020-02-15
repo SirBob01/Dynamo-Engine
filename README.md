@@ -30,6 +30,7 @@ This engine wraps around SDL2 and its extensions:
 # TODO
 - Use smart pointers
 - Implement custom network protocol
+- Implement user-generated textures for TextureManager
 - Add support for dynamic 2D lighting
 - Implement AI utilities for 2D pathfinding (A* with generic nodes)
 - Refactor GUI framework
