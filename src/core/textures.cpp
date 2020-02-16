@@ -27,6 +27,40 @@ namespace Dynamo {
         TTF_Quit();
     }
 
+    Texture TextureManager::generate_texture(std::string key, Vec2D dimensions,
+                                             Color *colors) {
+        if(texture_map_.find(key) == texture_map_.end()) {
+            int width = dimensions.x;
+            int height = dimensions.y;
+
+            SDL_Texture *texture = SDL_CreateTexture(
+                renderer_, 
+                SDL_PIXELFORMAT_RGBA8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                width, height
+            );
+
+            uint32_t *pixels;
+            int pitch;
+            SDL_LockTexture(
+                texture, 
+                nullptr, 
+                reinterpret_cast<void **>(&pixels), 
+                &pitch
+            );
+
+            for(int x = 0; x < width; x++) {
+                for(int y = 0; y < height; y++) {
+                    Color color = colors[y * width + x];
+                    pixels[y * width + x] = color.get_hex();
+                }
+            }
+            SDL_UnlockTexture(texture);
+            texture_map_[key] = texture;
+        }
+        return {renderer_, texture_map_[key]};
+    }
+
     Texture TextureManager::load_image(std::string filename) {
         std::string full_path = default_image_path_+filename;
         if(texture_map_.find(full_path) == texture_map_.end()) {
@@ -42,7 +76,7 @@ namespace Dynamo {
     }
 
     Texture TextureManager::load_text(std::string text, 
-                                           std::string font_id, Color color) {
+                                      std::string font_id, Color color) {
         if(fonts_.find(font_id) == fonts_.end()) {
             throw InvalidKey(font_id, "fonts_");
         }

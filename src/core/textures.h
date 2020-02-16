@@ -34,6 +34,11 @@ namespace Dynamo {
         TextureManager(SDL_Renderer *renderer);
         ~TextureManager();
 
+        // Generate a texture based on a color map
+        // Takes a an array of colors [width * height] to fill texture
+        Texture generate_texture(std::string key, Vec2D dimensions, 
+                                 Color *colors);
+
         // Load an image texture
         Texture load_image(std::string filename);
 
