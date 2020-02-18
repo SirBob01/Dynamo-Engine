@@ -34,3 +34,7 @@ This engine wraps around SDL2 and its extensions:
 - Implement AI utilities for 2D pathfinding (A* with generic nodes)
 - Refactor GUI framework
 - Add documentation for usage (sample games, wiki)
+
+# MAJOR UPDATE
+- Migrate to using Vulkan API for low-level render calls
+- Restructure core modules to interface with Vulkan
