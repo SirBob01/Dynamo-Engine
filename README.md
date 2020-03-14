@@ -26,6 +26,7 @@ This engine wraps around SDL2 and its extensions:
 - SDL2_image
 - SDL2_ttf
 - SDL2_net
+- Ogg Vorbis
 
 # TODO
 - Use smart pointers
