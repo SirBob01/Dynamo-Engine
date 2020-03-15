@@ -2,6 +2,8 @@
 #define DYNAMO_JUKEBOX_H_
 
 #include <SDL2/SDL.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 #include <unordered_map>
 #include <vector>
@@ -11,8 +13,6 @@
 #include "clock.h"
 #include "../util/util.h"
 #include "../log/error.h"
-#include "../sound/oggvorbis/vorbis/codec.h"
-#include "../sound/oggvorbis/vorbis/vorbisfile.h"
 
 namespace Dynamo {
     // Represent an audio file
