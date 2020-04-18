@@ -319,6 +319,9 @@ namespace Dynamo {
         // Bind a string command to an input
         void bind(std::string command, INPUT_CODE input);
 
+        // Get the list of all input bind keys
+        std::vector<std::string> get_bind_keys();
+        
         // Get the input mapped to a command
         INPUT_CODE get_bind(std::string command);
 

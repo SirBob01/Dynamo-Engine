@@ -8,9 +8,9 @@ namespace Dynamo {
         mouse_pos_ = {0, 0};
         window_event_ = WINDOW_NONE;
 
-        std::memset(pressed_, false, (INPUT_LEN + 1) * sizeof(bool));
-        std::memset(released_, false, (INPUT_LEN + 1) * sizeof(bool));
-        std::memset(state_, false, (INPUT_LEN + 1) * sizeof(bool));
+        std::memset(pressed_, 0, (INPUT_LEN + 1) * sizeof(bool));
+        std::memset(released_, 0, (INPUT_LEN + 1) * sizeof(bool));
+        std::memset(state_, 0, (INPUT_LEN + 1) * sizeof(bool));
     }
 
     void Inputs::poll() {
@@ -109,6 +109,14 @@ namespace Dynamo {
 
     void Inputs::bind(std::string command, INPUT_CODE input) {
         binds_[command] = input;
+    }
+
+    std::vector<std::string> Inputs::get_bind_keys() {
+        std::vector<std::string> bind_keys;
+        for(auto pair : binds_) {
+            bind_keys.push_back(pair.first);
+        }
+        return bind_keys;
     }
 
     INPUT_CODE Inputs::get_bind(std::string command) {

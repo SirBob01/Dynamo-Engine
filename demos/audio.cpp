@@ -22,11 +22,14 @@ public:
         inputs_->bind("toggle pause", Dynamo::INPUT_P);
         inputs_->bind("clear music stream", Dynamo::INPUT_C);
 
-        for(auto bind : inputs_->get_all_binds()) {
+        std::vector<std::string> all_binds = inputs_->get_bind_keys();
+
+        for(auto bind : all_binds) {
+            Dynamo::INPUT_CODE input_name = inputs_->get_bind(bind);
             commands.push_back(
                 new Dynamo::Sprite(
                     textures_->load_text(
-                        "Press " + inputs_->get_name(bind.second) + " to " + bind.first,
+                        "Press " + inputs_->get_name(input_name) + " to " + bind,
                         "sentry",
                         {0, 0, 0}
                     )
@@ -83,7 +86,7 @@ public:
     };
 
     void draw() override {
-        display_->set_fill({255, 255, 255});
+        display_->set_fill({255, 0, 255});
         float index = 0.0f;
         for(auto text : commands) {
             display_->draw_sprite(
