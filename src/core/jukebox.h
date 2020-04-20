@@ -81,9 +81,13 @@ namespace Dynamo {
     // Main audio engine
     class Jukebox {
         Track base_;
+        Track record_buffer_;
 
-        SDL_AudioSpec device_spec_;
-        SDL_AudioDeviceID device_;
+        SDL_AudioSpec output_spec_;
+        SDL_AudioSpec input_spec_;
+
+        SDL_AudioDeviceID output_;
+        SDL_AudioDeviceID input_;
 
         std::unordered_map<std::string, AudioFile *> bank_;
         std::vector<Stream *> streams_;
@@ -93,8 +97,12 @@ namespace Dynamo {
 
         Clock *clock_;
 
-        // SDL_Audio callback function
-        static void callback(void *data, uint8_t *stream, int length);
+        // SDL_Audio playback function
+        static void playback_call(void *data, uint8_t *stream, int length);
+        
+        // SDL_Audio record function
+        // TODO: Data gets streamed from input device into record_buffer_
+        static void record_call(void *data, uint8_t *stream, int length);
 
         // Load an audio file
         AudioFile *load_file(std::string filename);

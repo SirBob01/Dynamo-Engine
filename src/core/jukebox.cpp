@@ -45,18 +45,35 @@ namespace Dynamo {
     }
 
     Jukebox::Jukebox(Clock *clock) {
-        // Initialize audio device
-        SDL_memset(&device_spec_, 0, sizeof(SDL_AudioSpec));
-        device_spec_.channels = 2;
-        device_spec_.freq = 44100;
-        device_spec_.format = AUDIO_S16LSB;
-        device_spec_.samples = 1024;
-        device_spec_.userdata = &base_;
-        device_spec_.callback = callback;
+        // Initialize audio output device specifications
+        SDL_AudioSpec desired_output;
+        SDL_zero(desired_output);
 
-        device_ = SDL_OpenAudioDevice(
-            nullptr, 0, &device_spec_, nullptr, 0
+        desired_output.channels = 2;
+        desired_output.freq = 44100;
+        desired_output.format = AUDIO_S16LSB;
+        desired_output.samples = 1024;
+        desired_output.userdata = &base_;
+        desired_output.callback = playback_call;
+
+        // Initialize audio input device specifications
+        SDL_AudioSpec desired_input;
+        SDL_zero(desired_input);
+        
+        desired_input.channels = 2;
+        desired_input.freq = 44100;
+        desired_input.format = AUDIO_S16LSB;
+        desired_input.samples = 1024;
+        desired_input.userdata = &record_buffer_;
+        desired_input.callback = record_call;
+
+        output_ = SDL_OpenAudioDevice(
+            nullptr, 0, &desired_output, &output_spec_, 0
         );
+        input_ = SDL_OpenAudioDevice(
+            nullptr, true, &desired_input, &input_spec_, 0
+        );
+
         master_volume_ = 1.0;
         clock_ = clock;
         play();
@@ -67,16 +84,22 @@ namespace Dynamo {
         for(auto &pair : bank_) {
             delete pair.second;
         }
-        SDL_CloseAudioDevice(device_);
+        SDL_CloseAudioDevice(output_);
+        SDL_CloseAudioDevice(input_);
     }
 
-    void Jukebox::callback(void *data, uint8_t *stream, int length) {
+    void Jukebox::playback_call(void *data, uint8_t *stream, int length) {
         Track *base = static_cast<Track *>(data);
 
         SDL_memset(stream+base->written, 0, length-base->written);
         SDL_memcpy(stream, base->buffer, base->written);
         SDL_memset(base->buffer, 0, base->written);
         base->written = 0;
+    }
+
+    void Jukebox::record_call(void *data, uint8_t *stream, int length) {
+        Track *record_buffer = static_cast<Track *>(data);
+        return;
     }
 
     AudioFile *Jukebox::load_file(std::string filename) {
@@ -149,7 +172,7 @@ namespace Dynamo {
     }
 
     bool Jukebox::is_playing() {
-        return SDL_GetAudioDeviceStatus(device_) == SDL_AUDIO_PLAYING;
+        return SDL_GetAudioDeviceStatus(output_) == SDL_AUDIO_PLAYING;
     }
 
     float Jukebox::get_volume() {
@@ -297,11 +320,11 @@ namespace Dynamo {
     }
 
     void Jukebox::play() {
-        SDL_PauseAudioDevice(device_, 0);
+        SDL_PauseAudioDevice(output_, 0);
     }
 
     void Jukebox::pause() {
-        SDL_PauseAudioDevice(device_, 1);
+        SDL_PauseAudioDevice(output_, 1);
     }
 
     void Jukebox::update() {
@@ -309,7 +332,7 @@ namespace Dynamo {
             return;
         }
         // Lock device to prevent race conditions
-        SDL_LockAudioDevice(device_);
+        SDL_LockAudioDevice(output_);
         int max_copy = 0;
 
         // Update streaming tracks
@@ -393,7 +416,7 @@ namespace Dynamo {
 
         // Only update written bytes after all chunks are mixed
         base_.written += max_copy;
-        SDL_UnlockAudioDevice(device_);
+        SDL_UnlockAudioDevice(output_);
     }
 
     void Jukebox::clear() {
