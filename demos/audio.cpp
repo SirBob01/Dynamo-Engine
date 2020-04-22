@@ -3,10 +3,11 @@
 
 class Game : public Dynamo::Scene {
     std::vector<Dynamo::Sprite *> commands;
-    int music_stream;
-    int ambient_stream;
+    Dynamo::StreamID music_stream, ambient_stream;
 
     Dynamo::Sound *sfx;
+    Dynamo::Sound *recorded;
+    bool recording;
 
 public:
     Game(Dynamo::Core modules) : Dynamo::Scene(modules) {};
@@ -21,6 +22,8 @@ public:
         inputs_->bind("fadeout music", Dynamo::INPUT_S);
         inputs_->bind("toggle pause", Dynamo::INPUT_P);
         inputs_->bind("clear music stream", Dynamo::INPUT_C);
+        inputs_->bind("start recording", Dynamo::INPUT_V);
+        inputs_->bind("play recording", Dynamo::INPUT_B);
 
         std::vector<std::string> all_binds = inputs_->get_bind_keys();
 
@@ -39,7 +42,9 @@ public:
 
         ambient_stream = jukebox_->generate_stream();
         music_stream = jukebox_->generate_stream();
+        
         sfx = jukebox_->load_sound("assets/audio/fusion_boom.ogg");
+        recorded = new Dynamo::Sound(4194304);
 
         jukebox_->set_volume(0.5);
     };
@@ -49,7 +54,8 @@ public:
             delete sprite;
         }
         jukebox_->clear();
-        jukebox_->destroy_sound(sfx);
+        delete sfx;
+        delete recorded;
     };
 
     void update(unsigned dt) override {
@@ -82,6 +88,27 @@ public:
             else {
                 jukebox_->play();
             }
+        }
+        if(inputs_->get_pressed("start recording")) {
+            // Reset record buffer
+            for(int i = 0; i < recorded->length; i++) {
+                recorded->samples[i] = 0;
+            }
+            recorded->write = 0;
+
+            jukebox_->start_record();
+            recording = true;
+        }
+        if(inputs_->get_released("start recording")) {
+            jukebox_->start_record();
+            recording = false;
+        }
+        if(inputs_->get_pressed("play recording")) {
+            jukebox_->play_sound(recorded, 1.0);
+        }
+
+        if(recording) {
+            jukebox_->stream_recorded(recorded);
         }
     };
 
