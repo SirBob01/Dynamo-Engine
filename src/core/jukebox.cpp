@@ -21,19 +21,19 @@ namespace Dynamo {
         return &vb;
     }
 
-    Track::Track() {
-        length = 4096;
-        buffer = new char[length];
-        SDL_memset(buffer, 0, length);
-
-        written = 0;
+    Sound::Sound(int size) {
+        length = size;
+        samples = new char[length];
+        SDL_memset(samples, 0, length);
+        write = 0;
     }
 
-    Track::~Track() {
-        delete[] buffer;
+    Sound::~Sound() {
+        delete samples;
     }
 
     Stream::Stream() {
+        track = new Sound(4096);
         volume = 0;
         max_volume = 1.0;
 
@@ -44,8 +44,13 @@ namespace Dynamo {
         playing = true;
     }
 
+    Stream::~Stream() {
+        delete track;
+    }
+
     Jukebox::Jukebox(Clock *clock) {
-        recorded_ = new RingBuffer(4096);
+        base_ = new Sound(4096);
+        record_ = new RingBuffer(65536);
 
         // Initialize audio output device specifications
         SDL_AudioSpec desired_output;
@@ -55,8 +60,8 @@ namespace Dynamo {
         desired_output.freq = 44100;
         desired_output.format = AUDIO_S16LSB;
         desired_output.samples = 1024;
-        desired_output.userdata = &base_;
-        desired_output.callback = playback_call;
+        desired_output.userdata = base_;
+        desired_output.callback = play_callback;
 
         // Initialize audio input device specifications
         SDL_AudioSpec desired_input;
@@ -66,8 +71,8 @@ namespace Dynamo {
         desired_input.freq = 44100;
         desired_input.format = AUDIO_S16LSB;
         desired_input.samples = 1024;
-        desired_input.userdata = recorded_;
-        desired_input.callback = record_call;
+        desired_input.userdata = record_;
+        desired_input.callback = record_callback;
 
         output_ = SDL_OpenAudioDevice(
             nullptr, 0, &desired_output, &output_spec_, 0
@@ -87,24 +92,27 @@ namespace Dynamo {
         for(auto &pair : bank_) {
             delete pair.second;
         }
-        delete recorded_;
         SDL_CloseAudioDevice(output_);
         SDL_CloseAudioDevice(input_);
+        delete base_;
+        delete record_;
     }
 
-    void Jukebox::playback_call(void *data, uint8_t *stream, int length) {
-        Track *base = static_cast<Track *>(data);
-
-        SDL_memset(stream+base->written, 0, length-base->written);
-        SDL_memcpy(stream, base->buffer, base->written);
-        SDL_memset(base->buffer, 0, base->written);
-        base->written = 0;
+    void Jukebox::play_callback(void *data, uint8_t *stream, int length) {
+        Sound *base = static_cast<Sound *>(data);
+        SDL_memset(stream+base->write, 0, length-base->write);
+        SDL_memcpy(stream, base->samples, base->write);
+        SDL_memset(base->samples, 0, base->write);
+        base->write = 0;
     }
 
-    void Jukebox::record_call(void *data, uint8_t *stream, int length) {
-        RingBuffer *buffer = static_cast<RingBuffer *>(data);
-        for(int i = 0; i < length && !buffer->is_full(); i++) {
-            buffer->write(stream[i]);
+    void Jukebox::record_callback(void *data, uint8_t *stream, int length) {
+        RingBuffer *record = static_cast<RingBuffer *>(data);
+        if(record->is_full()) {
+            record->clear();
+        }
+        for(int i = 0; i < length; i++) {
+            record->write(stream[i]);
         }
     }
 
@@ -133,43 +141,43 @@ namespace Dynamo {
     }
 
     void Jukebox::mix_chunk(Chunk *chunk, int *max_copy) {
-        int length = chunk->sound.length;
-        if(length > base_.length - base_.written) {
-            length = base_.length - base_.written;
+        int length = chunk->length;
+        if(length > base_->length - base_->write) {
+            length = base_->length - base_->write;
         }
         if(*max_copy < length) {
             *max_copy = length;
         }
 
         mix_raw(
-            base_.buffer + base_.written,
-            chunk->sound.samples,
+            base_->samples + base_->write,
+            chunk->samples,
             length,
             chunk->volume
         );
-        chunk->sound.samples += length;
-        chunk->sound.length -= length;
+        chunk->samples += length;
+        chunk->length -= length;
     }
 
     void Jukebox::mix_stream(Stream *stream, int *max_copy) {
-        int length = stream->track.written;
-        if(length > base_.length - base_.written) {
-            length = base_.length - base_.written;
+        int length = stream->track->write;
+        if(length > base_->length - base_->write) {
+            length = base_->length - base_->write;
         }
         if(*max_copy < length) {
             *max_copy = length;
         }
 
         mix_raw(
-            base_.buffer + base_.written,
-            stream->track.buffer,
+            base_->samples + base_->write,
+            stream->track->samples,
             length,
             stream->volume
         );
-        stream->track.written -= length;
+        stream->track->write -= length;
     }
 
-    void Jukebox::check_stream_validity(int stream) {
+    void Jukebox::check_stream_validity(StreamID stream) {
         if(stream >= streams_.size()) {
             throw InvalidKey(
                 "Stream ID "+std::to_string(stream),
@@ -179,10 +187,6 @@ namespace Dynamo {
 
     bool Jukebox::is_playing() {
         return SDL_GetAudioDeviceStatus(output_) == SDL_AUDIO_PLAYING;
-    }
-
-    RingBuffer *Jukebox::get_record_buffer() {
-        return recorded_;
     }
 
     float Jukebox::get_volume() {
@@ -199,32 +203,32 @@ namespace Dynamo {
         master_volume_ = volume;
     }
 
-    int Jukebox::generate_stream() {
+    StreamID Jukebox::generate_stream() {
         streams_.push_back(new Stream());
         return streams_.size() - 1;
     }
 
-    bool Jukebox::is_stream_playing(int stream) {
+    bool Jukebox::is_stream_playing(StreamID stream) {
         check_stream_validity(stream);
         return streams_[stream]->playing;
     }
 
-    bool Jukebox::is_stream_empty(int stream) {
+    bool Jukebox::is_stream_empty(StreamID stream) {
         check_stream_validity(stream);
         return streams_[stream]->queue.size() == 0;
     }
 
-    bool Jukebox::is_stream_transition(int stream) {
+    bool Jukebox::is_stream_transition(StreamID stream) {
         check_stream_validity(stream);
         return streams_[stream]->time == -1;
     }
 
-    float Jukebox::get_stream_volume(int stream) {
+    float Jukebox::get_stream_volume(StreamID stream) {
         check_stream_validity(stream);
         return streams_[stream]->max_volume;
     }
 
-    void Jukebox::set_stream_volume(int stream, float volume) {
+    void Jukebox::set_stream_volume(StreamID stream, float volume) {
         check_stream_validity(stream);
         if(volume > 1.0) {
             volume = 1.0;
@@ -235,7 +239,7 @@ namespace Dynamo {
         streams_[stream]->max_volume = volume;
     }
 
-    void Jukebox::queue_stream(std::string filename, int stream,
+    void Jukebox::queue_stream(std::string filename, StreamID stream,
                                double fadein, double fadeout,
                                int loops) {
         check_stream_validity(stream);
@@ -252,17 +256,17 @@ namespace Dynamo {
         });
     }
 
-    void Jukebox::play_stream(int stream) {
+    void Jukebox::play_stream(StreamID stream) {
         check_stream_validity(stream);
         streams_[stream]->playing = true;
     }
 
-    void Jukebox::pause_stream(int stream) {
+    void Jukebox::pause_stream(StreamID stream) {
         check_stream_validity(stream);
         streams_[stream]->playing = false;
     }
 
-    void Jukebox::skip_stream(int stream, double fadeout) {
+    void Jukebox::skip_stream(StreamID stream, double fadeout) {
         check_stream_validity(stream);
         Stream *stream_ptr = streams_[stream];
         if(is_stream_empty(stream) || is_stream_transition(stream)) {
@@ -276,9 +280,27 @@ namespace Dynamo {
         current.duration = stream_ptr->time + (fadeout * t);
     }
 
-    void Jukebox::clear_stream(int stream) {
+    void Jukebox::clear_stream(StreamID stream) {
         check_stream_validity(stream);
-        streams_[stream]->queue = {};
+        Stream *stream_ptr = streams_[stream];
+        if(is_stream_empty(stream) || is_stream_transition(stream)) {
+            return;
+        }
+
+        // Reset stream data
+        stream_ptr->volume = 0;
+        stream_ptr->time = -1;
+        stream_ptr->loop_counter = 0;
+
+        // Reset the seek of each track in the stream before emptying
+        while(!stream_ptr->queue.empty()) {
+            StreamMeta &current = stream_ptr->queue.front();
+            ov_raw_seek(
+                current.file->get_encoded(), 
+                0
+            );
+            stream_ptr->queue.pop();
+        }
     }
 
     Sound *Jukebox::load_sound(std::string filename) {
@@ -307,26 +329,27 @@ namespace Dynamo {
             }
         }
 
-        Sound *sound = new Sound();
-        sound->length = temp.size();
-        sound->samples = new char[sound->length];
+        Sound *sound = new Sound(temp.size());
+        sound->write = sound->length;
         SDL_memcpy(sound->samples, &(temp[0]), sound->length);
         return sound;
-    }
-
-    void Jukebox::destroy_sound(Sound *sound) {
-        delete[] sound->samples;
-        delete sound;
     }
 
     void Jukebox::play_sound(Sound *sound, float volume) {
         if(!sound) {
             return;
         }
-        chunks_.push_back(
-            {{sound->samples, sound->length},
-             volume}
-        );
+        chunks_.push_back({
+            sound->samples, 
+            sound->length, 
+            volume
+        });
+    }
+
+    void Jukebox::stream_recorded(Sound *target) {
+        while(target->write < target->length && !record_->is_empty()) {
+            target->samples[target->write++] = record_->read();        
+        }
     }
 
     void Jukebox::play() {
@@ -386,15 +409,15 @@ namespace Dynamo {
             }
             
             // Write to stream buffer
-            while(stream->track.written < stream->track.length) {
+            while(stream->track->write < stream->track->length) {
                 long bytes_read = ov_read(
                     ogg, 
-                    stream->track.buffer + stream->track.written,
-                    stream->track.length - stream->track.written, 
+                    stream->track->samples + stream->track->write,
+                    stream->track->length - stream->track->write, 
                     0, 2, 1, 
                     nullptr
                 );
-                stream->track.written += bytes_read;
+                stream->track->write += bytes_read;
                 
                 // EOF
                 if(!bytes_read) {
@@ -423,7 +446,7 @@ namespace Dynamo {
         auto it = chunks_.begin();
         while(it != chunks_.end()) {
             Chunk &chunk = *it;
-            if(!chunk.sound.length) {
+            if(!chunk.length) {
                 it = chunks_.erase(it);
             }
             else {
@@ -432,19 +455,19 @@ namespace Dynamo {
             }
         }
 
-        // Only update written bytes after all chunks are mixed
-        base_.written += max_copy;
+        // Only update write bytes after all chunks are mixed
+        base_->write += max_copy;
         SDL_UnlockAudioDevice(output_);
     }
 
     void Jukebox::clear() {
-        chunks_.clear();
         for(auto &stream : streams_) {
             delete stream;
         }
         for(auto &file : bank_) {
             ov_raw_seek(file.second->get_encoded(), 0);
         }
+        chunks_.clear();
         streams_.clear();
     }
 }
