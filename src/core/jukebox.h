@@ -11,6 +11,7 @@
 #include <string>
 
 #include "clock.h"
+#include "../util/ringbuffer.h"
 #include "../util/util.h"
 #include "../log/error.h"
 
@@ -81,7 +82,7 @@ namespace Dynamo {
     // Main audio engine
     class Jukebox {
         Track base_;
-        Track record_buffer_;
+        RingBuffer *recorded_;
 
         SDL_AudioSpec output_spec_;
         SDL_AudioSpec input_spec_;
@@ -125,6 +126,9 @@ namespace Dynamo {
 
         // Check if the audio device is playing or paused
         bool is_playing();
+
+        // Return the buffer where audio is written to from input device
+        RingBuffer *get_record_buffer();
 
         // Get the master volume
         float get_volume();
@@ -187,6 +191,12 @@ namespace Dynamo {
 
         // Pause all audio playback
         void pause();
+
+        // Resume audio recording
+        void start_record();
+
+        // Pause audio recording
+        void pause_record();
 
         // Update tick
         void update();

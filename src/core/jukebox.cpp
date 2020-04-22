@@ -45,6 +45,8 @@ namespace Dynamo {
     }
 
     Jukebox::Jukebox(Clock *clock) {
+        recorded_ = new RingBuffer(4096);
+
         // Initialize audio output device specifications
         SDL_AudioSpec desired_output;
         SDL_zero(desired_output);
@@ -64,14 +66,15 @@ namespace Dynamo {
         desired_input.freq = 44100;
         desired_input.format = AUDIO_S16LSB;
         desired_input.samples = 1024;
-        desired_input.userdata = &record_buffer_;
+        desired_input.userdata = recorded_;
         desired_input.callback = record_call;
 
         output_ = SDL_OpenAudioDevice(
             nullptr, 0, &desired_output, &output_spec_, 0
         );
         input_ = SDL_OpenAudioDevice(
-            nullptr, true, &desired_input, &input_spec_, 0
+            nullptr, true, &desired_input, &input_spec_,
+            SDL_AUDIO_ALLOW_FORMAT_CHANGE
         );
 
         master_volume_ = 1.0;
@@ -84,6 +87,7 @@ namespace Dynamo {
         for(auto &pair : bank_) {
             delete pair.second;
         }
+        delete recorded_;
         SDL_CloseAudioDevice(output_);
         SDL_CloseAudioDevice(input_);
     }
@@ -98,8 +102,10 @@ namespace Dynamo {
     }
 
     void Jukebox::record_call(void *data, uint8_t *stream, int length) {
-        Track *record_buffer = static_cast<Track *>(data);
-        return;
+        RingBuffer *buffer = static_cast<RingBuffer *>(data);
+        for(int i = 0; i < length && !buffer->is_full(); i++) {
+            buffer->write(stream[i]);
+        }
     }
 
     AudioFile *Jukebox::load_file(std::string filename) {
@@ -173,6 +179,10 @@ namespace Dynamo {
 
     bool Jukebox::is_playing() {
         return SDL_GetAudioDeviceStatus(output_) == SDL_AUDIO_PLAYING;
+    }
+
+    RingBuffer *Jukebox::get_record_buffer() {
+        return recorded_;
     }
 
     float Jukebox::get_volume() {
@@ -325,6 +335,14 @@ namespace Dynamo {
 
     void Jukebox::pause() {
         SDL_PauseAudioDevice(output_, 1);
+    }
+
+    void Jukebox::start_record() {
+        SDL_PauseAudioDevice(input_, 0);
+    }
+
+    void Jukebox::pause_record() {
+        SDL_PauseAudioDevice(input_, 1);
     }
 
     void Jukebox::update() {
