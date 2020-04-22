@@ -17,12 +17,7 @@ namespace Dynamo {
     }
 
     bool RingBuffer::is_full() {
-        if(read_ != 0) {
-            return write_ == read_ - 1;  
-        }
-        else {
-            return write_ == size_ - 1;
-        }
+        return write_ == (read_ + size_ - 1) % size_;
     }
 
     bool RingBuffer::is_empty() {
@@ -51,5 +46,10 @@ namespace Dynamo {
             return;
         }
         write_ = (write_ + size_ - 1) % size_;
+    }
+
+    void RingBuffer::clear() {
+        read_ = 0;
+        write_ = 0;
     }
 }

@@ -26,6 +26,9 @@ namespace Dynamo {
 
         // Remove a byte from the buffer
         void pop();
+
+        // Empty the buffer
+        void clear();
     };
 }
 
