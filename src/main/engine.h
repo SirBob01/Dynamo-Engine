@@ -28,6 +28,7 @@ namespace Dynamo {
     public:
         Engine(std::string title, bool fullscreen, 
                int width=0, int height=0);
+        ~Engine();
 
         // Check if the engine is running
         bool is_running();
@@ -61,9 +62,6 @@ namespace Dynamo {
 
         // Pause the application
         void stop();
-
-        // Uninitialize all modules and free memory
-        void quit();
     };
 }
 

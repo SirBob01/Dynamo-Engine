@@ -19,7 +19,22 @@ namespace Dynamo {
 
         scene_manager_ = new FSM();
 
-        running_ = false;
+        running_ = true;
+    }
+
+    Engine::~Engine() {
+        // Clean up
+        for(auto &scene : scenes_) {
+            delete scene;
+        }
+        delete scene_manager_;
+        delete display_;
+        delete textures_;
+        delete jukebox_;
+        delete inputs_;
+        delete clock_;
+        
+        SDL_Quit();
     }
 
     bool Engine::is_running() {
@@ -50,20 +65,5 @@ namespace Dynamo {
 
     void Engine::stop() {
         running_ = false;
-    }
-
-    void Engine::quit() {
-        // Clean up
-        for(auto &scene : scenes_) {
-            delete scene;
-        }
-        delete scene_manager_;
-        delete display_;
-        delete textures_;
-        delete jukebox_;
-        delete inputs_;
-        delete clock_;
-        
-        SDL_Quit();
     }
 }
