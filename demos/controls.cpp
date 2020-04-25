@@ -55,14 +55,11 @@ public:
 };
 
 int main(int argv, char **args) {
-    Dynamo::Engine game_engine("Input Test", false, 640, 480);
-    game_engine.push_scene<Game>();
-    game_engine.start();
+    Dynamo::Engine engine("Input Test", false, 640, 480);
+    engine.push_scene<Game>();
 
-    while(game_engine.is_running()) {
-        game_engine.run();
+    while(engine.is_running()) {
+        engine.run();
     }
-
-    game_engine.quit();
     return 0;
 }

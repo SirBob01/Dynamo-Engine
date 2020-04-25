@@ -67,14 +67,11 @@ void Game::draw() {
 
 int main(int argv, char **args) {
     // Entry point function
-    Dynamo::Engine game_engine("Rendering Test", false, 1000, 600);
-    game_engine.push_scene<Game>();
-    game_engine.start();
+    Dynamo::Engine engine("Rendering Test", false, 1000, 600);
+    engine.push_scene<Game>();
 
-    while(game_engine.is_running()) {
-        game_engine.run();
+    while(engine.is_running()) {
+        engine.run();
     }
-
-    game_engine.quit();
     return 0;
 }

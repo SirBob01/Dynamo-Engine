@@ -80,14 +80,11 @@ void Second::draw() {
 
 // Program entry point
 int main(int argv, char **args) {
-    Dynamo::Engine game_engine("Scene Test", false, 1000, 600);
-    game_engine.push_scene<First>();
-    game_engine.start();
+    Dynamo::Engine engine("Scene Test", false, 1000, 600);
+    engine.push_scene<First>();
 
-    while(game_engine.is_running()) {
-        game_engine.run();
+    while(engine.is_running()) {
+        engine.run();
     }
-
-    game_engine.quit();
     return 0;
 }
