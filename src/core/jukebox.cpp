@@ -29,7 +29,7 @@ namespace Dynamo {
     }
 
     Sound::~Sound() {
-        delete samples;
+        delete[] samples;
     }
 
     Stream::Stream() {
