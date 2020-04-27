@@ -6,7 +6,7 @@
 
 This engine is meant to simplify the application development process, automating core processes like the main loop and state handling. Aside from abstracting away low-level resource management, the library offers additional game development utilities. Below is an overview of its features:
 
-- Support for both [OOP](https://en.wikipedia.org/wiki/Object-oriented_design) and [ECS](https://en.wikipedia.org/wiki/Entity_component_system) architectures in designing game objects
+- Support for an optimized [ECS](https://en.wikipedia.org/wiki/Entity_component_system) architecture in designing game objects
 - A simplified Scene management system
 - Artificial intelligence utilities including [FSM](https://en.wikipedia.org/wiki/Finite-state_machine)
 - Animating sprites, rasterizing primitives, and rendering text
