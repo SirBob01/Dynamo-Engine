@@ -8,7 +8,7 @@
 #include <string>
 #include <cstring>
 
-#include "../util/vec2d.h"
+#include "../util/vector.h"
 
 namespace Dynamo {
     typedef enum { 

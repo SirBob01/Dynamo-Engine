@@ -9,7 +9,7 @@
 
 #include "../core/textures.h"
 #include "../util/aabb.h"
-#include "../util/vec2d.h"
+#include "../util/vector.h"
 
 namespace Dynamo {
     class Sprite {

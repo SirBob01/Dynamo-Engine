@@ -3,7 +3,7 @@
 
 #include "../main/scene.h"
 #include "../core/inputs.h"
-#include "../util/vec2d.h"
+#include "../util/vector.h"
 #include "../util/aabb.h"
 
 namespace Dynamo::GUI {

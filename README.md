@@ -26,10 +26,11 @@ This engine wraps around SDL2 and its extensions:
 - Ogg Vorbis
 
 # TODO
-- Use smart pointers
-- Finish implementing custom network protocol
-- Add support for dynamic 2D lighting
-- Implement 2D pathfinding utility (A* with generic nodes)
+- Move all sub-modules into specialized namespaces
+- Implement A* pathfinding utility
+- Implement Scene graphs...?
 - Refactor GUI framework
-- Migrate to using Vulkan API for low-level render calls
-- Track down memory leaks
+- Use smart pointers
+- Add support for dynamic 2D lighting
+- Finish implementing custom network protocol
+- Migrate to Vulkan API for low-level render calls

@@ -9,7 +9,7 @@
 #include <string>
 
 #include "../util/color.h"
-#include "../util/vec2d.h"
+#include "../util/vector.h"
 #include "../log/error.h"
 
 namespace Dynamo {

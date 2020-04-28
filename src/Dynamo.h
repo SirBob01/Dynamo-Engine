@@ -28,7 +28,8 @@
 #include "net/packet.h"
 
 #include "util/color.h"
-#include "util/vec2d.h"
+#include "util/vector.h"
+#include "util/matrix.h"
 #include "util/aabb.h"
 #include "util/random.h"
 #include "util/typeid.h"

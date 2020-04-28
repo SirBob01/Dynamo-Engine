@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "vec2d.h"
+#include "vector.h"
 
 namespace Dynamo {
     struct AABB {

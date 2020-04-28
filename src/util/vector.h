@@ -1,40 +1,13 @@
-#ifndef DYNAMO_VEC2D_H_
-#define DYNAMO_VEC2D_H_
+#ifndef DYNAMO_VECTOR_H_
+#define DYNAMO_VECTOR_H_
 
 #include <SDL2/SDL.h>
 
-#include <math.h>
+#include <cmath>
+
+#include "matrix.h"
 
 namespace Dynamo {
-    struct Mat2D {
-        /*
-        [a, b
-         c, d]
-        */
-        float a, b;
-        float c, d;
-
-        float determinant() const;
-
-        Mat2D operator+(const Mat2D &rhs) const;
-        Mat2D operator-(const Mat2D &rhs) const;
-        Mat2D operator*(const Mat2D &rhs) const;
-        Mat2D operator*(float scalar) const;
-        Mat2D operator/(float scalar) const;
-        Mat2D operator-() const;
-
-        Mat2D inverse() const;
-
-        Mat2D &operator+=(const Mat2D &rhs);
-        Mat2D &operator-=(const Mat2D &rhs);
-        Mat2D &operator*=(const Mat2D &rhs);
-        Mat2D &operator*=(float scalar);
-        Mat2D &operator/=(float scalar);
-
-        bool operator==(const Mat2D &rhs) const;
-        bool operator!=(const Mat2D &rhs) const;
-    };
-
     struct Vec2D {
         float x;
         float y;
