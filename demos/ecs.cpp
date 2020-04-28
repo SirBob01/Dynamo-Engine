@@ -19,59 +19,51 @@ struct Controllable {
 
 // Define the systems
 void control_system(Dynamo::ECS *world) {
-    for(auto &entity : world->get_group<Velocity, Controllable>()) {
-        Velocity *vel = world->get_component<Velocity>(entity);
-        Controllable *controller = world->get_component<Controllable>(entity);
-        
-        Dynamo::Inputs *inputs = controller->inputs;
+    world->get_group<Velocity, Controllable>([](auto &vel, auto &controller) {
+        Dynamo::Inputs *inputs = controller.inputs;
         if(inputs->get_pressed_raw(Dynamo::INPUT_W)) {
-            vel->vel.y = -0.5;
+            vel.vel.y = -0.5;
         }
         if(inputs->get_pressed_raw(Dynamo::INPUT_S)) {
-            vel->vel.y = 0.5;
+            vel.vel.y = 0.5;
         }
         if(inputs->get_pressed_raw(Dynamo::INPUT_A)) {
-            vel->vel.x = -0.5;
+            vel.vel.x = -0.5;
         }
         if(inputs->get_pressed_raw(Dynamo::INPUT_D)) {
-            vel->vel.x = 0.5;
+            vel.vel.x = 0.5;
         }
 
-        if(inputs->get_released_raw(Dynamo::INPUT_W) && vel->vel.y < 0) {
-            vel->vel.y = 0;
+        if(inputs->get_released_raw(Dynamo::INPUT_W) && vel.vel.y < 0) {
+            vel.vel.y = 0;
         }
-        if(inputs->get_released_raw(Dynamo::INPUT_S) && vel->vel.y > 0) {
-            vel->vel.y = 0;
+        if(inputs->get_released_raw(Dynamo::INPUT_S) && vel.vel.y > 0) {
+            vel.vel.y = 0;
         }
-        if(inputs->get_released_raw(Dynamo::INPUT_A) && vel->vel.x < 0) {
-            vel->vel.x = 0;
+        if(inputs->get_released_raw(Dynamo::INPUT_A) && vel.vel.x < 0) {
+            vel.vel.x = 0;
         }
-        if(inputs->get_released_raw(Dynamo::INPUT_D) && vel->vel.x > 0) {
-            vel->vel.x = 0;
+        if(inputs->get_released_raw(Dynamo::INPUT_D) && vel.vel.x > 0) {
+            vel.vel.x = 0;
         }
-    }
+    });
 }
 
 void move_system(unsigned dt, Dynamo::ECS *world) {
-    for(auto &entity : world->get_group<Dynamo::Vec2D, Velocity>()) {
-        Dynamo::Vec2D *pos = world->get_component<Dynamo::Vec2D>(entity);
-        Velocity *vel = world->get_component<Velocity>(entity);
-        *pos += vel->vel * dt;
-    }
+    world->get_group<Dynamo::Vec2D, Velocity>([dt](auto &pos, auto &vel) {
+        pos += vel.vel * dt;
+    });
 }
 
 void draw_system(unsigned dt, Dynamo::ECS *world, Dynamo::Display *display) {
-    for(auto &entity : world->get_group<Dynamo::Vec2D, Drawable>()) {
-        Drawable *sprite = world->get_component<Drawable>(entity);
-        Dynamo::Vec2D *pos = world->get_component<Dynamo::Vec2D>(entity);
-        sprite->sprite->animate(dt, 24, true);
-
+    world->get_group<Dynamo::Vec2D, Drawable>([dt, display](auto &pos, auto &drawable) {
+        drawable.sprite->animate(dt, 24, true);
         display->draw_sprite(
             nullptr, 
-            sprite->sprite,
-            *(pos)
+            drawable.sprite,
+            pos
         );
-    }
+    });
 }
 
 // Main game scene
