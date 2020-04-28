@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <functional>
 
 #include "entity.h"
 #include "component.h"
@@ -27,8 +28,14 @@ namespace Dynamo {
         void destroy_entity(Entity entity);
 
         // Get a vector of entities belonging to a component group
+        // Alternatively, pass a lambda that will be called on each entity
+        template <typename ... T>
+        struct fn_sig {
+            typedef std::function<void(T ...)> type;
+        };
         template <typename ... Component>
-        std::vector<Entity> get_group() {
+        std::vector<Entity> get_group(typename fn_sig<Component &...>
+                                      ::type func=nullptr) {
             std::vector<BasePool *> group_pools;
             std::vector<Entity> group;
 
@@ -48,8 +55,8 @@ namespace Dynamo {
                 }
             }
 
-            // Loop through entities in min and check if 
-            // they exist in the other pools
+            // Loop through each entity in min and check if 
+            // it exist in all the other pools
             for(int i = 0; i < min->get_length(); i++) {
                 Entity entity = min->get_entity(i);
                 
@@ -64,6 +71,9 @@ namespace Dynamo {
                 }
                 if(match) {
                     group.push_back(entity);
+                    if(func) {
+                        func(*get_component<Component>(entity) ...);                    
+                    }
                 }
             }
             return group;
