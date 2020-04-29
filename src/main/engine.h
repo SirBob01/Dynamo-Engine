@@ -14,6 +14,7 @@
 namespace Dynamo {
     class Engine {
         Display *display_;
+        Renderer *renderer_;
         TextureManager *textures_;
         Jukebox *jukebox_;
         Inputs *inputs_;
@@ -41,6 +42,7 @@ namespace Dynamo {
                 scenes_.push_back(
                     new S({
                         display_, 
+                        renderer_,
                         textures_, 
                         jukebox_, 
                         inputs_, 

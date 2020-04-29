@@ -4,8 +4,9 @@
 #include "main/engine.h"
 #include "main/scene.h"
 
-#include "core/textures.h"
+#include "core/renderer.h"
 #include "core/jukebox.h"
+#include "core/textures.h"
 #include "core/display.h"
 #include "core/inputs.h"
 #include "core/clock.h"

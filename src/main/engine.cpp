@@ -13,7 +13,8 @@ namespace Dynamo {
         // Initialize singleton modules
         clock_ = new Clock();
         display_ = new Display(width, height, title, fullscreen);
-        textures_ = new TextureManager(display_->get_renderer());
+        renderer_ = new Renderer(display_->get_window());
+        textures_ = new TextureManager(renderer_->get_renderer());
         jukebox_ = new Jukebox(clock_);
         inputs_ = new Inputs();
 
@@ -28,6 +29,7 @@ namespace Dynamo {
             delete scene;
         }
         delete scene_manager_;
+        delete renderer_;
         delete display_;
         delete textures_;
         delete jukebox_;
@@ -55,7 +57,7 @@ namespace Dynamo {
         }
         
         jukebox_->update();
-        display_->refresh();
+        renderer_->refresh();
         clock_->set_fps(fps_cap);
     }
 

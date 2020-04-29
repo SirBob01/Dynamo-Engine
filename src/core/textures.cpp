@@ -1,17 +1,6 @@
 #include "textures.h"
 
 namespace Dynamo {
-    SDL_Texture *TextureManager::convert_surface(SDL_Surface *surface) {
-        SDL_Texture *texture = SDL_CreateTextureFromSurface(
-            renderer_, 
-            surface
-        );
-        if(!texture) {
-            throw SDLError();
-        }
-        return texture;
-    }
-
     TextureManager::TextureManager(SDL_Renderer *renderer) {
         renderer_ = renderer;
 
@@ -27,6 +16,17 @@ namespace Dynamo {
         TTF_Quit();
     }
 
+    SDL_Texture *TextureManager::convert_surface(SDL_Surface *surface) {
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(
+            renderer_, 
+            surface
+        );
+        if(!texture) {
+            throw SDLError();
+        }
+        return texture;
+    }
+    
     Texture TextureManager::generate_texture(std::string key, Vec2D dimensions,
                                              Color *colors) {
         if(texture_map_.find(key) == texture_map_.end()) {

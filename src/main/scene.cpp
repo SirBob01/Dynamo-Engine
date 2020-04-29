@@ -4,6 +4,7 @@ namespace Dynamo {
     Scene::Scene(Core modules) : State() {
         // Unpack modules
         display_ = modules.display;
+        renderer_ = modules.renderer;
         textures_ = modules.textures;
         jukebox_ = modules.jukebox;
         inputs_ = modules.inputs;
@@ -15,7 +16,7 @@ namespace Dynamo {
 
     Scene::~Scene() {
         // Default black fill
-        display_->set_fill({0, 0, 0});
-        display_->set_borderfill({0, 0, 0});
+        renderer_->set_fill({0, 0, 0});
+        renderer_->set_borderfill({0, 0, 0});
     }
 }

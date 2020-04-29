@@ -7,6 +7,7 @@
 #include "../state/fsm.h"
 #include "../state/state.h"
 #include "../core/display.h"
+#include "../core/renderer.h"
 #include "../core/textures.h"
 #include "../core/jukebox.h"
 #include "../core/inputs.h"
@@ -17,6 +18,7 @@ namespace Dynamo {
     // Holds references to core data passed between scenes
     struct Core {
         Display *display;
+        Renderer *renderer;
         TextureManager *textures;
         Jukebox *jukebox;
         Inputs *inputs;
@@ -33,6 +35,7 @@ namespace Dynamo {
 
     protected:
         Display *display_;
+        Renderer *renderer_;
         TextureManager *textures_;
         Jukebox *jukebox_;
         Inputs *inputs_;
@@ -50,6 +53,7 @@ namespace Dynamo {
                 scenes_->push_back(
                     new S({
                         display_, 
+                        renderer_,
                         textures_, 
                         jukebox_, 
                         inputs_, 
