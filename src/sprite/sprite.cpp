@@ -50,14 +50,12 @@ namespace Dynamo {
         // Left to right, top to bottom
         for(int j = 0; j < ver_frames; j++) {
             for(int i = 0; i < hor_frames; i++) {
-                SDL_Rect *frame_rect = new SDL_Rect();
-
-                frame_rect->w = frame_dimensions_.x;
-                frame_rect->h = frame_dimensions_.y;
-                frame_rect->x = i*frame_dimensions_.x;
-                frame_rect->y = j*frame_dimensions_.y;
-                
-                source_.push_back(frame_rect);
+                source_.push_back({
+                    static_cast<int>(i*frame_dimensions_.x),
+                    static_cast<int>(j*frame_dimensions_.y),
+                    static_cast<int>(frame_dimensions_.x),
+                    static_cast<int>(frame_dimensions_.y)
+                });
             }
         }
 
@@ -75,11 +73,44 @@ namespace Dynamo {
     }
 
     Sprite::~Sprite() {
-        SDL_DestroyTexture(base_);
-        for(auto &r : source_) {
-            delete r;
+        if(base_) {
+            SDL_DestroyTexture(base_);
         }
-        source_.clear();
+    }
+
+    Sprite::Sprite(Sprite &&other) noexcept {
+        *this = std::move(other);
+    }
+
+    Sprite &Sprite::operator=(Sprite &&other) noexcept {
+        if(this != &other) {
+            renderer_ = other.renderer_;
+            texture_ = other.texture_;
+            base_ = other.base_;
+            other.base_ = nullptr;
+
+            texture_w_ = other.texture_w_;
+            texture_h_ = other.texture_h_;
+
+            texture_dimensions_ = other.texture_dimensions_;
+            frame_dimensions_ = other.frame_dimensions_;
+            target_dimensions_ = other.target_dimensions_;
+
+            source_ = other.source_;
+            scale_ = other.scale_;
+            
+            accumulator_ = other.accumulator_;
+            max_frames_ = other.max_frames_;
+            current_frame_ = other.current_frame_;
+
+            finished_ = other.finished_;
+            
+            angle_ = other.angle_;
+            hflip_ = other.hflip_;
+            vflip_ = other.vflip_;
+            visible_ = other.visible_;
+        }
+        return *this;
     }
 
     SDL_Texture *Sprite::get_texture() {
@@ -102,7 +133,7 @@ namespace Dynamo {
         return target_dimensions_ * scale_;
     }
 
-    SDL_Rect *Sprite::get_source() {
+    SDL_Rect &Sprite::get_source() {
         return source_[current_frame_];
     }
 

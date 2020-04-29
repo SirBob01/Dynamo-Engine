@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cinttypes>
+#include <iostream>
 
 #include "entity.h"
 #include "../log/error.h"
@@ -30,42 +31,47 @@ namespace Dynamo {
     // Allows quick iteration and search-by-Entity
     template <typename Component>
     class ComponentPool : public BasePool {
-        int length_;
-        int capacity_;
         uint32_t max_value_;
 
-        uint32_t *sparse_; // Holdes indices to dense_ and pool_
+        uint32_t *sparse_; // Holds indices to dense_ and pool_
         std::vector<Entity> dense_; // Holds indices to sparse_
 
-        Component *pool_;
+        std::vector<Component> pool_; // Holds all component objects
     
     public:
         ComponentPool() {
-            length_ = 0;
-            capacity_ = 2;
             max_value_ = 4;
-
             sparse_ = new uint32_t[max_value_];
-            pool_ = static_cast<Component *>(
-                std::malloc(sizeof(Component) * capacity_)
-            );
         };
 
         ~ComponentPool() {
             clear();
-            std::free(pool_);
             delete[] sparse_;
+        };
+
+        // Compile-time conditional for instantiating components
+        // If the component is constructible, call the constructor
+        // Otherwise, aggregate-initialize the object
+        template<typename ... Fields> 
+        std::enable_if_t<std::is_constructible<Component, Fields ...>::value> 
+        initialize_component(Fields ... params) {
+            pool_.emplace_back(params ...);
+        };
+        template<typename ... Fields> 
+        std::enable_if_t<!std::is_constructible<Component, Fields ...>::value> 
+        initialize_component(Fields ... params) {
+            pool_.push_back({params ...});
         };
 
         // Get the length of the sparse set
         int get_length() {
-            return length_;
+            return pool_.size();
         };
 
         // Get a pointer to a component instance 
         // Use for iteration
         Component *get_at(int index) {
-            return pool_ + index;
+            return &pool_[index];
         };
 
         // Get the entity at an index
@@ -94,13 +100,6 @@ namespace Dynamo {
             if(search(entity) != -1) {
                 return;
             }
-            if(length_+1 >= capacity_) {
-                // Reallocate component array
-                capacity_ *= 2;
-                pool_ = static_cast<Component *>(
-                    std::realloc(pool_, sizeof(Component) * capacity_)
-                );
-            }
             if(entity_index >= max_value_) {
                 // Reallocate sparse array
                 uint32_t *new_sparse = new uint32_t[entity_index * 2];
@@ -115,7 +114,8 @@ namespace Dynamo {
 
             sparse_[entity_index] = get_length();
             dense_.push_back(entity);
-            pool_[length_++] = {params ...};
+
+            initialize_component(params ...);
         };
 
         // Destroy a component instance if it exists
@@ -126,8 +126,8 @@ namespace Dynamo {
             }
 
             // Destoroy target and fill its place
-            pool_[index].~Component();
-            pool_[index] = pool_[get_length()-1];
+            std::swap(pool_[index], pool_.back());
+            pool_.pop_back();
 
             // Rearrange indices
             Entity temp = dense_.back();
@@ -136,25 +136,21 @@ namespace Dynamo {
 
             dense_[index] = temp;
             sparse_[temp_index] = sparse_[entity_index];
-            length_--;
             dense_.pop_back();
         };
 
         // Perform a function on each component
         template <class F>
         void each(F function) {
-            for(int i = 0; i < length_; i++) {
-                function(pool_ + i);
+            for(auto &c : pool_) {
+                function(c);
             }
         };
 
         // Clear the pool
         void clear() {
             dense_.clear();
-            for(int i = 0; i < get_length(); i++) {
-                pool_[i].~Component();
-            }
-            length_ = 0;
+            pool_.clear();
         };
     };
 }

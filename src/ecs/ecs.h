@@ -72,7 +72,7 @@ namespace Dynamo {
                 if(match) {
                     group.push_back(entity);
                     if(func) {
-                        func(*get_component<Component>(entity) ...);                    
+                        func(*get_component<Component>(entity) ...);
                     }
                 }
             }

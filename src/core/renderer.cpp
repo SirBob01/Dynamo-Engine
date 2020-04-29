@@ -110,7 +110,7 @@ namespace Dynamo {
         SDL_RenderCopy(
             renderer_, 
             source->get_texture(), 
-            source->get_source(), 
+            &source->get_source(), 
             nullptr
         );
         set_render_target(nullptr);

@@ -24,7 +24,7 @@ namespace Dynamo {
         Vec2D frame_dimensions_;
         Vec2D target_dimensions_;
 
-        std::vector<SDL_Rect *> source_;
+        std::vector<SDL_Rect> source_;
 
         float scale_;
         
@@ -44,6 +44,10 @@ namespace Dynamo {
         Sprite(Texture texture, Vec2D frame_dimensions={0, 0});
         ~Sprite();
 
+        // Move constructor and operator
+        Sprite(Sprite &&other) noexcept;
+        Sprite &operator=(Sprite &&other) noexcept;
+
         // Get spritesheet texture (all frames)
         SDL_Texture *get_texture();
 
@@ -60,7 +64,7 @@ namespace Dynamo {
         Vec2D get_dimensions();
 
         // Get the rectangle of an individual animation frame
-        SDL_Rect *get_source();
+        SDL_Rect &get_source();
 
         // Get number of animation frames
         int get_num_frames();
