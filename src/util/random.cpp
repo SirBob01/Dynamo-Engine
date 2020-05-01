@@ -9,7 +9,7 @@ namespace Dynamo {
         return static_cast<float>(std::rand()) / RAND_MAX;
     }
 
-    float Random::range(int min, int max) {
+    float Random::range(float min, float max) {
         return min + ((max - min) * random());
     }
 }

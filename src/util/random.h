@@ -13,7 +13,7 @@ namespace Dynamo {
         static float random();
 
         // Get a random number between min and max
-        static float range(int min, int max);
+        static float range(float min, float max);
     };
 }
 
