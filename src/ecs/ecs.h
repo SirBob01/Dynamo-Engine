@@ -72,7 +72,7 @@ namespace Dynamo {
                 if(match) {
                     group.push_back(entity);
                     if(func) {
-                        func(*get_component<Component>(entity) ...);
+                        func(*grab<Component>(entity) ...);
                     }
                 }
             }
@@ -81,7 +81,7 @@ namespace Dynamo {
 
         // Get an entity's component
         template <typename Component>
-        Component *get_component(Entity entity) {
+        Component *grab(Entity entity) {
             unsigned type_index = registry_.get_id<Component>();
             if(type_index >= pools_.size()) {
                 return nullptr;
@@ -104,7 +104,7 @@ namespace Dynamo {
 
         // Add a component to an entity
         template <typename Component, typename ... Fields>
-        void add_component(Entity entity, Fields ... params) {
+        void assign(Entity entity, Fields ... params) {
             unsigned type_index = registry_.get_id<Component>();
             if(type_index >= pools_.size()) {
                 pools_.push_back(new ComponentPool<Component>());
@@ -123,7 +123,7 @@ namespace Dynamo {
 
         // Remove a component from an entity
         template <typename Component>
-        void remove_component(Entity entity) {
+        void remove(Entity entity) {
             unsigned type_index = registry_.get_id<Component>();
             if(type_index >= pools_.size()) {
                 return;
@@ -148,6 +148,8 @@ namespace Dynamo {
         };
 
         // Perform a function on a particular pool of components
+        // It must have the following signature: 
+        //      void function(Component &c);
         template <typename Component, class F>
         void each(F function) {
             unsigned type_index = registry_.get_id<Component>();
