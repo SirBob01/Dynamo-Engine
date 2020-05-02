@@ -8,6 +8,10 @@ namespace Dynamo {
 
         delta_ = 0;
         delta_cap_ = 100;
+
+        fps_ = 0.0f;
+        fps_start_ = 0;
+        fps_period_ = 30;
     }
 
     unsigned Clock::get_frames() {
@@ -23,7 +27,7 @@ namespace Dynamo {
     }
 
     float Clock::get_fps() {
-        return frames_ / (current_ / 1000.0);
+        return fps_;
     }
 
     void Clock::set_fps(unsigned fps) {
@@ -43,6 +47,13 @@ namespace Dynamo {
         frames_++;
         current_ = SDL_GetTicks();
         delta_ = current_ - previous_;
+
+        // Count fps at a certain frequency
+        if(frames_%fps_period_ == 0) {
+            fps_ = fps_period_ / ((current_ - fps_start_) / 1000.0);
+            fps_start_ = current_;
+        }
+        
         if(delta_ > delta_cap_) { // Protect integration from breaking
             delta_ = delta_cap_;
         }

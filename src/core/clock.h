@@ -12,6 +12,10 @@ namespace Dynamo {
         unsigned delta_;
         unsigned delta_cap_;
 
+        float fps_;
+        unsigned fps_start_;
+        unsigned fps_period_;
+
     public:
         Clock();
 
