@@ -17,7 +17,7 @@ namespace Dynamo {
             return;
         }
         for(auto &type : owned_[entity]) {
-            pools_[type]->remove(entity);
+            pools_[type.first]->remove(entity);
         }
         entities_.invalidate_id(entity);
         owned_.erase(entity);
