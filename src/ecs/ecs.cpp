@@ -2,9 +2,7 @@
 
 namespace Dynamo {
     ECS::~ECS() {
-        for(auto &pool : pools_) {
-            delete pool;
-        }
+        clear_all();
     }
 
     Entity ECS::create_entity() {
@@ -21,5 +19,12 @@ namespace Dynamo {
         }
         entities_.invalidate_id(entity);
         owned_.erase(entity);
+    }
+
+    void ECS::clear_all() {
+        for(auto &pool : pools_) {
+            delete pool;
+            pool = nullptr;
+        }
     }
 }

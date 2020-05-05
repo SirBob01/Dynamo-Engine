@@ -9,17 +9,18 @@
 #include "../log/error.h"
 
 namespace Dynamo {
-    // Common base-class for templated ComponentPools
-    // Allows quick iteration and search-by-Entity
+    // Dynamic sparse set for Type data
+    // Cache friendly storage of components and fast search-by-Entity
+    // Each Entity in dense_ directly maps to Type in pool_
     //  Search: O(1)
     //  Remove: O(1)
     //  Insert: O(1) ammortized
     class BasePool {
     protected:
-        std::vector<int> sparse_;   // Holds indices to dense_ and pool_
-        std::vector<Entity> dense_; // Holds indices to sparse_
+        std::vector<int> sparse_;       // Indices to dense_ and pool_
+        std::vector<Entity> dense_;     // Indices to sparse_
 
-        uint32_t max_value_;        // Maximum Entity value (size of dense_)
+        uint32_t max_value_;            // Max Entity ID (size of dense_)
         
     public:
         BasePool() {
@@ -30,7 +31,7 @@ namespace Dynamo {
         // Get the length of the sparse set
         inline int get_length() {
             return dense_.size();
-        }
+        };
 
         // Get the entity at an index
         inline Entity get_entity(int index) {
@@ -40,7 +41,7 @@ namespace Dynamo {
         // Get the entities associated with the component
         inline std::vector<Entity> &get_members() {
             return dense_;
-        }
+        };
 
         // Search the index of the component instance owned by the entity
         // Returns -1 on failure
@@ -56,50 +57,39 @@ namespace Dynamo {
             return -1;
         };
 
+        // Check if an entity exists within a container
+        inline bool exists(Entity entity) {
+            return search(entity) != -1; 
+        };
+
+        // Remove an entity from the pool
+        // Implemented in derived template pools
+        // as it involves component destruction
         virtual void remove(Entity entity) = 0;
     };
 
-    // Dynamic sparse set of component data
-    template <typename Component>
+    // Specialized pool for each Component
+    // Necessary for creation and destruction of objects
+    template <typename Type>
     class ComponentPool : public BasePool {
-        std::vector<Component> pool_;
-    
-    public:
-        // Compile-time conditional for instantiating components
-        // If the component is constructible, call the constructor
-        // Otherwise, aggregate-initialize the object
-        template<typename ... Fields> 
-        std::enable_if_t<std::is_constructible<Component, Fields ...>::value> 
-        inline initialize_component(Fields ... params) {
-            pool_.emplace_back(params ...);
-        };
-        template<typename ... Fields> 
-        std::enable_if_t<!std::is_constructible<Component, Fields ...>::value> 
-        inline initialize_component(Fields ... params) {
-            pool_.push_back({params ...});
-        };
+        std::vector<Type> pool_;    // Holds the components objects
 
-        // Get a pointer to a component instance 
-        // Use for iteration
-        inline Component *get_at(int index) {
+    public:
+        // Get the pointer to a component at an index
+        inline Type *get_at(int index) {
             return &pool_[index];
         };
 
-        // Perform a function on each component
-        template <class F>
-        inline void each(F function) {
-            for(auto &c : pool_) {
-                function(c);
-            }
-        };
-
-        // Clear the pool
-        inline void clear() {
-            dense_.clear();
-            pool_.clear();
+        // Get the pointer to a component from an Entity ID
+        // Skip indirection of searching for index from entity
+        // Assumes that the entity exists in the set
+        inline Type *get_from_entity(Entity entity) {
+            return &pool_[sparse_[EntityTracker::get_index(entity)]];
         };
 
         // Add a new component
+        // If the component is constructible, call the constructor
+        // Otherwise, aggregate-initialize the object
         template <typename ... Fields>
         inline void insert(Entity entity, Fields ... params) {
             uint32_t entity_index = EntityTracker::get_index(entity);
@@ -110,9 +100,13 @@ namespace Dynamo {
             }
 
             sparse_[entity_index] = get_length();
-            dense_.push_back(entity);
-
-            initialize_component(params ...);
+            dense_.emplace_back(entity);
+            if constexpr(std::is_aggregate_v<Type>) {
+                pool_.push_back({params ...});
+            }
+            else {
+                pool_.emplace_back(params ...);
+            }
         };
 
         // Destroy a component instance
@@ -123,14 +117,28 @@ namespace Dynamo {
             std::swap(pool_[index], pool_.back());
             pool_.pop_back();
 
-            // Rearrange indices
             Entity temp = dense_.back();
+            dense_[index] = temp;
+            dense_.pop_back();
+
+            // Rearrange sparse set indices            
             uint32_t entity_index = EntityTracker::get_index(entity);
             uint32_t temp_index = EntityTracker::get_index(temp);
-
-            dense_[index] = temp;
             sparse_[temp_index] = sparse_[entity_index];
-            dense_.pop_back();
+        };
+
+        // Perform a function on each component
+        template <class F>
+        void each(F function) {
+            for(auto &component : pool_) {
+                function(component);
+            }
+        };
+
+        // Clear the pool
+        void clear() {
+            pool_.clear();
+            dense_.clear();
         };
     };
 }

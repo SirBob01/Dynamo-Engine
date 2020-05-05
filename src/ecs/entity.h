@@ -20,10 +20,14 @@ namespace Dynamo {
         EntityTracker();
 
         // Get the entity index
-        static uint32_t get_index(Entity entity);
+        static inline uint32_t get_index(Entity entity) {
+            return entity >> 32;
+        };
 
         // Get the entity version number
-        static uint32_t get_version(Entity entity);
+        static inline uint32_t get_version(Entity entity) {
+            return entity & 0xFFFFFFFF;
+        };
 
         // Check if an entity is still active
         bool is_active(Entity entity);

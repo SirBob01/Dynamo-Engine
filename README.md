@@ -7,7 +7,7 @@
 This engine is meant to simplify the application development process, automating core processes like the main loop and state handling. Aside from abstracting away low-level resource management, the library offers additional game development utilities. Below is an overview of its features:
 
 - A user-friendly and intuitive C++ API
-- Support for [ECS](https://en.wikipedia.org/wiki/Entity_component_system) architecture in designing game objects
+- Support for optimized [ECS](https://en.wikipedia.org/wiki/Entity_component_system) architecture in designing game objects
 - A simplified Scene management system
 - Artificial intelligence utilities including [FSM](https://en.wikipedia.org/wiki/Finite-state_machine)
 - Animating sprites, rasterizing primitives, and rendering text
@@ -28,14 +28,12 @@ This engine wraps around `SDL2` and its extensions:
 The custom audio engine uses the `Ogg Vorbis` codec. <br/>
 Their respective development libraries must be installed.
 
-To use `Dynamo`, the compiler must support at least C++14.
+To use `Dynamo`, the compiler must support at least C++17.
 
 # TODO
 - Move all sub-modules into specialized namespaces
 - Implement A* pathfinding utility
-- Implement Scene graphs...?
 - Refactor GUI framework
 - Use smart pointers
-- Add support for dynamic 2D lighting
 - Finish implementing custom network protocol
 - Migrate to the `Vulkan` API for low-level render calls

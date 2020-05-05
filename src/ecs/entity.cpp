@@ -5,14 +5,6 @@ namespace Dynamo {
         index_counter_ = 0;
     }
 
-    uint32_t EntityTracker::get_index(Entity entity) {
-        return entity >> 32;
-    }
-
-    uint32_t EntityTracker::get_version(Entity entity) {
-        return entity & 0xFFFFFFFF;
-    }
-
     bool EntityTracker::is_active(Entity entity) {
         uint32_t index, version;
         index = EntityTracker::get_index(entity);
