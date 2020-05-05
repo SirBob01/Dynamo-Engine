@@ -1,7 +1,7 @@
 #include "renderer.h"
 
 namespace Dynamo {
-    Renderer::Renderer(SDL_Window *window) {
+    Renderer::Renderer(SDL_Window *window, bool vsync) {
         int window_x, window_y;
         SDL_GetWindowSize(window, &window_x, &window_y);
 
@@ -14,10 +14,14 @@ namespace Dynamo {
             logic_dim
         };
 
+        int flags = SDL_RENDERER_ACCELERATED;
+        if(vsync) {
+            flags = flags | SDL_RENDERER_PRESENTVSYNC;
+        }
         renderer_ = SDL_CreateRenderer(
             window, 
-            -1, 
-            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+            -1,
+            flags
         );
         SDL_RenderSetLogicalSize(renderer_, window_x, window_y);
 

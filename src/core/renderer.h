@@ -27,7 +27,7 @@ namespace Dynamo {
         void set_render_target(Sprite *dest);
     
     public:
-        Renderer(SDL_Window *window);
+        Renderer(SDL_Window *window, bool vsync=false);
         ~Renderer();
 
         //Get the pointer to the SDL renderer
