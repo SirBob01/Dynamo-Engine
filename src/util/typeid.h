@@ -10,7 +10,7 @@ namespace Dynamo {
         TypeID();
 
         template <typename T>
-        unsigned get_id() {
+        inline unsigned get_id() {
             static const unsigned id = id_counter_++;
             return id;
         }
