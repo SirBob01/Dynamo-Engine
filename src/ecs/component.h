@@ -98,11 +98,14 @@ namespace Dynamo {
                 max_value_ = entity_index * 2;
                 sparse_.resize(max_value_, -1);
             }
+            if(search(entity) != -1) {
+                return;
+            }
 
-            sparse_[entity_index] = get_length();
+            sparse_[entity_index] = dense_.size();
             dense_.emplace_back(entity);
             if constexpr(std::is_aggregate_v<Type>) {
-                pool_.push_back({params ...});
+                pool_.push_back(Type {params ...});
             }
             else {
                 pool_.emplace_back(params ...);
@@ -112,6 +115,9 @@ namespace Dynamo {
         // Destroy a component instance
         inline void remove(Entity entity) {
             int index = search(entity);
+            if(index == -1) {
+                return;
+            }
 
             // Destroy target and fill its place
             std::swap(pool_[index], pool_.back());

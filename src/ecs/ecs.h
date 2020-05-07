@@ -36,6 +36,9 @@ namespace Dynamo {
         };
 
     public:
+        template <typename ... Type>
+        struct exclude {};
+
         ~ECS();
 
         // Create an new entity
@@ -44,9 +47,28 @@ namespace Dynamo {
         // Destroy an entity
         void destroy_entity(Entity entity);
 
-        // Pass a lambda that will be called on each entity
-        template <typename ... Type>
-        void each_group(typename fn_sig<Entity &, Type &...>::type func) {
+        // Perform a function on a particular pool of components
+        // It must have the following signature: 
+        //      void function(Type &c);
+        template <typename Type>
+        void each(typename fn_sig<Type &>::type func) {
+            unsigned type_index = registry_.get_id<Type>();
+            if(type_index >= pools_.size() ||
+               pools_[type_index] == nullptr) {
+                return;
+            }
+            ComponentPool<Type> *pool;
+            pool = static_cast<ComponentPool<Type> *>(
+                pools_[type_index]
+            );
+            pool->each(func);
+        };
+
+        // Perform a function on entities within a component group
+        template <typename ... Type, typename ... Expt, 
+                  template <typename ...> class List=exclude>
+        void each_group(typename fn_sig<Entity &, Type &...>::type func,
+                        const List<Expt ...> &ex_list=exclude<>{}) {
             // Iterate through the smallest pool for optimal speed
             std::vector<int> pool_ids {
                 static_cast<int>(registry_.get_id<Type>()) ...
@@ -63,9 +85,11 @@ namespace Dynamo {
                 }
             );
 
-            // Perform func on entities found in all pools
+            // Perform func on entities found in the group,
+            // but not the ones found in the excluded pools
             for(auto &entity : pools_[*min_iter]->get_members()) {
-                if((pools_[registry_.get_id<Type>()]->exists(entity) && ...)) {
+                if((pools_[registry_.get_id<Type>()]->exists(entity) && ...) &&
+                  (!pools_[registry_.get_id<Expt>()]->exists(entity) && ...)) {
                     func(entity, *fast_grab<Type>(entity) ...);
                 }
             }
@@ -128,23 +152,6 @@ namespace Dynamo {
             }
         };
 
-        // Perform a function on a particular pool of components
-        // It must have the following signature: 
-        //      void function(Type &c);
-        template <typename Type>
-        void each(typename fn_sig<Type &>::type func) {
-            unsigned type_index = registry_.get_id<Type>();
-            if(type_index >= pools_.size() ||
-               pools_[type_index] == nullptr) {
-                return;
-            }
-            ComponentPool<Type> *pool = static_cast<
-                ComponentPool<Type> *>(
-                pools_[type_index]
-            );
-            pool->each(func);
-        };
-
         // Clear a component pool
         template <typename Type>
         void clear() {
@@ -153,8 +160,8 @@ namespace Dynamo {
                pools_[type_index] == nullptr) {
                 return;
             }
-            ComponentPool<Type> *pool = static_cast<
-                ComponentPool<Type> *>(
+            ComponentPool<Type> *pool;
+            pool = static_cast<ComponentPool<Type> *>(
                 pools_[type_index]
             );
             pool->clear();
