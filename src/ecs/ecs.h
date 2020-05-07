@@ -71,7 +71,8 @@ namespace Dynamo {
                         const List<Expt ...> &ex_list=exclude<>{}) {
             // Iterate through the smallest pool for optimal speed
             std::vector<int> pool_ids {
-                static_cast<int>(registry_.get_id<Type>()) ...
+                static_cast<int>(registry_.get_id<Type>()) ...,
+                static_cast<int>(registry_.get_id<Expt>()) ...
             };
             for(auto &id : pool_ids) {
                 if(id >= pools_.size() || 
