@@ -19,14 +19,9 @@ namespace Dynamo {
     protected:
         std::vector<int> sparse_;       // Indices to dense_ and pool_
         std::vector<Entity> dense_;     // Indices to sparse_
-
-        uint32_t max_value_;            // Max Entity ID (size of dense_)
         
     public:
-        BasePool() {
-            max_value_ = 4;
-            sparse_.resize(max_value_, -1);
-        };
+        virtual ~BasePool() = default;
 
         // Get the length of the sparse set
         inline int get_length() {
@@ -47,7 +42,7 @@ namespace Dynamo {
         // Returns -1 on failure
         inline int search(Entity entity) {
             uint32_t entity_index = EntityTracker::get_index(entity);
-            if(entity_index >= max_value_) {
+            if(entity_index >= sparse_.size()) {
                 return -1;
             }
             if(sparse_[entity_index] != -1 && 
@@ -71,7 +66,7 @@ namespace Dynamo {
     // Specialized pool for each Component
     // Necessary for creation and destruction of objects
     template <typename Type>
-    class ComponentPool : public BasePool {
+    class Pool : public BasePool {
         std::vector<Type> pool_;    // Holds the components objects
 
     public:
@@ -93,10 +88,9 @@ namespace Dynamo {
         template <typename ... Fields>
         inline void insert(Entity entity, Fields ... params) {
             uint32_t entity_index = EntityTracker::get_index(entity);
-            if(entity_index >= max_value_) {
+            if(entity_index >= sparse_.size()) {
                 // Reallocate sparse array
-                max_value_ = entity_index * 2;
-                sparse_.resize(max_value_, -1);
+                sparse_.resize((entity_index + 1) * 2, -1);
             }
             if(search(entity) != -1) {
                 return;
@@ -104,8 +98,9 @@ namespace Dynamo {
 
             sparse_[entity_index] = dense_.size();
             dense_.emplace_back(entity);
-            if constexpr(std::is_aggregate_v<Type>) {
-                pool_.push_back(Type {params ...});
+            
+            if(std::is_aggregate_v<Type>) {
+                pool_.push_back(Type {params ...});            
             }
             else {
                 pool_.emplace_back(params ...);

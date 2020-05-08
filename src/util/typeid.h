@@ -2,6 +2,10 @@
 #define DYNAMO_TYPEID_H_
 
 namespace Dynamo {
+    // Container for storing a list of template types
+    template <typename... Type>
+    struct TypeList {};
+
     // Methods for generating unique type IDs
     class TypeID {
         unsigned id_counter_;

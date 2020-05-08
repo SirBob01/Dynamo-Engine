@@ -2,6 +2,7 @@
 #define DYNAMO_ECS_H_
 
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 #include <functional>
 
@@ -20,25 +21,59 @@ namespace Dynamo {
         > owned_;
         std::vector<BasePool *> pools_;
 
-        // Function signature for working with components
-        template <typename ... T>
-        struct fn_sig {
-            typedef std::function<void(T ...)> type;
-        };
+        // Test if all the a type has no corresponding pool
+        template <typename... T>
+        bool has_invalid_pool() {
+            std::vector<int> pool_ids {
+                static_cast<int>(registry_.get_id<T>())...
+            };
+            for(auto &id : pool_ids) {
+                if(id >= pools_.size() || 
+                   pools_[id] == nullptr) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         // Grab a component from an entity
         // Skip the unnecessary checks for faster cycles
-        template <typename Type>
-        inline Type *fast_grab(Entity entity) {
-            return static_cast<ComponentPool<Type> *>(
-                pools_[registry_.get_id<Type>()]
-            )->get_from_entity(entity);
+        template <typename Type, typename Min, class Container=Pool<Type>>
+        inline Type *fast_grab(Container *pool, Entity entity, int index) {
+            if constexpr(std::is_same_v<Type, Min>) {
+                // No need for indirection with smallest container
+                // Cache friendly! :)
+                return pool->get_at(index);
+            }
+            else {
+                return pool->get_from_entity(entity);
+            }
         };
 
-    public:
-        template <typename ... Type>
-        struct exclude {};
+        // Perform func on entities found in the group,
+        // but not the ones found in the excluded pools
+        template <typename Min, typename Func, 
+                  typename... Type, template <typename...> class T=TypeList,
+                  typename... Expt, template <typename...> class E=TypeList>
+        void iterate_group(Func &func, BasePool *min, auto &pools,
+                           T<Type...> &, E<Expt...> &) {
+            int min_index = 0;
+            for(auto &entity : min->get_members()) {
+                if((std::get<Pool<Type> *>(pools)->exists(entity) &&...) &&
+                  (!std::get<Pool<Expt> *>(pools)->exists(entity) &&...)) {
+                    func(
+                        entity, 
+                        *fast_grab<Type, Min>(
+                            std::get<Pool<Type> *>(pools), entity,
+                            min_index
+                        )...
+                    );
+                }
+                min_index++;
+            }
+        }
 
+    public:
         ~ECS();
 
         // Create an new entity
@@ -50,50 +85,50 @@ namespace Dynamo {
         // Perform a function on a particular pool of components
         // It must have the following signature: 
         //      void function(Type &c);
-        template <typename Type>
-        void each(typename fn_sig<Type &>::type func) {
+        template <typename Type, typename Func>
+        void each(Func func) {
             unsigned type_index = registry_.get_id<Type>();
             if(type_index >= pools_.size() ||
                pools_[type_index] == nullptr) {
                 return;
             }
-            ComponentPool<Type> *pool;
-            pool = static_cast<ComponentPool<Type> *>(
+            Pool<Type> *pool;
+            pool = static_cast<Pool<Type> *>(
                 pools_[type_index]
             );
             pool->each(func);
         };
 
         // Perform a function on entities within a component group
-        template <typename ... Type, typename ... Expt, 
-                  template <typename ...> class List=exclude>
-        void each_group(typename fn_sig<Entity &, Type &...>::type func,
-                        const List<Expt ...> &ex_list=exclude<>{}) {
+        template <typename... Type, typename... Expt,
+                  template <typename...> class List=TypeList,
+                  typename Func>
+        void each_group(Func func, const List<Expt...> &exclude=TypeList<>{}) {
             // Iterate through the smallest pool for optimal speed
-            std::vector<int> pool_ids {
-                static_cast<int>(registry_.get_id<Type>()) ...,
-                static_cast<int>(registry_.get_id<Expt>()) ...
-            };
-            for(auto &id : pool_ids) {
-                if(id >= pools_.size() || 
-                   pools_[id] == nullptr) {
-                    return;
-                }
+            if(has_invalid_pool<Type..., Expt...>()) {
+                return;
             }
-            auto min_iter = std::min_element(
-                pool_ids.begin(), pool_ids.end(), [this](auto &a, auto &b) {
-                    return pools_[a]->get_length() < pools_[b]->get_length();
+
+            // Accessing tuple is much faster than accessing vector
+            auto pools = std::make_tuple(
+                static_cast<Pool<Type> *>(pools_[registry_.get_id<Type>()])...,
+                static_cast<Pool<Expt> *>(pools_[registry_.get_id<Expt>()])...
+            );
+            auto min = std::min(
+                {static_cast<BasePool *>(std::get<Pool<Type> *>(pools))...}, 
+                [](auto &a, auto &b) {
+                    return a->get_length() < b->get_length();
                 }
             );
 
-            // Perform func on entities found in the group,
-            // but not the ones found in the excluded pools
-            for(auto &entity : pools_[*min_iter]->get_members()) {
-                if((pools_[registry_.get_id<Type>()]->exists(entity) && ...) &&
-                  (!pools_[registry_.get_id<Expt>()]->exists(entity) && ...)) {
-                    func(entity, *fast_grab<Type>(entity) ...);
-                }
-            }
+            TypeList<Type...> members_list;
+            TypeList<Expt...> exclude_list;
+            ((std::get<Pool<Type> *>(pools) == min ? 
+                iterate_group<Type>(
+                    func, min, pools,
+                    members_list, exclude_list
+                ) : void()),...
+            );
         };
 
         // Get the pointer to an entity's component if it exists
@@ -105,32 +140,37 @@ namespace Dynamo {
                !entities_.is_active(entity)) {
                 return nullptr;
             }
-            ComponentPool<Type> *pool;
-            pool = static_cast<ComponentPool<Type> *>(
+            
+            Pool<Type> *pool;
+            pool = static_cast<Pool<Type> *>(
                 pools_[type_index]
             );
-            return pool->get_at(pool->search(entity));
+            int pos = pool->search(entity);
+            if(pos == -1) {
+                return nullptr;
+            }
+            return pool->get_at(pos);
         };
 
         // Add a component to an entity
-        template <typename Type, typename ... Fields>
-        void assign(Entity entity, Fields ... params) {
+        template <typename Type, typename... Fields>
+        void assign(Entity entity, Fields... params) {
             unsigned type_index = registry_.get_id<Type>();
             if(type_index >= pools_.size()) {
                 pools_.resize(type_index + 1, nullptr);
             }
             if(pools_[type_index] == nullptr) {
-                pools_[type_index] = new ComponentPool<Type>();   
+                pools_[type_index] = new Pool<Type>();   
             }
             if(!entities_.is_active(entity)) {
                 return;
             }
-            ComponentPool<Type> *pool;
-            pool = static_cast<ComponentPool<Type> *>(
+            Pool<Type> *pool;
+            pool = static_cast<Pool<Type> *>(
                 pools_[type_index]
             );
             if(pool->search(entity) == -1) {
-                pool->insert(entity, params ...);
+                pool->insert(entity, params...);
                 owned_[entity][type_index] = 1;
             }
         };
@@ -143,8 +183,8 @@ namespace Dynamo {
                !entities_.is_active(entity)) {
                 return;
             }
-            ComponentPool<Type> *pool;
-            pool = static_cast<ComponentPool<Type> *>(
+            Pool<Type> *pool;
+            pool = static_cast<Pool<Type> *>(
                 pools_[type_index]
             );
             if(pool->search(entity) != -1) {
@@ -161,8 +201,8 @@ namespace Dynamo {
                pools_[type_index] == nullptr) {
                 return;
             }
-            ComponentPool<Type> *pool;
-            pool = static_cast<ComponentPool<Type> *>(
+            Pool<Type> *pool;
+            pool = static_cast<Pool<Type> *>(
                 pools_[type_index]
             );
             pool->clear();
