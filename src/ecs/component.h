@@ -19,7 +19,7 @@ namespace Dynamo {
     protected:
         std::vector<int> sparse_;       // Indices to dense_ and pool_
         std::vector<Entity> dense_;     // Indices to sparse_
-        
+
     public:
         virtual ~BasePool() = default;
 
@@ -99,7 +99,7 @@ namespace Dynamo {
             sparse_[entity_index] = dense_.size();
             dense_.emplace_back(entity);
             
-            if(std::is_aggregate_v<Type>) {
+            if constexpr(std::is_aggregate_v<Type>) {
                 pool_.push_back(Type {params ...});            
             }
             else {

@@ -55,7 +55,8 @@ namespace Dynamo {
         template <typename Min, typename Func, 
                   typename... Type, template <typename...> class T=TypeList,
                   typename... Expt, template <typename...> class E=TypeList>
-        void iterate_group(Func &func, BasePool *min, auto &pools,
+        void iterate_group(Func &func, BasePool *min, 
+                           std::tuple<Pool<Type> *..., Pool<Expt> *...> &pools,
                            T<Type...> &, E<Expt...> &) {
             int min_index = 0;
             for(auto &entity : min->get_members()) {
