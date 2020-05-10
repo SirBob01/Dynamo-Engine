@@ -32,8 +32,7 @@ namespace Dynamo {
         delete[] samples;
     }
 
-    Stream::Stream() {
-        track = new Sound(4096);
+    Stream::Stream() : track(4096) {
         volume = 0;
         max_volume = 1.0;
 
@@ -44,14 +43,7 @@ namespace Dynamo {
         playing = true;
     }
 
-    Stream::~Stream() {
-        delete track;
-    }
-
-    Jukebox::Jukebox(Clock *clock) {
-        base_ = new Sound(4096);
-        record_ = new RingBuffer(65536);
-
+    Jukebox::Jukebox(Clock *clock) : base_(4096), record_(65536) {
         // Initialize audio output device specifications
         SDL_AudioSpec desired_output;
         SDL_zero(desired_output);
@@ -60,7 +52,7 @@ namespace Dynamo {
         desired_output.freq = 44100;
         desired_output.format = AUDIO_S16LSB;
         desired_output.samples = 1024;
-        desired_output.userdata = base_;
+        desired_output.userdata = &base_;
         desired_output.callback = play_callback;
 
         // Initialize audio input device specifications
@@ -71,7 +63,7 @@ namespace Dynamo {
         desired_input.freq = 44100;
         desired_input.format = AUDIO_S16LSB;
         desired_input.samples = 1024;
-        desired_input.userdata = record_;
+        desired_input.userdata = &record_;
         desired_input.callback = record_callback;
 
         output_ = SDL_OpenAudioDevice(
@@ -94,8 +86,6 @@ namespace Dynamo {
         }
         SDL_CloseAudioDevice(output_);
         SDL_CloseAudioDevice(input_);
-        delete base_;
-        delete record_;
     }
 
     void Jukebox::play_callback(void *data, uint8_t *stream, int length) {
@@ -140,41 +130,41 @@ namespace Dynamo {
         }
     }
 
-    void Jukebox::mix_chunk(Chunk *chunk, int *max_copy) {
-        int length = chunk->length;
-        if(length > base_->length - base_->write) {
-            length = base_->length - base_->write;
+    void Jukebox::mix_chunk(Chunk &chunk, int *max_copy) {
+        int length = chunk.length;
+        if(length > base_.length - base_.write) {
+            length = base_.length - base_.write;
         }
         if(*max_copy < length) {
             *max_copy = length;
         }
 
         mix_raw(
-            base_->samples + base_->write,
-            chunk->samples,
+            base_.samples + base_.write,
+            chunk.samples,
             length,
-            chunk->volume
+            chunk.volume
         );
-        chunk->samples += length;
-        chunk->length -= length;
+        chunk.samples += length;
+        chunk.length -= length;
     }
 
-    void Jukebox::mix_stream(Stream *stream, int *max_copy) {
-        int length = stream->track->write;
-        if(length > base_->length - base_->write) {
-            length = base_->length - base_->write;
+    void Jukebox::mix_stream(Stream &stream, int *max_copy) {
+        int length = stream.track.write;
+        if(length > base_.length - base_.write) {
+            length = base_.length - base_.write;
         }
         if(*max_copy < length) {
             *max_copy = length;
         }
 
         mix_raw(
-            base_->samples + base_->write,
-            stream->track->samples,
+            base_.samples + base_.write,
+            stream.track.samples,
             length,
-            stream->volume
+            stream.volume
         );
-        stream->track->write -= length;
+        stream.track.write -= length;
     }
 
     void Jukebox::check_stream_validity(StreamID stream) {
@@ -347,8 +337,8 @@ namespace Dynamo {
     }
 
     void Jukebox::stream_recorded(Sound *target) {
-        while(target->write < target->length && !record_->is_empty()) {
-            target->samples[target->write++] = record_->read();        
+        while(target->write < target->length && !record_.is_empty()) {
+            target->samples[target->write++] = record_.read();
         }
     }
 
@@ -409,15 +399,15 @@ namespace Dynamo {
             }
             
             // Write to stream buffer
-            while(stream->track->write < stream->track->length) {
+            while(stream->track.write < stream->track.length) {
                 long bytes_read = ov_read(
                     ogg, 
-                    stream->track->samples + stream->track->write,
-                    stream->track->length - stream->track->write, 
+                    stream->track.samples + stream->track.write,
+                    stream->track.length - stream->track.write, 
                     0, 2, 1, 
                     nullptr
                 );
-                stream->track->write += bytes_read;
+                stream->track.write += bytes_read;
                 
                 // EOF
                 if(!bytes_read) {
@@ -438,7 +428,7 @@ namespace Dynamo {
                 }
             }
             else {
-                mix_stream(stream, &max_copy);
+                mix_stream(*stream, &max_copy);
             }
         }
 
@@ -450,13 +440,13 @@ namespace Dynamo {
                 it = chunks_.erase(it);
             }
             else {
-                mix_chunk(&chunk, &max_copy);
+                mix_chunk(chunk, &max_copy);
                 ++it;
             }
         }
 
         // Only update write bytes after all chunks are mixed
-        base_->write += max_copy;
+        base_.write += max_copy;
         SDL_UnlockAudioDevice(output_);
     }
 

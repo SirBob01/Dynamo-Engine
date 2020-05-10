@@ -9,6 +9,7 @@
 #include <vector>
 #include <queue>
 #include <string>
+#include <memory>
 
 #include "clock.h"
 #include "../util/ringbuffer.h"
@@ -17,7 +18,7 @@
 
 namespace Dynamo {
     // A unique integer handle for a stream
-    typedef int StreamID;
+    using StreamID = int;
 
     // Represent an audio file
     class AudioFile {
@@ -31,7 +32,7 @@ namespace Dynamo {
         OggVorbis_File *get_encoded();
     };
 
-    // Raw sound sample data
+    // Holds raw PCM data for sound storage
     struct Sound {
         char *samples;
         int length;
@@ -41,7 +42,8 @@ namespace Dynamo {
         ~Sound();
     };
 
-    // An instance of playing sound
+    // Temporary sound data passed into mixer
+    // Do not use a raw PCM storage, use Sound instead
     struct Chunk {
         char *samples;
         int length;
@@ -63,7 +65,7 @@ namespace Dynamo {
 
     // A sound stream
     struct Stream {
-        Sound *track;
+        Sound track;
         std::queue<StreamMeta> queue;
         
         float volume;
@@ -75,13 +77,12 @@ namespace Dynamo {
         bool playing;
 
         Stream();
-        ~Stream();
     };
 
     // Audio engine
     class Jukebox {
-        Sound *base_;
-        RingBuffer *record_;
+        Sound base_;
+        RingBuffer record_;
 
         SDL_AudioSpec output_spec_;
         SDL_AudioSpec input_spec_;
@@ -111,10 +112,10 @@ namespace Dynamo {
         void mix_raw(char *dst, char *src, int length, float volume);
 
         // Mix a chunk of sound onto the main track
-        void mix_chunk(Chunk *chunk, int *max_copy);
+        void mix_chunk(Chunk &chunk, int *max_copy);
 
         // Mix a streaming track onto main track
-        void mix_stream(Stream *stream, int *max_copy);
+        void mix_stream(Stream &stream, int *max_copy);
 
         // Sanity check for stream IDs
         void check_stream_validity(StreamID stream);
