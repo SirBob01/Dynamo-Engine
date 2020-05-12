@@ -81,9 +81,6 @@ namespace Dynamo {
 
     Jukebox::~Jukebox() {
         clear();
-        for(auto &pair : bank_) {
-            delete pair.second;
-        }
         SDL_CloseAudioDevice(output_);
         SDL_CloseAudioDevice(input_);
     }
@@ -106,10 +103,9 @@ namespace Dynamo {
         }
     }
 
-    AudioFile *Jukebox::load_file(std::string filename) {
+    std::shared_ptr<AudioFile> &Jukebox::load_file(std::string filename) {
         if(!bank_.count(filename)) {
-            AudioFile *file = new AudioFile(filename);
-            bank_[filename] = file;
+            bank_[filename] = std::make_shared<AudioFile>(filename);
         }
         return bank_[filename];
     }
@@ -194,7 +190,7 @@ namespace Dynamo {
     }
 
     StreamID Jukebox::generate_stream() {
-        streams_.push_back(new Stream());
+        streams_.push_back(std::make_shared<Stream>());
         return streams_.size() - 1;
     }
 
@@ -233,7 +229,7 @@ namespace Dynamo {
                                double fadein, double fadeout,
                                int loops) {
         check_stream_validity(stream);
-        AudioFile *file = load_file(filename);
+        auto &file = load_file(filename);
         double duration = ov_time_total(file->get_encoded(), -1);
 
         streams_[stream]->queue.push({
@@ -258,7 +254,7 @@ namespace Dynamo {
 
     void Jukebox::skip_stream(StreamID stream, double fadeout) {
         check_stream_validity(stream);
-        Stream *stream_ptr = streams_[stream];
+        auto &stream_ptr = streams_[stream];
         if(is_stream_empty(stream) || is_stream_transition(stream)) {
             return;
         }
@@ -272,7 +268,7 @@ namespace Dynamo {
 
     void Jukebox::clear_stream(StreamID stream) {
         check_stream_validity(stream);
-        Stream *stream_ptr = streams_[stream];
+        auto &stream_ptr = streams_[stream];
         if(is_stream_empty(stream) || is_stream_transition(stream)) {
             return;
         }
@@ -294,7 +290,7 @@ namespace Dynamo {
     }
 
     Sound *Jukebox::load_sound(std::string filename) {
-        AudioFile *file = load_file(filename);
+        auto &file = load_file(filename);
         vorbis_info *meta = ov_info(file->get_encoded(), -1);
         char buffer[4096];
         std::vector<char> temp;
@@ -451,9 +447,6 @@ namespace Dynamo {
     }
 
     void Jukebox::clear() {
-        for(auto &stream : streams_) {
-            delete stream;
-        }
         for(auto &file : bank_) {
             ov_raw_seek(file.second->get_encoded(), 0);
         }

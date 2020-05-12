@@ -43,7 +43,7 @@ namespace Dynamo {
     };
 
     // Temporary sound data passed into mixer
-    // Do not use a raw PCM storage, use Sound instead
+    // Do not use as raw PCM storage, use Sound instead
     struct Chunk {
         char *samples;
         int length;
@@ -52,7 +52,7 @@ namespace Dynamo {
 
     // A queued stream unit
     struct StreamMeta {
-        AudioFile *file;
+        std::shared_ptr<AudioFile> file;
 
         // Time measures in seconds
         double duration;
@@ -91,8 +91,8 @@ namespace Dynamo {
         SDL_AudioDeviceID output_;
         SDL_AudioDeviceID input_;
 
-        std::unordered_map<std::string, AudioFile *> bank_;
-        std::vector<Stream *> streams_;
+        std::unordered_map<std::string, std::shared_ptr<AudioFile>> bank_;
+        std::vector<std::shared_ptr<Stream>> streams_;
         std::vector<Chunk> chunks_;
 
         float master_volume_;
@@ -106,7 +106,7 @@ namespace Dynamo {
         static void record_callback(void *data, uint8_t *stream, int length);
 
         // Load an audio file
-        AudioFile *load_file(std::string filename);
+        std::shared_ptr<AudioFile> &load_file(std::string filename);
 
         // Mix src into dst and clip the amplitude
         void mix_raw(char *dst, char *src, int length, float volume);
