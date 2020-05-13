@@ -2,7 +2,7 @@
 
 ---
 
-`Dynamo` is a 2D game engine written in C++ and powered by `SDL2` and its extension libraries. 
+`Dynamo` is a C++ game engine powered by `SDL2` and its extension libraries. 
 
 The API is meant to simplify the application development process, automating core processes like the main loop and state handling. Aside from abstracting away low-level resource management, the library offers additional game development utilities.
 
@@ -19,6 +19,10 @@ The API is meant to simplify the application development process, automating cor
 These features allow it to be used as a framework for general multimedia applications.
 
 For a more in-depth look at the engine's components, visit the [__wiki__](https://github.com/SirBob01/Dynamo-Engine/wiki).
+
+## Rationale
+
+I built this because I've always wanted to understand how game engines worked under the hood. This is mostly a learning exercise, but I also use it for my personal projects because of its flexibility and reusability.
 
 ## Dependencies
 
@@ -37,10 +41,10 @@ To use `Dynamo`, the compiler must support at least C++17.
 Anyone is welcome to open a pull request! State the issue being solved and the solution precisely. Just ensure that the new code adheres to the style of the codebase. 
 - Maximum line width of 80 characters
 - For long parameter lists, either split them across multiple lines or store them in a new (private) POD
-- Only API functions and objects should be publicy accessible
-- All code must be within the `Dynamo` namespace
+- Only API functions and objects should be publicly accessible
+- All code must be within `namespace Dynamo`
 
-For major suggestions on improving the engine, open an issue so we can have a discussion.
+For other major suggestions on improving the engine, open an issue so we can have a discussion.
 
 ## License
 
