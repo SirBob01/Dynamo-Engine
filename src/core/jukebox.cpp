@@ -161,6 +161,10 @@ namespace Dynamo {
         return SDL_GetAudioDeviceStatus(output_) == SDL_AUDIO_PLAYING;
     }
 
+    bool Jukebox::is_recording() {
+        return SDL_GetAudioDeviceStatus(input_) == SDL_AUDIO_PLAYING;
+    }
+
     float Jukebox::get_volume() {
         return master_volume_;
     }
@@ -176,7 +180,7 @@ namespace Dynamo {
     }
 
     SoundStream Jukebox::generate_stream() {
-        streams_.push_back(StreamLine());
+        streams_.emplace_back();
         return streams_.size() - 1;
     }
 
@@ -293,7 +297,7 @@ namespace Dynamo {
                 nullptr
             );
             for(int i = 0; i < bytes_read; i++) {
-                sound.push_back(buffer[i]);
+                sound.emplace_back(buffer[i]);
             }
             if(bytes_read == 0) {
                 eof = 1;
@@ -306,12 +310,12 @@ namespace Dynamo {
     }
 
     void Jukebox::play_sound(Sound &sound, float volume) {
-        chunks_.push_back({&sound, 0, volume});
+        chunks_.emplace_back(Chunk {&sound, 0, volume});
     }
 
     void Jukebox::stream_recorded(Sound &target) {
         while(!record_.is_empty()) {
-            target.push_back(record_.read());
+            target.emplace_back(record_.read());
         }
     }
 
@@ -388,7 +392,7 @@ namespace Dynamo {
                 }
 
                 for(int i = 0; i < bytes_read; i++) {
-                    stream.track.push_back(buffer[i]);
+                    stream.track.emplace_back(buffer[i]);
                 }
             }
 

@@ -11,7 +11,6 @@
 #include <string>
 #include <memory>
 
-#include "clock.h"
 #include "../util/ringbuffer.h"
 #include "../util/util.h"
 #include "../log/error.h"
@@ -115,6 +114,9 @@ namespace Dynamo {
 
         // Check if the audio device is playing or paused
         bool is_playing();
+
+        // Check if the device is currently receiving input
+        bool is_recording();
 
         // Get the master volume
         float get_volume();
