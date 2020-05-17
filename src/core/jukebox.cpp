@@ -1,7 +1,7 @@
 #include "jukebox.h"
 
 namespace Dynamo {
-    AudioFile::AudioFile(std::string filename) {
+    Jukebox::AudioFile::AudioFile(std::string filename) {
         file = fopen(filename.c_str(), "rb");
         if(!file) {
             throw GenericError(filename + " file doesn't exist");
@@ -12,27 +12,16 @@ namespace Dynamo {
         }
     }
 
-    AudioFile::~AudioFile() {
+    Jukebox::AudioFile::~AudioFile() {
         ov_clear(&vb);
         fclose(file);
     }
 
-    OggVorbis_File *AudioFile::get_encoded() {
+    OggVorbis_File *Jukebox::AudioFile::get_encoded() {
         return &vb;
     }
 
-    Sound::Sound(int size) {
-        length = size;
-        samples = new char[length];
-        SDL_memset(samples, 0, length);
-        write = 0;
-    }
-
-    Sound::~Sound() {
-        delete[] samples;
-    }
-
-    Stream::Stream() : track(4096) {
+    Jukebox::StreamLine::StreamLine() : track(4096) {
         volume = 0;
         max_volume = 1.0;
 
@@ -43,7 +32,7 @@ namespace Dynamo {
         playing = true;
     }
 
-    Jukebox::Jukebox(Clock *clock) : base_(4096), record_(65536) {
+    Jukebox::Jukebox() : base_(4096), record_(65536) {
         // Initialize audio output device specifications
         SDL_AudioSpec desired_output;
         SDL_zero(desired_output);
@@ -75,7 +64,6 @@ namespace Dynamo {
         );
 
         master_volume_ = 1.0;
-        clock_ = clock;
         play();
     }
 
@@ -86,28 +74,27 @@ namespace Dynamo {
     }
 
     void Jukebox::play_callback(void *data, uint8_t *stream, int length) {
-        Sound *base = static_cast<Sound *>(data);
-        SDL_memset(stream+base->write, 0, length-base->write);
-        SDL_memcpy(stream, base->samples, base->write);
-        SDL_memset(base->samples, 0, base->write);
-        base->write = 0;
+        Sound &base = *static_cast<Sound *>(data);
+        int written = base.size();
+        SDL_memset(stream+written, 0, length-written);
+        SDL_memcpy(stream, &base[0], written);
+        base.clear();
     }
 
     void Jukebox::record_callback(void *data, uint8_t *stream, int length) {
-        RingBuffer *record = static_cast<RingBuffer *>(data);
-        if(record->is_full()) {
-            record->clear();
+        RingBuffer &record = *static_cast<RingBuffer *>(data);
+        if(record.is_full()) {
+            record.clear();
         }
         for(int i = 0; i < length; i++) {
-            record->write(stream[i]);
+            record.write(stream[i]);
         }
     }
 
-    std::shared_ptr<AudioFile> &Jukebox::load_file(std::string filename) {
+    void Jukebox::load_file(std::string filename) {
         if(!bank_.count(filename)) {
             bank_[filename] = std::make_shared<AudioFile>(filename);
         }
-        return bank_[filename];
     }
 
     void Jukebox::mix_raw(char *dst, char *src, int length, float volume) {
@@ -126,44 +113,43 @@ namespace Dynamo {
         }
     }
 
-    void Jukebox::mix_chunk(Chunk &chunk, int *max_copy) {
-        int length = chunk.length;
-        if(length > base_.length - base_.write) {
-            length = base_.length - base_.write;
-        }
-        if(*max_copy < length) {
-            *max_copy = length;
+    void Jukebox::mix_chunk(Chunk &chunk, int current_size) {
+        int length = std::min(
+            chunk.sound->size() - chunk.written,
+            base_.capacity() - current_size
+        );
+        if(current_size + length > base_.size()) {
+            base_.resize(current_size + length, 0);
         }
 
         mix_raw(
-            base_.samples + base_.write,
-            chunk.samples,
+            &base_[0] + current_size,
+            &(*chunk.sound)[0] + chunk.written,
             length,
             chunk.volume
         );
-        chunk.samples += length;
-        chunk.length -= length;
+        chunk.written += length;
     }
 
-    void Jukebox::mix_stream(Stream &stream, int *max_copy) {
-        int length = stream.track.write;
-        if(length > base_.length - base_.write) {
-            length = base_.length - base_.write;
-        }
-        if(*max_copy < length) {
-            *max_copy = length;
+    void Jukebox::mix_stream(StreamLine &stream, int current_size) {
+        int length = std::min(
+            stream.track.size(),
+            base_.capacity() - current_size
+        );
+        if(current_size + length > base_.size()) {
+            base_.resize(current_size + length, 0);
         }
 
         mix_raw(
-            base_.samples + base_.write,
-            stream.track.samples,
+            &base_[0] + current_size,
+            &stream.track[0],
             length,
             stream.volume
         );
-        stream.track.write -= length;
+        stream.track.resize(stream.track.size() - length);
     }
 
-    void Jukebox::check_stream_validity(StreamID stream) {
+    void Jukebox::check_stream_validity(SoundStream stream) {
         if(stream >= streams_.size()) {
             throw InvalidKey(
                 "Stream ID "+std::to_string(stream),
@@ -189,32 +175,32 @@ namespace Dynamo {
         master_volume_ = volume;
     }
 
-    StreamID Jukebox::generate_stream() {
-        streams_.push_back(std::make_shared<Stream>());
+    SoundStream Jukebox::generate_stream() {
+        streams_.push_back(StreamLine());
         return streams_.size() - 1;
     }
 
-    bool Jukebox::is_stream_playing(StreamID stream) {
+    bool Jukebox::is_stream_playing(SoundStream stream) {
         check_stream_validity(stream);
-        return streams_[stream]->playing;
+        return streams_[stream].playing;
     }
 
-    bool Jukebox::is_stream_empty(StreamID stream) {
+    bool Jukebox::is_stream_empty(SoundStream stream) {
         check_stream_validity(stream);
-        return streams_[stream]->queue.size() == 0;
+        return streams_[stream].queue.size() == 0;
     }
 
-    bool Jukebox::is_stream_transition(StreamID stream) {
+    bool Jukebox::is_stream_transition(SoundStream stream) {
         check_stream_validity(stream);
-        return streams_[stream]->time == -1;
+        return streams_[stream].time == -1;
     }
 
-    float Jukebox::get_stream_volume(StreamID stream) {
+    float Jukebox::get_stream_volume(SoundStream stream) {
         check_stream_validity(stream);
-        return streams_[stream]->max_volume;
+        return streams_[stream].max_volume;
     }
 
-    void Jukebox::set_stream_volume(StreamID stream, float volume) {
+    void Jukebox::set_stream_volume(SoundStream stream, float volume) {
         check_stream_validity(stream);
         if(volume > 1.0) {
             volume = 1.0;
@@ -222,79 +208,81 @@ namespace Dynamo {
         if(volume <= 0) {
             volume = 0;
         }
-        streams_[stream]->max_volume = volume;
+        streams_[stream].max_volume = volume;
     }
 
-    void Jukebox::queue_stream(std::string filename, StreamID stream,
+    void Jukebox::queue_stream(std::string filename, SoundStream stream,
                                double fadein, double fadeout,
                                int loops) {
         check_stream_validity(stream);
-        auto &file = load_file(filename);
+        load_file(filename);
+        auto &file = bank_[filename];
         double duration = ov_time_total(file->get_encoded(), -1);
 
-        streams_[stream]->queue.push({
+        streams_[stream].queue.push({
             file,
             duration,
             fadein,
             fadeout,
-            loops,
-            0,
+            loops
         });
     }
 
-    void Jukebox::play_stream(StreamID stream) {
+    void Jukebox::play_stream(SoundStream stream) {
         check_stream_validity(stream);
-        streams_[stream]->playing = true;
+        streams_[stream].playing = true;
     }
 
-    void Jukebox::pause_stream(StreamID stream) {
+    void Jukebox::pause_stream(SoundStream stream) {
         check_stream_validity(stream);
-        streams_[stream]->playing = false;
+        streams_[stream].playing = false;
     }
 
-    void Jukebox::skip_stream(StreamID stream, double fadeout) {
+    void Jukebox::skip_stream(SoundStream stream, double fadeout) {
         check_stream_validity(stream);
-        auto &stream_ptr = streams_[stream];
+        auto &stream_line = streams_[stream];
         if(is_stream_empty(stream) || is_stream_transition(stream)) {
             return;
         }
-        StreamMeta &current = stream_ptr->queue.front();
+        StreamQueued &current = stream_line.queue.front();
         
         // Seamless transition if fading out in the middle of fade in
-        float t = stream_ptr->volume / stream_ptr->max_volume;
+        float t = stream_line.volume / stream_line.max_volume;
         current.fadeout = fadeout;
-        current.duration = stream_ptr->time + (fadeout * t);
+        current.duration = stream_line.time + (fadeout * t);
     }
 
-    void Jukebox::clear_stream(StreamID stream) {
+    void Jukebox::clear_stream(SoundStream stream) {
         check_stream_validity(stream);
-        auto &stream_ptr = streams_[stream];
+        auto &stream_line = streams_[stream];
         if(is_stream_empty(stream) || is_stream_transition(stream)) {
             return;
         }
 
         // Reset stream data
-        stream_ptr->volume = 0;
-        stream_ptr->time = -1;
-        stream_ptr->loop_counter = 0;
+        stream_line.volume = 0;
+        stream_line.time = -1;
+        stream_line.loop_counter = 0;
 
         // Reset the seek of each track in the stream before emptying
-        while(!stream_ptr->queue.empty()) {
-            StreamMeta &current = stream_ptr->queue.front();
+        while(!stream_line.queue.empty()) {
+            StreamQueued &current = stream_line.queue.front();
             ov_raw_seek(
                 current.file->get_encoded(), 
                 0
             );
-            stream_ptr->queue.pop();
+            stream_line.queue.pop();
         }
     }
 
-    Sound *Jukebox::load_sound(std::string filename) {
-        auto &file = load_file(filename);
-        vorbis_info *meta = ov_info(file->get_encoded(), -1);
-        char buffer[4096];
-        std::vector<char> temp;
+    Sound Jukebox::load_sound(std::string filename) {
+        Sound sound;
 
+        load_file(filename);
+        auto &file = bank_[filename];
+        vorbis_info *meta = ov_info(file->get_encoded(), -1);
+
+        char buffer[4096];
         ov_raw_seek(file->get_encoded(), 0);
         int eof = 0;
         while(!eof) {
@@ -305,36 +293,25 @@ namespace Dynamo {
                 nullptr
             );
             for(int i = 0; i < bytes_read; i++) {
-                temp.push_back(buffer[i]);
+                sound.push_back(buffer[i]);
             }
             if(bytes_read == 0) {
                 eof = 1;
             }
             else if(bytes_read == OV_EBADLINK) {
-                return nullptr;
+                return sound;
             }
         }
-
-        Sound *sound = new Sound(temp.size());
-        sound->write = sound->length;
-        SDL_memcpy(sound->samples, &(temp[0]), sound->length);
         return sound;
     }
 
-    void Jukebox::play_sound(Sound *sound, float volume) {
-        if(!sound) {
-            return;
-        }
-        chunks_.push_back({
-            sound->samples, 
-            sound->length, 
-            volume
-        });
+    void Jukebox::play_sound(Sound &sound, float volume) {
+        chunks_.push_back({&sound, 0, volume});
     }
 
-    void Jukebox::stream_recorded(Sound *target) {
-        while(target->write < target->length && !record_.is_empty()) {
-            target->samples[target->write++] = record_.read();
+    void Jukebox::stream_recorded(Sound &target) {
+        while(!record_.is_empty()) {
+            target.push_back(record_.read());
         }
     }
 
@@ -354,77 +331,81 @@ namespace Dynamo {
         SDL_PauseAudioDevice(input_, 1);
     }
 
-    void Jukebox::update() {
+    void Jukebox::update(unsigned dt) {
         if(!is_playing()) {
             return;
         }
         // Lock device to prevent race conditions
         SDL_LockAudioDevice(output_);
-        int max_copy = 0;
+        int current_size = base_.size();
 
         // Update streaming tracks
         for(auto &stream : streams_) {
-            if(!stream->playing || !stream->queue.size()) {
+            if(!stream.playing || !stream.queue.size()) {
                 continue;
             }
 
-            StreamMeta &current = stream->queue.front();
+            StreamQueued &current = stream.queue.front();
             OggVorbis_File *ogg = current.file->get_encoded();
-            if(stream->time < 0) {
-                current.start_time = clock_->get_time();
+            if(stream.time < 0) {
+                stream.time = 0;
             }
+            stream.time += dt / 1000.0;
 
             // Fade in and out of stream track
-            stream->time = (clock_->get_time() - current.start_time) / 1000.0;
             if(!current.fadein) {
-                stream->volume = stream->max_volume;
+                stream.volume = stream.max_volume;
             }
-            else if(stream->time <= current.fadein) {
-                stream->volume = Util::lerp(
-                    0.0f, stream->max_volume,
-                    1.0 - (current.fadein - stream->time) / current.fadein
+            else if(stream.time <= current.fadein) {
+                stream.volume = Util::lerp(
+                    0.0f, stream.max_volume,
+                    1.0 - (current.fadein - stream.time) / current.fadein
                 );
             }
 
-            if(stream->time >= current.duration - current.fadeout) {
-                stream->volume = Util::lerp(
-                    stream->max_volume, 0.0f,
-                    (stream->time - current.duration + current.fadeout) /
-                                                       current.fadeout
+            if(stream.time >= current.duration - current.fadeout) {
+                stream.volume = Util::lerp(
+                    stream.max_volume, 0.0f,
+                    (stream.time - current.duration + current.fadeout) /
+                                                      current.fadeout
                 );
             }
             
             // Write to stream buffer
-            while(stream->track.write < stream->track.length) {
+            while(stream.track.size() < stream.track.capacity()) {
+                char buffer[4096];
                 long bytes_read = ov_read(
                     ogg, 
-                    stream->track.samples + stream->track.write,
-                    stream->track.length - stream->track.write, 
+                    buffer,
+                    stream.track.capacity() - stream.track.size(), 
                     0, 2, 1, 
                     nullptr
                 );
-                stream->track.write += bytes_read;
                 
                 // EOF
                 if(!bytes_read) {
                     break;
                 }
+
+                for(int i = 0; i < bytes_read; i++) {
+                    stream.track.push_back(buffer[i]);
+                }
             }
 
             // End of track... loop or change?
-            if(stream->time >= current.duration) {
+            if(stream.time >= current.duration) {
                 ov_raw_seek(ogg, 0);
                 current.duration = ov_time_total(ogg, -1);
                 
-                stream->volume = 0;
-                stream->time = -1;
-                if(++stream->loop_counter == current.loops) {
-                    stream->loop_counter = 0;
-                    stream->queue.pop();
+                stream.volume = 0;
+                stream.time = -1;
+                if(++stream.loop_counter == current.loops) {
+                    stream.loop_counter = 0;
+                    stream.queue.pop();
                 }
             }
             else {
-                mix_stream(*stream, &max_copy);
+                mix_stream(stream, current_size);
             }
         }
 
@@ -432,17 +413,15 @@ namespace Dynamo {
         auto it = chunks_.begin();
         while(it != chunks_.end()) {
             Chunk &chunk = *it;
-            if(!chunk.length) {
+            if(chunk.written == chunk.sound->size()) {
                 it = chunks_.erase(it);
             }
             else {
-                mix_chunk(chunk, &max_copy);
+                mix_chunk(chunk, current_size);
                 ++it;
             }
         }
 
-        // Only update write bytes after all chunks are mixed
-        base_.write += max_copy;
         SDL_UnlockAudioDevice(output_);
     }
 

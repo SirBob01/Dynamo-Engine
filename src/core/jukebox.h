@@ -17,70 +17,61 @@
 #include "../log/error.h"
 
 namespace Dynamo {
-    // A unique integer handle for a stream
-    using StreamID = int;
+    // A sound object is a byte array of PCM values
+    using Sound = std::vector<char>;
 
-    // Represent an audio file
-    class AudioFile {
-        FILE *file;         // Byte file
-        OggVorbis_File vb;  // Encoded Ogg file
-
-    public:
-        AudioFile(std::string filename);
-        ~AudioFile();
-
-        OggVorbis_File *get_encoded();
-    };
-
-    // Holds raw PCM data for sound storage
-    struct Sound {
-        char *samples;
-        int length;
-        int write;
-
-        Sound(int size);
-        ~Sound();
-    };
-
-    // Temporary sound data passed into mixer
-    // Do not use as raw PCM storage, use Sound instead
-    struct Chunk {
-        char *samples;
-        int length;
-        float volume;
-    };
-
-    // A queued stream unit
-    struct StreamMeta {
-        std::shared_ptr<AudioFile> file;
-
-        // Time measures in seconds
-        double duration;
-        double fadein;
-        double fadeout;
-        
-        int loops;
-        unsigned start_time; // Millisecond marker
-    };
-
-    // A sound stream
-    struct Stream {
-        Sound track;
-        std::queue<StreamMeta> queue;
-        
-        float volume;
-        float max_volume;
-
-        double time; // Time position on current track
-        int loop_counter;
-
-        bool playing;
-
-        Stream();
-    };
+    // A unique integer handle for a sound stream
+    using SoundStream = unsigned int;
 
     // Audio engine
     class Jukebox {
+        // Represent an audio file
+        class AudioFile {
+            FILE *file;         // Byte file
+            OggVorbis_File vb;  // Encoded Ogg file
+
+        public:
+            AudioFile(std::string filename);
+            ~AudioFile();
+
+            OggVorbis_File *get_encoded();
+        };
+
+        // Sound data passed into mixer
+        struct Chunk {
+            Sound *sound;
+            int written;
+            float volume;
+        };
+
+        // A queued stream unit
+        struct StreamQueued {
+            std::shared_ptr<AudioFile> file;
+
+            // Time measures in seconds
+            double duration;
+            double fadein;
+            double fadeout;
+            
+            int loops;
+        };
+
+        // A sound stream queue
+        struct StreamLine {
+            Sound track;
+            std::queue<StreamQueued> queue;
+            
+            float volume;
+            float max_volume;
+
+            double time; // Time position on current track
+            int loop_counter;
+
+            bool playing;
+
+            StreamLine();
+        };
+
         Sound base_;
         RingBuffer record_;
 
@@ -92,12 +83,10 @@ namespace Dynamo {
         SDL_AudioDeviceID input_;
 
         std::unordered_map<std::string, std::shared_ptr<AudioFile>> bank_;
-        std::vector<std::shared_ptr<Stream>> streams_;
+        std::vector<StreamLine> streams_;
         std::vector<Chunk> chunks_;
 
         float master_volume_;
-
-        Clock *clock_;
 
         // SDL_Audio playback function
         static void play_callback(void *data, uint8_t *stream, int length);
@@ -106,22 +95,22 @@ namespace Dynamo {
         static void record_callback(void *data, uint8_t *stream, int length);
 
         // Load an audio file
-        std::shared_ptr<AudioFile> &load_file(std::string filename);
+        void load_file(std::string filename);
 
         // Mix src into dst and clip the amplitude
         void mix_raw(char *dst, char *src, int length, float volume);
 
         // Mix a chunk of sound onto the main track
-        void mix_chunk(Chunk &chunk, int *max_copy);
+        void mix_chunk(Chunk &chunk, int current_size);
 
         // Mix a streaming track onto main track
-        void mix_stream(Stream &stream, int *max_copy);
+        void mix_stream(StreamLine &stream, int current_size);
 
         // Sanity check for stream IDs
-        void check_stream_validity(StreamID stream);
+        void check_stream_validity(SoundStream stream);
 
     public:
-        Jukebox(Clock *clock);
+        Jukebox();
         ~Jukebox();
 
         // Check if the audio device is playing or paused
@@ -135,53 +124,51 @@ namespace Dynamo {
 
         // Generate a streaming track
         // Return the index to the stream
-        StreamID generate_stream();
+        SoundStream generate_stream();
 
         // Is the stream playing
-        bool is_stream_playing(StreamID stream);
+        bool is_stream_playing(SoundStream stream);
 
         // Is there anything on the stream's queue
-        bool is_stream_empty(StreamID stream);
+        bool is_stream_empty(SoundStream stream);
 
         // Check if stream is transitioning between files
-        bool is_stream_transition(StreamID stream);
+        bool is_stream_transition(SoundStream stream);
 
         // Get the volume of a stream
-        float get_stream_volume(StreamID stream);
+        float get_stream_volume(SoundStream stream);
 
         // Set the stream volume
-        void set_stream_volume(StreamID stream, float volume);
+        void set_stream_volume(SoundStream stream, float volume);
 
         // Queue a new audio into a streaming track
         // Allows fading in and out timing in seconds
         // Allows looping tracks (-1 for infinite loops)
         // Infinite loops can only terminate with clear_stream()
-        void queue_stream(std::string filename, StreamID stream, 
+        void queue_stream(std::string filename, SoundStream stream, 
                           double fadein=0, double fadeout=0, 
                           int loops=1);
 
         // Play a stream
-        void play_stream(StreamID stream);
+        void play_stream(SoundStream stream);
 
         // Pause a stream
-        void pause_stream(StreamID stream);
+        void pause_stream(SoundStream stream);
 
         // Skip current playing track on stream
-        void skip_stream(StreamID stream, double fadeout=0);
+        void skip_stream(SoundStream stream, double fadeout=0);
 
         // Clear all tracks on the stream
-        void clear_stream(StreamID stream);
+        void clear_stream(SoundStream stream);
 
-        // Load a sound bite
-        // Do not lose the reference to this pointer
-        // Jukebox will not destroy it for you
-        Sound *load_sound(std::string filename);
+        // Load a sound bite from a file
+        Sound load_sound(std::string filename);
 
         // Play a sound bite
-        void play_sound(Sound *sound, float volume=1.0);
+        void play_sound(Sound &sound, float volume=1.0);
 
         // Copy contents of internal record buffer to target buffer
-        void stream_recorded(Sound *target);
+        void stream_recorded(Sound &target);
 
         // Resume all audio playback
         void play();
@@ -195,8 +182,8 @@ namespace Dynamo {
         // Pause audio recording
         void pause_record();
 
-        // Update tick
-        void update();
+        // Update the audio engine
+        void update(unsigned dt);
 
         // Clear all active chunks and streams
         void clear();
