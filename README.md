@@ -48,8 +48,8 @@ For other major suggestions on improving the engine, open an issue so we can hav
 
 ## TODO
 
-- Move all sub-modules into specialized namespaces
-- Implement A* pathfinding utility
+- Implement behavior trees
+- Implement A* pathfinder
 - Refactor GUI framework
 - Transition to smart pointers
 - Finish implementing custom network protocol
