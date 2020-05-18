@@ -17,8 +17,8 @@
 #include "ecs/component.h"
 #include "ecs/ecs.h"
 
-#include "state/state.h"
-#include "state/fsm.h"
+#include "ai/fsm/state.h"
+#include "ai/fsm/machine.h"
 
 #include "gui/widget.h"
 #include "gui/button.h"
