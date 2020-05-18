@@ -8,7 +8,6 @@
 #include <ctime>
 
 #include "scene.h"
-#include "../state/fsm.h"
 #include "../util/random.h"
 
 namespace Dynamo {
@@ -20,14 +19,14 @@ namespace Dynamo {
         Inputs *inputs_;
         Clock *clock_;
 
-        FSM *scene_manager_;
-        TypeID scene_registry_;
-        std::vector<State *> scenes_;
+        TypeID registry_;
+        std::vector<Scene *> scenes_;
+        std::vector<Scene *> active_;
 
         bool running_;
 
     public:
-        Engine(std::string title, bool fullscreen, 
+        Engine(std::string title, bool fullscreen, bool vsync,
                int width=0, int height=0);
         ~Engine();
 
@@ -37,23 +36,22 @@ namespace Dynamo {
         // Add a new scene to the stack
         template <class S>
         void push_scene() {
-            unsigned type_id = scene_registry_.get_id<S>();
+            unsigned type_id = registry_.get_id<S>();
             if(type_id >= scenes_.size()) {
-                scenes_.push_back(
-                    new S({
-                        display_, 
-                        renderer_,
-                        textures_, 
-                        jukebox_, 
-                        inputs_, 
-                        clock_,
-
-                        &scene_registry_,
-                        &scenes_
-                    })
-                );
+                S *scene = new S();
+                scene->registry_ = &registry_;
+                scene->scenes_ = &scenes_;
+                scenes_.push_back(scene);
             }
-            scene_manager_->push_state(scenes_[type_id]);
+            Core core = {
+                *display_,
+                *textures_,
+                *jukebox_,
+                *inputs_,
+                *clock_
+            };
+            scenes_[type_id]->load(core);
+            active_.push_back(scenes_[type_id]);
         };
         
         // Perform a single frame update

@@ -2,10 +2,8 @@
 #define DYNAMO_SCENE_H_
 
 #include <SDL2/SDL.h>
-#include <unordered_set>
+#include <vector>
 
-#include "../state/fsm.h"
-#include "../state/state.h"
 #include "../core/display.h"
 #include "../core/renderer.h"
 #include "../core/textures.h"
@@ -15,60 +13,54 @@
 #include "../util/typeid.h"
 
 namespace Dynamo {
-    // Holds references to core data passed between scenes
+    // Collection of references to core modules
     struct Core {
-        Display *display;
-        Renderer *renderer;
-        TextureManager *textures;
-        Jukebox *jukebox;
-        Inputs *inputs;
-        Clock *clock;
-
-        TypeID *scene_registry_;
-        std::vector<State *> *scenes_;
+        Display &display;
+        TextureManager &textures;
+        Jukebox &jukebox;
+        Inputs &inputs;
+        Clock &clock;
     };
 
     // Base class for game scenes (menus, cutscenes, gameplay)
-    class Scene : public State {
-        TypeID *scene_registry_;
-        std::vector<State *> *scenes_;
+    class Scene {
+        TypeID *registry_;
+        std::vector<Scene *> *scenes_;
 
-    protected:
-        Display *display_;
-        Renderer *renderer_;
-        TextureManager *textures_;
-        Jukebox *jukebox_;
-        Inputs *inputs_;
-        Clock *clock_;
+        Scene *next_; // TypeID of the next scene
+        bool kill_;   // Should kill on transition?
+
+        friend class Engine;
 
     public:
-        Scene(Core modules);
-        virtual ~Scene();
+        Scene();
+        virtual ~Scene() = default;
 
         // Set the next scene
         template <class S>
-        void set_scene() {
-            unsigned type_id = scene_registry_->get_id<S>();
+        void set_scene(bool kill=true) {
+            unsigned type_id = registry_->get_id<S>();
             if(type_id >= scenes_->size()) {
-                scenes_->push_back(
-                    new S({
-                        display_, 
-                        renderer_,
-                        textures_, 
-                        jukebox_, 
-                        inputs_, 
-                        clock_,
-
-                        scene_registry_,
-                        scenes_
-                    })
-                );
+                S *scene = new S();
+                scene->registry_ = registry_;
+                scene->scenes_ = scenes_;
+                scenes_->push_back(scene);
             }
-            set_next((*scenes_)[type_id]);
+            next_ = (*scenes_)[type_id];
+            kill_ = kill;
         };
 
-        // Draw all renderable scene objects
-        virtual void draw() = 0;
+        // Initialize the scene and the necessary objects
+        virtual void load(Core &core);
+
+        // Destroy all objects and free allocated memory
+        virtual void unload(Core &core);
+
+        // Update scene state at every frame
+        virtual void update(Core &core);
+
+        // Draw all renderable objects
+        virtual void draw(Renderer &renderer);
     };
 }
 
