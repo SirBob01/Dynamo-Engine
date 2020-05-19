@@ -11,12 +11,35 @@
 #include "../util/random.h"
 
 namespace Dynamo {
+    enum class EngineFlag {
+        None       = 0,
+        FullScreen = 1 << 0, 
+        VSync      = 1 << 1,
+    };
+
+    inline unsigned operator&(EngineFlag lhs, EngineFlag rhs) {
+        using T = unsigned;
+        return static_cast<T>(lhs) & static_cast<T>(rhs);
+    }
+
+    inline EngineFlag operator|(EngineFlag lhs, EngineFlag rhs) {
+        using T = unsigned;
+        return static_cast<EngineFlag>(
+            static_cast<T>(lhs) | static_cast<T>(rhs)
+        );
+    }
+
+    inline EngineFlag operator|=(EngineFlag &lhs, EngineFlag rhs) {
+        lhs = lhs | rhs;
+        return lhs;
+    }
+
     class Engine {
         Display *display_;
         Renderer *renderer_;
         TextureManager *textures_;
         Jukebox *jukebox_;
-        Inputs *inputs_;
+        InputHandler *inputs_;
         Clock *clock_;
 
         TypeID registry_;
@@ -26,8 +49,8 @@ namespace Dynamo {
         bool running_;
 
     public:
-        Engine(std::string title, bool fullscreen, bool vsync,
-               int width=0, int height=0);
+        Engine(std::string title, int width=0, int height=0, 
+               EngineFlag flags=EngineFlag::None);
         ~Engine();
 
         // Check if the engine is running

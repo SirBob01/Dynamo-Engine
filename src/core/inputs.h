@@ -5,325 +5,330 @@
 
 #include <unordered_map>
 #include <vector>
+#include <array>
 #include <string>
-#include <cstring>
 
 #include "../util/vector.h"
 
 namespace Dynamo {
-    typedef enum { 
+    enum class Input { 
         // Adapted from SDL_Scancode enum
-        INPUT_UNKNOWN = 0,
+        Unknown = 0,
         
-        INPUT_A = 4,
-        INPUT_B = 5,
-        INPUT_C = 6,
-        INPUT_D = 7,
-        INPUT_E = 8,
-        INPUT_F = 9,
-        INPUT_G = 10,
-        INPUT_H = 11,
-        INPUT_I = 12,
-        INPUT_J = 13,
-        INPUT_K = 14,
-        INPUT_L = 15,
-        INPUT_M = 16,
-        INPUT_N = 17,
-        INPUT_O = 18,
-        INPUT_P = 19,
-        INPUT_Q = 20,
-        INPUT_R = 21,
-        INPUT_S = 22,
-        INPUT_T = 23,
-        INPUT_U = 24,
-        INPUT_V = 25,
-        INPUT_W = 26,
-        INPUT_X = 27,
-        INPUT_Y = 28,
-        INPUT_Z = 29,
-        INPUT_1 = 30,
-        INPUT_2 = 31,
-        INPUT_3 = 32,
-        INPUT_4 = 33,
-        INPUT_5 = 34,
-        INPUT_6 = 35,
-        INPUT_7 = 36,
-        INPUT_8 = 37,
-        INPUT_9 = 38,
-        INPUT_0 = 39,
-        INPUT_RETURN = 40,
-        INPUT_ESCAPE = 41,
-        INPUT_BACKSPACE = 42,
-        INPUT_TAB = 43,
-        INPUT_SPACE = 44,
-        INPUT_MINUS = 45,
-        INPUT_EQUALS = 46,
-        INPUT_LEFTBRACKET = 47,
-        INPUT_RIGHTBRACKET = 48,
-        INPUT_BACKSLASH = 49,
-        INPUT_NONUSHASH = 50,
-        INPUT_SEMICOLON = 51,
-        INPUT_APOSTROPHE = 52,
-        INPUT_GRAVE = 53,
-        INPUT_COMMA = 54,
-        INPUT_PERIOD = 55,
-        INPUT_SLASH = 56,
-        INPUT_CAPSLOCK = 57,
-        INPUT_F1 = 58,
-        INPUT_F2 = 59,
-        INPUT_F3 = 60,
-        INPUT_F4 = 61,
-        INPUT_F5 = 62,
-        INPUT_F6 = 63,
-        INPUT_F7 = 64,
-        INPUT_F8 = 65,
-        INPUT_F9 = 66,
-        INPUT_F10 = 67,
-        INPUT_F11 = 68,
-        INPUT_F12 = 69,
-        INPUT_PRINTSCREEN = 70,
-        INPUT_SCROLLLOCK = 71,
-        INPUT_PAUSE = 72,
-        INPUT_INSERT = 73,
-        INPUT_HOME = 74,
-        INPUT_PAGEUP = 75,
-        INPUT_DELETE = 76,
-        INPUT_END = 77,
-        INPUT_PAGEDOWN = 78,
-        INPUT_RIGHT = 79,
-        INPUT_LEFT = 80,
-        INPUT_DOWN = 81,
-        INPUT_UP = 82,
-        INPUT_NUMLOCKCLEAR = 83,
-        INPUT_KP_DIVIDE = 84,
-        INPUT_KP_MULTIPLY = 85,
-        INPUT_KP_MINUS = 86,
-        INPUT_KP_PLUS = 87,
-        INPUT_KP_ENTER = 88,
-        INPUT_KP_1 = 89,
-        INPUT_KP_2 = 90,
-        INPUT_KP_3 = 91,
-        INPUT_KP_4 = 92,
-        INPUT_KP_5 = 93,
-        INPUT_KP_6 = 94,
-        INPUT_KP_7 = 95,
-        INPUT_KP_8 = 96,
-        INPUT_KP_9 = 97,
-        INPUT_KP_0 = 98,
-        INPUT_KP_PERIOD = 99,
-        INPUT_NONUSBACKSLASH = 100,
-        INPUT_APPLICATION = 101,
-        INPUT_POWER = 102,
-        INPUT_KP_EQUALS = 103,
-        INPUT_F13 = 104,
-        INPUT_F14 = 105,
-        INPUT_F15 = 106,
-        INPUT_F16 = 107,
-        INPUT_F17 = 108,
-        INPUT_F18 = 109,
-        INPUT_F19 = 110,
-        INPUT_F20 = 111,
-        INPUT_F21 = 112,
-        INPUT_F22 = 113,
-        INPUT_F23 = 114,
-        INPUT_F24 = 115,
-        INPUT_EXECUTE = 116,
-        INPUT_HELP = 117,
-        INPUT_MENU = 118,
-        INPUT_SELECT = 119,
-        INPUT_STOP = 120,
-        INPUT_AGAIN = 121,
-        INPUT_UNDO = 122,
-        INPUT_CUT = 123,
-        INPUT_COPY = 124,
-        INPUT_PASTE = 125,
-        INPUT_FIND = 126,
-        INPUT_MUTE = 127,
-        INPUT_VOLUMEUP = 128,
-        INPUT_VOLUMEDOWN = 129,
-        INPUT_KP_COMMA = 133,
-        INPUT_KP_EQUALSAS400 = 134,
-        INPUT_INTERNATIONAL1 = 135,
-        INPUT_INTERNATIONAL2 = 136,
-        INPUT_INTERNATIONAL3 = 137,
-        INPUT_INTERNATIONAL4 = 138,
-        INPUT_INTERNATIONAL5 = 139,
-        INPUT_INTERNATIONAL6 = 140,
-        INPUT_INTERNATIONAL7 = 141,
-        INPUT_INTERNATIONAL8 = 142,
-        INPUT_INTERNATIONAL9 = 143,
-        INPUT_LANG1 = 144,
-        INPUT_LANG2 = 145,
-        INPUT_LANG3 = 146,
-        INPUT_LANG4 = 147,
-        INPUT_LANG5 = 148,
-        INPUT_LANG6 = 149,
-        INPUT_LANG7 = 150,
-        INPUT_LANG8 = 151,
-        INPUT_LANG9 = 152,
-        INPUT_ALTERASE = 153,
-        INPUT_SYSREQ = 154,
-        INPUT_CANCEL = 155,
-        INPUT_CLEAR = 156,
-        INPUT_PRIOR = 157,
-        INPUT_RETURN2 = 158,
-        INPUT_SEPARATOR = 159,
-        INPUT_OUT = 160,
-        INPUT_OPER = 161,
-        INPUT_CLEARAGAIN = 162,
-        INPUT_CRSEL = 163,
-        INPUT_EXSEL = 164,
-        INPUT_KP_00 = 176,
-        INPUT_KP_000 = 177,
-        INPUT_THOUSANDSSEPARATOR = 178,
-        INPUT_DECIMALSEPARATOR = 179,
-        INPUT_CURRENCYUNIT = 180,
-        INPUT_CURRENCYSUBUNIT = 181,
-        INPUT_KP_LEFTPAREN = 182,
-        INPUT_KP_RIGHTPAREN = 183,
-        INPUT_KP_LEFTBRACE = 184,
-        INPUT_KP_RIGHTBRACE = 185,
-        INPUT_KP_TAB = 186,
-        INPUT_KP_BACKSPACE = 187,
-        INPUT_KP_A = 188,
-        INPUT_KP_B = 189,
-        INPUT_KP_C = 190,
-        INPUT_KP_D = 191,
-        INPUT_KP_E = 192,
-        INPUT_KP_F = 193,
-        INPUT_KP_XOR = 194,
-        INPUT_KP_POWER = 195,
-        INPUT_KP_PERCENT = 196,
-        INPUT_KP_LESS = 197,
-        INPUT_KP_GREATER = 198,
-        INPUT_KP_AMPERSAND = 199,
-        INPUT_KP_DBLAMPERSAND = 200,
-        INPUT_KP_VERTICALBAR = 201,
-        INPUT_KP_DBLVERTICALBAR = 202,
-        INPUT_KP_COLON = 203,
-        INPUT_KP_HASH = 204,
-        INPUT_KP_SPACE = 205,
-        INPUT_KP_AT = 206,
-        INPUT_KP_EXCLAM = 207,
-        INPUT_KP_MEMSTORE = 208,
-        INPUT_KP_MEMRECALL = 209,
-        INPUT_KP_MEMCLEAR = 210,
-        INPUT_KP_MEMADD = 211,
-        INPUT_KP_MEMSUBTRACT = 212,
-        INPUT_KP_MEMMULTIPLY = 213,
-        INPUT_KP_MEMDIVIDE = 214,
-        INPUT_KP_PLUSMINUS = 215,
-        INPUT_KP_CLEAR = 216,
-        INPUT_KP_CLEARENTRY = 217,
-        INPUT_KP_BINARY = 218,
-        INPUT_KP_OCTAL = 219,
-        INPUT_KP_DECIMAL = 220,
-        INPUT_KP_HEXADECIMAL = 221,
-        INPUT_LCTRL = 224,
-        INPUT_LSHIFT = 225,
-        INPUT_LALT = 226,
-        INPUT_LGUI = 227,
-        INPUT_RCTRL = 228,
-        INPUT_RSHIFT = 229,
-        INPUT_RALT = 230,
-        INPUT_RGUI = 231,
-        INPUT_MODE = 257,
-        INPUT_AUDIONEXT = 258,
-        INPUT_AUDIOPREV = 259,
-        INPUT_AUDIOSTOP = 260,
-        INPUT_AUDIOPLAY = 261,
-        INPUT_AUDIOMUTE = 262,
-        INPUT_MEDIASELECT = 263,
-        INPUT_WWW = 264,
-        INPUT_MAIL = 265,
-        INPUT_CALCULATOR = 266,
-        INPUT_COMPUTER = 267,
-        INPUT_AC_SEARCH = 268,
-        INPUT_AC_HOME = 269,
-        INPUT_AC_BACK = 270,
-        INPUT_AC_FORWARD = 271,
-        INPUT_AC_STOP = 272,
-        INPUT_AC_REFRESH = 273,
-        INPUT_AC_BOOKMARKS = 274,
-        INPUT_BRIGHTNESSDOWN = 275,
-        INPUT_BRIGHTNESSUP = 276,
-        INPUT_DISPLAYSWITCH = 277,
-        INPUT_KBDILLUMTOGGLE = 278,
-        INPUT_KBDILLUMDOWN = 279,
-        INPUT_KBDILLUMUP = 280,
-        INPUT_EJECT = 281,
-        INPUT_SLEEP = 282,
-        INPUT_APP1 = 283,
-        INPUT_APP2 = 284,
+        A = 4,
+        B = 5,
+        C = 6,
+        D = 7,
+        E = 8,
+        F = 9,
+        G = 10,
+        H = 11,
+        I = 12,
+        J = 13,
+        K = 14,
+        L = 15,
+        M = 16,
+        N = 17,
+        O = 18,
+        P = 19,
+        Q = 20,
+        R = 21,
+        S = 22,
+        T = 23,
+        U = 24,
+        V = 25,
+        W = 26,
+        X = 27,
+        Y = 28,
+        Z = 29,
+        K1 = 30,
+        K2 = 31,
+        K3 = 32,
+        K4 = 33,
+        K5 = 34,
+        K6 = 35,
+        K7 = 36,
+        K8 = 37,
+        K9 = 38,
+        K0 = 39,
+        Return = 40,
+        Escape = 41,
+        BackSpace = 42,
+        Tab = 43,
+        Space = 44,
+        Minus = 45,
+        Equals = 46,
+        LeftBracket = 47,
+        RightBracket = 48,
+        BackSlash = 49,
+        NonUsHash = 50,
+        Semicolon = 51,
+        Apostrophe = 52,
+        Grave = 53,
+        Comma = 54,
+        Period = 55,
+        Slash = 56,
+        CapsLock = 57,
+        F1 = 58,
+        F2 = 59,
+        F3 = 60,
+        F4 = 61,
+        F5 = 62,
+        F6 = 63,
+        F7 = 64,
+        F8 = 65,
+        F9 = 66,
+        F10 = 67,
+        F11 = 68,
+        F12 = 69,
+        PrintScreen = 70,
+        ScrollLock = 71,
+        Pause = 72,
+        Insert = 73,
+        Home = 74,
+        PageUp = 75,
+        Delete = 76,
+        End = 77,
+        PageDown = 78,
+        Right = 79,
+        Left = 80,
+        Down = 81,
+        Up = 82,
+        NumLockClear = 83,
+        KpDivide = 84,
+        KpMultiply = 85,
+        KpMinus = 86,
+        KpPlus = 87,
+        KpEnter = 88,
+        Kp1 = 89,
+        Kp2 = 90,
+        Kp3 = 91,
+        Kp4 = 92,
+        Kp5 = 93,
+        Kp6 = 94,
+        Kp7 = 95,
+        Kp8 = 96,
+        Kp9 = 97,
+        Kp0 = 98,
+        KpPeriod = 99,
+        NonUsBackSlash = 100,
+        Application = 101,
+        Power = 102,
+        KpEquals = 103,
+        F13 = 104,
+        F14 = 105,
+        F15 = 106,
+        F16 = 107,
+        F17 = 108,
+        F18 = 109,
+        F19 = 110,
+        F20 = 111,
+        F21 = 112,
+        F22 = 113,
+        F23 = 114,
+        F24 = 115,
+        Execute = 116,
+        Help = 117,
+        Menu = 118,
+        Select = 119,
+        Stop = 120,
+        Again = 121,
+        Undo = 122,
+        Cut = 123,
+        Copy = 124,
+        Paste = 125,
+        Find = 126,
+        Mute = 127,
+        VolumeUp = 128,
+        VolumeDown = 129,
+        KpComma = 133,
+        KpEqualsAS400 = 134,
+        International1 = 135,
+        International2 = 136,
+        International3 = 137,
+        International4 = 138,
+        International5 = 139,
+        International6 = 140,
+        International7 = 141,
+        International8 = 142,
+        International9 = 143,
+        Lang1 = 144,
+        Lang2 = 145,
+        Lang3 = 146,
+        Lang4 = 147,
+        Lang5 = 148,
+        Lang6 = 149,
+        Lang7 = 150,
+        Lang8 = 151,
+        Lang9 = 152,
+        AltErase = 153,
+        SysReq = 154,
+        Cancel = 155,
+        Clear = 156,
+        Prior = 157,
+        Return2 = 158,
+        Separator = 159,
+        Out = 160,
+        Oper = 161,
+        ClearAgain = 162,
+        CrSel = 163,
+        ExSel = 164,
+        Kp00 = 176,
+        Kp000 = 177,
+        ThousandsSeparator = 178,
+        DecimalSeparator = 179,
+        CurrencyUnit = 180,
+        CurrencySubUnit = 181,
+        KpLeftParen = 182,
+        KpRightParen = 183,
+        KpLeftBrace = 184,
+        KpRightBrace = 185,
+        KpTab = 186,
+        KpBackSpace = 187,
+        KpA = 188,
+        KpB = 189,
+        KpC = 190,
+        KpD = 191,
+        KpE = 192,
+        KpF = 193,
+        KpXOR = 194,
+        KpPower = 195,
+        KpPercent = 196,
+        KpLess = 197,
+        KpGreater = 198,
+        KpAmpersand = 199,
+        KpDblAmpersand = 200,
+        KpVerticalBar = 201,
+        KpDblVerticalBar = 202,
+        KpColon = 203,
+        KpHash = 204,
+        KpSpace = 205,
+        KpAt = 206,
+        KpExclam = 207,
+        KpMemStore = 208,
+        KpMemRecall = 209,
+        KpMemClear = 210,
+        KpMemAdd = 211,
+        KpMemSubtract = 212,
+        KpMemMultiply = 213,
+        KpMemDivide = 214,
+        KpPlusMinus = 215,
+        KpClear = 216,
+        KpClearEntry = 217,
+        KpBinary = 218,
+        KpOctal = 219,
+        KpDecimal = 220,
+        KpHexadecimal = 221,
+        LCtrl = 224,
+        LShift = 225,
+        LAlt = 226,
+        LGUI = 227,
+        RCtrl = 228,
+        RShift = 229,
+        RAlt = 230,
+        RGUI = 231,
+        Mode = 257,
+        AudioNext = 258,
+        AudioPrev = 259,
+        AudioStop = 260,
+        AudioPlay = 261,
+        AudioMute = 262,
+        MediaSelect = 263,
+        WWW = 264,
+        Mail = 265,
+        Calculator = 266,
+        Computer = 267,
+        AcSearch = 268,
+        AcHome = 269,
+        AcBack = 270,
+        AcForward = 271,
+        AcStop = 272,
+        AcRefresh = 273,
+        AcBookmarks = 274,
+        BrightnessDown = 275,
+        BrightnessUp = 276,
+        DisplaySwitch = 277,
+        KbdIllumToggle = 278,
+        KbdIllumDown = 279,
+        KbdIllumUp = 280,
+        Eject = 281,
+        Sleep = 282,
+        App1 = 283,
+        App2 = 284,
 
-        INPUT_MOUSELEFT = 513,
-        INPUT_MOUSEMIDDLE = 514,
-        INPUT_MOUSERIGHT = 515,
+        MouseLeft = 513,
+        MouseMiddle = 514,
+        MouseRight = 515,
 
-        INPUT_LEN = 515 // Not an input, just the highest value
-    } INPUT_CODE;
+        MaxCode = 516 // Not an input, just the highest value
+    };
 
-    typedef enum {
-        WINDOW_NONE = -1,
-        WINDOW_SHOWN = SDL_WINDOWEVENT_SHOWN,
-        WINDOW_HIDDEN = SDL_WINDOWEVENT_HIDDEN,
-        WINDOW_EXPOSED = SDL_WINDOWEVENT_EXPOSED,
-        WINDOW_MOVE = SDL_WINDOWEVENT_MOVED,
-        WINDOW_RESIZE = SDL_WINDOWEVENT_RESIZED,
-        WINDOW_SIZECHANGE = SDL_WINDOWEVENT_SIZE_CHANGED,
-        WINDOW_MINIMIZE = SDL_WINDOWEVENT_MINIMIZED,
-        WINDOW_MAXIMIZE = SDL_WINDOWEVENT_MAXIMIZED,
-        WINDOW_RESTORE = SDL_WINDOWEVENT_RESTORED,
-        WINDOW_ENTER = SDL_WINDOWEVENT_ENTER,
-        WINDOW_LEAVE = SDL_WINDOWEVENT_LEAVE,
-        WINDOW_FOCUSGAIN = SDL_WINDOWEVENT_FOCUS_GAINED,
-        WINDOW_FOCUSLOSS = SDL_WINDOWEVENT_FOCUS_LOST,
-        WINDOW_CLOSE = SDL_WINDOWEVENT_CLOSE
-    } WINDOW_CODE;
+    enum class WindowEvent {
+        None = -1,
+        Shown = SDL_WINDOWEVENT_SHOWN,
+        Hidden = SDL_WINDOWEVENT_HIDDEN,
+        Exposed = SDL_WINDOWEVENT_EXPOSED,
+        Move = SDL_WINDOWEVENT_MOVED,
+        Resize = SDL_WINDOWEVENT_RESIZED,
+        SizeChange = SDL_WINDOWEVENT_SIZE_CHANGED,
+        Minimize = SDL_WINDOWEVENT_MINIMIZED,
+        Maximize = SDL_WINDOWEVENT_MAXIMIZED,
+        Restore = SDL_WINDOWEVENT_RESTORED,
+        Enter = SDL_WINDOWEVENT_ENTER,
+        Leave = SDL_WINDOWEVENT_LEAVE,
+        FocusGain = SDL_WINDOWEVENT_FOCUS_GAINED,
+        FocusLost = SDL_WINDOWEVENT_FOCUS_LOST,
+        Close = SDL_WINDOWEVENT_CLOSE
+    };
 
-    class Inputs {
+    class InputHandler {
         SDL_Event event_;
 
-        std::unordered_map<std::string, INPUT_CODE> binds_;
+        using KeyMap = std::array<bool, static_cast<int>(Input::MaxCode)>;
 
-        bool pressed_[INPUT_LEN + 1];
-        bool released_[INPUT_LEN + 1];
-        bool state_[INPUT_LEN + 1];
-
-        std::vector<int>pressed_change_;
-        std::vector<int>released_change_;
+        KeyMap pressed_;
+        KeyMap released_;
+        KeyMap state_;
         
+        std::vector<int> pressed_change_;
+        std::vector<int> released_change_;
+        
+        std::unordered_map<std::string, Input> binds_;
         std::string text_input_;
 
         Vec2D mouse_pos_;
 
-        WINDOW_CODE window_event_;
+        WindowEvent window_event_;
 
+        bool recording_text_;
         bool quit_;
-
-    public:
-        Inputs();
-
-        // Update the input handler
-        void poll();
 
         // Reset pressed and released state arrays
         void reset_states();
 
-        // Get the value of a text input event
-        std::string get_text_input();
+    public:
+        InputHandler();
 
+        // Update the input handler
+        void poll();
+
+        // Check if recording text input
+        bool is_recording_text();
+
+        // Start recording text input
+        void toggle_recording_text();
+        
         // Reset the text input string field
-        void reset_text_input();
+        void clear_text();
+
+        // Get the value of a text input event
+        std::string get_text();
 
         // Bind a string command to an input
-        void bind(std::string command, INPUT_CODE input);
-
-        // Get the list of all input bind keys
-        std::vector<std::string> get_bind_keys();
+        void bind(std::string command, Input input);
         
         // Get the input mapped to a command
-        INPUT_CODE get_bind(std::string command);
+        Input get_bind(std::string command);
 
         // Check the pressed state of an input
         bool get_pressed(std::string command);
@@ -331,29 +336,51 @@ namespace Dynamo {
         // Check the released state of an input
         bool get_released(std::string command);
 
-        // Get the state of the command bind (held down or relased)
+        // Get the state of the command bind (held down or released)
         bool get_state(std::string command);
 
         // Get the pressed state of a raw input constant
-        bool get_pressed_raw(INPUT_CODE input);
+        bool get_pressed_raw(Input input);
 
         // Get the released state of a raw input constant
-        bool get_released_raw(INPUT_CODE input);
+        bool get_released_raw(Input input);
 
         // Get the state of the button
-        bool get_state_raw(INPUT_CODE input);
+        bool get_state_raw(Input input);
 
         // Get the name string of an input event
-        std::string get_name(INPUT_CODE input);
+        std::string get_name(Input input);
         
         // Check for a window event
-        WINDOW_CODE get_window_event();
+        WindowEvent get_window_event();
 
         // Get mouse position
         Vec2D get_mouse_pos();
 
         // Test if the event handler quit
         bool get_quit();
+
+        // Send a quit signal
+        void signal_quit();
+
+        // Perform a function on each input code
+        // Function signature: void f(Dynamo::Input);
+        template <class F>
+        void each_code(F func) {
+            for(int i = 0; i < static_cast<int>(Input::MaxCode); i++) {
+                Input code = static_cast<Input>(i);
+                func(code);
+            }
+        };
+
+        // Perform a function each command bind
+        // Function signature: void f(std::string, Dynamo::Input);
+        template <class F>
+        void each_bind(F func) {
+            for(auto &bind : binds_) {
+                func(bind.first, bind.second);
+            }
+        }
     };
 }
 

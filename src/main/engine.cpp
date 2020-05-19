@@ -1,8 +1,8 @@
 #include "engine.h"
 
 namespace Dynamo {
-    Engine::Engine(std::string title, bool fullscreen, bool vsync,
-                   int width, int height) {
+    Engine::Engine(std::string title, int width, int height, 
+                   EngineFlag flags) {
         if(SDL_Init(SDL_INIT_EVERYTHING) == -1) {
             throw SDLError();
         }
@@ -10,13 +10,17 @@ namespace Dynamo {
         // Seed the random number generator
         Random::seed(std::time(nullptr));
 
-        // Initialize singleton modules
-        clock_ = new Clock();
-        display_ = new Display(width, height, title, fullscreen, vsync);
+        // Initialize core modules
+        display_ = new Display(
+            width, height, title, 
+            flags & EngineFlag::FullScreen,
+            flags & EngineFlag::VSync
+        );
         renderer_ = new Renderer(display_);
         textures_ = new TextureManager(display_->get_renderer());
         jukebox_ = new Jukebox();
-        inputs_ = new Inputs();
+        inputs_ = new InputHandler();
+        clock_ = new Clock();
 
         running_ = true;
     }

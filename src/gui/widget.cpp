@@ -35,9 +35,9 @@ namespace Dynamo::GUI {
         bounds_.dim = dim;
     }
 
-    void Widget::update(Inputs *inputs) {
+    void Widget::update(InputHandler *inputs) {
         bool mouse_bounds = is_in_bounds(inputs->get_mouse_pos());
-        bool click = inputs->get_state_raw(INPUT_MOUSELEFT);
+        bool click = inputs->get_state_raw(Input::MouseLeft);
         
         // Handle
         if(click) {

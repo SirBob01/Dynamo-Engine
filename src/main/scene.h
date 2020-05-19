@@ -18,7 +18,7 @@ namespace Dynamo {
         Display &display;
         TextureManager &textures;
         Jukebox &jukebox;
-        Inputs &inputs;
+        InputHandler &inputs;
         Clock &clock;
     };
 
@@ -27,7 +27,7 @@ namespace Dynamo {
         TypeID *registry_;
         std::vector<Scene *> *scenes_;
 
-        Scene *next_; // TypeID of the next scene
+        Scene *next_; // Pointer to the next scene
         bool kill_;   // Should kill on transition?
 
         friend class Engine;

@@ -1,33 +1,48 @@
 #include "inputs.h"
 
 namespace Dynamo {
-    Inputs::Inputs() {
+    InputHandler::InputHandler() {
         text_input_ = "";
+        recording_text_ = false;
         quit_ = false;
 
         mouse_pos_ = {0, 0};
-        window_event_ = WINDOW_NONE;
+        window_event_ = WindowEvent::None;
 
-        std::memset(pressed_, 0, (INPUT_LEN + 1) * sizeof(bool));
-        std::memset(released_, 0, (INPUT_LEN + 1) * sizeof(bool));
-        std::memset(state_, 0, (INPUT_LEN + 1) * sizeof(bool));
+        pressed_.fill(false);
+        released_.fill(false);
+        state_.fill(false);
     }
 
-    void Inputs::poll() {
+    void InputHandler::reset_states() {
+        for(int key : pressed_change_) {
+            pressed_[key] = false;
+        }
+        for(int key : released_change_) {
+            released_[key] = false;
+        }
+        pressed_change_.clear();
+        released_change_.clear();
+    }
+
+    void InputHandler::poll() {
         reset_states();
         
+        int lmb = static_cast<int>(Input::MouseLeft);
+        int rmb = static_cast<int>(Input::MouseRight);
+
         while(SDL_PollEvent(&event_)) {
             if(event_.type == SDL_QUIT) {
-                quit_ = true;
+                signal_quit();
             }
             
             if(event_.type == SDL_WINDOWEVENT) {
-                window_event_ = static_cast<WINDOW_CODE>(
+                window_event_ = static_cast<WindowEvent>(
                     event_.window.event
                 );
             }
             else {
-                window_event_ = WINDOW_NONE;
+                window_event_ = WindowEvent::None;
             }
 
             if(event_.type == SDL_MOUSEMOTION) {
@@ -37,12 +52,12 @@ namespace Dynamo {
 
             if(event_.type == SDL_MOUSEBUTTONDOWN) {
                 uint8_t button = event_.button.button;
-                for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
-                    pressed_[i] = (button - 1 == i - INPUT_MOUSELEFT);
+                for(int i = lmb; i <= rmb; i++) {
+                    pressed_[i] = (button - 1 == i - lmb);
                     if(pressed_[i]) {
                         pressed_change_.push_back(i);
                     }
-                    if(button - 1 == i - INPUT_MOUSELEFT) {
+                    if(button - 1 == i - lmb) {
                         state_[i] = true;
                     }
                 }
@@ -50,25 +65,27 @@ namespace Dynamo {
             
             if(event_.type == SDL_MOUSEBUTTONUP) {
                 uint8_t button = event_.button.button;
-                for(int i = INPUT_MOUSELEFT; i <= INPUT_MOUSERIGHT; i++) {
-                    released_[i] = (button - 1 == i - INPUT_MOUSELEFT);
+                for(int i = lmb; i <= rmb; i++) {
+                    released_[i] = (button - 1 == i - lmb);
                     if(released_[i]) {
                         released_change_.push_back(i);
                     }
-                    if(button - 1 == i - INPUT_MOUSELEFT) {
+                    if(button - 1 == i - lmb) {
                         state_[i] = false;
                     }
                 }
             }
 
-            if(event_.type == SDL_KEYDOWN && event_.key.repeat == 0) {
-                int scancode = event_.key.keysym.scancode;
-                state_[scancode] = true;
-                pressed_[scancode] = true;
-                pressed_change_.push_back(scancode);
+            if(event_.type == SDL_KEYDOWN) {
+                if(event_.key.repeat == 0) {
+                    int scancode = event_.key.keysym.scancode;
+                    state_[scancode] = true;
+                    pressed_[scancode] = true;
+                    pressed_change_.push_back(scancode);
 
+                }           
                 // Special backspace event
-                if(text_input_.size()) {
+                if(text_input_.size() && recording_text_) {
                     if(event_.key.keysym.sym == SDLK_BACKSPACE) {
                         text_input_.erase(text_input_.size()-1);
                     }
@@ -82,85 +99,74 @@ namespace Dynamo {
                 released_change_.push_back(scancode);
             }
             
-            if(event_.type == SDL_TEXTINPUT) {
+            if(event_.type == SDL_TEXTINPUT && recording_text_) {
                 text_input_ += event_.text.text;
             }
         }
     }
 
-    void Inputs::reset_states() {
-        for(int key : pressed_change_) {
-            pressed_[key] = false;
-        }
-        for(int key : released_change_) {
-            released_[key] = false;
-        }
-        pressed_change_.clear();
-        released_change_.clear();
+    bool InputHandler::is_recording_text() {
+        return recording_text_;
     }
 
-    std::string Inputs::get_text_input() {
-        return text_input_;
+    void InputHandler::toggle_recording_text() {
+        recording_text_ = !recording_text_;
     }
-
-    void Inputs::reset_text_input() {
+    
+    void InputHandler::clear_text() {
         text_input_ = "";
     }
 
-    void Inputs::bind(std::string command, INPUT_CODE input) {
+    std::string InputHandler::get_text() {
+        return text_input_;
+    }
+    
+    void InputHandler::bind(std::string command, Input input) {
         binds_[command] = input;
     }
 
-    std::vector<std::string> Inputs::get_bind_keys() {
-        std::vector<std::string> bind_keys;
-        for(auto pair : binds_) {
-            bind_keys.push_back(pair.first);
-        }
-        return bind_keys;
-    }
-
-    INPUT_CODE Inputs::get_bind(std::string command) {
+    Input InputHandler::get_bind(std::string command) {
         return binds_[command];
     }
 
-    bool Inputs::get_pressed(std::string command) {
+    bool InputHandler::get_pressed(std::string command) {
         return get_pressed_raw(binds_[command]);
     }
 
-    bool Inputs::get_released(std::string command) {
+    bool InputHandler::get_released(std::string command) {
         return get_released_raw(binds_[command]);
     }
 
-    bool Inputs::get_state(std::string command) {
+    bool InputHandler::get_state(std::string command) {
         return get_state_raw(binds_[command]);
     }
 
-    bool Inputs::get_pressed_raw(INPUT_CODE input) {
-        return pressed_[input];
+    bool InputHandler::get_pressed_raw(Input input) {
+        return pressed_[static_cast<int>(input)];
     }
 
-    bool Inputs::get_released_raw(INPUT_CODE input) {
-        return released_[input];
+    bool InputHandler::get_released_raw(Input input) {
+        return released_[static_cast<int>(input)];
     }
 
-    bool Inputs::get_state_raw(INPUT_CODE input) {
-        return state_[input];
+    bool InputHandler::get_state_raw(Input input) {
+        return state_[static_cast<int>(input)];
     }
 
-    std::string Inputs::get_name(INPUT_CODE input) {
+    std::string InputHandler::get_name(Input input) {
         std::string s = " ";
-        if(input < INPUT_MOUSELEFT) {
+        if(input < Input::MouseLeft) {
             s = SDL_GetScancodeName(static_cast<SDL_Scancode>(input));
         }
         else {
             switch(input) {
-                case INPUT_MOUSELEFT:
+                case Input::MouseLeft:
                     s = "Left Mouse";
                     break;
-                case INPUT_MOUSEMIDDLE:
+                case Input::MouseMiddle:
                     s = "Middle Mouse";
                     break;
-                case INPUT_MOUSERIGHT:
+                case Input::MouseRight:
                     s = "Right Mouse";
                     break;
                 default:
@@ -170,15 +176,19 @@ namespace Dynamo {
         return s;
     }
 
-    WINDOW_CODE Inputs::get_window_event() {
+    WindowEvent InputHandler::get_window_event() {
         return window_event_;
     }
 
-    Vec2D Inputs::get_mouse_pos() {
+    Vec2D InputHandler::get_mouse_pos() {
         return mouse_pos_;
     }
 
-    bool Inputs::get_quit() {
+    bool InputHandler::get_quit() {
         return quit_;
+    }
+
+    void InputHandler::signal_quit() {
+        quit_ = true;
     }
 }

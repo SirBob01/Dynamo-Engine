@@ -43,7 +43,7 @@ namespace Dynamo::GUI {
         void set_target(Vec2D pos, Vec2D dim);
 
         // Update the state of the widget
-        void update(Inputs *inputs);
+        void update(InputHandler *inputs);
     };
 }
 
