@@ -5,48 +5,45 @@ class Game : public Dynamo::Scene {
     Dynamo::Sprite *default_text;
 
 public:
-    Game(Dynamo::Core modules) : Dynamo::Scene(modules) {};
-    
-    void on_entry() override {
+    void load(Dynamo::Core &core) override {
         input_display = nullptr;
-        textures_->load_font("sentry", "assets/fonts/Sentry.ttf", 64);
-        default_text = new Dynamo::Sprite(textures_->load_text(
+        core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 64);
+        default_text = new Dynamo::Sprite(core.textures.load_text(
             "Press anything to test input!", 
             "sentry",
             {255, 255, 255}
         ));
     };
 
-    void update(unsigned dt) override {
+    void update(Dynamo::Core &core) override {
         // Loop through all possible inputs and display its name if pressed
-        for(int i = 0; i < Dynamo::INPUT_LEN + 1; i++) {
-            Dynamo::INPUT_CODE code = static_cast<Dynamo::INPUT_CODE>(i);
-            if(inputs_->get_pressed_raw(code)) {
+        core.inputs.each_code([&core, this](auto &code) {
+            if(core.inputs.get_pressed_raw(code)) {
                 if(input_display) {
                     delete input_display;
                 }
 
                 // Prevent memory leaks by deleting current renderable text
-                textures_->clear_textures();
+                core.textures.clear_textures();
                 
-                input_display = new Dynamo::Sprite(textures_->load_text(
-                    inputs_->get_name(code), 
+                input_display = new Dynamo::Sprite(core.textures.load_text(
+                    core.inputs.get_name(code), 
                     "sentry",
                     {255, 255, 255}
                 ));
             }
-        }
+        });
     };
 
-    void draw() override {
-        display_->set_fill({0, 0, 0});
+    void draw(Dynamo::Renderer &renderer) override {
+        renderer.set_fill({0, 0, 0});
         
         Dynamo::Sprite *target = input_display;
         if(!target) {
             target = default_text;
         }
 
-        display_->draw_sprite(
+        renderer.draw_sprite(
             nullptr, 
             target,
             {320, 240}
@@ -55,7 +52,7 @@ public:
 };
 
 int main(int argv, char **args) {
-    Dynamo::Engine engine("Input Test", false, 640, 480);
+    Dynamo::Engine engine("Input Test", 640, 480);
     engine.push_scene<Game>();
 
     while(engine.is_running()) {

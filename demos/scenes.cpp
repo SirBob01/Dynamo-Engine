@@ -5,82 +5,80 @@ class First : public Dynamo::Scene {
     Dynamo::Sprite *text;
 
 public:
-    First(Dynamo::Core modules) : Dynamo::Scene(modules) {};
+    void load(Dynamo::Core &core) override;
+    void unload(Dynamo::Core &core) override;
 
-    void on_entry() override;
-    void on_exit() override;
-
-    void update(unsigned dt) override;
-    void draw() override;
+    void update(Dynamo::Core &core) override;
+    void draw(Dynamo::Renderer &renderer) override;
 };
 
 class Second : public Dynamo::Scene {
     Dynamo::Sprite *text;
 
 public:
-    Second(Dynamo::Core modules) : Dynamo::Scene(modules) {};
+    void load(Dynamo::Core &core) override;
+    void unload(Dynamo::Core &core) override;
 
-    void on_entry() override;
-    void on_exit() override;
-
-    void update(unsigned dt) override;
-    void draw() override;
+    void update(Dynamo::Core &core) override;
+    void draw(Dynamo::Renderer &renderer) override;
 };
 
 
 // Definitions
-void First::on_entry() {
-    textures_->load_font("sentry", "assets/fonts/Sentry.ttf", 64);
-    text = new Dynamo::Sprite(textures_->load_text(
-        "Scene 1! Press Q to change scenes.", 
+void First::load(Dynamo::Core &core) {
+    core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 64);
+    text = new Dynamo::Sprite(core.textures.load_text(
+        "Scene 1! Press Q to load next scene.", 
         "sentry",
         {255, 255, 255}
     ));
 }
 
-void First::on_exit() {
+void First::unload(Dynamo::Core &core) {
     delete text;
 }
 
-void First::update(unsigned dt) {
-    if(inputs_->get_pressed_raw(Dynamo::INPUT_Q)) {
-        set_scene<Second>();
+void First::update(Dynamo::Core &core) {
+    if(core.inputs.get_pressed_raw(Dynamo::Input::Q)) {
+        // Do not kill this scene, show it underneath
+        // Demonstrates scene layering
+        set_scene<Second>(false); 
     }
 }
 
-void First::draw() {
-    display_->set_fill({255, 0, 255});
-    display_->draw_sprite(nullptr, text, {500, 300});
+void First::draw(Dynamo::Renderer &renderer) {
+    renderer.set_fill({255, 0, 255});
+    renderer.draw_sprite(nullptr, text, {500, 300});
 }
 
 
-void Second::on_entry() {
-    textures_->load_font("sentry", "assets/fonts/Sentry.ttf", 64);
-    text = new Dynamo::Sprite(textures_->load_text(
-        "Scene 2! Press Q to change scenes.", 
+void Second::load(Dynamo::Core &core) {
+    core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 64);
+    text = new Dynamo::Sprite(core.textures.load_text(
+        "Scene 2! Press Q to unload.", 
         "sentry",
         {255, 255, 255}
     ));
 }
 
-void Second::on_exit() {
+void Second::unload(Dynamo::Core &core) {
     delete text;
 }
 
-void Second::update(unsigned dt) {
-    if(inputs_->get_pressed_raw(Dynamo::INPUT_Q)) {
+void Second::update(Dynamo::Core &core) {
+    if(core.inputs.get_pressed_raw(Dynamo::Input::Q)) {
         set_scene<First>();
     }
 }
 
-void Second::draw() {
-    display_->set_fill({0, 100, 0});
-    display_->draw_sprite(nullptr, text, {500, 300});
+void Second::draw(Dynamo::Renderer &renderer) {
+    renderer.set_fill({0, 100, 0, 100});
+    renderer.draw_sprite(nullptr, text, {500, 200});
 }
 
 // Program entry point
 int main(int argv, char **args) {
-    Dynamo::Engine engine("Scene Test", false, 1000, 600);
+    Dynamo::Engine engine("Scene Test", 1000, 600);
     engine.push_scene<First>();
 
     while(engine.is_running()) {

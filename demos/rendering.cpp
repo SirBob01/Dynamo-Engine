@@ -2,17 +2,21 @@
 
 class Game : public Dynamo::Scene {
     Dynamo::Sprite *blurry_circle;
+    Dynamo::Sprite *smiley;
     Dynamo::Vec2D poly[5];
 
 public:
-    Game(Dynamo::Core modules) : Dynamo::Scene(modules) {};
+    void load(Dynamo::Core &core) override;
     
-    void on_entry() override;
-    void draw() override;
+    void unload(Dynamo::Core &core) override;
+    
+    void update(Dynamo::Core &core) override;
+
+    void draw(Dynamo::Renderer &renderer) override;
 };
 
 // Definitions
-void Game::on_entry() {
+void Game::load(Dynamo::Core &core) {
     // Dynamic texture generation test
     float r = 100.0;
     Dynamo::Color colors[(int)(r*2)][(int)(r*2)];
@@ -34,11 +38,15 @@ void Game::on_entry() {
         }
     }
     blurry_circle = new Dynamo::Sprite(
-        textures_->generate_texture(
+        core.textures.generate_texture(
             "blurry circle", 
             {r*2, r*2}, 
             (Dynamo::Color *)colors
         )
+    );
+    smiley = new Dynamo::Sprite(
+        core.textures.load_image("assets/textures/ball.png"),
+        {50, 50}
     );
 
     poly[0] = {50, 10};
@@ -48,10 +56,20 @@ void Game::on_entry() {
     poly[4] = {35, 30};
 };
 
-void Game::draw() {
-    display_->set_fill({255, 255, 255});
+void Game::unload(Dynamo::Core &core) {
+    delete blurry_circle;
+    delete smiley;
+}
 
-    display_->draw_polygon(nullptr, poly, 5, {10, 10, 255}, true);
+void Game::update(Dynamo::Core &core) {
+    smiley->animate(core.clock.get_delta(), 12, true);
+}
+
+void Game::draw(Dynamo::Renderer &renderer) {
+    renderer.set_fill({255, 255, 255});
+
+    renderer.draw_polygon(nullptr, poly, 5, {10, 10, 255}, true);
+    renderer.draw_sprite(nullptr, smiley, {100, 100});
     
     // Create an offset polygon to test drawing filled shapes 
     Dynamo::Vec2D other_poly[5];
@@ -59,15 +77,15 @@ void Game::draw() {
         other_poly[i] = poly[i];
         other_poly[i].x += 50;
     }
-    display_->draw_polygon(nullptr, other_poly, 5, {10, 10, 255}, false);
-    display_->draw_circle(nullptr, {500, 300}, 250, {255, 0, 255}, false);
-    display_->draw_circle(nullptr, {500, 300}, 100, {255, 0, 255}, true);
-    display_->draw_sprite(nullptr, blurry_circle, {700, 300});
+    renderer.draw_polygon(nullptr, other_poly, 5, {10, 10, 255}, false);
+    renderer.draw_circle(nullptr, {500, 300}, 250, {255, 0, 255}, false);
+    renderer.draw_circle(nullptr, {500, 300}, 100, {255, 0, 255}, true);
+    renderer.draw_sprite(nullptr, blurry_circle, {700, 300});
 }
 
 int main(int argv, char **args) {
     // Entry point function
-    Dynamo::Engine engine("Rendering Test", false, 1000, 600);
+    Dynamo::Engine engine("Rendering Test", 1000, 600);
     engine.push_scene<Game>();
 
     while(engine.is_running()) {

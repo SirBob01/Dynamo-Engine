@@ -1,35 +1,38 @@
 #include "../src/Dynamo.h"
 
+// Scene declaration
 class MyScene : public Dynamo::Scene {
 public:
-    MyScene(Dynamo::Core modules) : Dynamo::Scene(modules) {};
+    void load(Dynamo::Core &core) override;
     
-    void on_entry() override;
+    void unload(Dynamo::Core &core) override;
     
-    void on_exit() override;
-    
-    void update(unsigned dt) override;
+    void update(Dynamo::Core &core) override;
 
-    void draw() override;
+    void draw(Dynamo::Renderer &renderer) override;
 };
 
-void MyScene::on_entry() {}
+// Scene method overrides
+void MyScene::load(Dynamo::Core &core) {}
 
-void MyScene::on_exit() {}
+void MyScene::unload(Dynamo::Core &core) {}
 
-void MyScene::update(unsigned dt) {}
+void MyScene::update(Dynamo::Core &core) {}
 
-void MyScene::draw() {
-    display_->set_fill({255, 255, 255});
+void MyScene::draw(Dynamo::Renderer &renderer) {
+    Dynamo::Color white = {255, 255, 255};
+    renderer.set_fill(white);
 }
 
+// Entry point function
 int main(int argc, char **argv) {
+    // Initial window size and logical dimensions
     int width = 640, height = 480;
-    bool fullscreen = false;
 
-    Dynamo::Engine engine("Hello, world!", fullscreen, width, height);
-    engine.push_scene<MyScene>(); // Initial scene
+    Dynamo::Engine engine("Hello, world!", width, height);
+    engine.push_scene<MyScene>(); // Load the initial scene
 
+    // Game loop
     while(engine.is_running()) {
         engine.run();
     }

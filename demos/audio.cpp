@@ -3,120 +3,104 @@
 
 class Game : public Dynamo::Scene {
     std::vector<Dynamo::Sprite *> commands;
-    Dynamo::StreamID music_stream, ambient_stream;
 
-    Dynamo::Sound *sfx;
-    Dynamo::Sound *recorded;
-    bool recording;
+    Dynamo::SoundStream music, ambient;
+    Dynamo::Sound sfx, recorded;
 
 public:
-    Game(Dynamo::Core modules) : Dynamo::Scene(modules) {};
-    
-    void on_entry() override {
-        textures_->load_font("sentry", "assets/fonts/Sentry.ttf", 32);
+    void load(Dynamo::Core &core) override {
+        core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 32);
 
-        inputs_->bind("play music", Dynamo::INPUT_Q);
-        inputs_->bind("play rain", Dynamo::INPUT_W);
-        inputs_->bind("play boom sfx", Dynamo::INPUT_E);
-        inputs_->bind("skip music", Dynamo::INPUT_A);
-        inputs_->bind("fadeout music", Dynamo::INPUT_S);
-        inputs_->bind("toggle pause", Dynamo::INPUT_P);
-        inputs_->bind("clear music stream", Dynamo::INPUT_C);
-        inputs_->bind("start recording", Dynamo::INPUT_V);
-        inputs_->bind("play recording", Dynamo::INPUT_B);
+        core.inputs.bind("play music", Dynamo::Input::Q);
+        core.inputs.bind("play rain", Dynamo::Input::W);
+        core.inputs.bind("play boom sfx", Dynamo::Input::E);
+        core.inputs.bind("skip music", Dynamo::Input::A);
+        core.inputs.bind("fadeout music", Dynamo::Input::S);
+        core.inputs.bind("toggle pause", Dynamo::Input::P);
+        core.inputs.bind("clear music stream", Dynamo::Input::C);
+        core.inputs.bind("start recording (hold)", Dynamo::Input::V);
+        core.inputs.bind("play recording", Dynamo::Input::B);
 
-        std::vector<std::string> all_binds = inputs_->get_bind_keys();
-
-        for(auto bind : all_binds) {
-            Dynamo::INPUT_CODE input_name = inputs_->get_bind(bind);
+        core.inputs.each_bind([&core, this](auto &bind, auto &code) {
             commands.push_back(
                 new Dynamo::Sprite(
-                    textures_->load_text(
-                        "Press " + inputs_->get_name(input_name) + " to " + bind,
+                    core.textures.load_text(
+                        "Press " + core.inputs.get_name(code) + " to " + bind,
                         "sentry",
                         {0, 0, 0}
                     )
                 )
             );
-        }
+        });
 
-        ambient_stream = jukebox_->generate_stream();
-        music_stream = jukebox_->generate_stream();
+        ambient = core.jukebox.generate_stream();
+        music = core.jukebox.generate_stream();
         
-        sfx = jukebox_->load_sound("assets/audio/fusion_boom.ogg");
-        recorded = new Dynamo::Sound(4194304);
-
-        jukebox_->set_volume(0.5);
+        sfx = core.jukebox.load_sound("assets/audio/fusion_boom.ogg");
+        
+        core.jukebox.set_volume(0.5);
     };
     
-    void on_exit() override {
+    void unload(Dynamo::Core &core) override {
         for(auto sprite : commands) {
             delete sprite;
         }
-        jukebox_->clear();
-        delete sfx;
-        delete recorded;
+        core.jukebox.clear();
     };
 
-    void update(unsigned dt) override {
-        if(inputs_->get_pressed("play music")) {
-            jukebox_->queue_stream(
+    void update(Dynamo::Core &core) override {
+        if(core.inputs.get_pressed("play music")) {
+            core.jukebox.queue_stream(
                 "assets/audio/test_mixer.ogg", 
-                music_stream, 
-                5, 0, -1 // Fade-in 5 seconds, abrupt stop, loop forever
+                music, 
+                5, 5, -1 // Fade-in 5 seconds, abrupt stop
             );
         }
-        if(inputs_->get_pressed("skip music")) {
-            jukebox_->skip_stream(music_stream, 0);
+        if(core.inputs.get_pressed("skip music")) {
+            core.jukebox.skip_stream(music, 3);
         }
-        if(inputs_->get_pressed("fadeout music")) {
-            jukebox_->skip_stream(music_stream, 5);
+        if(core.inputs.get_pressed("fadeout music")) {
+            core.jukebox.skip_stream(music, 5);
         }
-        if(inputs_->get_pressed("clear music stream")) {
-            jukebox_->clear_stream(music_stream);
+        if(core.inputs.get_pressed("clear music stream")) {
+            core.jukebox.clear_stream(music);
         }
-        if(inputs_->get_pressed("play rain")) {
-            jukebox_->queue_stream("assets/audio/rain.ogg", ambient_stream);
+        if(core.inputs.get_pressed("play rain")) {
+            core.jukebox.queue_stream("assets/audio/rain.ogg", ambient);
         }
-        if(inputs_->get_pressed("play boom sfx")) {
-            jukebox_->play_sound(sfx, 0.5);
+        if(core.inputs.get_pressed("play boom sfx")) {
+            core.jukebox.play_sound(sfx, 0.5);
         }
-        if(inputs_->get_pressed("toggle pause")) {
-            if(jukebox_->is_playing()) {
-                jukebox_->pause();
+        if(core.inputs.get_pressed("toggle pause")) {
+            if(core.jukebox.is_stream_playing(music)) {
+                core.jukebox.pause_stream(music);
             }
             else {
-                jukebox_->play();
+                core.jukebox.play_stream(music);
             }
         }
-        if(inputs_->get_pressed("start recording")) {
+        if(core.inputs.get_pressed("start recording (hold)")) {
             // Reset record buffer
-            for(int i = 0; i < recorded->length; i++) {
-                recorded->samples[i] = 0;
-            }
-            recorded->write = 0;
-
-            jukebox_->start_record();
-            recording = true;
+            recorded.clear();
+            core.jukebox.start_record();
         }
-        if(inputs_->get_released("start recording")) {
-            jukebox_->start_record();
-            recording = false;
+        if(core.inputs.get_released("start recording (hold)")) {
+            core.jukebox.pause_record();
         }
-        if(inputs_->get_pressed("play recording")) {
-            jukebox_->play_sound(recorded, 1.0);
+        if(core.inputs.get_pressed("play recording")) {
+            core.jukebox.play_sound(recorded, 1.0);
         }
 
-        if(recording) {
-            jukebox_->stream_recorded(recorded);
+        if(core.jukebox.is_recording()) {
+            core.jukebox.stream_recorded(recorded);
         }
     };
 
-    void draw() override {
-        display_->set_fill({255, 0, 255});
+    void draw(Dynamo::Renderer &renderer) override {
+        renderer.set_fill({255, 0, 255});
         float index = 0.0f;
         for(auto text : commands) {
-            display_->draw_sprite(
+            renderer.draw_sprite(
                 nullptr, 
                 text,
                 {320.0f, 50.0f + (index * 32.0f)}
@@ -127,7 +111,7 @@ public:
 };
 
 int main(int argv, char **args) {
-    Dynamo::Engine engine("Audio Test", false, 640, 480);
+    Dynamo::Engine engine("Audio Test", 640, 480);
     engine.push_scene<Game>();
 
     while(engine.is_running()) {
