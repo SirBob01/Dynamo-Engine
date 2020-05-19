@@ -1,55 +1,21 @@
 #include "renderer.h"
 
 namespace Dynamo {
-    Renderer::Renderer(SDL_Window *window, bool vsync) {
-        int window_x, window_y;
-        SDL_GetWindowSize(window, &window_x, &window_y);
-
-        Vec2D logic_dim = {
-            static_cast<float>(window_x), 
-            static_cast<float>(window_y)
-        };
-        logic_bounds_ = {
-            logic_dim/2,
-            logic_dim
-        };
-
-        int flags = SDL_RENDERER_ACCELERATED;
-        if(vsync) {
-            flags = flags | SDL_RENDERER_PRESENTVSYNC;
-        }
-        renderer_ = SDL_CreateRenderer(
-            window, 
-            -1,
-            flags
-        );
-        SDL_RenderSetLogicalSize(renderer_, window_x, window_y);
-
+    Renderer::Renderer(Display *display, bool vsync) {
+        display_ = display;
         border_color_ = {0, 0, 0};
         fill_ = {0, 0, 0};
-    }
-
-    Renderer::~Renderer() {
-        SDL_DestroyRenderer(renderer_);
     }
 
     void Renderer::set_render_target(Sprite *dest) {
         if(dest) {
             // Blend rendering over target sprite
-            SDL_SetRenderTarget(renderer_, dest->get_base());
+            SDL_SetRenderTarget(display_->get_renderer(), dest->get_base());
         }
         else {
             // Default render target is the main display
-            SDL_SetRenderTarget(renderer_, nullptr);
+            SDL_SetRenderTarget(display_->get_renderer(), nullptr);
         }
-    }
-
-    SDL_Renderer *Renderer::get_renderer() {
-        return renderer_;
-    }
-
-    Vec2D Renderer::get_dimensions() {
-        return logic_bounds_.dim;
     }
 
     Color Renderer::get_fill(Color color) {
@@ -60,20 +26,9 @@ namespace Dynamo {
         return border_color_;
     }
 
-    void Renderer::set_dimensions(int width, int height) {
-        Vec2D logic_dim = {
-            static_cast<float>(width), 
-            static_cast<float>(height)
-        };
-        logic_bounds_ = {
-            logic_dim/2,
-            logic_dim
-        };
-        SDL_RenderSetLogicalSize(renderer_, width, height);
-    }
-
     void Renderer::set_fill(Color color) {
-        draw_rect(nullptr, logic_bounds_, color, true);
+        Vec2D logic_dim = display_->get_dimensions();
+        draw_rect(nullptr, {logic_dim/2, logic_dim}, color, true);
         fill_ = color;
     }
 
@@ -82,11 +37,10 @@ namespace Dynamo {
     }
 
     void Renderer::draw_sprite(Sprite *dest, Sprite *source, Vec2D position,
-                              RENDER_BLEND mode) {
+                               RenderBlend mode) {
         AABB aabb = {position, source->get_dimensions()};
         if(!source->get_visible() || 
-           source->get_alpha() <= 0 ||
-           !aabb.is_colliding(logic_bounds_)) {
+           source->get_alpha() <= 0) {
             return;
         }
         SDL_SetTextureBlendMode(
@@ -98,7 +52,7 @@ namespace Dynamo {
         set_render_target(dest);
         SDL_Rect target_rect = aabb.convert_to_rect();
         SDL_RenderCopyEx(
-            renderer_,
+            display_->get_renderer(),
             source->get_base(),
             nullptr,
             &target_rect,
@@ -109,10 +63,10 @@ namespace Dynamo {
 
         // Render actual source texture on its base
         set_render_target(source);
-        SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 0);
-        SDL_RenderClear(renderer_);
+        SDL_SetRenderDrawColor(display_->get_renderer(), 0, 0, 0, 0);
+        SDL_RenderClear(display_->get_renderer());
         SDL_RenderCopy(
-            renderer_, 
+            display_->get_renderer(), 
             source->get_texture(), 
             &source->get_source(), 
             nullptr
@@ -121,23 +75,20 @@ namespace Dynamo {
     }
 
     void Renderer::draw_point(Sprite *dest, Vec2D point, 
-                             Color color, RENDER_BLEND mode) {
-        if(!logic_bounds_.is_in_bounds(point)) {
-            return;
-        }
+                              Color color, RenderBlend mode) {
         SDL_SetRenderDrawBlendMode(
-            renderer_,
+            display_->get_renderer(),
             static_cast<SDL_BlendMode>(mode)
         );
         SDL_SetRenderDrawColor(
-            renderer_, 
+            display_->get_renderer(), 
             color.r, color.g, color.b, color.a
         );
 
         set_render_target(dest);
         SDL_Point sdl_point = point.convert_to_point();
         SDL_RenderDrawPoint(
-            renderer_, 
+            display_->get_renderer(), 
             sdl_point.x,
             sdl_point.y
         );
@@ -145,17 +96,13 @@ namespace Dynamo {
     }
 
     void Renderer::draw_line(Sprite *dest, Vec2D point1, Vec2D point2, 
-                            Color color, RENDER_BLEND mode) {
-        if(!logic_bounds_.is_in_bounds(point1) && 
-           !logic_bounds_.is_in_bounds(point2)) {
-            return;
-        }
+                             Color color, RenderBlend mode) {
         SDL_SetRenderDrawBlendMode(
-            renderer_,
+            display_->get_renderer(),
             static_cast<SDL_BlendMode>(mode)
         );
         SDL_SetRenderDrawColor(
-            renderer_, 
+            display_->get_renderer(), 
             color.r, color.g, color.b, color.a
         );
 
@@ -163,7 +110,7 @@ namespace Dynamo {
         SDL_Point sdl_p1 = point1.convert_to_point();
         SDL_Point sdl_p2 = point2.convert_to_point();
         SDL_RenderDrawLine(
-            renderer_, 
+            display_->get_renderer(), 
             sdl_p1.x,
             sdl_p1.y, 
             sdl_p2.x,
@@ -173,32 +120,29 @@ namespace Dynamo {
     }
 
     void Renderer::draw_rect(Sprite *dest, AABB box, 
-                            Color color, bool fill, RENDER_BLEND mode) {
-        if(!box.is_colliding(logic_bounds_)) {
-            return;
-        }
+                             Color color, bool fill, RenderBlend mode) {
         SDL_SetRenderDrawBlendMode(
-            renderer_,
+            display_->get_renderer(),
             static_cast<SDL_BlendMode>(mode)
         );
         SDL_SetRenderDrawColor(
-            renderer_, 
+            display_->get_renderer(), 
             color.r, color.g, color.b, color.a
         );
 
         set_render_target(dest);
         SDL_Rect rect = box.convert_to_rect();
         if(fill) {
-            SDL_RenderFillRect(renderer_, &rect);
+            SDL_RenderFillRect(display_->get_renderer(), &rect);
         }
         else {
-            SDL_RenderDrawRect(renderer_, &rect);
+            SDL_RenderDrawRect(display_->get_renderer(), &rect);
         }
         set_render_target(nullptr);
     }
 
     void Renderer::draw_circle(Sprite *dest, Vec2D center, int radius, 
-                              Color color, bool fill, RENDER_BLEND mode) {
+                               Color color, bool fill, RenderBlend mode) {
         // Midpoint algorithm generates circle points
         int x = radius;
         int y = 0;
@@ -230,25 +174,25 @@ namespace Dynamo {
 
         // Batch render the points
         SDL_SetRenderDrawBlendMode(
-            renderer_,
+            display_->get_renderer(),
             static_cast<SDL_BlendMode>(mode)
         );
         SDL_SetRenderDrawColor(
-            renderer_, 
+            display_->get_renderer(), 
             color.r, color.g, color.b, color.a
         );
 
         set_render_target(dest);
         if(!fill) {
             SDL_RenderDrawPoints(
-                renderer_,
+                display_->get_renderer(),
                 &points[0],
                 points.size()
             );
         }
         else {
             SDL_RenderDrawLines(
-                renderer_,
+                display_->get_renderer(),
                 &points[0],
                 points.size()
             );
@@ -257,7 +201,7 @@ namespace Dynamo {
     }
 
     void Renderer::draw_polygon(Sprite *dest, Vec2D points[], int n, 
-                               Color color, bool fill, RENDER_BLEND mode) {
+                                Color color, bool fill, RenderBlend mode) {
         if(!fill) {
             for(int i = 0; i < n; i++) {
                 draw_line(dest, points[i], points[(i+1)%n], color, mode);
@@ -341,12 +285,15 @@ namespace Dynamo {
     }
 
     void Renderer::refresh() {
-        SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_NONE);
+        SDL_SetRenderDrawBlendMode(
+            display_->get_renderer(), 
+            SDL_BLENDMODE_NONE
+        );
         SDL_SetRenderDrawColor(
-            renderer_, 
+            display_->get_renderer(), 
             border_color_.r, border_color_.g, border_color_.b, 0xFF
         );
-        SDL_RenderPresent(renderer_);
-        SDL_RenderClear(renderer_);
+        SDL_RenderPresent(display_->get_renderer());
+        SDL_RenderClear(display_->get_renderer());
     }
 }
