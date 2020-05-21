@@ -36,6 +36,14 @@ Their respective development libraries must be installed.
 
 To use `Dynamo`, the compiler must support at least C++17.
 
+## Compiling Demos
+
+The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `demos/build` directory, then run: 
+- `cmake .`
+- `make`
+
+This, of course, assumes that all the dependency requirements are satisfied.
+
 ## Contributing
 
 Anyone is welcome to open a pull request! State the issue being solved and explain the solution precisely. Just ensure that the new code adheres to the style of the codebase. 
@@ -51,7 +59,6 @@ For other major suggestions on improving the engine, open an issue so we can hav
 - Implement behavior trees
 - Implement A* pathfinder
 - Refactor GUI framework
-- Transition to smart pointers
 - Finish implementing custom network protocol
 - Migrate to the `Vulkan` API for low-level render calls
 
