@@ -1,2 +1,2 @@
-./demos/build/*
-!./demos/build/CMakeLists.txt
+demos/build/*
+!CMakeLists.txt
