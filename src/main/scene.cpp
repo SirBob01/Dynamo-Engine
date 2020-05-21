@@ -4,6 +4,7 @@ namespace Dynamo {
     Scene::Scene() {
         next_ = nullptr;
         kill_ = true;
+        draw_ = true;
     }
 
     void Scene::load(Core &core) {

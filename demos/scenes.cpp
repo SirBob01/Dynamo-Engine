@@ -40,9 +40,9 @@ void First::unload(Dynamo::Core &core) {
 
 void First::update(Dynamo::Core &core) {
     if(core.inputs.get_pressed_raw(Dynamo::Input::Q)) {
-        // Do not kill this scene, show it underneath
+        // Do not kill this scene, keep drawing it
         // Demonstrates scene layering
-        set_scene<Second>(false); 
+        set_scene<Second>(false, true); 
     }
 }
 

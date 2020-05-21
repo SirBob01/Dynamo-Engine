@@ -29,6 +29,7 @@ namespace Dynamo {
 
         Scene *next_; // Pointer to the next scene
         bool kill_;   // Should kill on transition?
+        bool draw_;   // Keep drawing if still alive?
 
         friend class Engine;
 
@@ -38,7 +39,7 @@ namespace Dynamo {
 
         // Set the next scene
         template <class S>
-        void set_scene(bool kill=true) {
+        void set_scene(bool kill=true, bool drawing=false) {
             unsigned type_id = registry_->get_id<S>();
             if(type_id >= scenes_->size()) {
                 S *scene = new S();
@@ -47,7 +48,10 @@ namespace Dynamo {
                 scenes_->push_back(scene);
             }
             next_ = (*scenes_)[type_id];
+            next_->draw_ = true;
+
             kill_ = kill;
+            draw_ = drawing;
         };
 
         // Initialize the scene and the necessary objects

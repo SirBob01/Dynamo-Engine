@@ -60,7 +60,9 @@ namespace Dynamo {
             current->update(core);
 
             for(auto &scene : active_) {
-                scene->draw(*renderer_);
+                if(scene->draw_) {
+                    scene->draw(*renderer_);                
+                }
             }
 
             if(current->next_) {
@@ -79,6 +81,7 @@ namespace Dynamo {
                 for(int i = 0; i < active_.size(); i++) {
                     if(active_[i] == next) {
                         search = i;
+                        break;
                     }
                 }
                 if(search == -1) {
