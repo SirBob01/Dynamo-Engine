@@ -26,7 +26,7 @@ public:
 
 // Definitions
 void First::load(Dynamo::Core &core) {
-    core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 64);
+    core.textures.load_font("sentry", "../assets/fonts/Sentry.ttf", 64);
     text = new Dynamo::Sprite(core.textures.load_text(
         "Scene 1! Press Q to load next scene.", 
         "sentry",
@@ -53,7 +53,7 @@ void First::draw(Dynamo::Renderer &renderer) {
 
 
 void Second::load(Dynamo::Core &core) {
-    core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 64);
+    core.textures.load_font("sentry", "../assets/fonts/Sentry.ttf", 64);
     text = new Dynamo::Sprite(core.textures.load_text(
         "Scene 2! Press Q to unload.", 
         "sentry",

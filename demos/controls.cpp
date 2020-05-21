@@ -7,7 +7,7 @@ class Game : public Dynamo::Scene {
 public:
     void load(Dynamo::Core &core) override {
         input_display = nullptr;
-        core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 64);
+        core.textures.load_font("sentry", "../assets/fonts/Sentry.ttf", 64);
         default_text = new Dynamo::Sprite(core.textures.load_text(
             "Press anything to test input!", 
             "sentry",

@@ -45,7 +45,7 @@ void Game::load(Dynamo::Core &core) {
         )
     );
     smiley = new Dynamo::Sprite(
-        core.textures.load_image("assets/textures/ball.png"),
+        core.textures.load_image("../assets/textures/ball.png"),
         {50, 50}
     );
 

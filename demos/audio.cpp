@@ -9,7 +9,7 @@ class Game : public Dynamo::Scene {
 
 public:
     void load(Dynamo::Core &core) override {
-        core.textures.load_font("sentry", "assets/fonts/Sentry.ttf", 32);
+        core.textures.load_font("sentry", "../assets/fonts/Sentry.ttf", 32);
 
         core.inputs.bind("play music", Dynamo::Input::Q);
         core.inputs.bind("play rain", Dynamo::Input::W);
@@ -36,7 +36,7 @@ public:
         ambient = core.jukebox.generate_stream();
         music = core.jukebox.generate_stream();
         
-        sfx = core.jukebox.load_sound("assets/audio/fusion_boom.ogg");
+        sfx = core.jukebox.load_sound("../assets/audio/fusion_boom.ogg");
         
         core.jukebox.set_volume(0.5);
     };
@@ -51,7 +51,7 @@ public:
     void update(Dynamo::Core &core) override {
         if(core.inputs.get_pressed("play music")) {
             core.jukebox.queue_stream(
-                "assets/audio/test_mixer.ogg", 
+                "../assets/audio/test_mixer.ogg", 
                 music, 
                 5, 5, -1 // Fade-in 5 seconds, abrupt stop
             );
@@ -66,7 +66,7 @@ public:
             core.jukebox.clear_stream(music);
         }
         if(core.inputs.get_pressed("play rain")) {
-            core.jukebox.queue_stream("assets/audio/rain.ogg", ambient);
+            core.jukebox.queue_stream("../assets/audio/rain.ogg", ambient);
         }
         if(core.inputs.get_pressed("play boom sfx")) {
             core.jukebox.play_sound(sfx, 0.5);
