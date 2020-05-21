@@ -1,0 +1,5 @@
+./demos/bin
+./demos/CMakeFiles
+./demos/CMakeCache.txt
+./demos/*.cmake
+./demos/Makefile
