@@ -7,7 +7,7 @@ project(.)
 file(GLOB_RECURSE INCLUDE "../../src/*.h")
 
 #However, the file(GLOB...) allows for wildcard additions:
-file(GLOB_RECURSE SOURCES "../../src/*.cpp")
+file(GLOB_RECURSE SOURCES "../../src/*.cpp" "../../src/*.c")
  
 add_executable(audio ../audio.cpp ${SOURCES} ${INCLUDE})
 add_executable(controls ../controls.cpp ${SOURCES} ${INCLUDE})
