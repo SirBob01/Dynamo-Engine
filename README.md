@@ -31,7 +31,6 @@ This engine wraps around `SDL2` and its extensions:
 - `SDL2_ttf`
 - `SDL2_net`
 
-The custom audio engine uses the `Ogg Vorbis` codec. <br/>
 Their respective development libraries must be installed.
 
 To use `Dynamo`, the compiler must support at least C++17.
