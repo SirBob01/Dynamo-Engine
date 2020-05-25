@@ -1,9 +1,8 @@
 #ifndef DYNAMO_JUKEBOX_H_
 #define DYNAMO_JUKEBOX_H_
+#define STB_VORBIS_HEADER_ONLY
 
 #include <SDL2/SDL.h>
-#include <vorbis/codec.h>
-#include <vorbis/vorbisfile.h>
 
 #include <unordered_map>
 #include <vector>
@@ -11,13 +10,14 @@
 #include <string>
 #include <memory>
 
+#include "../assets/stb_vorbis.c"
 #include "../util/ringbuffer.h"
 #include "../util/util.h"
 #include "../log/error.h"
 
 namespace Dynamo {
-    // A sound object is a byte array of PCM values
-    using Sound = std::vector<char>;
+    // A sound object is an array of PCM values (shorts)
+    using Sound = std::vector<short>;
 
     // A unique integer handle for a sound stream
     using SoundStream = unsigned int;
@@ -26,14 +26,13 @@ namespace Dynamo {
     class Jukebox {
         // Represent an audio file
         class AudioFile {
-            FILE *file;         // Byte file
-            OggVorbis_File vb;  // Encoded Ogg file
+            stb_vorbis *vb;
 
         public:
             AudioFile(std::string filename);
             ~AudioFile();
 
-            OggVorbis_File *get_encoded();
+            stb_vorbis *get_vorbis();
         };
 
         // Sound data passed into mixer
@@ -97,7 +96,7 @@ namespace Dynamo {
         void load_file(std::string filename);
 
         // Mix src into dst and clip the amplitude
-        void mix_raw(char *dst, char *src, int length, float volume);
+        void mix_raw(short *dst, short *src, int length, float volume);
 
         // Mix a chunk of sound onto the main track
         void mix_chunk(Chunk &chunk, int current_size);

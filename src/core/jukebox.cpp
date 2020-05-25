@@ -2,26 +2,21 @@
 
 namespace Dynamo {
     Jukebox::AudioFile::AudioFile(std::string filename) {
-        file = fopen(filename.c_str(), "rb");
-        if(!file) {
-            throw GenericError(filename + " file doesn't exist");
-        }
-        else if(ov_open_callbacks(file, &vb, nullptr, 
-                                  0, OV_CALLBACKS_NOCLOSE) < 0) {
-            throw GenericError(filename + " is not an Ogg Vorbis file");
+        vb = stb_vorbis_open_filename(filename.c_str(), nullptr, nullptr);
+        if(vb == nullptr) {
+            throw GenericError("Couldn't load Ogg Vorbis: " + filename);
         }
     }
 
     Jukebox::AudioFile::~AudioFile() {
-        ov_clear(&vb);
-        fclose(file);
+        stb_vorbis_close(vb);
     }
 
-    OggVorbis_File *Jukebox::AudioFile::get_encoded() {
-        return &vb;
+    stb_vorbis *Jukebox::AudioFile::get_vorbis() {
+        return vb;
     }
 
-    Jukebox::StreamLine::StreamLine() : track(4096) {
+    Jukebox::StreamLine::StreamLine() : track(2048) {
         volume = 0;
         max_volume = 1.0;
 
@@ -32,7 +27,7 @@ namespace Dynamo {
         playing = true;
     }
 
-    Jukebox::Jukebox() : base_(4096), record_(65536) {
+    Jukebox::Jukebox() : base_(2048), record_(65536) {
         // Initialize audio output device specifications
         SDL_AudioSpec desired_output;
         SDL_zero(desired_output);
@@ -75,7 +70,7 @@ namespace Dynamo {
 
     void Jukebox::play_callback(void *data, uint8_t *stream, int length) {
         Sound &base = *static_cast<Sound *>(data);
-        int written = base.size();
+        int written = base.size() * sizeof(short);
         SDL_memset(stream+written, 0, length-written);
         SDL_memcpy(stream, &base[0], written);
         base.clear();
@@ -97,19 +92,17 @@ namespace Dynamo {
         }
     }
 
-    void Jukebox::mix_raw(char *dst, char *src, int length, float volume) {
-        for(int i = 0; i < length; i += 2) {
-            float target = (dst[i+1] << 8) | (dst[i] & 0xFF);
-            float sample = (src[i+1] << 8) | (src[i] & 0xFF);
+    void Jukebox::mix_raw(short *dst, short *src, int length, float volume) {
+        for(int i = 0; i < length; i++) {
+            float target = dst[i];
+            float sample = src[i];
 
+            // Adjust volume and clip to prevent distortion
             sample *= (volume * master_volume_);
             target += sample;
-
-            // Clip to prevent distortion
             target = Util::clamp(target, -32768.0f, 32767.0f);
 
-            dst[i] = target;
-            dst[i+1] = static_cast<short>(target) >> 8;
+            dst[i] = static_cast<short>(target);
         }
     }
 
@@ -221,7 +214,9 @@ namespace Dynamo {
         check_stream_validity(stream);
         load_file(filename);
         auto &file = bank_[filename];
-        double duration = ov_time_total(file->get_encoded(), -1);
+        double duration = stb_vorbis_stream_length_in_seconds(
+            file->get_vorbis()
+        );
 
         streams_[stream].queue.push({
             file,
@@ -271,10 +266,7 @@ namespace Dynamo {
         // Reset the seek of each track in the stream before emptying
         while(!stream_line.queue.empty()) {
             StreamQueued &current = stream_line.queue.front();
-            ov_raw_seek(
-                current.file->get_encoded(), 
-                0
-            );
+            stb_vorbis_seek_start(current.file->get_vorbis());
             stream_line.queue.pop();
         }
     }
@@ -284,26 +276,18 @@ namespace Dynamo {
 
         load_file(filename);
         auto &file = bank_[filename];
-        vorbis_info *meta = ov_info(file->get_encoded(), -1);
 
-        char buffer[4096];
-        ov_raw_seek(file->get_encoded(), 0);
-        int eof = 0;
-        while(!eof) {
-            long bytes_read = ov_read(
-                file->get_encoded(), 
-                buffer, sizeof(buffer), 
-                0, 2, 1, 
-                nullptr
+        short buffer[2048];
+        stb_vorbis_seek_start(file->get_vorbis());
+        int read = -1;
+        while(read) {
+            read = stb_vorbis_get_samples_short_interleaved(
+                file->get_vorbis(), 2,
+                buffer,
+                2048
             );
-            for(int i = 0; i < bytes_read; i++) {
+            for(int i = 0; i < read * 2; i++) {
                 sound.emplace_back(buffer[i]);
-            }
-            if(bytes_read == 0) {
-                eof = 1;
-            }
-            else if(bytes_read == OV_EBADLINK) {
-                return sound;
             }
         }
         return sound;
@@ -315,7 +299,10 @@ namespace Dynamo {
 
     void Jukebox::stream_recorded(Sound &target) {
         while(!record_.is_empty()) {
-            target.emplace_back(record_.read());
+            char l = record_.read();
+            char r = record_.read();
+            short pcm = (r << 8) | (l & 0xFF);
+            target.emplace_back(pcm);
         }
     }
 
@@ -350,7 +337,7 @@ namespace Dynamo {
             }
 
             StreamQueued &current = stream.queue.front();
-            OggVorbis_File *ogg = current.file->get_encoded();
+            stb_vorbis *ogg = current.file->get_vorbis();
             if(stream.time < 0) {
                 stream.time = 0;
             }
@@ -377,29 +364,24 @@ namespace Dynamo {
             
             // Write to stream buffer
             while(stream.track.size() < stream.track.capacity()) {
-                char buffer[4096];
-                long bytes_read = ov_read(
-                    ogg, 
-                    buffer,
-                    stream.track.capacity() - stream.track.size(), 
-                    0, 2, 1, 
-                    nullptr
+                short buffer[2048];
+                int request = stream.track.capacity() - stream.track.size();
+                int samples = stb_vorbis_get_samples_short_interleaved(
+                    ogg, 2, buffer, request
                 );
-                
                 // EOF
-                if(!bytes_read) {
+                if(!samples) {
                     break;
                 }
-
-                for(int i = 0; i < bytes_read; i++) {
+                for(int i = 0; i < samples * 2; i++) {
                     stream.track.emplace_back(buffer[i]);
                 }
             }
 
             // End of track... loop or change?
             if(stream.time >= current.duration) {
-                ov_raw_seek(ogg, 0);
-                current.duration = ov_time_total(ogg, -1);
+                stb_vorbis_seek_start(ogg);
+                current.duration = stb_vorbis_stream_length_in_seconds(ogg);
                 
                 stream.volume = 0;
                 stream.time = -1;
@@ -431,7 +413,7 @@ namespace Dynamo {
 
     void Jukebox::clear() {
         for(auto &file : bank_) {
-            ov_raw_seek(file.second->get_encoded(), 0);
+            stb_vorbis_seek_start(file.second->get_vorbis());
         }
         chunks_.clear();
         streams_.clear();
