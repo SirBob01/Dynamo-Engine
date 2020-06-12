@@ -37,11 +37,11 @@ To use `Dynamo`, the compiler must support at least C++17.
 
 ## Compiling Demos
 
-The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `demos/build` directory, then run: 
-- `cmake .`
+The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `/demos/build` directory, then run: 
+- `cmake . -G BUILD_GENERATOR`
 - `make`
 
-This, of course, assumes that all the dependency requirements are satisfied.
+Replace `BUILD_GENERATOR` with the [generator](https://cmake.org/cmake/help/v3.2/manual/cmake-generators.7.html) applicable to your development environment. This assumes that all the dependency requirements are satisfied. 
 
 ## Contributing
 
