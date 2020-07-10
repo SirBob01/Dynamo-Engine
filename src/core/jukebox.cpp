@@ -54,8 +54,7 @@ namespace Dynamo {
             nullptr, 0, &desired_output, &output_spec_, 0
         );
         input_ = SDL_OpenAudioDevice(
-            nullptr, true, &desired_input, &input_spec_,
-            SDL_AUDIO_ALLOW_FORMAT_CHANGE
+            nullptr, 1, &desired_input, &input_spec_, 0
         );
 
         master_volume_ = 1.0;
