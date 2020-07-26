@@ -20,6 +20,12 @@ These features allow it to be used as a framework for general multimedia applica
 
 For a more in-depth look at the engine's components, visit the [__wiki__](https://github.com/SirBob01/Dynamo-Engine/wiki).
 
+## Screenshots
+<img src="./media/screenshots/rendering.png" alt="Rendering Test" width="400"/>
+<img src="./media/screenshots/ecs.png" alt="ECS Test" width="400"/>
+<img src="./media/screenshots/audio.png" alt="Audio Test" width="400"/>
+<img src="./media/screenshots/scenes.png" alt="Scene Test" width="400"/>
+
 ## Rationale
 
 I built this because I've always wanted to understand how game engines worked under the hood. This is mostly a learning exercise, but I also use it for my personal projects because of its flexibility and reusability.
