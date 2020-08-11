@@ -118,14 +118,14 @@ namespace Dynamo {
             std::swap(pool_[index], pool_.back());
             pool_.pop_back();
 
+            // Rearrange sparse set indices
             Entity temp = dense_.back();
-            dense_[index] = temp;
-            dense_.pop_back();
-
-            // Rearrange sparse set indices            
             uint32_t entity_index = EntityTracker::get_index(entity);
             uint32_t temp_index = EntityTracker::get_index(temp);
+
+            dense_[sparse_[entity_index]] = temp_index;
             sparse_[temp_index] = sparse_[entity_index];
+            dense_.pop_back();
         };
 
         // Perform a function on each component
