@@ -61,6 +61,7 @@ For other major suggestions on improving the engine, open an issue so we can hav
 
 ## TODO
 
+- Implement positional audio in Jukebox
 - Implement behavior trees
 - Implement A* pathfinder
 - Refactor GUI framework
