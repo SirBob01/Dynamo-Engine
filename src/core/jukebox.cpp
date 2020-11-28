@@ -19,6 +19,7 @@ namespace Dynamo {
     Jukebox::StreamLine::StreamLine() : track(2048) {
         volume = 0;
         max_volume = 1.0;
+        position = {0, 0};
 
         // So we can measure time starting from 0
         time = -1;
@@ -58,6 +59,7 @@ namespace Dynamo {
         );
 
         master_volume_ = 1.0;
+        max_distance_ = 250.0f;
         play();
     }
 
@@ -91,17 +93,30 @@ namespace Dynamo {
         }
     }
 
-    void Jukebox::mix_raw(short *dst, short *src, int length, float volume) {
+    void Jukebox::mix_raw(short *dst, short *src, int length, 
+                          float volume, Vec2D position) {
+        float distance = Util::clamp(position.x / max_distance_, -1.0f, 1.0f);
+        float left_v = volume * ((1.0f - distance) / 2.0f);
+        float right_v = volume * ((1.0f + distance) / 2.0f);
+        bool left_channel = true;
         for(int i = 0; i < length; i++) {
             float target = dst[i];
             float sample = src[i];
 
             // Adjust volume and clip to prevent distortion
-            sample *= (volume * master_volume_);
+            if(left_channel) {
+                sample *= (master_volume_ * left_v);            
+            }
+            else {
+                sample *= (master_volume_ * right_v);            
+            }
+            
+            // Add the final sample into the mix
             target += sample;
             target = Util::clamp(target, -32768.0f, 32767.0f);
 
             dst[i] = static_cast<short>(target);
+            left_channel = !left_channel;
         }
     }
 
@@ -118,7 +133,8 @@ namespace Dynamo {
             &base_[0] + current_size,
             &(*chunk.sound)[0] + chunk.written,
             length,
-            chunk.volume
+            chunk.volume,
+            chunk.position
         );
         chunk.written += length;
     }
@@ -136,7 +152,8 @@ namespace Dynamo {
             &base_[0] + current_size,
             &stream.track[0],
             length,
-            stream.volume
+            stream.volume,
+            stream.position
         );
         stream.track.resize(stream.track.size() - length);
     }
@@ -161,6 +178,10 @@ namespace Dynamo {
         return master_volume_;
     }
 
+    float Jukebox::get_max_distance() {
+        return max_distance_;
+    }
+
     void Jukebox::set_volume(float volume) {
         if(volume > 1.0) {
             volume = 1.0;
@@ -169,6 +190,10 @@ namespace Dynamo {
             volume = 0;
         }
         master_volume_ = volume;
+    }
+
+    void Jukebox::set_max_distance(float distance) {
+        max_distance_ = distance;
     }
 
     SoundStream Jukebox::generate_stream() {
@@ -205,6 +230,11 @@ namespace Dynamo {
             volume = 0;
         }
         streams_[stream].max_volume = volume;
+    }
+
+    void Jukebox::set_stream_position(SoundStream stream, Vec2D position) {
+        check_stream_validity(stream);
+        streams_[stream].position = position;
     }
 
     void Jukebox::queue_stream(std::string filename, SoundStream stream,
@@ -292,8 +322,8 @@ namespace Dynamo {
         return sound;
     }
 
-    void Jukebox::play_sound(Sound &sound, float volume) {
-        chunks_.emplace_back(Chunk {&sound, 0, volume});
+    void Jukebox::play_sound(Sound &sound, float volume, Vec2D position) {
+        chunks_.emplace_back(Chunk {&sound, 0, volume, position});
     }
 
     void Jukebox::stream_recorded(Sound &target) {

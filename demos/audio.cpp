@@ -49,6 +49,11 @@ public:
     };
 
     void update(Dynamo::Core &core) override {
+        // Test stereo panning
+        // Listener is at the center of the screen
+        Dynamo::Vec2D position = core.inputs.get_mouse_pos() - core.display.get_dimensions()/2.0;
+        core.jukebox.set_stream_position(music, position);
+        
         if(core.inputs.get_pressed("play music")) {
             core.jukebox.queue_stream(
                 "../assets/audio/test_mixer.ogg", 
@@ -69,7 +74,7 @@ public:
             core.jukebox.queue_stream("../assets/audio/rain.ogg", ambient);
         }
         if(core.inputs.get_pressed("play boom sfx")) {
-            core.jukebox.play_sound(sfx, 0.5);
+            core.jukebox.play_sound(sfx, 0.5, position);
         }
         if(core.inputs.get_pressed("toggle pause")) {
             if(core.jukebox.is_stream_playing(music)) {

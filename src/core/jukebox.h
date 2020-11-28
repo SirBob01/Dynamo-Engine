@@ -12,6 +12,7 @@
 
 #include "../assets/stb_vorbis.c"
 #include "../util/ringbuffer.h"
+#include "../util/vector.h"
 #include "../util/util.h"
 #include "../log/error.h"
 
@@ -40,6 +41,7 @@ namespace Dynamo {
             Sound *sound;
             int written;
             float volume;
+            Vec2D position;
         };
 
         // A queued stream unit
@@ -61,6 +63,7 @@ namespace Dynamo {
             
             float volume;
             float max_volume;
+            Vec2D position;
 
             double time; // Time position on current track
             int loop_counter;
@@ -86,6 +89,9 @@ namespace Dynamo {
 
         float master_volume_;
 
+        // Maximum distance from audio source in pixels
+        float max_distance_;
+
         // SDL_Audio playback function
         static void play_callback(void *data, uint8_t *stream, int length);
         
@@ -96,7 +102,8 @@ namespace Dynamo {
         void load_file(std::string filename);
 
         // Mix src into dst and clip the amplitude
-        void mix_raw(short *dst, short *src, int length, float volume);
+        void mix_raw(short *dst, short *src, int length, 
+                     float volume, Vec2D position);
 
         // Mix a chunk of sound onto the main track
         void mix_chunk(Chunk &chunk, int current_size);
@@ -120,8 +127,14 @@ namespace Dynamo {
         // Get the master volume
         float get_volume();
 
+        // Get the maximum distance for positional audio
+        float get_max_distance();
+
         // Set the master volume
         void set_volume(float volume);
+
+        // Set the maximum distance for positional audio
+        void set_max_distance(float distance);
 
         // Generate a streaming track
         // Return the index to the stream
@@ -141,6 +154,9 @@ namespace Dynamo {
 
         // Set the stream volume
         void set_stream_volume(SoundStream stream, float volume);
+
+        // Set the position of the stream relative to the listener
+        void set_stream_position(SoundStream stream, Vec2D position);
 
         // Queue a new audio into a streaming track
         // Allows fading in and out timing in seconds
@@ -166,7 +182,8 @@ namespace Dynamo {
         Sound load_sound(std::string filename);
 
         // Play a sound bite
-        void play_sound(Sound &sound, float volume=1.0);
+        void play_sound(Sound &sound, float volume=1.0, 
+                        Vec2D position={0, 0});
 
         // Copy contents of internal record buffer to target buffer
         void stream_recorded(Sound &target);
