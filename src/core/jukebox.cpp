@@ -1,5 +1,5 @@
 #include "jukebox.h"
-
+#include <iostream>
 namespace Dynamo {
     Jukebox::AudioFile::AudioFile(std::string filename) {
         vb = stb_vorbis_open_filename(filename.c_str(), nullptr, nullptr);
@@ -95,9 +95,20 @@ namespace Dynamo {
 
     void Jukebox::mix_raw(short *dst, short *src, int length, 
                           float volume, Vec2D position) {
-        float distance = Util::clamp(position.x / max_distance_, -1.0f, 1.0f);
-        float left_v = volume * ((1.0f - distance) / 2.0f);
-        float right_v = volume * ((1.0f + distance) / 2.0f);
+        // Distance attenuation
+        float intensity;
+        if(position.x == 0) {
+            intensity = 1.0f;
+        }
+        else {
+            intensity = Util::clamp(max_distance_/std::fabs(position.x), 0.0f, 1.0f);
+        }
+        
+        // 2D stereo panning
+        Vec2D dir = position.normalize();
+        float right_v = (1.0 + dir.x)/2.0;
+        float left_v = std::fabs((-1.0 + dir.x)/2.0);
+        
         bool left_channel = true;
         for(int i = 0; i < length; i++) {
             float target = dst[i];
@@ -105,10 +116,10 @@ namespace Dynamo {
 
             // Adjust volume and clip to prevent distortion
             if(left_channel) {
-                sample *= (master_volume_ * left_v);            
+                sample *= (intensity * volume * master_volume_ * left_v);
             }
             else {
-                sample *= (master_volume_ * right_v);            
+                sample *= (intensity * volume * master_volume_ * right_v);            
             }
             
             // Add the final sample into the mix

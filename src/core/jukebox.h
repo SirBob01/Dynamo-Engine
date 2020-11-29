@@ -9,6 +9,7 @@
 #include <queue>
 #include <string>
 #include <memory>
+#include <cmath>
 
 #include "../assets/stb_vorbis.c"
 #include "../util/ringbuffer.h"
