@@ -61,6 +61,7 @@ For other major suggestions on improving the engine, open an issue so we can hav
 
 ## TODO
 
+- Implement the Doppler effect (frequency and pitch shifting) in Jukebox
 - Implement behavior trees
 - Implement A* pathfinder
 - Refactor GUI framework
