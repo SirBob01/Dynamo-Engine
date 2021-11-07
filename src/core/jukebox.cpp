@@ -95,20 +95,21 @@ namespace Dynamo {
 
     void Jukebox::mix_raw(short *dst, short *src, int length, 
                           float volume, Vec2D position) {
-        // Distance attenuation
+        // Volumes
+        float left_v = 1.0f;
+        float right_v = 1.0f;
+        float intensity = 1.0f;
+
+        // Distance attenuation and stereo panning
         float distance = position.length();
-        float intensity;
-        if(distance == 0) {
-            intensity = 1.0f;
-        }
-        else {
-            intensity = Util::clamp(max_distance_/distance, 0.0f, 1.0f);
+        if(distance > 0) {
+            intensity = Util::clamp(max_distance_ / distance, 0.0f, 1.0f);
+
+            Vec2D unit = position / distance;
+            left_v = std::fabs((-1.0 + unit.x)/2.0);
+            right_v = (1.0 + unit.x)/2.0;
         }
         
-        // 2D stereo panning
-        Vec2D unit = position / distance;
-        float right_v = (1.0 + unit.x)/2.0;
-        float left_v = std::fabs((-1.0 + unit.x)/2.0);
 
         bool left_channel = true;
         for(int i = 0; i < length; i++) {
