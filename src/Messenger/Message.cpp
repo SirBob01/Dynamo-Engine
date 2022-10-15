@@ -1,8 +1,8 @@
-#include "./Message.hpp"
+#include "Message.hpp"
 
 namespace Dynamo {
     std::string Message::format() {
-        if (error) {
+        if (is_error) {
             return fmt::format("[ERROR {:%Y-%m-%d %H:%M:%S}] {}",
                                timestamp,
                                content);

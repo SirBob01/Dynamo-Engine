@@ -1,5 +1,4 @@
-#ifndef DYNAMO_MESSENGER_MESSAGE_HPP_
-#define DYNAMO_MESSENGER_MESSAGE_HPP_
+#pragma once
 
 #include <chrono>
 #include <string>
@@ -13,23 +12,9 @@ namespace Dynamo {
      *
      */
     struct Message {
-        /**
-         * @brief Exact time the message was generated
-         *
-         */
         std::chrono::_V2::system_clock::time_point timestamp;
-
-        /**
-         * @brief Message content
-         *
-         */
         std::string content;
-
-        /**
-         * @brief Is the message an error?
-         *
-         */
-        bool error;
+        bool is_error;
 
         /**
          * @brief Get the string representation of the message
@@ -39,5 +24,3 @@ namespace Dynamo {
         std::string format();
     };
 } // namespace Dynamo
-
-#endif

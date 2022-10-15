@@ -1,3 +1,6 @@
 [submodule "submodules/fmt"]
 	path = submodules/fmt
 	url = git@github.com:fmtlib/fmt.git
+[submodule "submodules/glfw"]
+	path = submodules/glfw
+	url = git@github.com:glfw/glfw.git

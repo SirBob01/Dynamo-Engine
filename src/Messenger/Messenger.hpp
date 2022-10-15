@@ -1,5 +1,4 @@
-#ifndef DYNAMO_MESSENGER_HPP_
-#define DYNAMO_MESSENGER_HPP_
+#pragma once
 
 #include <chrono>
 #include <fstream>
@@ -12,31 +11,14 @@
 #include <fmt/chrono.h>
 #include <fmt/format.h>
 
-#include "./Message.hpp"
+#include "Message.hpp"
 
 namespace Dynamo {
-    /**
-     * @brief Enumerates all possible points of failure in the engine
-     *
-     */
-    enum ErrorCode { CoreFailure };
-
-    /**
-     * @brief Messages associated with each error code
-     *
-     */
-    static const std::unordered_map<ErrorCode, std::string> ErrorMessages = {
-        {ErrorCode::CoreFailure, "An internal failure has occurred."}};
-
     /**
      * @brief Logging utility handler
      *
      */
     class Messenger {
-        /**
-         * @brief List of all logged messages
-         *
-         */
         inline static std::vector<Message> _log;
 
       public:
@@ -50,10 +32,10 @@ namespace Dynamo {
         /**
          * @brief Log an error to stderr
          *
-         * @param code Error code
-         * @param exit Terminate the process
+         * @param content Message to be displayed
+         * @param exit    Terminate the process
          */
-        static void error(ErrorCode code, bool exit = true);
+        static void error(std::string content, bool exit = true);
 
         /**
          * @brief Dump the log history to disk
@@ -63,5 +45,3 @@ namespace Dynamo {
         static void dump();
     };
 } // namespace Dynamo
-
-#endif

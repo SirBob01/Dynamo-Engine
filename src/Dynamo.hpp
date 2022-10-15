@@ -1,7 +1,8 @@
-#ifndef DYNAMO_HPP_
-#define DYNAMO_HPP_
+#pragma once
 
 #include "Messenger/Message.hpp"
 #include "Messenger/Messenger.hpp"
 
-#endif
+#include "Engine/Engine.hpp"
+
+#include "Utils/TypeId.hpp"

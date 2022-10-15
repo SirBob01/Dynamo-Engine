@@ -8,9 +8,9 @@ namespace Dynamo {
         std::cout << message.format() << std::endl;
     }
 
-    void Messenger::error(ErrorCode code, bool exit) {
+    void Messenger::error(std::string content, bool exit) {
         const auto timestamp = std::chrono::system_clock::now();
-        Message message = {timestamp, ErrorMessages.at(code), true};
+        Message message = {timestamp, content, true};
         _log.push_back(message);
         std::cerr << message.format() << std::endl;
 
