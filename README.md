@@ -2,7 +2,7 @@
 
 ---
 
-`Dynamo` is a C++ game engine powered by `SDL2` and its extension libraries. 
+`Dynamo` is a C++ game engine powered by `SDL2` and its extension libraries.
 
 The API is meant to simplify the application development process, automating core processes like the main loop and state handling. Aside from abstracting away low-level resource management, the library offers additional game development utilities.
 
@@ -18,9 +18,10 @@ The API is meant to simplify the application development process, automating cor
 
 These features allow it to be used as a framework for general multimedia applications.
 
-For a more in-depth look at the engine's components, visit the [__wiki__](https://github.com/SirBob01/Dynamo-Engine/wiki).
+For a more in-depth look at the engine's components, visit the [**wiki**](https://github.com/SirBob01/Dynamo-Engine/wiki).
 
 ## Screenshots
+
 <img src="./media/screenshots/rendering.png" alt="Rendering Test" width="400"/>
 <img src="./media/screenshots/ecs.png" alt="ECS Test" width="400"/>
 <img src="./media/screenshots/audio.png" alt="Audio Test" width="400"/>
@@ -32,26 +33,21 @@ I built this because I've always wanted to understand how game engines worked un
 
 ## Dependencies
 
-This engine wraps around `SDL2` and its extensions:
-- `SDL2_image`
-- `SDL2_ttf`
-- `SDL2_net`
-
-Their respective development libraries must be installed.
-
-To use `Dynamo`, the compiler must support at least C++17.
+To use `Dynamo`, the compiler must support at least C++20.
 
 ## Compiling Demos
 
-The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `/demos/build` directory, then run: 
+The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `/demos/build` directory, then run:
+
 - `cmake . -G BUILD_GENERATOR`
 - `make`
 
-Replace `BUILD_GENERATOR` with the [generator](https://cmake.org/cmake/help/v3.2/manual/cmake-generators.7.html) applicable to your development environment. This assumes that all the dependency requirements are satisfied. 
+Replace `BUILD_GENERATOR` with the [generator](https://cmake.org/cmake/help/v3.2/manual/cmake-generators.7.html) applicable to your development environment. This assumes that all the dependency requirements are satisfied.
 
 ## Contributing
 
-Anyone is welcome to open a pull request! State the issue being solved and explain the solution precisely. Just ensure that the new code adheres to the style of the codebase. 
+Anyone is welcome to open a pull request! State the issue being solved and explain the solution precisely. Just ensure that the new code adheres to the style of the codebase.
+
 - Maximum line width of 80 characters
 - For long parameter lists, either split them across multiple lines or store them in a new (private) POD
 - Only API functions and objects should be publicly accessible
@@ -63,7 +59,7 @@ For other major suggestions on improving the engine, open an issue so we can hav
 
 - Implement the Doppler effect (frequency and pitch shifting) in Jukebox
 - Implement behavior trees
-- Implement A* pathfinder
+- Implement A\* pathfinder
 - Refactor GUI framework
 - Finish implementing custom network protocol
 - Migrate to the `Vulkan` API for low-level render calls
