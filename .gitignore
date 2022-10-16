@@ -2,3 +2,4 @@ demos/build/*
 !CMakeLists.txt
 .vscode/*
 build
+.DS_Store
