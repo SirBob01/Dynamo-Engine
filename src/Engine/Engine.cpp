@@ -16,10 +16,9 @@ namespace Dynamo {
 
     Engine::~Engine() { glfwTerminate(); }
 
-    void Engine::run() {
-        while (!_display->get_closed()) {
-            _display->refresh();
-        }
-        Messenger::log("Closed!");
-    }
+    Core Engine::get_core() { return {*_display}; }
+
+    bool Engine::is_running() { return !_display->is_closed(); }
+
+    void Engine::run() { _display->refresh(); }
 } // namespace Dynamo

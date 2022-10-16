@@ -41,13 +41,13 @@ namespace Dynamo {
 
     const Vec2 &Display::get_size() { return _size; }
 
-    bool Display::get_closed() { return glfwWindowShouldClose(_window); }
+    bool Display::is_closed() { return glfwWindowShouldClose(_window); }
 
-    bool Display::get_fullscreen() {
+    bool Display::is_fullscreen() {
         return glfwGetWindowMonitor(_window) != nullptr;
     }
 
-    bool Display::get_vsync() { return _vsync; }
+    bool Display::is_vsync() { return _vsync; }
 
     void Display::set_size(const Vec2 &size) {
         _size.x = size.x;

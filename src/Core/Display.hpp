@@ -72,7 +72,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool get_closed();
+        bool is_closed();
 
         /**
          * @brief Is the display windowed or in fullscreen?
@@ -80,7 +80,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool get_fullscreen();
+        bool is_fullscreen();
 
         /**
          * @brief Is vsync enabled?
@@ -88,7 +88,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool get_vsync();
+        bool is_vsync();
 
         /**
          * @brief Set the logical size of the display
@@ -126,7 +126,9 @@ namespace Dynamo {
         void set_icon(std::string filename);
 
         /**
-         * @brief Called every tick
+         * @brief Refresh the display
+         *
+         * This is called at the end of every tick
          *
          */
         void refresh();

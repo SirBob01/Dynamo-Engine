@@ -1,7 +1,6 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
+#include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Messenger/Messenger.hpp"
 #include "EngineFlag.hpp"
@@ -38,6 +37,21 @@ namespace Dynamo {
          *
          */
         ~Engine();
+
+        /**
+         * @brief Get the core modules
+         *
+         * @return const Core
+         */
+        Core get_core();
+
+        /**
+         * @brief Is the application still running?
+         *
+         * @return true
+         * @return false
+         */
+        bool is_running();
 
         /**
          * @brief Perform a single frame update

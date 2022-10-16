@@ -2,7 +2,8 @@
 
 int main() {
     Dynamo::Engine engine("Hello, world!", 640, 480);
-    engine.run();
-
+    while (engine.is_running()) {
+        engine.run();
+    }
     return 0;
 }
