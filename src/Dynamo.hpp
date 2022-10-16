@@ -1,4 +1,5 @@
 #pragma once
+#define GLFW_INCLUDE_VULKAN
 
 #include "Messenger/Message.hpp"
 #include "Messenger/Messenger.hpp"

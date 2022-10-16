@@ -1,7 +1,9 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.24)
 project(.)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -O")
+find_package(Vulkan REQUIRED glslangValidator)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -O3")
 
 add_subdirectory("submodules/fmt")
 add_subdirectory("submodules/glfw")
@@ -15,4 +17,4 @@ add_library(Dynamo STATIC ${SOURCES} ${INCLUDE})
 target_include_directories(Dynamo PUBLIC "./src")
 
 # Link all libraries together
-target_link_libraries(Dynamo fmt glfw)
+target_link_libraries(Dynamo fmt glfw Vulkan::Vulkan)
