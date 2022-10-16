@@ -22,8 +22,8 @@ namespace Dynamo {
          * @brief Construct a new Engine object
          *
          * @param title  Title of the window
-         * @param width  Initial width of the display
-         * @param height Initial height of the display
+         * @param width  Initial width of the display (0 if width of screen)
+         * @param height Initial height of the display (0 if height of screen)
          * @param flags  Initial configuration settings
          */
         Engine(std::string title,

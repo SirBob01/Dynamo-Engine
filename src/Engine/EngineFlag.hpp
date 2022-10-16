@@ -15,6 +15,12 @@ namespace Dynamo {
          *
          */
         FullScreen = 1 << 0,
+
+        /**
+         * @brief Enable vsync
+         *
+         */
+        VSync = 1 << 1
     };
 
     inline unsigned operator&(EngineFlag lhs, EngineFlag rhs) {

@@ -4,7 +4,9 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../Math/Vec2.hpp"
 #include "../Messenger/Messenger.hpp"
+#include "../Vendor/stb_image.h"
 
 namespace Dynamo {
     /**
@@ -13,7 +15,11 @@ namespace Dynamo {
      *
      */
     class Display {
+        GLFWmonitor *_monitor;
         GLFWwindow *_window;
+
+        Vec2 _size;
+        bool _vsync;
 
       public:
         /**
@@ -23,8 +29,13 @@ namespace Dynamo {
          * @param height     Initial height of the window
          * @param title      Title of the window
          * @param fullscreen Toggle fullscreen mode
+         * @param vsync      Toggle vsync
          */
-        Display(int width, int height, std::string title, bool fullscreen);
+        Display(int width,
+                int height,
+                std::string title,
+                bool fullscreen,
+                bool vsync);
 
         /**
          * @brief Destroy the Display object
@@ -39,7 +50,52 @@ namespace Dynamo {
          *
          * @return GLFWwindow&
          */
-        GLFWwindow &get_window();
+        const GLFWwindow &get_window();
+
+        /**
+         * @brief Get the size of the display in screen coordinates
+         *
+         * @return Vec2
+         */
+        Vec2 get_window_size();
+
+        /**
+         * @brief Get the logical size of the display in pixels
+         *
+         * @return const Vec2&
+         */
+        const Vec2 &get_size();
+
+        /**
+         * @brief Is the display closed?
+         *
+         * @return true
+         * @return false
+         */
+        bool get_closed();
+
+        /**
+         * @brief Is the display windowed or in fullscreen?
+         *
+         * @return true
+         * @return false
+         */
+        bool get_fullscreen();
+
+        /**
+         * @brief Is vsync enabled?
+         *
+         * @return true
+         * @return false
+         */
+        bool get_vsync();
+
+        /**
+         * @brief Set the logical size of the display
+         *
+         * @param size
+         */
+        void set_size(const Vec2 &size);
 
         /**
          * @brief Set the title of the display
@@ -47,5 +103,32 @@ namespace Dynamo {
          * @param title
          */
         void set_title(std::string title);
+
+        /**
+         * @brief Toggle fullscreen or windowed
+         *
+         * @param fullscreen
+         */
+        void set_fullscreen(bool fullscreen);
+
+        /**
+         * @brief Toggle vsync
+         *
+         * @param vsync
+         */
+        void set_vsync(bool vsync);
+
+        /**
+         * @brief Set the icon of the window
+         *
+         * @param filename Path to the image file
+         */
+        void set_icon(std::string filename);
+
+        /**
+         * @brief Called every tick
+         *
+         */
+        void refresh();
     };
 } // namespace Dynamo

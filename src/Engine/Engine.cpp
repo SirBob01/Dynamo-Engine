@@ -10,14 +10,16 @@ namespace Dynamo {
         _display = std::make_unique<Display>(width,
                                              height,
                                              title,
-                                             flags & EngineFlag::FullScreen);
+                                             flags & EngineFlag::FullScreen,
+                                             flags & EngineFlag::VSync);
     }
 
     Engine::~Engine() { glfwTerminate(); }
 
     void Engine::run() {
-        while (!glfwWindowShouldClose(&_display->get_window())) {
-            glfwPollEvents();
+        while (!_display->get_closed()) {
+            _display->refresh();
         }
+        Messenger::log("Closed!");
     }
 } // namespace Dynamo
