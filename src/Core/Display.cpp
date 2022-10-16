@@ -31,7 +31,7 @@ namespace Dynamo {
 
     Display::~Display() { glfwDestroyWindow(_window); }
 
-    const GLFWwindow &Display::get_window() { return *_window; }
+    GLFWwindow *Display::get_window() { return _window; }
 
     Vec2 Display::get_window_size() {
         int width, height;
@@ -97,9 +97,7 @@ namespace Dynamo {
                                     STBI_rgb_alpha);
         if (!pixels) {
             Messenger::error("Could not load window icon file `" + filename +
-                                 "`",
-                             false);
-            return;
+                             "`");
         }
         GLFWimage image = {
             width,
@@ -108,6 +106,4 @@ namespace Dynamo {
         };
         glfwSetWindowIcon(_window, 1, &image);
     }
-
-    void Display::refresh() { glfwPollEvents(); }
 } // namespace Dynamo

@@ -50,7 +50,7 @@ namespace Dynamo {
          *
          * @return GLFWwindow&
          */
-        const GLFWwindow &get_window();
+        GLFWwindow *get_window();
 
         /**
          * @brief Get the size of the display in screen coordinates
@@ -124,13 +124,5 @@ namespace Dynamo {
          * @param filename Path to the image file
          */
         void set_icon(std::string filename);
-
-        /**
-         * @brief Refresh the display
-         *
-         * This is called at the end of every tick
-         *
-         */
-        void refresh();
     };
 } // namespace Dynamo

@@ -33,7 +33,7 @@ I built this because I've always wanted to understand how game engines worked un
 
 ## Dependencies
 
-To use `Dynamo`, the compiler must support at least C++20.
+To use `Dynamo`, the compiler must support at least C++17.
 
 ## Compiling Demos
 
@@ -62,7 +62,14 @@ For other major suggestions on improving the engine, open an issue so we can hav
 - Implement A\* pathfinder
 - Refactor GUI framework
 - Finish implementing custom network protocol
-- Migrate to the `Vulkan` API for low-level render calls
+
+## Rewrite TODO
+
+- Clock management system
+- `Scene` management system
+- `Jukebox` class
+- `Renderer` submodule
+- `ECS` submodule
 
 ## License
 

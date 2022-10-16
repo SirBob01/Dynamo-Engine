@@ -2,6 +2,7 @@
 
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
+#include "../Core/Input.hpp"
 #include "../Messenger/Messenger.hpp"
 #include "../Utils/Random.hpp"
 #include "EngineFlag.hpp"
@@ -16,6 +17,7 @@ namespace Dynamo {
      */
     class Engine {
         std::unique_ptr<Display> _display;
+        std::unique_ptr<Input> _input;
 
       public:
         /**

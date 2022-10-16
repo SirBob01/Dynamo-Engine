@@ -3,9 +3,8 @@
 
 int main() {
     Dynamo::Messenger::log("Hello, world!");
-    Dynamo::Messenger::log("This is a logging example!");
-    Dynamo::Messenger::error("This error is silent...", false);
-    Dynamo::Messenger::error("This error will crash!");
+    Dynamo::Messenger::warn("This is a warning...");
+    Dynamo::Messenger::error("This is an error!");
 
     // Dead code
     std::cout << "This should not execute!" << std::endl;

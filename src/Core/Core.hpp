@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Display.hpp"
+#include "Input.hpp"
 
 namespace Dynamo {
     /**
@@ -13,5 +14,11 @@ namespace Dynamo {
          *
          */
         Display &display;
+
+        /**
+         * @brief Input handler
+         *
+         */
+        Input &input;
     };
 } // namespace Dynamo

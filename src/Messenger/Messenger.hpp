@@ -30,12 +30,18 @@ namespace Dynamo {
         static void log(std::string content);
 
         /**
-         * @brief Log an error to stderr
+         * @brief Log an error to stderr and terminate the process
          *
          * @param content Message to be displayed
-         * @param exit    Terminate the process
          */
-        static void error(std::string content, bool exit = true);
+        static void error(std::string content);
+
+        /**
+         * @brief Log a warning to stderr
+         *
+         * @param content Message to be displayed
+         */
+        static void warn(std::string content);
 
         /**
          * @brief Dump the log history to disk

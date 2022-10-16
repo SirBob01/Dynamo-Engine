@@ -8,13 +8,19 @@
 
 namespace Dynamo {
     /**
+     * @brief Enumerates the different warning types
+     *
+     */
+    enum class MessageType { Log, Warning, Error };
+
+    /**
      * @brief Message object
      *
      */
     struct Message {
         std::chrono::_V2::system_clock::time_point timestamp;
         std::string content;
-        bool is_error;
+        MessageType type;
 
         /**
          * @brief Get the string representation of the message
