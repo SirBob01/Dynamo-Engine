@@ -1,3 +1,4 @@
 demos/build/*
 !CMakeLists.txt
 .vscode/*
+build

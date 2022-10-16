@@ -3,10 +3,10 @@
 #include <memory>
 
 #include <GLFW/glfw3.h>
+#include <stb_image.h>
 
 #include "../Math/Vec2.hpp"
 #include "../Messenger/Messenger.hpp"
-#include "../Vendor/stb_image.h"
 
 namespace Dynamo {
     /**
@@ -62,9 +62,9 @@ namespace Dynamo {
         /**
          * @brief Get the logical size of the display in pixels
          *
-         * @return const Vec2&
+         * @return Vec2
          */
-        const Vec2 &get_size();
+        Vec2 get_size();
 
         /**
          * @brief Is the display closed?
@@ -95,7 +95,7 @@ namespace Dynamo {
          *
          * @param size
          */
-        void set_size(const Vec2 &size);
+        void set_size(Vec2 size);
 
         /**
          * @brief Set the title of the display

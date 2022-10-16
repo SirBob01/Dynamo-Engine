@@ -39,7 +39,7 @@ namespace Dynamo {
         return Vec2(width, height);
     }
 
-    const Vec2 &Display::get_size() { return _size; }
+    Vec2 Display::get_size() { return _size; }
 
     bool Display::is_closed() { return glfwWindowShouldClose(_window); }
 
@@ -49,7 +49,7 @@ namespace Dynamo {
 
     bool Display::is_vsync() { return _vsync; }
 
-    void Display::set_size(const Vec2 &size) {
+    void Display::set_size(Vec2 size) {
         _size.x = size.x;
         _size.y = size.y;
     }
