@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Core/Clock.hpp"
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Core/Input.hpp"
@@ -18,6 +19,7 @@ namespace Dynamo {
     class Engine {
         std::unique_ptr<Display> _display;
         std::unique_ptr<Input> _input;
+        std::unique_ptr<Clock> _clock;
 
       public:
         /**

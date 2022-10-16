@@ -3,6 +3,7 @@
 
 #include "Engine/Engine.hpp"
 
+#include "Core/Clock.hpp"
 #include "Core/Core.hpp"
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"

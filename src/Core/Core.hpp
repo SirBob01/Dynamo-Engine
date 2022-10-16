@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Clock.hpp"
 #include "Display.hpp"
 #include "Input.hpp"
 
@@ -20,5 +21,11 @@ namespace Dynamo {
          *
          */
         Input &input;
+
+        /**
+         * @brief Time manager
+         *
+         */
+        Clock &clock;
     };
 } // namespace Dynamo

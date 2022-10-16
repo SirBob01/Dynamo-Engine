@@ -10,6 +10,19 @@ namespace Dynamo {
         float d, e, f;
         float g, h, i;
 
+        /**
+         * @brief Construct a new Mat3 object
+         *
+         * @param a
+         * @param b
+         * @param c
+         * @param d
+         * @param e
+         * @param f
+         * @param g
+         * @param h
+         * @param i
+         */
         Mat3(float a = 1,
              float b = 0,
              float c = 0,

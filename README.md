@@ -65,7 +65,6 @@ For other major suggestions on improving the engine, open an issue so we can hav
 
 ## Rewrite TODO
 
-- Clock management system
 - `Scene` management system
 - `Jukebox` class
 - `Renderer` submodule
