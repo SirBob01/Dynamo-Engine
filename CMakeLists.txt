@@ -8,8 +8,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -O3")
 add_subdirectory("submodules/fmt")
 add_subdirectory("submodules/glfw")
 
-include_directories("submodules/stb")
-
 #Dynamo library files
 file(GLOB_RECURSE INCLUDE "./src/*.hpp" "./src/*.h")
 file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*.c")
