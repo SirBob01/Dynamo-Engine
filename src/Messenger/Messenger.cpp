@@ -23,7 +23,7 @@ namespace Dynamo {
         const auto timestamp = std::chrono::system_clock::now();
         Message message = {timestamp, content, MessageType::Warning};
         _log.push_back(message);
-        std::cout << message.format() << std::endl;
+        std::cerr << message.format() << std::endl;
     }
 
     void Messenger::dump() {
