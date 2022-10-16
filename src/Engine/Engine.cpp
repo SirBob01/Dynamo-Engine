@@ -12,6 +12,10 @@ namespace Dynamo {
                                              title,
                                              flags & EngineFlag::FullScreen,
                                              flags & EngineFlag::VSync);
+
+        // Seed the random number generator
+        Random::seed(
+            std::chrono::system_clock::now().time_since_epoch().count());
     }
 
     Engine::~Engine() { glfwTerminate(); }

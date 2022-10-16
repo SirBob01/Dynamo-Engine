@@ -3,6 +3,7 @@
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Messenger/Messenger.hpp"
+#include "../Utils/Random.hpp"
 #include "EngineFlag.hpp"
 
 namespace Dynamo {

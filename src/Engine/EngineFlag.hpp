@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Dynamo {
     /**
      * @brief Customizable flags for initializing the engine
