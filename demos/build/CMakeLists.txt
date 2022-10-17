@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 3.24)
 project(.)
 
-add_subdirectory("../.." "./Dynamo")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -O3")
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED on)
+
+add_compile_options(-Wall -g -O3)
+
+add_subdirectory("../.." "./Dynamo")
 
 # Compile each demo
 file(GLOB DEMOS "../*.cpp")

@@ -18,7 +18,7 @@ namespace Dynamo {
      *
      */
     struct Message {
-        std::chrono::_V2::system_clock::time_point timestamp;
+        std::chrono::system_clock::time_point timestamp;
         std::string content;
         MessageType type;
 
