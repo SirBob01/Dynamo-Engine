@@ -96,7 +96,7 @@ namespace Dynamo {
                                     &channels,
                                     STBI_rgb_alpha);
         if (!pixels) {
-            Log::warn("Could not load window icon file `" + filename + "`");
+            Log::warn("Could not load window icon file `{}`", filename);
             return;
         }
         GLFWimage image = {
