@@ -2,7 +2,7 @@
 
 ---
 
-`Dynamo` is a C++ game engine powered by `SDL2` and its extension libraries.
+`Dynamo` is a C++ game engine powered by `Vulkan`.
 
 The API is meant to simplify the application development process, automating core processes like the main loop and state handling. Aside from abstracting away low-level resource management, the library offers additional game development utilities.
 
@@ -52,16 +52,13 @@ For high-level suggestions on improving the engine, open an issue so we can have
 ## TODO
 
 - Implement the Doppler effect (frequency and pitch shifting) in Jukebox
-- Implement behavior trees
-- Implement A\* pathfinder
-- Refactor GUI framework
 - Finish implementing custom network protocol
 
 ## Rewrite TODO
 
-- `Scene` management system
 - `Jukebox` class
 - `Renderer` submodule
+- `Scene` management system
 - `ECS` submodule
 - Integrate `ImGUI` for engine interface
 - Integrate `Mono C#` for scripting
