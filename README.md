@@ -34,6 +34,8 @@ I built this because I've always wanted to understand how game engines worked un
 
 To use `Dynamo`, the compiler must support at least C++17.
 
+`Dynamo` uses a number of submodules that can be installed by running `git submodule update --init`
+
 ## Compiling Demos
 
 The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `/demos/build` directory, then run:
@@ -65,6 +67,6 @@ For high-level suggestions on improving the engine, open an issue so we can have
 
 ## License
 
-Code and documentation Copyright (c) 2019-2020 Keith Leonardo
+Code and documentation Copyright (c) 2019-2022 Keith Leonardo
 
 Code released under the [MIT License](https://choosealicense.com/licenses/mit/).
