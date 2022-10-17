@@ -11,7 +11,6 @@ The API is meant to simplify the application development process, automating cor
 - A user-friendly and intuitive C++ API
 - Native support for an optimized [ECS](https://en.wikipedia.org/wiki/Entity_component_system) architecture in designing game objects
 - A simplified Scene management system
-- Artificial intelligence utilities including [FSM](https://en.wikipedia.org/wiki/Finite-state_machine)
 - Animating sprites, rasterizing primitives, and rendering text
 - An audio engine that supports multiple streaming tracks and raw PCM data manipulation
 - ... and more!
@@ -48,12 +47,7 @@ Replace `BUILD_GENERATOR` with the [generator](https://cmake.org/cmake/help/v3.2
 
 Anyone is welcome to open a pull request! State the issue being solved and explain the solution precisely. Just ensure that the new code adheres to the style of the codebase.
 
-- Maximum line width of 80 characters
-- For long parameter lists, either split them across multiple lines or store them in a new (private) POD
-- Only API functions and objects should be publicly accessible
-- All code must be within `namespace Dynamo`
-
-For other major suggestions on improving the engine, open an issue so we can have a discussion.
+For high-level suggestions on improving the engine, open an issue so we can have a discussion.
 
 ## TODO
 
@@ -69,6 +63,8 @@ For other major suggestions on improving the engine, open an issue so we can hav
 - `Jukebox` class
 - `Renderer` submodule
 - `ECS` submodule
+- Integrate `ImGUI` for engine interface
+- Integrate `Mono C#` for scripting
 
 ## License
 
