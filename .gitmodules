@@ -7,3 +7,6 @@
 [submodule "submodules/stb"]
 	path = submodules/stb
 	url = git@github.com:nothings/stb.git
+[submodule "submodules/portaudio"]
+	path = submodules/portaudio
+	url = git@github.com:PortAudio/portaudio.git

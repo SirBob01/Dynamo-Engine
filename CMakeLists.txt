@@ -13,6 +13,7 @@ find_package(Vulkan REQUIRED glslangValidator)
 
 add_subdirectory("submodules/fmt")
 add_subdirectory("submodules/glfw")
+add_subdirectory("submodules/portaudio")
 
 #Dynamo library files
 file(GLOB_RECURSE INCLUDE "./src/*.hpp" "./src/*.h")
@@ -23,4 +24,4 @@ add_library(Dynamo STATIC ${SOURCES} ${INCLUDE})
 target_include_directories(Dynamo PUBLIC "./src" "./submodules/stb")
 
 # Link all libraries together
-target_link_libraries(Dynamo fmt glfw Vulkan::Vulkan)
+target_link_libraries(Dynamo fmt glfw Vulkan::Vulkan PortAudio)
