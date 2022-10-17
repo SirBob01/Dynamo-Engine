@@ -14,7 +14,7 @@ namespace Dynamo {
                                content);
             break;
         default:
-            return fmt::format("[DEBUG {:%Y-%m-%d %H:%M:%S}] {}",
+            return fmt::format("[INFO {:%Y-%m-%d %H:%M:%S}] {}",
                                timestamp,
                                content);
             break;
