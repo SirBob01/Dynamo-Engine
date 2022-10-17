@@ -1,12 +1,16 @@
 #pragma once
 
+#include "EngineFlag.hpp"
+
 #include "../Core/Clock.hpp"
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Core/Input.hpp"
+
+#include "../Jukebox/Jukebox.hpp"
+
 #include "../Log/Log.hpp"
 #include "../Utils/Random.hpp"
-#include "EngineFlag.hpp"
 
 namespace Dynamo {
     /**
@@ -20,6 +24,8 @@ namespace Dynamo {
         std::unique_ptr<Display> _display;
         std::unique_ptr<Input> _input;
         std::unique_ptr<Clock> _clock;
+
+        std::unique_ptr<Jukebox> _jukebox;
 
       public:
         /**

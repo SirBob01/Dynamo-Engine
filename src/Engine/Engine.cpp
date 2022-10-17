@@ -7,6 +7,7 @@ namespace Dynamo {
             Log::error("Failed to initialize GLFW.");
         }
 
+        // Core submodules
         _display = std::make_unique<Display>(width,
                                              height,
                                              title,
@@ -14,6 +15,9 @@ namespace Dynamo {
                                              flags & EngineFlag::VSync);
         _input = std::make_unique<Input>(*_display);
         _clock = std::make_unique<Clock>();
+
+        // Rendering submodules
+        _jukebox = std::make_unique<Jukebox>();
 
         // Seed the random number generator
         Random::seed(
