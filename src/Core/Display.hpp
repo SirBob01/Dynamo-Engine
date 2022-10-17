@@ -3,8 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
+#include "../Log/Log.hpp"
 #include "../Math/Vec2.hpp"
-#include "../Messenger/Messenger.hpp"
 
 namespace Dynamo {
     /**

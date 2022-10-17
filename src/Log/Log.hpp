@@ -18,22 +18,22 @@ namespace Dynamo {
      * @brief Logging utility handler
      *
      */
-    class Messenger {
-        inline static std::vector<Message> _log;
+    class Log {
+        inline static std::vector<Message> _history;
 
       public:
         /**
-         * @brief Log a message to stdout
+         * @brief Log an informative message to stdout
          *
          * @param format Formatting template string
          * @param args   Data arguments (optional)
          */
         template <typename... Types>
-        static void log(std::string format, Types... args) {
+        static void info(std::string format, Types... args) {
             const auto timestamp = std::chrono::system_clock::now();
             std::string content = fmt::format(format, args...);
-            Message message = {timestamp, content, MessageType::Log};
-            _log.push_back(message);
+            Message message = {timestamp, content, MessageType::Info};
+            _history.push_back(message);
             std::cout << message.format() << std::endl;
         }
 
@@ -48,7 +48,7 @@ namespace Dynamo {
             const auto timestamp = std::chrono::system_clock::now();
             std::string content = fmt::format(format, args...);
             Message message = {timestamp, content, MessageType::Error};
-            _log.push_back(message);
+            _history.push_back(message);
             std::cerr << message.format() << std::endl;
 
             // Terminate and write the log to disk
@@ -67,7 +67,7 @@ namespace Dynamo {
             const auto timestamp = std::chrono::system_clock::now();
             std::string content = fmt::format(format, args...);
             Message message = {timestamp, content, MessageType::Warning};
-            _log.push_back(message);
+            _history.push_back(message);
             std::cerr << message.format() << std::endl;
         }
 

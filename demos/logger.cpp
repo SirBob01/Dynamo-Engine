@@ -2,9 +2,9 @@
 #include <iostream>
 
 int main() {
-    Dynamo::Messenger::log("Hello, world!");
-    Dynamo::Messenger::warn("This is a warning...");
-    Dynamo::Messenger::error("This is an error!");
+    Dynamo::Log::info("Hello, world!");
+    Dynamo::Log::warn("This is a warning...");
+    Dynamo::Log::error("This is an error!");
 
     // Dead code
     std::cout << "This should not execute!" << std::endl;

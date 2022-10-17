@@ -1,7 +1,7 @@
-#include "Messenger.hpp"
+#include "Log.hpp"
 
 namespace Dynamo {
-    void Messenger::dump() {
+    void Log::dump() {
         auto timestamp = std::chrono::floor<std::chrono::seconds>(
             std::chrono::system_clock::now());
         std::string filename =
@@ -10,7 +10,7 @@ namespace Dynamo {
         std::ofstream outfile;
         outfile.open(filename, std::ios::out);
 
-        for (Message &message : _log) {
+        for (Message &message : _history) {
             std::string formatted = message.format();
             outfile.write(formatted.c_str(), formatted.length());
             outfile.write("\n", 1);

@@ -11,7 +11,7 @@ namespace Dynamo {
      * @brief Enumerates the different warning types
      *
      */
-    enum class MessageType { Log, Warning, Error };
+    enum class MessageType { Info, Warning, Error };
 
     /**
      * @brief Message object

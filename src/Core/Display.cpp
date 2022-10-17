@@ -9,7 +9,7 @@ namespace Dynamo {
                      bool vsync) {
         _monitor = glfwGetPrimaryMonitor();
         if (!_monitor) {
-            Messenger::error("GLFW could not find primary monitor device.");
+            Log::error("GLFW could not find primary monitor device.");
         }
         const GLFWvidmode *mode = glfwGetVideoMode(_monitor);
         if (width == 0) width = mode->width;
@@ -21,7 +21,7 @@ namespace Dynamo {
         _vsync = vsync;
 
         if (!_window) {
-            Messenger::error("Failed to create a GLFW window");
+            Log::error("Failed to create a GLFW window");
         }
         glfwMakeContextCurrent(_window);
 
@@ -96,8 +96,7 @@ namespace Dynamo {
                                     &channels,
                                     STBI_rgb_alpha);
         if (!pixels) {
-            Messenger::error("Could not load window icon file `" + filename +
-                             "`");
+            Log::error("Could not load window icon file `" + filename + "`");
         }
         GLFWimage image = {
             width,

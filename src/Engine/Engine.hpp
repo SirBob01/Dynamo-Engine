@@ -4,7 +4,7 @@
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Core/Input.hpp"
-#include "../Messenger/Messenger.hpp"
+#include "../Log/Log.hpp"
 #include "../Utils/Random.hpp"
 #include "EngineFlag.hpp"
 

@@ -14,5 +14,5 @@
 #include "Utils/Random.hpp"
 #include "Utils/TypeId.hpp"
 
-#include "Messenger/Message.hpp"
-#include "Messenger/Messenger.hpp"
+#include "Log/Log.hpp"
+#include "Log/Message.hpp"
