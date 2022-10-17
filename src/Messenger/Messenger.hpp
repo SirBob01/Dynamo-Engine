@@ -25,23 +25,51 @@ namespace Dynamo {
         /**
          * @brief Log a message to stdout
          *
-         * @param content Message to be displayed
+         * @param format Formatting template string
+         * @param args   Data arguments (optional)
          */
-        static void log(std::string content);
+        template <typename... Types>
+        static void log(std::string format, Types... args) {
+            const auto timestamp = std::chrono::system_clock::now();
+            std::string content = fmt::format(format, args...);
+            Message message = {timestamp, content, MessageType::Log};
+            _log.push_back(message);
+            std::cout << message.format() << std::endl;
+        }
 
         /**
          * @brief Log an error to stderr and terminate the process
          *
-         * @param content Message to be displayed
+         * @param format Formatting template string
+         * @param args   Data arguments (optional)
          */
-        static void error(std::string content);
+        template <typename... Types>
+        static void error(std::string format, Types... args) {
+            const auto timestamp = std::chrono::system_clock::now();
+            std::string content = fmt::format(format, args...);
+            Message message = {timestamp, content, MessageType::Error};
+            _log.push_back(message);
+            std::cerr << message.format() << std::endl;
+
+            // Terminate and write the log to disk
+            dump();
+            throw std::runtime_error("Dynamo has crashed.");
+        }
 
         /**
          * @brief Log a warning to stderr
          *
-         * @param content Message to be displayed
+         * @param format Formatting template string
+         * @param args   Data arguments (optional)
          */
-        static void warn(std::string content);
+        template <typename... Types>
+        static void warn(std::string format, Types... args) {
+            const auto timestamp = std::chrono::system_clock::now();
+            std::string content = fmt::format(format, args...);
+            Message message = {timestamp, content, MessageType::Warning};
+            _log.push_back(message);
+            std::cerr << message.format() << std::endl;
+        }
 
         /**
          * @brief Dump the log history to disk
