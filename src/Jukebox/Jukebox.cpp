@@ -11,9 +11,33 @@ namespace Dynamo {
                        Pa_GetErrorText(err));
         }
 
+        // Get list of sound devices
+        int device_count = Pa_GetDeviceCount();
+        if (device_count < 0) {
+            err = device_count;
+            Log::error("PortAudio failed to count sound devices: {}",
+                       Pa_GetErrorText(err));
+        }
+
+        // Calculate default input and output channels
+        int input_channels = 0;
+        int output_channels = 0;
+        for (int index = 0; index < device_count; index++) {
+            const PaDeviceInfo *device_info = Pa_GetDeviceInfo(index);
+            if (index == Pa_GetDefaultInputDevice()) {
+                input_channels = device_info->maxInputChannels;
+            } else if (index == Pa_GetDefaultOutputDevice()) {
+                output_channels = device_info->maxOutputChannels;
+            }
+        }
+        if (!output_channels) {
+            Log::error("PortAudio could not find suitable audio devices.");
+        }
+
+        // Start the IO stream
         err = Pa_OpenDefaultStream(&_stream,
-                                   2, // Number of input channels
-                                   2, // Number of output channels
+                                   input_channels,
+                                   output_channels,
                                    paFloat32,
                                    JUKEBOX_SAMPLE_RATE,
                                    paFramesPerBufferUnspecified,
@@ -56,7 +80,6 @@ namespace Dynamo {
                                  const PaStreamCallbackTimeInfo *time_info,
                                  PaStreamCallbackFlags status_flags,
                                  void *data) {
-        // TODO: Implement
         return 0;
     }
 } // namespace Dynamo

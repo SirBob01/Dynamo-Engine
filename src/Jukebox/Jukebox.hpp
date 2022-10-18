@@ -40,8 +40,8 @@ namespace Dynamo {
          * @brief Callback for passing data between the runtime and the sound
          * devices
          *
-         * @param input        Input sound stream
-         * @param output       Output sound stream
+         * @param input        Input sound buffer (recording device)
+         * @param output       Output sound buffer (speaker device)
          * @param frame_count  Frames per buffer
          * @param time_info    Time information in seconds
          * @param status_flags Status flags
