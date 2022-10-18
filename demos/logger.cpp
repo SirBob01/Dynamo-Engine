@@ -3,6 +3,7 @@
 
 int main() {
     Dynamo::Log::info("Hello, world!");
+    Dynamo::Log::info();
     Dynamo::Log::warn("This is a warning...");
     Dynamo::Log::error("This is an error!");
 

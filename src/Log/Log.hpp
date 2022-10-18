@@ -29,7 +29,7 @@ namespace Dynamo {
          * @param args   Data arguments (optional)
          */
         template <typename... Types>
-        static void info(std::string format, Types... args) {
+        static void info(std::string format = "", Types... args) {
             const auto timestamp = std::chrono::system_clock::now();
             std::string content = fmt::format(format, args...);
             Message message = {timestamp, content, MessageType::Info};
