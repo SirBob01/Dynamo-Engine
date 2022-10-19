@@ -15,12 +15,13 @@ add_subdirectory("submodules/fmt")
 add_subdirectory("submodules/glfw")
 add_subdirectory("submodules/portaudio")
 
-#Dynamo library files
+# Dynamo library files
 file(GLOB_RECURSE INCLUDE "./src/*.hpp" "./src/*.h")
 file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*.c")
+file(GLOB STB_SOURCES "./submodules/stb/*.c")
 
 # Make Dynamo a shared library
-add_library(Dynamo STATIC ${SOURCES} ${INCLUDE} "./submodules/stb/stb_vorbis.c")
+add_library(Dynamo STATIC ${SOURCES} ${INCLUDE} ${STB_SOURCES})
 target_include_directories(Dynamo PUBLIC "./src" "./submodules/stb")
 
 # Link all libraries together
