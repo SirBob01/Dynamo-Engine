@@ -8,6 +8,11 @@
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"
 
+#include "Jukebox/Jukebox.hpp"
+
+#include "Resource/Resource.hpp"
+#include "Resource/ResourceManager.hpp"
+
 #include "Math/Mat3.hpp"
 #include "Math/Vec2.hpp"
 
