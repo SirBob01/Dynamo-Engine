@@ -2,9 +2,15 @@
 
 namespace Dynamo {
     Jukebox::Jukebox() {
-        PaError err;
+        // Initialize state
+        _state.input_channels = 0;
+        _state.output_channels = 0;
+        _state.volume = 1.0f;
+        _state.playing = true;
+        _state.recording = false;
 
         // Initialize PortAudio
+        PaError err;
         err = Pa_Initialize();
         if (err != paNoError) {
             Log::error("Could not initialize PortAudio subsystem: {}",
@@ -20,30 +26,27 @@ namespace Dynamo {
         }
 
         // Calculate default input and output channels
-        int input_channels = 0;
-        int output_channels = 0;
         for (int index = 0; index < device_count; index++) {
             const PaDeviceInfo *device_info = Pa_GetDeviceInfo(index);
             if (index == Pa_GetDefaultInputDevice()) {
-                input_channels = device_info->maxInputChannels;
+                _state.input_channels = device_info->maxInputChannels;
             } else if (index == Pa_GetDefaultOutputDevice()) {
-                output_channels = device_info->maxOutputChannels;
+                _state.output_channels = device_info->maxOutputChannels;
             }
         }
-        if (!output_channels) {
+        if (!_state.output_channels) {
             Log::error("PortAudio could not find suitable audio devices.");
         }
 
         // Start the IO stream
         err = Pa_OpenDefaultStream(&_stream,
-                                   input_channels,
-                                   output_channels,
+                                   _state.input_channels,
+                                   _state.output_channels,
                                    paFloat32,
                                    JUKEBOX_SAMPLE_RATE,
                                    paFramesPerBufferUnspecified,
                                    stream_callback,
-                                   nullptr // TODO: Pass userdata
-        );
+                                   &_state);
         if (err != paNoError) {
             Log::error("Could not open PortAudio stream: {}",
                        Pa_GetErrorText(err));
@@ -80,6 +83,19 @@ namespace Dynamo {
                                  const PaStreamCallbackTimeInfo *time_info,
                                  PaStreamCallbackFlags status_flags,
                                  void *data) {
+        State &state = *static_cast<State *>(data);
+        const float *input_buffer = static_cast<const float *>(input);
+        float *output_buffer = static_cast<float *>(output);
         return 0;
+    }
+
+    bool Jukebox::is_playing() { return _state.playing; }
+
+    bool Jukebox::is_recording() { return _state.recording; }
+
+    float Jukebox::get_volume() { return _state.volume; }
+
+    void Jukebox::set_volume(float volume) {
+        _state.volume = std::min(std::max(volume, 0.0f), 1.0f);
     }
 } // namespace Dynamo

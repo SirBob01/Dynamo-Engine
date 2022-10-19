@@ -11,16 +11,9 @@
 
 #include "../Log/Log.hpp"
 #include "../Math/Vec3.hpp"
+#include "./Sound.hpp"
 
 namespace Dynamo {
-    /**
-     * @brief Raw sound data is an array of PCM values
-     *
-     * Each PCM value ranges between [-1.0, 1.0]
-     *
-     */
-    using Sound = std::vector<float>;
-
     /**
      * @brief A stream on which audio tracks can be played
      *
@@ -35,6 +28,22 @@ namespace Dynamo {
      */
     class Jukebox {
         PaStream *_stream;
+
+        /**
+         * @brief Internal state
+         *
+         */
+        struct State {
+            WaveForm base;
+
+            int input_channels;
+            int output_channels;
+
+            float volume;
+            bool playing;
+            bool recording;
+        };
+        State _state;
 
         /**
          * @brief Callback for passing data between the runtime and the sound
@@ -67,5 +76,35 @@ namespace Dynamo {
          *
          */
         ~Jukebox();
+
+        /**
+         * @brief Is the output device playing?
+         *
+         * @return true
+         * @return false
+         */
+        bool is_playing();
+
+        /**
+         * @brief Is the input device listening
+         *
+         * @return true
+         * @return false
+         */
+        bool is_recording();
+
+        /**
+         * @brief Get the master volume
+         *
+         * @return float
+         */
+        float get_volume();
+
+        /**
+         * @brief Set the master volume
+         *
+         * @param volume
+         */
+        void set_volume(float volume);
     };
 } // namespace Dynamo

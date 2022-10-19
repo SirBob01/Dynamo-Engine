@@ -9,6 +9,7 @@
 #include "Core/Input.hpp"
 
 #include "Jukebox/Jukebox.hpp"
+#include "Jukebox/Sound.hpp"
 
 #include "Resource/Resource.hpp"
 #include "Resource/ResourceManager.hpp"
