@@ -1,6 +1,11 @@
 #pragma once
 
 namespace Dynamo {
+    /**
+     * @brief A circular buffer such that the writehead will automatically loop
+     * back at the start of the buffer as it overflows, discarding old data
+     *
+     */
     class RingBuffer {
         char *_buffer;
 
