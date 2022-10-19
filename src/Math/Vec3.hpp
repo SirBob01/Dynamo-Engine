@@ -161,10 +161,12 @@ namespace Dynamo {
          * @return Vec3&
          */
         inline Vec3 &transform(const Mat4 &mat) {
-            float w = 1.0 / (mat.m * x + mat.n * y + mat.o * z + mat.p);
-            x = (mat.a * x + mat.b * y + mat.c * z + mat.d) * w;
-            y = (mat.e * x + mat.f * y + mat.g * z + mat.h) * w;
-            y = (mat.i * x + mat.j * y + mat.k * z + mat.l) * w;
+            const auto &vals = mat.values;
+            float w =
+                1.0 / (vals[12] * x + vals[13] * y + vals[14] * z + vals[15]);
+            x = (vals[0] * x + vals[1] * y + vals[2] * z + vals[3]) * w;
+            y = (vals[4] * x + vals[5] * y + vals[6] * z + vals[7]) * w;
+            y = (vals[8] * x + vals[9] * y + vals[10] * z + vals[11]) * w;
             return *this;
         }
 

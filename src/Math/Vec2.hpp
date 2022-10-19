@@ -169,9 +169,10 @@ namespace Dynamo {
          * @return Vec2&
          */
         inline Vec2 &transform(const Mat3 &mat) {
-            float w = 1.0 / (mat.g * x + mat.h * y + mat.i);
-            x = (mat.a * x + mat.b * y + mat.c) * w;
-            y = (mat.d * x + mat.e * y + mat.f) * w;
+            const auto &vals = mat.values;
+            float w = 1.0 / (vals[6] * x + vals[7] * y + vals[8]);
+            x = (vals[0] * x + vals[1] * y + vals[2]) * w;
+            y = (vals[3] * x + vals[4] * y + vals[5]) * w;
             return *this;
         }
 
