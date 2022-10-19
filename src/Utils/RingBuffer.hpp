@@ -1,25 +1,34 @@
 #pragma once
 
+#include <array>
+
 namespace Dynamo {
     /**
-     * @brief A circular buffer such that the writehead will automatically loop
-     * back at the start of the buffer as it overflows, discarding old data
+     * @brief A circular buffer such that writing will automatically loop back
+     * at the start of the buffer as it overflows, discarding old data
      *
+     * The buffer keeps track of a read and write pointer
+     * The buffer is full if write is just behind read
+     * The buffer is empty if the read and write point to the same index
+     *
+     * @tparam N Maximum size of the ring buffer
      */
+    template <int N>
     class RingBuffer {
-        char *_buffer;
-
-        int _size;
-        int _read, _write;
+        std::array<char, N> _buffer;
+        int _read;
+        int _write;
 
       public:
         /**
-         * @brief Construct a new RingBuffer object of a certain size
+         * @brief Construct a new Ring Buffer object
          *
-         * @param size
          */
-        RingBuffer(int size);
-        ~RingBuffer();
+        RingBuffer() : _read(0), _write(0) {
+            for (int i = 0; i < N; i++) {
+                _buffer[i] = 0;
+            }
+        }
 
         /**
          * @brief Check if the buffer is full
@@ -27,7 +36,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_full();
+        inline bool is_full() { return _write == (_read + N - 1) % N; }
 
         /**
          * @brief Check if the buffer is empty
@@ -35,32 +44,53 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_empty();
+        inline bool is_empty() { return _write == _read; }
 
         /**
-         * @brief Read a byte from the buffer
+         * @brief Read a byte from the buffer, advancing the read pointer
          *
          * @return char
          */
-        char read();
+        inline char read() {
+            if (is_empty()) {
+                return 0;
+            }
+            char byte = _buffer[_read];
+            _read = (_read + 1) % N;
+            return byte;
+        }
 
         /**
-         * @brief Write a byte into the buffer
+         * @brief Write a byte into the buffer, advancing the write pointer
          *
          * @param byte
          */
-        void write(char byte);
+        inline void write(char byte) {
+            if (is_full()) {
+                return;
+            }
+            _buffer[_write] = byte;
+            _write = (_write + 1) % N;
+        }
 
         /**
-         * @brief Pop a byte from the buffer
+         * @brief Pop a byte from the buffer, shifting back the write pointer
          *
          */
-        void pop();
+        inline void pop() {
+            if (is_empty()) {
+                return;
+            }
+            _write = (_write + N - 1) % N;
+        }
 
         /**
          * @brief Empty the buffer
          *
          */
-        void clear();
+        inline void clear() {
+            _read = 0;
+            _write = 0;
+        }
     };
 } // namespace Dynamo

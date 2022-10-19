@@ -18,6 +18,7 @@
 #include "Math/Vec2.hpp"
 
 #include "Utils/Random.hpp"
+#include "Utils/RingBuffer.hpp"
 #include "Utils/TypeId.hpp"
 
 #include "Log/Log.hpp"
