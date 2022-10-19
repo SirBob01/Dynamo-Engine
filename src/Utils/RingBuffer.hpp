@@ -11,24 +11,21 @@ namespace Dynamo {
      * The buffer is full if write is just behind read
      * The buffer is empty if the read and write point to the same index
      *
+     * @tparam T Type of element
      * @tparam N Maximum size of the ring buffer
      */
-    template <int N>
+    template <typename T, int N>
     class RingBuffer {
-        std::array<char, N> _buffer;
+        std::array<T, N> _buffer;
         int _read;
         int _write;
 
       public:
         /**
-         * @brief Construct a new Ring Buffer object
+         * @brief Construct a new RingBuffer object
          *
          */
-        RingBuffer() : _read(0), _write(0) {
-            for (int i = 0; i < N; i++) {
-                _buffer[i] = 0;
-            }
-        }
+        RingBuffer() : _read(0), _write(0) {}
 
         /**
          * @brief Check if the buffer is full
@@ -47,40 +44,34 @@ namespace Dynamo {
         inline bool is_empty() { return _write == _read; }
 
         /**
-         * @brief Read a byte from the buffer, advancing the read pointer
+         * @brief Read a value from the buffer, advancing the read pointer
          *
-         * @return char
+         * @return T
          */
-        inline char read() {
-            if (is_empty()) {
-                return 0;
-            }
-            char byte = _buffer[_read];
+        inline T read() {
+            DYN_ASSERT(!is_empty());
+            T value = _buffer[_read];
             _read = (_read + 1) % N;
-            return byte;
+            return value;
         }
 
         /**
-         * @brief Write a byte into the buffer, advancing the write pointer
+         * @brief Write a value into the buffer, advancing the write pointer
          *
-         * @param byte
+         * @param value
          */
-        inline void write(char byte) {
-            if (is_full()) {
-                return;
-            }
-            _buffer[_write] = byte;
+        inline void write(T value) {
+            if (is_full()) return;
+            _buffer[_write] = value;
             _write = (_write + 1) % N;
         }
 
         /**
-         * @brief Pop a byte from the buffer, shifting back the write pointer
+         * @brief Pop a value from the buffer, shifting back the write pointer
          *
          */
         inline void pop() {
-            if (is_empty()) {
-                return;
-            }
+            if (is_empty()) return;
             _write = (_write + N - 1) % N;
         }
 

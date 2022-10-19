@@ -1,5 +1,16 @@
 #pragma once
 
+#ifndef NDEBUG
+#define DYN_ASSERT(cond)                                                       \
+    !cond ? Dynamo::Log::error("Assertion {} failed: {}, Line {}",             \
+                               #cond,                                          \
+                               __FILE__,                                       \
+                               __LINE__)                                       \
+          : (void(0))
+#else
+#define DYNAMO_ASSERT(cond) (void(0))
+#endif
+
 #include <chrono>
 #include <fstream>
 #include <iostream>
