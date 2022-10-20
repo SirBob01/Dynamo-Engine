@@ -10,9 +10,10 @@
 
 #include "Jukebox/Jukebox.hpp"
 #include "Jukebox/Sound.hpp"
+#include "Jukebox/SoundManager.hpp"
 
-#include "Resource/Resource.hpp"
-#include "Resource/ResourceManager.hpp"
+#include "Asset/Asset.hpp"
+#include "Asset/AssetManager.hpp"
 
 #include "Math/Mat3.hpp"
 #include "Math/Vec2.hpp"

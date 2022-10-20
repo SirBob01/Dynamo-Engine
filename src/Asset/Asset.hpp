@@ -2,14 +2,14 @@
 
 namespace Dynamo {
     /**
-     * @brief Resource handle
+     * @brief Asset handle
      *
-     * @tparam T Structure of the resource data
+     * @tparam T Structure of the asset data
      */
     template <typename T>
-    struct Resource {
+    struct Asset {
         /**
-         * @brief Index for accessing the resource
+         * @brief Index for accessing the asset
          *
          */
         const unsigned long index;
