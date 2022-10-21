@@ -17,7 +17,8 @@ namespace Dynamo {
         _clock = std::make_unique<Clock>();
 
         // Rendering submodules
-        _jukebox = std::make_unique<Jukebox>();
+        _sound_assets = std::make_unique<SoundManager>();
+        _jukebox = std::make_unique<Jukebox>(*_sound_assets);
 
         // Seed the random number generator
         Random::seed(

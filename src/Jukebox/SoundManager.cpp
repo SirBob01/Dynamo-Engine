@@ -11,11 +11,11 @@ namespace Dynamo {
 
         // Decode the waveform
         WaveForm waveform;
-        float buffer[2048];
-        stb_vorbis_seek_start(vb);
+        short buffer[2048];
         int read = -1;
+        stb_vorbis_seek_start(vb);
         while (read) {
-            read = stb_vorbis_get_samples_float_interleaved(vb,
+            read = stb_vorbis_get_samples_short_interleaved(vb,
                                                             info.channels,
                                                             buffer,
                                                             2048);
@@ -24,6 +24,17 @@ namespace Dynamo {
             }
         }
         stb_vorbis_close(vb);
+        resample_waveform(waveform,
+                          info.channels,
+                          info.sample_rate,
+                          SAMPLE_RATE);
         return allocate(waveform, info.channels);
+    }
+
+    Asset<Sound> SoundManager::load_raw(WaveForm waveform,
+                                        int channels,
+                                        unsigned int sample_rate) {
+        resample_waveform(waveform, channels, sample_rate, SAMPLE_RATE);
+        return allocate(waveform, channels);
     }
 } // namespace Dynamo

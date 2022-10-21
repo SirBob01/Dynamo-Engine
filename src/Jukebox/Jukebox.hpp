@@ -1,7 +1,5 @@
 #pragma once
 
-#define JUKEBOX_SAMPLE_RATE 44100
-
 #include <memory>
 #include <queue>
 #include <string>
@@ -9,11 +7,21 @@
 
 #include <portaudio.h>
 
+#include "../Asset/Asset.hpp"
 #include "../Log/Log.hpp"
 #include "../Math/Vec3.hpp"
+#include "../Utils/RingBuffer.hpp"
+
 #include "./Sound.hpp"
+#include "./SoundManager.hpp"
 
 namespace Dynamo {
+    /**
+     * @brief Size of the input and output ring buffers
+     *
+     */
+    constexpr unsigned int BUFFER_SIZE = 1 << 12;
+
     /**
      * @brief A stream on which audio tracks can be played
      *
@@ -21,27 +29,32 @@ namespace Dynamo {
     using SoundStream = unsigned int;
 
     /**
-     * @brief In-house audio engine
+     * @brief In-house audio engine supporting static sounds, spatial audio, and
+     * multilayer tracks
      *
-     * Supports sound effects, streaming tracks, and spatial audio
+     * To be performant, Jukebox assigns a worker thread for audio mixing
+     * processes.
      *
      */
     class Jukebox {
+        SoundManager &_assets;
         PaStream *_stream;
+
+        float _volume;
+
+        bool _playing;
+        bool _recording;
 
         /**
          * @brief Internal state
          *
          */
         struct State {
-            WaveForm base;
+            RingBuffer<short, BUFFER_SIZE> input_buffer;
+            RingBuffer<short, BUFFER_SIZE> output_buffer;
 
             int input_channels;
             int output_channels;
-
-            float volume;
-            bool playing;
-            bool recording;
         };
         State _state;
 
@@ -69,7 +82,7 @@ namespace Dynamo {
          * @brief Construct a new Jukebox object
          *
          */
-        Jukebox();
+        Jukebox(SoundManager &assets);
 
         /**
          * @brief Destroy the Jukebox object
@@ -101,10 +114,31 @@ namespace Dynamo {
         float get_volume();
 
         /**
+         * @brief Pause audio playback
+         *
+         */
+        void pause();
+
+        /**
+         * @brief Resume audio playback
+         *
+         */
+        void resume();
+
+        /**
          * @brief Set the master volume
          *
          * @param volume
          */
         void set_volume(float volume);
+
+        /**
+         * @brief Play a static sound
+         *
+         * @param sound  Sound asset
+         * @param volume Local volume
+         * @param start  Starting time in seconds
+         */
+        void play_static(Asset<Sound> &sound, float volume, float start = 0);
     };
 } // namespace Dynamo

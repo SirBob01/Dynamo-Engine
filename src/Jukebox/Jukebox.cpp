@@ -1,13 +1,15 @@
 #include "Jukebox.hpp"
 
 namespace Dynamo {
-    Jukebox::Jukebox() {
+    Jukebox::Jukebox(SoundManager &assets) : _assets(assets) {
+        _volume = 1.0f;
+
+        _playing = true;
+        _recording = false;
+
         // Initialize state
         _state.input_channels = 0;
         _state.output_channels = 0;
-        _state.volume = 1.0f;
-        _state.playing = true;
-        _state.recording = false;
 
         // Initialize PortAudio
         PaError err;
@@ -42,8 +44,8 @@ namespace Dynamo {
         err = Pa_OpenDefaultStream(&_stream,
                                    _state.input_channels,
                                    _state.output_channels,
-                                   paFloat32,
-                                   JUKEBOX_SAMPLE_RATE,
+                                   paInt16,
+                                   SAMPLE_RATE,
                                    paFramesPerBufferUnspecified,
                                    stream_callback,
                                    &_state);
@@ -84,18 +86,63 @@ namespace Dynamo {
                                  PaStreamCallbackFlags status_flags,
                                  void *data) {
         State &state = *static_cast<State *>(data);
-        const float *input_buffer = static_cast<const float *>(input);
-        float *output_buffer = static_cast<float *>(output);
+        const float *device_input = static_cast<const float *>(input);
+        float *device_output = static_cast<float *>(output);
+
+        // Receive input from the device
+        for (int f = 0; f < frame_count; f++) {
+            for (int c = 0; c < state.input_channels; c++) {
+                if (state.input_buffer.is_full()) {
+                    state.input_buffer.clear();
+                }
+                state.input_buffer.write(
+                    device_input[f * state.input_channels + c]);
+            }
+        }
+
+        // Push the local buffer onto the device
+        for (int f = 0; f < frame_count; f++) {
+            for (int c = 0; c < state.output_channels; c++) {
+                if (!state.output_buffer.is_empty()) {
+                    device_output[f * state.output_channels + c] =
+                        state.output_buffer.read();
+                }
+            }
+        }
         return 0;
     }
 
-    bool Jukebox::is_playing() { return _state.playing; }
+    bool Jukebox::is_playing() { return _playing; }
 
-    bool Jukebox::is_recording() { return _state.recording; }
+    bool Jukebox::is_recording() { return _recording; }
 
-    float Jukebox::get_volume() { return _state.volume; }
+    float Jukebox::get_volume() { return _volume; }
 
     void Jukebox::set_volume(float volume) {
-        _state.volume = std::min(std::max(volume, 0.0f), 1.0f);
+        _volume = std::min(std::max(volume, 0.0f), 1.0f);
+    }
+
+    void Jukebox::play_static(Asset<Sound> &sound, float volume, float start) {
+        Sound &data = _assets.get(sound);
+
+        // Calculate starting frame
+        int frame = static_cast<int>(std::floor(SAMPLE_RATE * start));
+
+        // Get pointer position within the waveform
+        int index = frame * data.channels;
+        if (index >= data.waveform.size()) return;
+
+        // TODO: Implement system for queuing audio to be processed and placed
+        // onto the buffer
+    }
+
+    void Jukebox::pause() {
+        Pa_StopStream(_stream);
+        _playing = false;
+    }
+
+    void Jukebox::resume() {
+        Pa_StartStream(_stream);
+        _playing = true;
     }
 } // namespace Dynamo
