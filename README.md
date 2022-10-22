@@ -1,5 +1,7 @@
 <img src="./media/logo.png" alt="Dynamo Engine" width="500"/>
 
+![Linux Build](https://github.com/SirBob01/Dynamo-Engine/actions/workflows/linux.yml/badge.svg)
+
 ---
 
 `Dynamo` is a C++ game engine powered by `Vulkan`.
@@ -41,7 +43,7 @@ Similar to the demos, the tests need to be built. Go to the `/tests/build/` dire
 
 - `cmake .. -G BUILD_GENERATOR`
 - `make`
-- `make test`
+- `ctest --verbose`
 
 ## Contributing
 
