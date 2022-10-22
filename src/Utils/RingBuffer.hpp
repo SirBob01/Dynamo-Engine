@@ -33,7 +33,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_full() { return _write == (_read + N - 1) % N; }
+        inline bool is_full() { return size() == N - 1; }
 
         /**
          * @brief Check if the buffer is empty
@@ -42,6 +42,22 @@ namespace Dynamo {
          * @return false
          */
         inline bool is_empty() { return _write == _read; }
+
+        /**
+         * @brief Get the size of the buffer
+         *
+         * @return int
+         */
+        inline int size() {
+            return _write >= _read ? _write - _read : (_write + N) - _read;
+        }
+
+        /**
+         * @brief Get the number of writes that can still be performed
+         *
+         * @return int
+         */
+        inline int remaining() { return (N - 1) - size(); }
 
         /**
          * @brief Read a value from the buffer, advancing the read pointer

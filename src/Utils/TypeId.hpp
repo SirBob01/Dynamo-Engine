@@ -7,15 +7,9 @@ namespace Dynamo {
      *
      */
     class TypeId {
-        unsigned _id_counter;
+        inline static unsigned _id_counter = 0;
 
       public:
-        /**
-         * @brief Initialize a new counter for assigning identifiers to types
-         *
-         */
-        TypeId() : _id_counter(0){};
-
         /**
          * @brief Get the unique identifier of a type
          *
@@ -23,7 +17,7 @@ namespace Dynamo {
          * @return unsigned
          */
         template <typename Type>
-        inline unsigned get() {
+        inline static unsigned get() {
             static const unsigned id = _id_counter++;
             return id;
         }

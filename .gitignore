@@ -1,5 +1,4 @@
-demos/build/*
-!CMakeLists.txt
+**/build/*
 .vscode/*
-build
+!CMakeLists.txt
 .DS_Store

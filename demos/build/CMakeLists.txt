@@ -14,16 +14,7 @@ add_subdirectory("../.." "./Dynamo")
 # Compile each demo
 file(GLOB DEMOS "../*.cpp")
 foreach(demo_path ${DEMOS})
-    get_filename_component(demo_exe ${demo_path} NAME_WE)
-    add_executable(${demo_exe} ${demo_path})
-
-    # Compile with MinGW-w64
-    if(WIN32)
-        target_link_libraries(${demo_exe} Dynamo mingw32)
-    endif()
-
-    # Compile on Unix systems
-    if(UNIX OR MSVC)
-        target_link_libraries(${demo_exe} Dynamo)
-    endif()
+    get_filename_component(demo ${demo_path} NAME_WE)
+    add_executable(${demo} ${demo_path})
+    target_link_libraries(${demo} Dynamo)
 endforeach()
