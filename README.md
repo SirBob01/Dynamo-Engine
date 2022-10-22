@@ -4,27 +4,17 @@
 
 `Dynamo` is a C++ game engine powered by `Vulkan`.
 
-The API is meant to simplify the application development process, automating core processes like the main loop and state handling. Aside from abstracting away low-level resource management, the library offers additional game development utilities.
-
 ## Features
 
-- A user-friendly and intuitive C++ API
 - Native support for an optimized [ECS](https://en.wikipedia.org/wiki/Entity_component_system) architecture in designing game objects
 - A simplified Scene management system
-- Animating sprites, rasterizing primitives, and rendering text
-- An audio engine that supports multiple streaming tracks and raw PCM data manipulation
+- Rendering engine powered by the Vulkan API
+- An audio engine that supports multiple playback tracks and raw PCM data manipulation
 - ... and more!
 
 These features allow it to be used as a framework for general multimedia applications.
 
 For a more in-depth look at the engine's components, visit the [**wiki**](https://github.com/SirBob01/Dynamo-Engine/wiki).
-
-## Screenshots
-
-<img src="./media/screenshots/rendering.png" alt="Rendering Test" width="400"/>
-<img src="./media/screenshots/ecs.png" alt="ECS Test" width="400"/>
-<img src="./media/screenshots/audio.png" alt="Audio Test" width="400"/>
-<img src="./media/screenshots/scenes.png" alt="Scene Test" width="400"/>
 
 ## Rationale
 
@@ -36,14 +26,22 @@ To use `Dynamo`, the compiler must support at least C++17.
 
 `Dynamo` uses a number of submodules that can be installed by running `git submodule update --init`
 
-## Compiling Demos
+## Running Demos
 
-The API comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `/demos/build` directory, then run:
+The engine comes with demo programs to test core features of the engine. To compile them, `cmake` must be installed. Go to the `/demos/build` directory, then run:
 
-- `cmake . -G BUILD_GENERATOR`
+- `cmake .. -G BUILD_GENERATOR`
 - `make`
 
 Replace `BUILD_GENERATOR` with the [generator](https://cmake.org/cmake/help/v3.2/manual/cmake-generators.7.html) applicable to your development environment. This assumes that all the dependency requirements are satisfied.
+
+## Running Tests
+
+Similar to the demos, the tests need to be built. Go to the `/tests/build/` directory then run:
+
+- `cmake .. -G BUILD_GENERATOR`
+- `make`
+- `make test`
 
 ## Contributing
 
@@ -52,11 +50,6 @@ Anyone is welcome to open a pull request! State the issue being solved and expla
 For high-level suggestions on improving the engine, open an issue so we can have a discussion.
 
 ## TODO
-
-- Implement the Doppler effect (frequency and pitch shifting) in Jukebox
-- Finish implementing custom network protocol
-
-## Rewrite TODO
 
 - `Jukebox` class
 - `Renderer` submodule

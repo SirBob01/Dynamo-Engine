@@ -9,10 +9,10 @@ set(CMAKE_C_STANDARD_REQUIRED on)
 
 add_compile_options(-Wall -g -O3)
 
-add_subdirectory("../.." "./Dynamo")
+add_subdirectory("../" "./Dynamo")
 
 # Compile each demo
-file(GLOB DEMOS "../*.cpp")
+file(GLOB DEMOS "./*.cpp")
 foreach(demo_path ${DEMOS})
     get_filename_component(demo ${demo_path} NAME_WE)
     add_executable(${demo} ${demo_path})
