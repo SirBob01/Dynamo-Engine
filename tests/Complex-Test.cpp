@@ -45,9 +45,10 @@ TEST_CASE("Complex number conjugate", "[Complex]") {
 }
 
 TEST_CASE("Complex number exp", "[Complex]") {
-    Dynamo::Complex z(M_PI, 2 * M_PI);
+    Dynamo::Complex z(1, 0.75 * M_PI);
     Dynamo::Complex exp = z.exp();
-    REQUIRE_THAT(exp.re, Approx(std::exp(M_PI)));
+    REQUIRE_THAT(exp.re, Approx(-M_E * M_SQRT1_2));
+    REQUIRE_THAT(exp.im, Approx(M_E * M_SQRT1_2));
 }
 
 TEST_CASE("Complex number euler's identity", "[Complex]") {
