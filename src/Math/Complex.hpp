@@ -61,13 +61,16 @@ namespace Dynamo {
         /**
          * @brief Apply Euler's formula
          *
-         * e^(x + y i) = e^x (cos(x) + sin(y) i)
+         * e^(x + y i)
+         * = e^x * e^yi
+         * = e^x * (cos(y) + sin(y) i)
+         * = e^x * cos(y) + e^x * sin(y) i
          *
          * @return Complex
          */
         inline Complex exp() const {
             double scale = std::exp(re);
-            return Complex(scale * std::cos(im), std::sin(im));
+            return Complex(scale * std::cos(im), scale * std::sin(im));
         }
 
         /**
