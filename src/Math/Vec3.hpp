@@ -40,7 +40,7 @@ namespace Dynamo {
          *
          * @return float
          */
-        inline float length() const { return sqrt(length_squared()); }
+        inline float length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Add another vector
@@ -79,7 +79,8 @@ namespace Dynamo {
          * @return Vec3
          */
         inline Vec3 operator/(float scalar) const {
-            return Vec3(x / scalar, y / scalar, z / scalar);
+            float inv = 1.0f / scalar;
+            return Vec3(x * inv, y * inv, z * inv);
         }
 
         /**
@@ -135,9 +136,10 @@ namespace Dynamo {
          * @return Vec3&
          */
         inline Vec3 &operator/=(float scalar) {
-            x /= scalar;
-            y /= scalar;
-            z /= scalar;
+            float inv = 1.0f / scalar;
+            x *= inv;
+            y *= inv;
+            z *= inv;
             return *this;
         }
 
@@ -147,10 +149,10 @@ namespace Dynamo {
          * @return Vec3&
          */
         inline Vec3 &normalize() {
-            const float magnitude = length();
-            x /= magnitude;
-            y /= magnitude;
-            z /= magnitude;
+            const float inv_magnitude = 1.0f / length();
+            x *= inv_magnitude;
+            y *= inv_magnitude;
+            z *= inv_magnitude;
             return *this;
         }
 
@@ -187,10 +189,10 @@ namespace Dynamo {
          * @return Vec3
          */
         inline Vec3 cross(const Vec3 &rhs) const {
-            float x = y * rhs.z - z * rhs.y;
-            float y = z * rhs.x - x * rhs.z;
-            float z = x * rhs.y - y * rhs.x;
-            return Vec3(x, y, z);
+            float n_x = y * rhs.z - z * rhs.y;
+            float n_y = z * rhs.x - x * rhs.z;
+            float n_z = x * rhs.y - y * rhs.x;
+            return Vec3(n_x, n_y, n_z);
         }
 
         /**
