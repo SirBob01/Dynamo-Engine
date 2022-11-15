@@ -39,7 +39,7 @@ namespace Dynamo {
          *
          * @return float
          */
-        inline float length() const { return sqrt(length_squared()); }
+        inline float length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Get the left normal perpendicular to this vector
@@ -92,7 +92,8 @@ namespace Dynamo {
          * @return Vec2
          */
         inline Vec2 operator/(float scalar) const {
-            return Vec2(x / scalar, y / scalar);
+            const float inv = 1.0f / scalar;
+            return Vec2(x * inv, y * inv);
         }
 
         /**
@@ -145,8 +146,9 @@ namespace Dynamo {
          * @return Vec2&
          */
         inline Vec2 &operator/=(float scalar) {
-            x /= scalar;
-            y /= scalar;
+            float inv = 1.0 / scalar;
+            x *= inv;
+            y *= inv;
             return *this;
         }
 
@@ -156,9 +158,9 @@ namespace Dynamo {
          * @return Vec2&
          */
         inline Vec2 &normalize() {
-            const float magnitude = length();
-            x /= magnitude;
-            y /= magnitude;
+            const float inv_magnitude = 1.0 / length();
+            x *= inv_magnitude;
+            y *= inv_magnitude;
             return *this;
         }
 
