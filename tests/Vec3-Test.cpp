@@ -1,17 +1,5 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
-#include <cmath>
-
-/**
- * @brief Approximator for comparing doubles
- *
- * @param x
- * @return Catch::Matchers::WithinAbsMatcher
- */
-Catch::Matchers::WithinAbsMatcher Approx(float x) {
-    return Catch::Matchers::WithinAbs(x, 1e-15);
-}
 
 TEST_CASE("Vec3 clone", "[Vec3]") {
     Dynamo::Vec3 a(3, 4, 2);
@@ -110,9 +98,9 @@ TEST_CASE("Vec3 divide by scalar in-place", "[Vec3]") {
 TEST_CASE("Vec3 normalize", "[Vec3]") {
     Dynamo::Vec3 a(1, 2, 2);
     a.normalize();
-    REQUIRE_THAT(a.x, Approx(1.0f / 3));
-    REQUIRE_THAT(a.y, Approx(2.0f / 3));
-    REQUIRE_THAT(a.z, Approx(2.0f / 3));
+    REQUIRE(a.x == 1.0f / 3);
+    REQUIRE(a.y == 2.0f / 3);
+    REQUIRE(a.z == 2.0f / 3);
 }
 
 TEST_CASE("Vec3 transform", "[Vec3]") {
