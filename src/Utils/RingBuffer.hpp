@@ -12,13 +12,17 @@ namespace Dynamo {
      * The buffer is empty if the read and write point to the same index
      *
      * @tparam T Type of element
-     * @tparam N Maximum size of the ring buffer
+     * @tparam N Maximum size of the container (power of 2)
      */
-    template <typename T, int N>
+    template <typename T, unsigned N>
     class RingBuffer {
+        static const unsigned MASK = N - 1;
+        static_assert(N > 0 && (N & MASK) == 0,
+                      "RingBuffer size (> 0) should be a power of 2");
+
         std::array<T, N> _buffer;
-        int _read;
-        int _write;
+        unsigned _read;
+        unsigned _write;
 
       public:
         /**
@@ -33,7 +37,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_full() { return size() == N - 1; }
+        inline bool is_full() { return size() == N; }
 
         /**
          * @brief Check if the buffer is empty
@@ -41,23 +45,21 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_empty() { return _write == _read; }
+        inline bool is_empty() { return size() == 0; }
 
         /**
          * @brief Get the size of the buffer
          *
-         * @return int
+         * @return unsigned
          */
-        inline int size() {
-            return _write >= _read ? _write - _read : (_write + N) - _read;
-        }
+        inline unsigned size() { return (_write - _read); }
 
         /**
          * @brief Get the number of writes that can still be performed
          *
-         * @return int
+         * @return unsigned
          */
-        inline int remaining() { return (N - 1) - size(); }
+        inline unsigned remaining() { return N - size(); }
 
         /**
          * @brief Read a value from the buffer, advancing the read pointer
@@ -66,9 +68,7 @@ namespace Dynamo {
          */
         inline T read() {
             DYN_ASSERT(!is_empty());
-            T value = _buffer[_read];
-            _read = (_read + 1) % N;
-            return value;
+            return _buffer[_read++ & MASK];
         }
 
         /**
@@ -77,9 +77,8 @@ namespace Dynamo {
          * @param value
          */
         inline void write(T value) {
-            if (is_full()) return;
-            _buffer[_write] = value;
-            _write = (_write + 1) % N;
+            DYN_ASSERT(!is_full());
+            _buffer[_write++ & MASK] = value;
         }
 
         /**
@@ -87,8 +86,8 @@ namespace Dynamo {
          *
          */
         inline void pop() {
-            if (is_empty()) return;
-            _write = (_write + N - 1) % N;
+            DYN_ASSERT(!is_empty());
+            _write--;
         }
 
         /**

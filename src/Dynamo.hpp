@@ -8,6 +8,7 @@
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"
 
+#include "Jukebox/Fourier.hpp"
 #include "Jukebox/Jukebox.hpp"
 #include "Jukebox/Sound.hpp"
 #include "Jukebox/SoundManager.hpp"

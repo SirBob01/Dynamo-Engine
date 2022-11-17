@@ -1,17 +1,8 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <cmath>
 
-/**
- * @brief Approximator for comparing doubles
- *
- * @param x
- * @return Catch::Matchers::WithinAbsMatcher
- */
-Catch::Matchers::WithinAbsMatcher Approx(double x) {
-    return Catch::Matchers::WithinAbs(x, 1e-15);
-}
+#include "Common.hpp"
 
 TEST_CASE("Complex number clone", "[Complex]") {
     Dynamo::Complex a(3, 4);
@@ -56,6 +47,13 @@ TEST_CASE("Complex number euler's identity", "[Complex]") {
     Dynamo::Complex exp = z.exp();
     REQUIRE(exp.re == -1);
     REQUIRE_THAT(exp.im, Approx(0));
+}
+
+TEST_CASE("Complex number negation", "[Complex]") {
+    Dynamo::Complex a(1, 2);
+    Dynamo::Complex b = -a;
+    REQUIRE(b.re == -1);
+    REQUIRE(b.im == -2);
 }
 
 TEST_CASE("Complex number add", "[Complex]") {

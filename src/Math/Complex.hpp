@@ -74,6 +74,13 @@ namespace Dynamo {
         }
 
         /**
+         * @brief Negation
+         *
+         * @return Complex
+         */
+        inline Complex operator-() const { return Complex(-re, -im); }
+
+        /**
          * @brief Add another complex number
          *
          * @param rhs
