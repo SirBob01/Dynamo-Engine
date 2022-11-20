@@ -57,7 +57,7 @@ namespace Dynamo {
          * @brief Contains indices to _dense and _pool
          *
          */
-        std::vector<unsigned> _sparse;
+        std::vector<int> _sparse;
 
       public:
         /**
@@ -80,8 +80,8 @@ namespace Dynamo {
             }
 
             // Verify that the sparse and dense arrays are correlated
-            unsigned index = _sparse[key];
-            if (index >= _dense.size() || _dense[index] != id) {
+            int index = _sparse[key];
+            if (index == -1 || index >= _dense.size() || _dense[index] != id) {
                 return -1;
             }
             return index;
@@ -140,8 +140,8 @@ namespace Dynamo {
             }
 
             // Verify that the sparse and dense arrays are correlated
-            unsigned index = _sparse[key];
-            if (index >= _dense.size() || _dense[index] != id) {
+            int index = _sparse[key];
+            if (index == -1 || index >= _dense.size() || _dense[index] != id) {
                 return;
             }
 
@@ -190,11 +190,33 @@ namespace Dynamo {
         /**
          * @brief Apply a function to each member of the set
          *
-         * @param function Function that takes a T object, id, and index
+         * @param function Function that takes a T object and its id
          */
-        void forall(std::function<void(T &item, Id id, int index)> function) {
-            for (int index = 0; index < size(); index++) {
-                function(_pool[index], _dense[index], index);
+        inline void forall(std::function<void(T &item, Id id)> function) {
+            for (int i = 0; i < size(); i++) {
+                function(_pool[i], _dense[i]);
+            }
+        }
+
+        /**
+         * @brief Apply a function to each item in the set
+         *
+         * @param function Function that takes a T object
+         */
+        inline void forall_items(std::function<void(T &item)> function) {
+            for (int i = 0; i < size(); i++) {
+                function(_pool[i]);
+            }
+        }
+
+        /**
+         * @brief Apply a function to each id in the set
+         *
+         * @param function Function that takes an id
+         */
+        inline void forall_ids(std::function<void(Id id)> function) {
+            for (int i = 0; i < size(); i++) {
+                function(_dense[i]);
             }
         }
     };

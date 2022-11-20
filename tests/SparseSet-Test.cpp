@@ -88,7 +88,7 @@ TEST_CASE("SparseSet mismatched id version", "[SparseSet]") {
     REQUIRE(set.size() == 1);
 }
 
-TEST_CASE("SparseSet foreach", "[SparseSet]") {
+TEST_CASE("SparseSet forall", "[SparseSet]") {
     CharSet set;
     Dynamo::IdTracker tracker;
 
@@ -110,27 +110,36 @@ TEST_CASE("SparseSet foreach", "[SparseSet]") {
 
     REQUIRE(set.size() == 3);
 
-    struct Triplet {
+    struct Pair {
         char &item;
         Dynamo::Id id;
-        int index;
     };
-    std::vector<Triplet> triplets;
-    set.forall([&](char &item, Dynamo::Id id, int index) {
-        triplets.push_back({item, id, index});
+    std::vector<Pair> triplets;
+    std::vector<char> items;
+    std::vector<Dynamo::Id> ids;
+
+    set.forall([&](char &item, Dynamo::Id id) {
+        triplets.push_back({item, id});
     });
+    set.forall_items([&](char &item) { items.push_back(item); });
+    set.forall_ids([&](Dynamo::Id id) { ids.push_back(id); });
 
     REQUIRE(triplets[0].item == 'c');
     REQUIRE(triplets[0].id == c);
-    REQUIRE(triplets[0].index == 0);
+    REQUIRE(items[0] == 'c');
+    REQUIRE(ids[0] == c);
 
     REQUIRE(triplets[1].item == 'b');
     REQUIRE(triplets[1].id == b);
-    REQUIRE(triplets[1].index == 1);
+    REQUIRE(items[1] == 'b');
+    REQUIRE(ids[1] == b);
 
     REQUIRE(triplets[2].item == 'd');
     REQUIRE(triplets[2].id == d);
-    REQUIRE(triplets[2].index == 2);
+    REQUIRE(items[2] == 'd');
+    REQUIRE(ids[2] == d);
 
     REQUIRE(triplets.size() == set.size());
+    REQUIRE(items.size() == set.size());
+    REQUIRE(ids.size() == set.size());
 }
