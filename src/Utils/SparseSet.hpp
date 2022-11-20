@@ -21,7 +21,7 @@ namespace Dynamo {
          */
         virtual ~SparseSetBase() = 0;
     };
-    SparseSetBase::~SparseSetBase() = default;
+    inline SparseSetBase::~SparseSetBase() = default;
 
     /**
      * @brief Sparse sets are an alternative to the hash map that allow
