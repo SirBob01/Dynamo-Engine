@@ -11,13 +11,13 @@ namespace Dynamo {
      *
      * @tparam T Type of data
      */
-    template <typename T, typename Container = std::vector<T>>
+    template <typename T>
     class ChannelData {
         /**
          * @brief Data container
          *
          */
-        Container _data;
+        std::vector<T> _data;
 
         /**
          * @brief Number of channels
@@ -49,7 +49,7 @@ namespace Dynamo {
          * @param data     Data buffer
          * @param channels Number of channels
          */
-        ChannelData(Container data, unsigned channels) :
+        ChannelData(std::vector<T> data, unsigned channels) :
             _data(data), _channels(channels), _frames(data.size() / channels) {
             DYN_ASSERT(data.size() % channels == 0);
         }
@@ -57,9 +57,9 @@ namespace Dynamo {
         /**
          * @brief Get the internal data container
          *
-         * @return Container&
+         * @return std::vector<T>&
          */
-        inline Container &data() { return _data; }
+        inline std::vector<T> &data() { return _data; }
 
         /**
          * @brief Get the number of frames
