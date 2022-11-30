@@ -80,7 +80,7 @@ namespace Dynamo {
          */
         inline Vec3 operator/(float scalar) const {
             float inv = 1.0f / scalar;
-            return Vec3(x * inv, y * inv, z * inv);
+            return *this * inv;
         }
 
         /**
@@ -137,10 +137,7 @@ namespace Dynamo {
          */
         inline Vec3 &operator/=(float scalar) {
             float inv = 1.0f / scalar;
-            x *= inv;
-            y *= inv;
-            z *= inv;
-            return *this;
+            return *this *= inv;
         }
 
         /**
@@ -148,13 +145,7 @@ namespace Dynamo {
          *
          * @return Vec3&
          */
-        inline Vec3 &normalize() {
-            const float inv_magnitude = 1.0f / length();
-            x *= inv_magnitude;
-            y *= inv_magnitude;
-            z *= inv_magnitude;
-            return *this;
-        }
+        inline Vec3 &normalize() { return *this /= length(); }
 
         /**
          * @brief Apply a transform with a 3x3 matrix
