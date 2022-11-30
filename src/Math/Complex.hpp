@@ -140,7 +140,7 @@ namespace Dynamo {
          */
         inline Complex operator/(double scalar) const {
             double inv = 1.0 / scalar;
-            return Complex(inv * re, inv * im);
+            return *this * inv;
         }
 
         /**
@@ -201,11 +201,7 @@ namespace Dynamo {
          */
         inline Complex &operator/=(const Complex &rhs) {
             Complex inv = rhs.reciprocal();
-            double n_re = re * inv.re - im * inv.im;
-            double n_im = re * inv.im + im * inv.re;
-            re = n_re;
-            im = n_im;
-            return *this;
+            return *this *= inv;
         }
 
         /**
@@ -216,9 +212,7 @@ namespace Dynamo {
          */
         inline Complex &operator/=(double scalar) {
             double inv = 1.0 / scalar;
-            re *= inv;
-            im *= inv;
-            return *this;
+            return *this *= inv;
         }
 
         /**

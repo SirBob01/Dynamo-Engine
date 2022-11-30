@@ -57,6 +57,7 @@ For high-level suggestions on improving the engine, open an issue so we can have
 - `Renderer` submodule
 - `Scene` management system
 - `ECS` submodule
+- SIMD instructions for math constructs
 - Integrate `ImGUI` for engine interface
 - Integrate `Mono C#` for scripting
 
