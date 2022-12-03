@@ -40,6 +40,11 @@ TEST_CASE("Box2 height", "[Box2]") {
     REQUIRE(a.valid());
 }
 
+TEST_CASE("Box2 area", "[Box2]") {
+    Dynamo::Box2 a({-2, -2}, {2, 4});
+    REQUIRE(a.area() == 24);
+}
+
 TEST_CASE("Box2 translate", "[Box2]") {
     Dynamo::Box2 a({-2, -2}, {2, 4});
     Dynamo::Vec2 offset(2, 2);

@@ -17,7 +17,7 @@ namespace Dynamo {
          * @param min
          * @param max
          */
-        Box2(Vec2 min, Vec2 max) : min(min), max(max){};
+        Box2(Vec2 min, Vec2 max) : min(min), max(max) {}
 
         /**
          * @brief Construct a new Box2 object given its center and dimensions
@@ -30,35 +30,42 @@ namespace Dynamo {
             Vec2 halfdim(width * 0.5, height * 0.5);
             min = center - halfdim;
             max = center + halfdim;
-        };
+        }
 
         /**
          * @brief Clone this box
          *
          * @return Box2
          */
-        inline Box2 clone() { return Box2(min, max); }
+        inline Box2 clone() const { return Box2(min, max); }
 
         /**
          * @brief Get the center of this box
          *
          * @return Vec2
          */
-        inline Vec2 center() { return (min + max) * 0.5; }
+        inline Vec2 center() const { return (min + max) * 0.5; }
 
         /**
          * @brief Get the width of this box
          *
          * @return float
          */
-        inline float width() { return max.x - min.x; }
+        inline float width() const { return max.x - min.x; }
 
         /**
          * @brief Get the height of this box
          *
          * @return float
          */
-        inline float height() { return max.y - min.y; }
+        inline float height() const { return max.y - min.y; }
+
+        /**
+         * @brief Get the area of this box
+         *
+         * @return float
+         */
+        inline float area() const { return width() * height(); }
 
         /**
          * @brief Translate this box by an offset vector
@@ -78,7 +85,7 @@ namespace Dynamo {
          * @param point
          * @return Vec2
          */
-        inline Vec2 clamp(const Vec2 &point) {
+        inline Vec2 clamp(const Vec2 &point) const {
             return Vec2(std::clamp(point.x, min.x, max.x),
                         std::clamp(point.y, min.y, max.y));
         }
@@ -86,13 +93,13 @@ namespace Dynamo {
         /**
          * @brief Test if this box overlaps with another box
          *
-         * @param rhs
+         * @param box
          * @return true
          * @return false
          */
-        inline bool intersects(const Box2 &rhs) const {
-            bool h = max.x < rhs.min.x || min.x > rhs.max.x;
-            bool v = max.y < rhs.min.y || min.y > rhs.max.y;
+        inline bool intersects(const Box2 &box) const {
+            bool h = max.x < box.min.x || min.x > box.max.x;
+            bool v = max.y < box.min.y || min.y > box.max.y;
             return !(h || v);
         }
 
@@ -150,6 +157,6 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool valid() { return width() >= 0 && height() >= 0; }
+        inline bool valid() const { return width() >= 0 && height() >= 0; }
     };
 } // namespace Dynamo
