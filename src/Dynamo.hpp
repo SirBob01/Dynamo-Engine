@@ -18,6 +18,7 @@
 
 #include "Math/Box2.hpp"
 #include "Math/Circle.hpp"
+#include "Math/Common.hpp"
 #include "Math/Complex.hpp"
 #include "Math/Mat3.hpp"
 #include "Math/Mat4.hpp"

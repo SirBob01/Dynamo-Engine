@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include "./Vec3.hpp"
+
 namespace Dynamo {
     /**
      * @brief Quaternion expression
