@@ -4,8 +4,10 @@
 
 #include "Common.hpp"
 
+using ComplexChannel = Dynamo::ChannelData<Dynamo::Complex>;
+
 TEST_CASE("Fourier transform", "[Fourier]") {
-    Dynamo::ComplexSignal signal(
+    ComplexChannel signal(
         {
             Dynamo::Complex(-1, 0),
             Dynamo::Complex(2, 0),
@@ -18,9 +20,9 @@ TEST_CASE("Fourier transform", "[Fourier]") {
             Dynamo::Complex(2, 0),
         },
         2);
-    Dynamo::ComplexSignal freqs(signal.channels(), signal.frames());
+    ComplexChannel freqs(signal.channels(), signal.frames());
 
-    Dynamo::fourier_transform(signal, freqs, signal.frames());
+    Dynamo::Fourier::transform(signal, freqs, signal.frames());
     Dynamo::Complex a0 = freqs.at(0, 0);
     Dynamo::Complex b0 = freqs.at(1, 0);
     Dynamo::Complex c0 = freqs.at(2, 0);
@@ -59,7 +61,7 @@ TEST_CASE("Fourier transform", "[Fourier]") {
 }
 
 TEST_CASE("Inverse Fourier transform", "[Fourier]") {
-    Dynamo::ComplexSignal freqs(
+    ComplexChannel freqs(
         {
             Dynamo::Complex(4, 0),
             Dynamo::Complex(-4, -2),
@@ -72,9 +74,9 @@ TEST_CASE("Inverse Fourier transform", "[Fourier]") {
             Dynamo::Complex(-3, -1),
         },
         2);
-    Dynamo::ComplexSignal signal(freqs.channels(), freqs.frames());
+    ComplexChannel signal(freqs.channels(), freqs.frames());
 
-    Dynamo::inverse_fourier_transform(freqs, signal, freqs.frames());
+    Dynamo::Fourier::inverse(freqs, signal, freqs.frames());
     Dynamo::Complex a0 = signal.at(0, 0);
     Dynamo::Complex b0 = signal.at(1, 0);
     Dynamo::Complex c0 = signal.at(2, 0);

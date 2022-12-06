@@ -1,11 +1,11 @@
 #include "Fourier.hpp"
 
-namespace Dynamo {
-    void fourier_transform(ComplexSignal &signal,
-                           ComplexSignal &freqs,
-                           unsigned N,
-                           unsigned src_offset,
-                           unsigned dst_offset) {
+namespace Dynamo::Fourier {
+    void transform(ChannelData<Complex> &signal,
+                   ChannelData<Complex> &freqs,
+                   unsigned N,
+                   unsigned src_offset,
+                   unsigned dst_offset) {
         DYN_ASSERT(dst_offset + N <= freqs.frames() &&
                    freqs.channels() == signal.channels() && (N & (N - 1)) == 0);
 
@@ -48,11 +48,11 @@ namespace Dynamo {
         }
     }
 
-    void inverse_fourier_transform(ComplexSignal &freqs,
-                                   ComplexSignal &signal,
-                                   unsigned N,
-                                   unsigned src_offset,
-                                   unsigned dst_offset) {
+    void inverse(ChannelData<Complex> &freqs,
+                 ChannelData<Complex> &signal,
+                 unsigned N,
+                 unsigned src_offset,
+                 unsigned dst_offset) {
         DYN_ASSERT(dst_offset + N <= signal.frames() &&
                    signal.channels() == freqs.channels() && (N & (N - 1)) == 0);
 
@@ -101,4 +101,4 @@ namespace Dynamo {
             }
         }
     }
-} // namespace Dynamo
+} // namespace Dynamo::Fourier
