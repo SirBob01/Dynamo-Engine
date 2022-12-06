@@ -8,7 +8,6 @@
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"
 
-#include "Jukebox/Fourier.hpp"
 #include "Jukebox/Jukebox.hpp"
 #include "Jukebox/Sound.hpp"
 #include "Jukebox/SoundManager.hpp"
@@ -20,6 +19,7 @@
 #include "Math/Circle.hpp"
 #include "Math/Common.hpp"
 #include "Math/Complex.hpp"
+#include "Math/Fourier.hpp"
 #include "Math/Mat3.hpp"
 #include "Math/Mat4.hpp"
 #include "Math/Quaternion.hpp"
