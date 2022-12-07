@@ -293,3 +293,19 @@ namespace Dynamo {
         }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Quaternion
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Quaternion> {
+    inline size_t operator()(const Dynamo::Quaternion &quaternion) const {
+        long tx = quaternion.x * 73856093;
+        long ty = quaternion.y * 19349663;
+        long tz = quaternion.z * 83492791;
+        long tw = quaternion.w * 52477425;
+        return tx ^ ty ^ tz ^ tw;
+    }
+};

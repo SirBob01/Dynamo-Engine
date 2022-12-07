@@ -110,3 +110,17 @@ namespace Dynamo {
         inline bool valid() const { return radius >= 0; }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Circle
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Circle> {
+    inline size_t operator()(const Dynamo::Circle &circle) const {
+        size_t tcenter = std::hash<Dynamo::Vec2>{}(circle.center);
+        size_t tradius = std::hash<float>{}(circle.radius);
+        return tcenter ^ (tradius << 1);
+    }
+};

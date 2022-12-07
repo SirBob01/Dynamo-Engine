@@ -153,3 +153,17 @@ namespace Dynamo {
         inline bool valid() const { return width() >= 0 && height() >= 0; }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Box2
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Box2> {
+    inline size_t operator()(const Dynamo::Box2 &box) const {
+        size_t tmin = std::hash<Dynamo::Vec2>{}(box.min);
+        size_t tmax = std::hash<Dynamo::Vec2>{}(box.max);
+        return tmin ^ (tmax << 1);
+    }
+};

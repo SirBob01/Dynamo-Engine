@@ -6,7 +6,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Vector in 3-dimensions
+     * @brief 3D vector
      *
      */
     struct Vec3 {
@@ -202,3 +202,18 @@ namespace Dynamo {
         }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Vec3
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Vec3> {
+    inline size_t operator()(const Dynamo::Vec3 &point) const {
+        long tx = point.x * 73856093;
+        long ty = point.y * 19349663;
+        long tz = point.z * 83492791;
+        return tx ^ ty ^ tz;
+    }
+};

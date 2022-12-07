@@ -87,3 +87,7 @@ TEST_CASE("Circle invalid", "[Circle]") {
     Dynamo::Circle a({3, 0}, -1);
     REQUIRE(!a.valid());
 }
+
+TEST_CASE("Circle hash", "[Circle]") {
+    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Circle>());
+}

@@ -6,7 +6,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Vector in 2-dimensions
+     * @brief 2D vector
      *
      */
     struct Vec2 {
@@ -207,3 +207,17 @@ namespace Dynamo {
         }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Vec2
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Vec2> {
+    inline size_t operator()(const Dynamo::Vec2 &point) const {
+        long tx = point.x * 73856093;
+        long ty = point.y * 19349663;
+        return tx ^ ty;
+    }
+};

@@ -3,7 +3,7 @@
 
 #include "Common.hpp"
 
-TEST_CASE("Triangle circumcircle", "[Triangle]") {
+TEST_CASE("Triangle2 circumcircle", "[Triangle2]") {
     Dynamo::Vec2 a(8, 5);
     Dynamo::Vec2 b(5, 5);
     Dynamo::Vec2 c(5, 9);
@@ -16,7 +16,7 @@ TEST_CASE("Triangle circumcircle", "[Triangle]") {
     REQUIRE_THAT(circle.radius, Approx(2.5));
 }
 
-TEST_CASE("Triangle barycentric inside", "[Triangle]") {
+TEST_CASE("Triangle2 barycentric inside", "[Triangle2]") {
     Dynamo::Vec2 point(0, 0);
     Dynamo::Vec2 a(-1, -0.5);
     Dynamo::Vec2 b(1, -0.5);
@@ -29,7 +29,7 @@ TEST_CASE("Triangle barycentric inside", "[Triangle]") {
     REQUIRE_THAT(comb.y, Approx(point.y));
 }
 
-TEST_CASE("Triangle barycentric outside", "[Triangle]") {
+TEST_CASE("Triangle2 barycentric outside", "[Triangle2]") {
     Dynamo::Vec2 point(-2, 1);
     Dynamo::Vec2 a(-1, -0.5);
     Dynamo::Vec2 b(1, -0.5);
@@ -42,7 +42,7 @@ TEST_CASE("Triangle barycentric outside", "[Triangle]") {
     REQUIRE_THAT(comb.y, Approx(point.y));
 }
 
-TEST_CASE("Triangle barycentric on vertex", "[Triangle]") {
+TEST_CASE("Triangle2 barycentric on vertex", "[Triangle2]") {
     Dynamo::Vec2 point(-1, -0.5);
     Dynamo::Vec2 a(-1, -0.5);
     Dynamo::Vec2 b(1, -0.5);
@@ -60,7 +60,7 @@ TEST_CASE("Triangle barycentric on vertex", "[Triangle]") {
     REQUIRE_THAT(coords.z, Approx(0));
 }
 
-TEST_CASE("Triangle winding clockwise", "[Triangle]") {
+TEST_CASE("Triangle2 winding clockwise", "[Triangle2]") {
     Dynamo::Vec2 a(0, 0);
     Dynamo::Vec2 b(0, 1);
     Dynamo::Vec2 c(1, 0);
@@ -68,7 +68,7 @@ TEST_CASE("Triangle winding clockwise", "[Triangle]") {
     REQUIRE(triangle.winding() < 0);
 }
 
-TEST_CASE("Triangle winding collinear", "[Triangle]") {
+TEST_CASE("Triangle2 winding collinear", "[Triangle2]") {
     Dynamo::Vec2 a(0, 0);
     Dynamo::Vec2 b(0, 1);
     Dynamo::Vec2 c(0, 2);
@@ -76,7 +76,7 @@ TEST_CASE("Triangle winding collinear", "[Triangle]") {
     REQUIRE(triangle.winding() == 0);
 }
 
-TEST_CASE("Triangle winding anti-clockwise", "[Triangle]") {
+TEST_CASE("Triangle2 winding anti-clockwise", "[Triangle2]") {
     Dynamo::Vec2 a(0, 0);
     Dynamo::Vec2 b(1, 0);
     Dynamo::Vec2 c(0, 1);
@@ -84,7 +84,7 @@ TEST_CASE("Triangle winding anti-clockwise", "[Triangle]") {
     REQUIRE(triangle.winding() > 0);
 }
 
-TEST_CASE("Triangle equality", "[Triangle]") {
+TEST_CASE("Triangle2 equality", "[Triangle2]") {
     Dynamo::Vec2 a(0, 0);
     Dynamo::Vec2 b(1, 0);
     Dynamo::Vec2 c(0, 1);
@@ -95,7 +95,7 @@ TEST_CASE("Triangle equality", "[Triangle]") {
     REQUIRE(triangle1 == triangle2);
 }
 
-TEST_CASE("Triangle inequality", "[Triangle]") {
+TEST_CASE("Triangle2 inequality", "[Triangle2]") {
     Dynamo::Vec2 a(0, 0);
     Dynamo::Vec2 b(1, 0);
     Dynamo::Vec2 c(0, 1);
@@ -104,4 +104,8 @@ TEST_CASE("Triangle inequality", "[Triangle]") {
     Dynamo::Triangle2 triangle2(c, a, b);
 
     REQUIRE(triangle1 != triangle2);
+}
+
+TEST_CASE("Triangle2 hash", "[Triangle2]") {
+    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Triangle2>());
 }
