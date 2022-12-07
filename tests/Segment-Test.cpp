@@ -11,17 +11,11 @@ TEST_CASE("Segment2 length", "[Segment2]") {
     REQUIRE(a.length() == 2);
 }
 
-TEST_CASE("Segment2 reverse", "[Segment2]") {
-    Dynamo::Segment2 a({0, 0}, {2, 0});
-    Dynamo::Segment2 b = -a;
-
-    REQUIRE(a.a == b.b);
-    REQUIRE(a.b == b.a);
-}
-
 TEST_CASE("Segment2 equality", "[Segment2]") {
     Dynamo::Segment2 a({0, 0}, {2, 4});
-    Dynamo::Segment2 b({0, 0}, {2, 4});
+    Dynamo::Segment2 b({2, 4}, {0, 0});
+
+    REQUIRE(a == a);
     REQUIRE(a == b);
 }
 
