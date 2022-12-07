@@ -81,6 +81,29 @@ namespace Dynamo {
         }
 
         /**
+         * @brief Count the number of shared vertices with another triangle
+         *
+         * @param rhs
+         * @return int
+         */
+        inline int shared_vertices(const Triangle2 &rhs) const {
+            return (a == rhs.a) + (a == rhs.b) + (a == rhs.c) + (b == rhs.a) +
+                   (b == rhs.b) + (b == rhs.c) + (c == rhs.a) + (c == rhs.b) +
+                   (c == rhs.c);
+        }
+
+        /**
+         * @brief Test if a triangle shares an edge with another triangle
+         *
+         * @param rhs
+         * @return true
+         * @return false
+         */
+        inline bool adjacent(const Triangle2 &rhs) const {
+            return shared_vertices(rhs) > 1;
+        }
+
+        /**
          * @brief Equality operator
          *
          * @param rhs
