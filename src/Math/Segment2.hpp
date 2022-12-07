@@ -4,12 +4,18 @@
 
 namespace Dynamo {
     /**
-     * @brief 2D line segment
+     * @brief 2D bidirectional line segment
      *
      */
     struct Segment2 {
         Vec2 a, b;
 
+        /**
+         * @brief Construct a new Segment2 object
+         *
+         * @param a
+         * @param b
+         */
         Segment2(Vec2 a, Vec2 b) : a(a), b(b) {}
 
         /**
@@ -27,13 +33,6 @@ namespace Dynamo {
         inline float length() const { return (a - b).length(); }
 
         /**
-         * @brief Reverse the segment
-         *
-         * @return Segment2
-         */
-        inline Segment2 operator-() const { return Segment2(b, a); }
-
-        /**
          * @brief Equality operator
          *
          * @param rhs
@@ -41,7 +40,7 @@ namespace Dynamo {
          * @return false
          */
         inline bool operator==(const Segment2 &rhs) const {
-            return a == rhs.a && b == rhs.b;
+            return (a == rhs.a && b == rhs.b) || (b == rhs.a && a == rhs.b);
         }
 
         /**
@@ -67,6 +66,6 @@ struct std::hash<Dynamo::Segment2> {
     inline size_t operator()(const Dynamo::Segment2 &segment) const {
         size_t ta = std::hash<Dynamo::Vec2>{}(segment.a);
         size_t tb = std::hash<Dynamo::Vec2>{}(segment.b);
-        return ta ^ (tb << 1);
+        return (ta ^ (tb << 1)) + ((ta << 1) ^ tb);
     }
 };

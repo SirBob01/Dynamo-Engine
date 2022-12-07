@@ -19,6 +19,7 @@
 #include "Math/Circle.hpp"
 #include "Math/Common.hpp"
 #include "Math/Complex.hpp"
+#include "Math/Delaunay.hpp"
 #include "Math/Fourier.hpp"
 #include "Math/Mat3.hpp"
 #include "Math/Mat4.hpp"

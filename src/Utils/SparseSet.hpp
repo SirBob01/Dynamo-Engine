@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <vector>
 
 #include "../Log/Log.hpp"
@@ -190,9 +189,11 @@ namespace Dynamo {
         /**
          * @brief Apply a function to each member of the set
          *
+         * @tparam Functor
          * @param function Function that takes a T object and its id
          */
-        inline void forall(std::function<void(T &item, Id id)> function) {
+        template <typename Functor>
+        inline void forall(Functor &&function) {
             for (int i = 0; i < size(); i++) {
                 function(_pool[i], _dense[i]);
             }
@@ -201,9 +202,11 @@ namespace Dynamo {
         /**
          * @brief Apply a function to each item in the set
          *
+         * @tparam Functor
          * @param function Function that takes a T object
          */
-        inline void forall_items(std::function<void(T &item)> function) {
+        template <typename Functor>
+        inline void forall_items(Functor &&function) {
             for (int i = 0; i < size(); i++) {
                 function(_pool[i]);
             }
@@ -212,9 +215,11 @@ namespace Dynamo {
         /**
          * @brief Apply a function to each id in the set
          *
+         * @tparam Functor
          * @param function Function that takes an id
          */
-        inline void forall_ids(std::function<void(Id id)> function) {
+        template <typename Functor>
+        inline void forall_ids(Functor &&function) {
             for (int i = 0; i < size(); i++) {
                 function(_dense[i]);
             }
