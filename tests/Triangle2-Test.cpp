@@ -84,6 +84,43 @@ TEST_CASE("Triangle2 winding anti-clockwise", "[Triangle2]") {
     REQUIRE(triangle.winding() > 0);
 }
 
+TEST_CASE("Triangle2 shared points", "[Triangle2]") {
+    Dynamo::Vec2 a(0, 0);
+    Dynamo::Vec2 b(1, 0);
+    Dynamo::Vec2 c(0, 1);
+    Dynamo::Vec2 d(1, 1);
+    Dynamo::Vec2 e(0.5, 0.5);
+    Dynamo::Vec2 f(-0.5, -0.5);
+
+    Dynamo::Triangle2 t1(a, b, c);
+    Dynamo::Triangle2 t2(b, c, a);
+    Dynamo::Triangle2 t3(c, d, e);
+    Dynamo::Triangle2 t4(f, d, e);
+
+    REQUIRE(t1.shared_vertices(t1) == 3);
+    REQUIRE(t1.shared_vertices(t2) == 3);
+    REQUIRE(t1.shared_vertices(t3) == 1);
+    REQUIRE(t1.shared_vertices(t4) == 0);
+}
+
+TEST_CASE("Triangle2 adjacent", "[Triangle2]") {
+    Dynamo::Vec2 a(0, 0);
+    Dynamo::Vec2 b(1, 0);
+    Dynamo::Vec2 c(0, 1);
+    Dynamo::Vec2 d(1, 1);
+    Dynamo::Vec2 e(0.5, 0.5);
+
+    Dynamo::Triangle2 t1(a, b, c);
+    Dynamo::Triangle2 t2(c, b, a);
+    Dynamo::Triangle2 t3(c, b, e);
+    Dynamo::Triangle2 t4(c, d, e);
+
+    REQUIRE(t1.adjacent(t1));
+    REQUIRE(t1.adjacent(t2));
+    REQUIRE(t1.adjacent(t3));
+    REQUIRE(!t1.adjacent(t4));
+}
+
 TEST_CASE("Triangle2 equality", "[Triangle2]") {
     Dynamo::Vec2 a(0, 0);
     Dynamo::Vec2 b(1, 0);
@@ -101,7 +138,7 @@ TEST_CASE("Triangle2 inequality", "[Triangle2]") {
     Dynamo::Vec2 c(0, 1);
 
     Dynamo::Triangle2 triangle1(a, b, c);
-    Dynamo::Triangle2 triangle2(c, a, b);
+    Dynamo::Triangle2 triangle2(c, b, a);
 
     REQUIRE(triangle1 != triangle2);
 }
