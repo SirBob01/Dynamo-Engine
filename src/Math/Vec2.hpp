@@ -21,13 +21,6 @@ namespace Dynamo {
         Vec2(float x = 0, float y = 0) : x(x), y(y) {}
 
         /**
-         * @brief Clone this vector
-         *
-         * @return Vec2
-         */
-        inline Vec2 clone() { return Vec2(x, y); }
-
-        /**
          * @brief Calculate the squared length
          *
          * @return float

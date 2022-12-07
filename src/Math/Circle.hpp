@@ -21,13 +21,6 @@ namespace Dynamo {
             center(center), radius(radius) {}
 
         /**
-         * @brief Clone this circle
-         *
-         * @return Circle
-         */
-        inline Circle clone() { return Circle(center, radius); }
-
-        /**
          * @brief Get the circumference of this circle
          *
          * @return float

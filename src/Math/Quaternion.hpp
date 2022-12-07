@@ -41,13 +41,6 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Clone this quaternion
-         *
-         * @return Quaternion
-         */
-        inline Quaternion clone() const { return Quaternion(x, y, z, w); }
-
-        /**
          * @brief Calculate the square length
          *
          * @return float

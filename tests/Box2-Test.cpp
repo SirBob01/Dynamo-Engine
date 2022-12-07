@@ -9,15 +9,6 @@ TEST_CASE("Box2 construct center and dimensions", "[Box2]") {
     REQUIRE(a.max.y == 2.5);
 }
 
-TEST_CASE("Box2 clone", "[Box2]") {
-    Dynamo::Box2 a({0, 0}, {2, 4});
-    Dynamo::Box2 b = a.clone();
-    REQUIRE(a.min == b.min);
-    REQUIRE(a.max == b.max);
-    REQUIRE(a.valid());
-    REQUIRE(b.valid());
-}
-
 TEST_CASE("Box2 center", "[Box2]") {
     Dynamo::Box2 a({-2, -2}, {2, 4});
     Dynamo::Vec2 center = a.center();

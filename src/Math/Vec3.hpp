@@ -22,13 +22,6 @@ namespace Dynamo {
         Vec3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
 
         /**
-         * @brief Clone this vector
-         *
-         * @return Vec3
-         */
-        inline Vec3 clone() { return Vec3(x, y, z); }
-
-        /**
          * @brief Calculate the squared length
          *
          * @return float

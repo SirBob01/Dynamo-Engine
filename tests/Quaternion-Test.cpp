@@ -12,15 +12,6 @@ TEST_CASE("Quaternion axis-angle", "[Quaternion]") {
     REQUIRE_THAT(z.w, Approx(std::cos(M_PI_4 * 0.5)));
 }
 
-TEST_CASE("Quaternion clone", "[Quaternion]") {
-    Dynamo::Quaternion a(1, 2, 3, 4);
-    Dynamo::Quaternion b = a.clone();
-    REQUIRE(a.x == b.x);
-    REQUIRE(a.y == b.y);
-    REQUIRE(a.z == b.z);
-    REQUIRE(a.w == b.w);
-}
-
 TEST_CASE("Quaternion length squared", "[Quaternion]") {
     Dynamo::Quaternion z(1, 2, 3, 4);
     REQUIRE(z.length_squared() == 30);

@@ -1,15 +1,6 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Circle clone", "[Circle]") {
-    Dynamo::Circle a({0, 0}, 5);
-    Dynamo::Circle b = a.clone();
-    REQUIRE(a.center == b.center);
-    REQUIRE(a.radius == b.radius);
-    REQUIRE(a.valid());
-    REQUIRE(b.valid());
-}
-
 TEST_CASE("Circle circumference", "[Circle]") {
     Dynamo::Circle a({0, 0}, 5);
     float circumference = M_PI * 10;

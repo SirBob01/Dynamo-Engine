@@ -4,13 +4,6 @@
 
 #include "Common.hpp"
 
-TEST_CASE("Complex number clone", "[Complex]") {
-    Dynamo::Complex a(3, 4);
-    Dynamo::Complex b = a.clone();
-    REQUIRE(a.re == b.re);
-    REQUIRE(a.im == b.im);
-}
-
 TEST_CASE("Complex number length squared", "[Complex]") {
     Dynamo::Complex z(3, 4);
     REQUIRE(z.length_squared() == 25);
