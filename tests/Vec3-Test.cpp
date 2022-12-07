@@ -135,3 +135,7 @@ TEST_CASE("Vec3 inequality", "[Vec3]") {
     REQUIRE(a != c);
     REQUIRE(a != d);
 }
+
+TEST_CASE("Vec3 hash", "[Vec3]") {
+    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Vec3>());
+}

@@ -231,3 +231,17 @@ namespace Dynamo {
         }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Complex
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Complex> {
+    inline size_t operator()(const Dynamo::Complex &complex) const {
+        long tre = complex.re * 73856093;
+        long tim = complex.im * 19349663;
+        return tre ^ tim;
+    }
+};

@@ -103,3 +103,18 @@ namespace Dynamo {
         }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Triangle2
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Triangle2> {
+    inline size_t operator()(const Dynamo::Triangle2 &triangle) const {
+        size_t ta = std::hash<Dynamo::Vec2>{}(triangle.a);
+        size_t tb = std::hash<Dynamo::Vec2>{}(triangle.b);
+        size_t tc = std::hash<Dynamo::Vec2>{}(triangle.c);
+        return ta ^ (tb << 1) ^ (tc << 2);
+    }
+};
