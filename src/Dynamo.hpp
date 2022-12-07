@@ -23,6 +23,7 @@
 #include "Math/Mat3.hpp"
 #include "Math/Mat4.hpp"
 #include "Math/Quaternion.hpp"
+#include "Math/Triangle2.hpp"
 #include "Math/Vec2.hpp"
 #include "Math/Vec3.hpp"
 

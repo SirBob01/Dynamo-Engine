@@ -20,13 +20,6 @@ namespace Dynamo {
         Complex(double re = 0, double im = 0) : re(re), im(im) {}
 
         /**
-         * @brief Clone this complex number
-         *
-         * @return Complex
-         */
-        inline Complex clone() const { return Complex(re, im); }
-
-        /**
          * @brief Calculate the square length
          *
          * @return double

@@ -1,14 +1,6 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Vec3 clone", "[Vec3]") {
-    Dynamo::Vec3 a(3, 4, 2);
-    Dynamo::Vec3 b = a.clone();
-    REQUIRE(a.x == b.x);
-    REQUIRE(a.y == b.y);
-    REQUIRE(a.z == b.z);
-}
-
 TEST_CASE("Vec3 length squared", "[Vec3]") {
     Dynamo::Vec3 a(1, 2, 2);
     REQUIRE(a.length_squared() == 9);

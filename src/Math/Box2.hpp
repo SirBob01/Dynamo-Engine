@@ -33,13 +33,6 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Clone this box
-         *
-         * @return Box2
-         */
-        inline Box2 clone() const { return Box2(min, max); }
-
-        /**
          * @brief Get the center of this box
          *
          * @return Vec2
