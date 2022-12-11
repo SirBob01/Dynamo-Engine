@@ -110,10 +110,10 @@ namespace Dynamo {
          * @param channel Channel index [0, channels - 1]
          * @return T&
          */
-        inline T &at(int frame, int channel) {
+        inline T &at(unsigned frame, unsigned channel) {
             // Struct of arrays access pattern for better cache locality
+            DYN_ASSERT(frame < _frames && channel < _channels);
             int index = (channel * _frames) + frame;
-            DYN_ASSERT(index >= 0 && index < _data.size());
             return _data[index];
         }
 
@@ -125,10 +125,10 @@ namespace Dynamo {
          * @param channel Channel index [0, channels - 1]
          * @return T&
          */
-        inline T &at_interleaved(int frame, int channel) {
+        inline T &at_interleaved(unsigned frame, unsigned channel) {
             // Array of structs access pattern
+            DYN_ASSERT(frame < _frames && channel < _channels);
             int index = (frame * _channels) + channel;
-            DYN_ASSERT(index >= 0 && index < _data.size());
             return _data[index];
         }
     };

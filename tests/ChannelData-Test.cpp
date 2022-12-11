@@ -20,6 +20,13 @@ TEST_CASE("ChannelData construction", "[ChannelData]") {
     REQUIRE(buffer.frames() == 3);
     REQUIRE(buffer.channels() == 2);
 
+    IntegerBuffer copy = buffer;
+    for (int c = 0; c < buffer.channels(); c++) {
+        for (int f = 0; f < buffer.frames(); f++) {
+            REQUIRE(buffer.at(f, c) == copy.at(f, c));
+        }
+    }
+
     CHECK_THROWS(IntegerBuffer({1, 2, 3}, 2));
 }
 
