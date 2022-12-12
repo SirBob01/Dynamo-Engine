@@ -40,6 +40,15 @@ TEST_CASE("ChannelData clear", "[ChannelData]") {
     }
 }
 
+TEST_CASE("ChannelData set frames", "[ChannelData]") {
+    IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
+    auto &data = buffer.data();
+
+    buffer.set_frames(2);
+    REQUIRE(buffer.frames() == 2);
+    REQUIRE(data.size() == 4);
+}
+
 TEST_CASE("ChannelData set channels", "[ChannelData]") {
     IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
     auto &data = buffer.data();
@@ -53,9 +62,10 @@ TEST_CASE("ChannelData resize", "[ChannelData]") {
     IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
     auto &data = buffer.data();
 
-    buffer.resize(5);
+    buffer.resize(5, 3);
     REQUIRE(buffer.frames() == 5);
-    REQUIRE(data.size() == 10);
+    REQUIRE(buffer.channels() == 3);
+    REQUIRE(data.size() == 15);
 }
 
 TEST_CASE("ChannelData reading", "[ChannelData]") {

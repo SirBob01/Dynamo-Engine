@@ -40,7 +40,7 @@ namespace Dynamo {
          */
         ChannelData(unsigned channels = 0, unsigned frames = 0) :
             _channels(channels), _frames(frames) {
-            resize(frames);
+            resize(frames, channels);
         }
 
         /**
@@ -82,6 +82,18 @@ namespace Dynamo {
         inline void clear() { std::fill(_data.begin(), _data.end(), T()); }
 
         /**
+         * @brief Set the number of frames
+         *
+         * This will resize the container
+         *
+         * @param frames Number of frames
+         */
+        inline void set_frames(unsigned frames) {
+            _data.resize(_channels * frames);
+            _frames = frames;
+        }
+
+        /**
          * @brief Set the number of channels
          *
          * This will resize the container
@@ -94,12 +106,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Resize the container to fit a certain number of frames
+         * @brief Resize the container
          *
-         * @param frames Number of frames to contain
+         * @param frames   Number of frames
+         * @param channels Number of channels
          */
-        inline void resize(unsigned frames) {
-            _data.resize(_channels * frames);
+        inline void resize(unsigned frames, unsigned channels) {
+            _data.resize(channels * frames);
+            _channels = channels;
             _frames = frames;
         }
 
