@@ -64,16 +64,16 @@ namespace Dynamo {
         /**
          * @brief Get the number of frames
          *
-         * @return int
+         * @return unsigned
          */
-        inline int frames() { return _frames; }
+        inline unsigned frames() { return _frames; }
 
         /**
          * @brief Get the number of channels
          *
-         * @return int
+         * @return unsigned
          */
-        inline int channels() { return _channels; }
+        inline unsigned channels() { return _channels; }
 
         /**
          * @brief Default-initialize all the data
@@ -88,7 +88,7 @@ namespace Dynamo {
          *
          * @param channels Number of channels
          */
-        inline void set_channels(int channels) {
+        inline void set_channels(unsigned channels) {
             _data.resize(channels * _frames);
             _channels = channels;
         }
@@ -98,7 +98,7 @@ namespace Dynamo {
          *
          * @param frames Number of frames to contain
          */
-        inline void resize(int frames) {
+        inline void resize(unsigned frames) {
             _data.resize(_channels * frames);
             _frames = frames;
         }
