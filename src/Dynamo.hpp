@@ -29,6 +29,7 @@
 #include "Math/Vec2.hpp"
 #include "Math/Vec3.hpp"
 
+#include "Utils/Bits.hpp"
 #include "Utils/ChannelData.hpp"
 #include "Utils/IdTracker.hpp"
 #include "Utils/Random.hpp"

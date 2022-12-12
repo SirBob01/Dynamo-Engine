@@ -68,4 +68,21 @@ namespace Dynamo {
                (BIT_REVERSAL_TABLE[(x >> 16) & 0xFF] << 8) |
                (BIT_REVERSAL_TABLE[(x >> 24) & 0xFF]);
     }
+
+    /**
+     * @brief Round a number to the next power of 2
+     *
+     * @param x
+     * @return unsigned
+     */
+    inline unsigned round_pow2(unsigned x) {
+        x--;
+        x |= x >> 1;
+        x |= x >> 2;
+        x |= x >> 4;
+        x |= x >> 8;
+        x |= x >> 16;
+        x++;
+        return x;
+    }
 } // namespace Dynamo
