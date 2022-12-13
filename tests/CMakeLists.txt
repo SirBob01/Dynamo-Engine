@@ -14,7 +14,7 @@ add_subdirectory("../" "./Dynamo")
 add_subdirectory("../submodules/Catch2" "./Catch2")
 
 # Compile each demo
-file(GLOB TESTS "./*.cpp")
+file(GLOB TESTS "./src/*.cpp")
 foreach(test_path ${TESTS})
     get_filename_component(test ${test_path} NAME_WE)
     add_executable(${test} ${test_path})
