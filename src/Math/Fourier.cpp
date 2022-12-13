@@ -6,12 +6,13 @@ namespace Dynamo::Fourier {
 
         // Bit reversal element reordering
         for (int c = 0; c < signal.channels(); c++) {
-            for (int i = 1, j = 0; i < N; i++) {
+            for (unsigned i = 1, j = 0; i < N; i++) {
                 unsigned bit = N >> 1;
-                do {
+                while (bit & j) {
                     j ^= bit;
                     bit >>= 1;
-                } while (bit & j);
+                }
+                j ^= bit;
                 if (i < j) {
                     std::swap(signal.at(i + offset, c),
                               signal.at(j + offset, c));
@@ -47,12 +48,13 @@ namespace Dynamo::Fourier {
 
         // Bit reversal element reordering
         for (int c = 0; c < signal.channels(); c++) {
-            for (int i = 1, j = 0; i < N; i++) {
+            for (unsigned i = 1, j = 0; i < N; i++) {
                 unsigned bit = N >> 1;
-                do {
+                while (bit & j) {
                     j ^= bit;
                     bit >>= 1;
-                } while (bit & j);
+                }
+                j ^= bit;
                 if (i < j) {
                     std::swap(signal.at(i + offset, c),
                               signal.at(j + offset, c));
