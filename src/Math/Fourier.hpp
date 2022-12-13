@@ -88,33 +88,22 @@ namespace Dynamo::Fourier {
 
     /**
      * @brief Implementation of the fourier transform algorithm to extract
-     * the frequency domain of a signal
+     * the frequency-domain of a time-domain signal in-place
      *
-     * @param signal     Input signal
-     * @param freqs      Output frequency domain
-     * @param N          Total number of frames (must be a power of 2)
-     * @param src_offset Start frame index of the input
-     * @param dst_offset Start frame index of the output
+     * @param signal Signal buffer
+     * @param N      Total number of frames (must be a power of 2)
+     * @param offset Start frame index of the input
      */
-    void transform(ChannelData<Complex> &signal,
-                   ChannelData<Complex> &freqs,
-                   unsigned N,
-                   unsigned src_offset = 0,
-                   unsigned dst_offset = 0);
+    void
+    transform(ChannelData<Complex> &signal, unsigned N, unsigned offset = 0);
 
     /**
      * @brief Implementation of the inverse fourier transform algorithm to
-     * convert a frequency domain into a time domain signal
+     * extract the time-domain of a frequency-domain signal in-place
      *
-     * @param freqs      Input frequency domain
-     * @param signal     Output signal
-     * @param N          Total number of frames (must be a power of 2)
-     * @param src_offset Start frame index of the input
-     * @param dst_offset Start frame index of the output
+     * @param signal Signal buffer
+     * @param N      Total number of frames (must be a power of 2)
+     * @param offset Start frame index of the input
      */
-    void inverse(ChannelData<Complex> &freqs,
-                 ChannelData<Complex> &signal,
-                 unsigned N,
-                 unsigned src_offset = 0,
-                 unsigned dst_offset = 0);
+    void inverse(ChannelData<Complex> &signal, unsigned N, unsigned offset = 0);
 } // namespace Dynamo::Fourier
