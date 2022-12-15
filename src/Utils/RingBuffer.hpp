@@ -39,7 +39,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_full() { return size() == N; }
+        inline bool is_full() const { return size() == N; }
 
         /**
          * @brief Check if the buffer is empty
@@ -47,21 +47,21 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_empty() { return size() == 0; }
+        inline bool is_empty() const { return size() == 0; }
 
         /**
          * @brief Get the size of the buffer
          *
          * @return unsigned
          */
-        inline unsigned size() { return (_write - _read); }
+        inline unsigned size() const { return (_write - _read); }
 
         /**
          * @brief Get the number of writes that can still be performed
          *
          * @return unsigned
          */
-        inline unsigned remaining() { return N - size(); }
+        inline unsigned remaining() const { return N - size(); }
 
         /**
          * @brief Read a value from the buffer, advancing the read pointer
@@ -93,7 +93,7 @@ namespace Dynamo {
          * @param n
          * @return unsigned
          */
-        inline unsigned read(T *dst, unsigned n) {
+        inline unsigned read(T *dst, const unsigned n) {
             // Compute copy partitions
             unsigned offset = _read & MASK;
             unsigned length = std::min(n, size());
@@ -119,7 +119,7 @@ namespace Dynamo {
          * @param n
          * @return unsigned
          */
-        inline unsigned write(T *src, unsigned n) {
+        inline unsigned write(const T *src, const unsigned n) {
             // Compute copy partitions
             unsigned offset = _write & MASK;
             unsigned length = std::min(n, remaining());
