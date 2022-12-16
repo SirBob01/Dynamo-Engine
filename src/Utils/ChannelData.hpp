@@ -7,12 +7,15 @@
 
 namespace Dynamo {
     /**
-     * @brief String of data allocated into multiple channels
+     * @brief Dynamic multi-channel container where data is stored in a
+     * deinterleaved layout
      *
      * @tparam T Type of data
      */
     template <typename T>
     class ChannelData {
+        static_assert(std::is_trivially_copyable<T>::value,
+                      "ChannelData members must be trivially copyable");
         /**
          * @brief Data container
          *
@@ -66,14 +69,14 @@ namespace Dynamo {
          *
          * @return unsigned
          */
-        inline unsigned frames() { return _frames; }
+        inline unsigned frames() const { return _frames; }
 
         /**
          * @brief Get the number of channels
          *
          * @return unsigned
          */
-        inline unsigned channels() { return _channels; }
+        inline unsigned channels() const { return _channels; }
 
         /**
          * @brief Default-initialize all the data
@@ -88,7 +91,7 @@ namespace Dynamo {
          *
          * @param frames Number of frames
          */
-        inline void set_frames(unsigned frames) {
+        inline void set_frames(const unsigned frames) {
             _data.resize(_channels * frames);
             _frames = frames;
         }
@@ -100,7 +103,7 @@ namespace Dynamo {
          *
          * @param channels Number of channels
          */
-        inline void set_channels(unsigned channels) {
+        inline void set_channels(const unsigned channels) {
             _data.resize(channels * _frames);
             _channels = channels;
         }
@@ -111,39 +114,58 @@ namespace Dynamo {
          * @param frames   Number of frames
          * @param channels Number of channels
          */
-        inline void resize(unsigned frames, unsigned channels) {
+        inline void resize(const unsigned frames, const unsigned channels) {
             _data.resize(channels * frames);
             _channels = channels;
             _frames = frames;
         }
 
         /**
-         * @brief Get a reference to a value in the container
+         * @brief Read a frame into a buffer
          *
-         * @param frame   Frame index [0, |data| / channels]
-         * @param channel Channel index [0, channels - 1]
-         * @return T&
+         * @param dst   Destination buffer
+         * @param frame Frame index
          */
-        inline T &at(unsigned frame, unsigned channel) {
-            // Struct of arrays access pattern for better cache locality
-            DYN_ASSERT(frame < _frames && channel < _channels);
-            int index = (channel * _frames) + frame;
-            return _data[index];
+        inline void read_frame(T *dst, const unsigned frame) const {
+            DYN_ASSERT(frame < _frames);
+            for (unsigned c = 0; c < _channels; c++) {
+                dst[c] = _data[(c * _frames) + frame];
+            }
         }
 
         /**
-         * @brief Get a reference to a value in the container using an
-         * interleaved access pattern
+         * @brief Read a channel into a buffer
          *
-         * @param frame   Frame index [0, |data| / channels]
-         * @param channel Channel index [0, channels - 1]
-         * @return T&
+         * @param dst     Destination buffer
+         * @param channel Channel index
          */
-        inline T &at_interleaved(unsigned frame, unsigned channel) {
-            // Array of structs access pattern
+        inline void read_channel(T *dst, const unsigned channel) const {
+            DYN_ASSERT(channel < _channels);
+            const T *ptr = _data.data() + (channel * _frames);
+            std::copy(ptr, ptr + _frames, dst);
+        }
+
+        /**
+         * @brief Get the pointer to the start of a channel
+         *
+         * @param channel
+         * @return T*
+         */
+        inline T *operator[](const unsigned channel) {
+            DYN_ASSERT(channel < _channels);
+            return _data.data() + (channel * _frames);
+        }
+
+        /**
+         * @brief Get a value in the container
+         *
+         * @param frame   Frame index
+         * @param channel Channel index
+         * @return T
+         */
+        inline T at(const unsigned frame, const unsigned channel) const {
             DYN_ASSERT(frame < _frames && channel < _channels);
-            int index = (frame * _channels) + channel;
-            return _data[index];
+            return _data[(channel * _frames) + frame];
         }
     };
 } // namespace Dynamo
