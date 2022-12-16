@@ -5,7 +5,6 @@
 
 #include "../Log/Log.hpp"
 #include "../Utils/Bits.hpp"
-#include "../Utils/ChannelData.hpp"
 
 #include "./Complex.hpp"
 
@@ -92,10 +91,8 @@ namespace Dynamo::Fourier {
      *
      * @param signal Signal buffer
      * @param N      Total number of frames (must be a power of 2)
-     * @param offset Start frame index of the input
      */
-    void
-    transform(ChannelData<Complex> &signal, unsigned N, unsigned offset = 0);
+    void transform(Complex *signal, unsigned N);
 
     /**
      * @brief Implementation of the inverse fourier transform algorithm to
@@ -103,7 +100,6 @@ namespace Dynamo::Fourier {
      *
      * @param signal Signal buffer
      * @param N      Total number of frames (must be a power of 2)
-     * @param offset Start frame index of the input
      */
-    void inverse(ChannelData<Complex> &signal, unsigned N, unsigned offset = 0);
+    void inverse(Complex *signal, unsigned N);
 } // namespace Dynamo::Fourier
