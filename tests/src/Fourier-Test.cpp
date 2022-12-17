@@ -1,14 +1,16 @@
 #include <Dynamo.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
 
 #include "Common.hpp"
 
-using ComplexChannel = std::vector<Dynamo::Complex>;
+template <unsigned N>
+using ComplexChannel = std::array<Dynamo::Complex, N>;
 
 TEST_CASE("Fourier transform", "[Fourier]") {
     // First channel
-    ComplexChannel signal0 = {
+    ComplexChannel<4> signal0 = {
         Dynamo::Complex(-1, 0),
         Dynamo::Complex(2, 0),
         Dynamo::Complex(3, 0),
@@ -33,7 +35,7 @@ TEST_CASE("Fourier transform", "[Fourier]") {
     REQUIRE_THAT(d0.im, Approx(2));
 
     // Second channel
-    ComplexChannel signal1 = {
+    ComplexChannel<4> signal1 = {
         Dynamo::Complex(-3, 0),
         Dynamo::Complex(1, 0),
         Dynamo::Complex(0, 0),
@@ -60,7 +62,7 @@ TEST_CASE("Fourier transform", "[Fourier]") {
 
 TEST_CASE("Inverse Fourier transform", "[Fourier]") {
     // First channel
-    ComplexChannel signal0 = {
+    ComplexChannel<4> signal0 = {
         Dynamo::Complex(4, 0),
         Dynamo::Complex(-4, -2),
         Dynamo::Complex(0, 0),
@@ -85,7 +87,7 @@ TEST_CASE("Inverse Fourier transform", "[Fourier]") {
     REQUIRE_THAT(d0.im, Approx(0));
 
     // Second channel
-    ComplexChannel signal1 = {
+    ComplexChannel<4> signal1 = {
         Dynamo::Complex(0, 0),
         Dynamo::Complex(-3, 1),
         Dynamo::Complex(-6, 0),
@@ -108,4 +110,40 @@ TEST_CASE("Inverse Fourier transform", "[Fourier]") {
 
     REQUIRE_THAT(d1.re, Approx(2));
     REQUIRE_THAT(d1.im, Approx(0));
+}
+
+TEST_CASE("Fourier transform benchmarks", "[Fourier]") {
+    BENCHMARK("Forward Fourier Transform benchmark") {
+        ComplexChannel<4> signal0 = {
+            Dynamo::Complex(-1, 0),
+            Dynamo::Complex(2, 0),
+            Dynamo::Complex(3, 0),
+            Dynamo::Complex(0, 0),
+        };
+        ComplexChannel<4> signal1 = {
+            Dynamo::Complex(-3, 0),
+            Dynamo::Complex(1, 0),
+            Dynamo::Complex(0, 0),
+            Dynamo::Complex(2, 0),
+        };
+        Dynamo::Fourier::transform(signal0.data(), signal0.size());
+        Dynamo::Fourier::transform(signal1.data(), signal1.size());
+    };
+
+    BENCHMARK("Inverse Fourier Transform benchmark") {
+        ComplexChannel<4> signal0 = {
+            Dynamo::Complex(4, 0),
+            Dynamo::Complex(-4, -2),
+            Dynamo::Complex(0, 0),
+            Dynamo::Complex(-4, 2),
+        };
+        ComplexChannel<4> signal1 = {
+            Dynamo::Complex(0, 0),
+            Dynamo::Complex(-3, 1),
+            Dynamo::Complex(-6, 0),
+            Dynamo::Complex(-3, -1),
+        };
+        Dynamo::Fourier::inverse(signal0.data(), signal0.size());
+        Dynamo::Fourier::inverse(signal1.data(), signal1.size());
+    };
 }
