@@ -17,7 +17,7 @@ namespace Dynamo {
          * @param center
          * @param radius
          */
-        Circle(Vec2 center, float radius = 1) :
+        constexpr Circle(Vec2 center, float radius = 1) :
             center(center), radius(radius) {}
 
         /**

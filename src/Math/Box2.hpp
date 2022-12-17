@@ -17,7 +17,7 @@ namespace Dynamo {
          * @param min
          * @param max
          */
-        Box2(Vec2 min, Vec2 max) : min(min), max(max) {}
+        constexpr Box2(Vec2 min, Vec2 max) : min(min), max(max) {}
 
         /**
          * @brief Construct a new Box2 object given its center and dimensions

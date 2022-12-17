@@ -18,7 +18,7 @@ namespace Dynamo {
          * @param x
          * @param y
          */
-        Vec2(float x = 0, float y = 0) : x(x), y(y) {}
+        constexpr Vec2(float x = 0, float y = 0) : x(x), y(y) {}
 
         /**
          * @brief Calculate the squared length

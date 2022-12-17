@@ -17,7 +17,7 @@ namespace Dynamo {
          * @param re Real part
          * @param im Imaginary part
          */
-        Complex(double re = 0, double im = 0) : re(re), im(im) {}
+        constexpr Complex(double re = 0, double im = 0) : re(re), im(im) {}
 
         /**
          * @brief Calculate the square length
