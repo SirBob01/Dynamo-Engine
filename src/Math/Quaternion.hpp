@@ -22,8 +22,12 @@ namespace Dynamo {
          * @param z Coefficient of k component
          * @param w Scalar component
          */
-        Quaternion(float x = 0, float y = 0, float z = 0, float w = 1) :
-            x(x), y(y), z(z), w(w) {}
+        constexpr Quaternion(float x = 0,
+                             float y = 0,
+                             float z = 0,
+                             float w = 1) :
+            x(x),
+            y(y), z(z), w(w) {}
 
         /**
          * @brief Construct a new Quaternion object from an angle-axis pair

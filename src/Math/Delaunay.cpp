@@ -7,7 +7,13 @@ namespace Dynamo::Delaunay {
 
         // Presorting will improve early cutoff rate
         Box2 bounds = calculate_bounding_volume(points);
-        presort_points(bounds, points);
+        if (bounds.width() > bounds.height()) {
+            auto comp = [](const Vec2 &a, const Vec2 &b) { return a.x < b.x; };
+            std::sort(points.begin(), points.end(), comp);
+        } else {
+            auto comp = [](const Vec2 &a, const Vec2 &b) { return a.y < b.y; };
+            std::sort(points.begin(), points.end(), comp);
+        }
 
         // Calculate the initial super triangle
         Triangle2 super_triangle = calculate_super_triangle(bounds);
@@ -111,15 +117,5 @@ namespace Dynamo::Delaunay {
         triangle.c.y += range_2.y;
 
         return triangle;
-    }
-
-    void presort_points(const Box2 &box, std::vector<Vec2> &points) {
-        if (box.width() > box.height()) {
-            auto comp = [](const Vec2 &a, const Vec2 &b) { return a.x < b.x; };
-            std::sort(points.begin(), points.end(), comp);
-        } else {
-            auto comp = [](const Vec2 &a, const Vec2 &b) { return a.y < b.y; };
-            std::sort(points.begin(), points.end(), comp);
-        }
     }
 } // namespace Dynamo::Delaunay

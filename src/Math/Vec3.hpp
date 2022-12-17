@@ -19,7 +19,8 @@ namespace Dynamo {
          * @param y
          * @param z
          */
-        Vec3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
+        constexpr Vec3(float x = 0, float y = 0, float z = 0) :
+            x(x), y(y), z(z) {}
 
         /**
          * @brief Calculate the squared length

@@ -15,7 +15,8 @@ namespace Dynamo {
          * @brief Construct a new Mat4 object
          *
          */
-        Mat4() : values({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}) {}
+        constexpr Mat4() :
+            values({1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}) {}
 
         /**
          * @brief Transpose this matrix

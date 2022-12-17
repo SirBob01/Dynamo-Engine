@@ -31,7 +31,7 @@ namespace Dynamo {
          * @brief Construct a new RingBuffer object
          *
          */
-        RingBuffer() : _read(0), _write(0) {}
+        constexpr RingBuffer() : _read(0), _write(0) {}
 
         /**
          * @brief Check if the buffer is full

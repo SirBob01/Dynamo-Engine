@@ -34,12 +34,4 @@ namespace Dynamo::Delaunay {
      * @return Triangle2
      */
     Triangle2 calculate_super_triangle(const Box2 &box);
-
-    /**
-     * @brief Presort the points by the dimension with the greater range
-     *
-     * @param box
-     * @param points
-     */
-    void presort_points(const Box2 &box, std::vector<Vec2> &points);
 } // namespace Dynamo::Delaunay

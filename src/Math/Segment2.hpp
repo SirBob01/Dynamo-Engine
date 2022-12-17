@@ -16,7 +16,7 @@ namespace Dynamo {
          * @param a
          * @param b
          */
-        Segment2(Vec2 a, Vec2 b) : a(a), b(b) {}
+        constexpr Segment2(Vec2 a, Vec2 b) : a(a), b(b) {}
 
         /**
          * @brief Calculate the squared length

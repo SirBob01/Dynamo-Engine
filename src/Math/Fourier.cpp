@@ -24,7 +24,7 @@ namespace Dynamo::Fourier {
             Complex omega_m = TWIDDLE_TABLE_FFT[s];
 
             for (unsigned k = 0; k < N; k += m) {
-                Complex omega(1, 0);
+                Complex omega(1);
                 for (int j = 0; j < half_m; j++) {
                     unsigned u_i = k + j;
                     unsigned t_i = u_i + half_m;
@@ -61,7 +61,7 @@ namespace Dynamo::Fourier {
             Complex omega_m = TWIDDLE_TABLE_IFFT[s];
 
             for (unsigned k = 0; k < N; k += m) {
-                Complex omega(1, 0);
+                Complex omega(1);
                 for (int j = 0; j < half_m; j++) {
                     unsigned u_i = k + j;
                     unsigned t_i = u_i + half_m;
