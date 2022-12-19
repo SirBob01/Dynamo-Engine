@@ -38,11 +38,10 @@ namespace Dynamo {
         /**
          * @brief Construct an empty ChannelData object
          *
-         * @param channels Number of channels
          * @param frames   Number of frames
+         * @param channels Number of channels
          */
-        ChannelData(unsigned channels = 0, unsigned frames = 0) :
-            _channels(channels), _frames(frames) {
+        ChannelData(unsigned frames = 0, unsigned channels = 0) {
             resize(frames, channels);
         }
 

@@ -8,11 +8,11 @@ TEST_CASE("ChannelData construction", "[ChannelData]") {
     REQUIRE(buffer.frames() == 0);
     REQUIRE(buffer.channels() == 0);
 
-    buffer = IntegerBuffer(1);
+    buffer = IntegerBuffer(0, 1);
     REQUIRE(buffer.frames() == 0);
     REQUIRE(buffer.channels() == 1);
 
-    buffer = IntegerBuffer(1, 3);
+    buffer = IntegerBuffer(3, 1);
     REQUIRE(buffer.frames() == 3);
     REQUIRE(buffer.channels() == 1);
 
