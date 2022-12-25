@@ -53,7 +53,6 @@ For high-level suggestions on improving the engine, open an issue so we can have
 
 ## TODO
 
-- `Jukebox` class
 - `Renderer` submodule
 - `Scene` management system
 - `ECS` submodule

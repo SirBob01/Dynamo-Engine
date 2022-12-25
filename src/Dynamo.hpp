@@ -8,9 +8,17 @@
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"
 
+#include "Jukebox/Filters/Binaural.hpp"
+#include "Jukebox/Filters/Convolver.hpp"
+#include "Jukebox/Filters/Filter.hpp"
+#include "Jukebox/Filters/Stereo.hpp"
+#include "Jukebox/HRTF.hpp"
 #include "Jukebox/Jukebox.hpp"
+#include "Jukebox/Listener.hpp"
+#include "Jukebox/Resample.hpp"
 #include "Jukebox/Sound.hpp"
 #include "Jukebox/SoundManager.hpp"
+#include "Jukebox/SoundMaterial.hpp"
 
 #include "Asset/Asset.hpp"
 #include "Asset/AssetManager.hpp"

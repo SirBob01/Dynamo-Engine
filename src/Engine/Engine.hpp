@@ -8,7 +8,6 @@
 #include "../Core/Input.hpp"
 
 #include "../Jukebox/Jukebox.hpp"
-#include "../Jukebox/SoundManager.hpp"
 
 #include "../Log/Log.hpp"
 #include "../Utils/Random.hpp"
@@ -25,8 +24,6 @@ namespace Dynamo {
         std::unique_ptr<Display> _display;
         std::unique_ptr<Input> _input;
         std::unique_ptr<Clock> _clock;
-
-        std::unique_ptr<SoundManager> _sound_assets;
         std::unique_ptr<Jukebox> _jukebox;
 
       public:

@@ -17,12 +17,11 @@ namespace Dynamo {
         _clock = std::make_unique<Clock>();
 
         // Rendering submodules
-        _sound_assets = std::make_unique<SoundManager>();
-        _jukebox = std::make_unique<Jukebox>(*_sound_assets);
+        _jukebox = std::make_unique<Jukebox>();
 
         // Seed the random number generator
-        Random::seed(
-            std::chrono::system_clock::now().time_since_epoch().count());
+        int seed = std::chrono::system_clock::now().time_since_epoch().count();
+        Random::seed(seed);
     }
 
     Engine::~Engine() { glfwTerminate(); }
@@ -36,5 +35,6 @@ namespace Dynamo {
         // (https://gafferongames.com/post/fix_your_timestep/)
         _input->poll();
         _clock->tick();
+        _jukebox->update();
     }
 } // namespace Dynamo
