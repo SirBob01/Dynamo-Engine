@@ -1,10 +1,9 @@
 #pragma once
-#define STB_VORBIS_HEADER_ONLY
 
 #include <array>
 #include <string>
 
-#include <stb_vorbis.c>
+#include <sndfile.hh>
 
 #include "../Asset/AssetManager.hpp"
 #include "../Log/Log.hpp"
@@ -19,12 +18,12 @@ namespace Dynamo {
     class SoundManager : public AssetManager<Sound> {
       public:
         /**
-         * @brief Load a sound from an ogg file
+         * @brief Load a sound from a file
          *
          * @param filename
          * @return Asset<Sound>
          */
-        Asset<Sound> load_ogg(const std::string filename);
+        Asset<Sound> load_file(const std::string filename);
 
         /**
          * @brief Create a sound asset from raw PCM data
