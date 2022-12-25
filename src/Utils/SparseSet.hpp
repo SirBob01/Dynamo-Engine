@@ -116,7 +116,7 @@ namespace Dynamo {
 
             // Update dense and pool arrays
             _dense.push_back(id);
-            if constexpr (std::is_aggregate_v<T>) {
+            if constexpr (std::is_aggregate<T>::value) {
                 _pool.push_back(T{args...});
             } else {
                 _pool.emplace_back(args...);

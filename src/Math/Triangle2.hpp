@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "./Circle.hpp"
 #include "./Vec2.hpp"
 #include "./Vec3.hpp"

@@ -15,6 +15,8 @@ namespace Dynamo::Delaunay {
     /**
      * @brief Calculate the delaunay triangulation of a point set
      *
+     * Note: This will reorder the points in-place for optimization purposes
+     *
      * @param points Input point set
      */
     std::vector<Triangle2> triangulate(std::vector<Vec2> &points);
