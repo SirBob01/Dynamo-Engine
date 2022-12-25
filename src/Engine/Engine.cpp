@@ -28,6 +28,8 @@ namespace Dynamo {
 
     Core Engine::get_core() { return {*_display, *_input, *_clock}; }
 
+    Jukebox &Engine::get_jukebox() { return *_jukebox; }
+
     bool Engine::is_running() { return !_display->is_closed(); }
 
     void Engine::run() {

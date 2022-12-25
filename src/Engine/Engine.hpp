@@ -56,6 +56,13 @@ namespace Dynamo {
         Core get_core();
 
         /**
+         * @brief Get a reference to Jukebox
+         *
+         * @return Jukebox&
+         */
+        Jukebox &get_jukebox();
+
+        /**
          * @brief Is the application still running?
          *
          * @return true

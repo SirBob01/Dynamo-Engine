@@ -118,6 +118,12 @@ namespace Dynamo {
     constexpr double DEFAULT_SAMPLE_RATE = 44100;
 
     /**
+     * @brief Sample normalization multiplier
+     *
+     */
+    constexpr double SAMPLE_NORM = 1.0 / __INT16_MAX__;
+
+    /**
      * @brief Sound asset represented as a signal holding multiple channels of
      * WaveSample data
      *
@@ -177,8 +183,7 @@ namespace Dynamo {
      * @return double
      */
     inline double norm_sample(const WaveSample sample) {
-        constexpr double scale = 1.0 / __INT16_MAX__;
-        return sample * scale;
+        return sample * SAMPLE_NORM;
     }
 
     /**
