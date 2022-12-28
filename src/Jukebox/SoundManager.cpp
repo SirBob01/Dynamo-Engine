@@ -12,7 +12,7 @@ namespace Dynamo {
         unsigned sample_rate = file.samplerate();
 
         // Read the PCM data
-        std::vector<short> interleaved(frames * channels);
+        WaveForm interleaved(frames * channels);
         file.readf(interleaved.data(), interleaved.size());
 
         // De-interleave the data into the final waveform buffer
@@ -27,7 +27,7 @@ namespace Dynamo {
 
     Asset<Sound> SoundManager::load_raw(const WaveForm waveform,
                                         const unsigned channels,
-                                        const double sample_rate) {
+                                        const float sample_rate) {
         return allocate(waveform, channels, sample_rate);
     }
 } // namespace Dynamo

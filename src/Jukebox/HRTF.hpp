@@ -23,10 +23,10 @@ namespace Dynamo {
      */
     class HRTF {
         /**
-         * @brief Maps azimuth-elevation angle pairs to coefficient sets
+         * @brief Maps azimuth-elevation angle pairs to impulse responses
          *
          */
-        std::unordered_map<Vec2, ChannelData<float>> _coeffs;
+        std::unordered_map<Vec2, Sound> _impulse_responses;
 
         /**
          * @brief Triangle mesh
@@ -35,10 +35,10 @@ namespace Dynamo {
         std::vector<Triangle2> _triangles;
 
         /**
-         * @brief Length of the filter
+         * @brief Length of the impulse response
          *
          */
-        unsigned _filter_length;
+        unsigned _length;
 
       public:
         /**
@@ -49,14 +49,14 @@ namespace Dynamo {
         HRTF(std::string filename);
 
         /**
-         * @brief Get the length of the filter coefficient buffer
+         * @brief Get the length of the impulse response
          *
          * @return unsigned
          */
-        unsigned get_filter_length();
+        unsigned get_length();
 
         /**
-         * @brief Get the Filter coefficients for a source relative to the
+         * @brief Get the impulse response for a source relative to the
          * listener, applying interpolation as needed
          *
          * @param listener_position Position of the listener
@@ -64,9 +64,9 @@ namespace Dynamo {
          * @param source_position   Position of the sound source
          * @param dst_buffer        Destination buffer
          */
-        void get_coefficients(const Vec3 &listener_position,
-                              const Quaternion &listener_rotation,
-                              const Vec3 &source_position,
-                              ChannelData<Complex> &dst_buffer);
+        void get_impulse_response(const Vec3 &listener_position,
+                                  const Quaternion &listener_rotation,
+                                  const Vec3 &source_position,
+                                  Sound &dst_buffer);
     };
 } // namespace Dynamo

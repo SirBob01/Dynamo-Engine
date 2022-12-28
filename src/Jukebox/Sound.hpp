@@ -11,10 +11,10 @@
 
 namespace Dynamo {
     /**
-     * @brief Indiviual sample ranges between [−32,767, +32,767]
+     * @brief Indiviual sample ranges between [−1.0, +1.0]
      *
      */
-    using WaveSample = short;
+    using WaveSample = float;
 
     /**
      * @brief An array of samples, a discrete representation of a sound wave
@@ -115,13 +115,7 @@ namespace Dynamo {
      * @brief The default sample rate is defined to be 44.1KHz
      *
      */
-    constexpr double DEFAULT_SAMPLE_RATE = 44100;
-
-    /**
-     * @brief Sample normalization multiplier
-     *
-     */
-    constexpr double SAMPLE_NORM = 1.0 / __INT16_MAX__;
+    constexpr float DEFAULT_SAMPLE_RATE = 44100;
 
     /**
      * @brief Sound asset represented as a signal holding multiple channels of
@@ -129,7 +123,7 @@ namespace Dynamo {
      *
      */
     class Sound : public ChannelData<WaveSample> {
-        double _sample_rate;
+        float _sample_rate;
 
       public:
         /**
@@ -141,7 +135,7 @@ namespace Dynamo {
          */
         Sound(unsigned frames = 0,
               unsigned channels = 0,
-              double sample_rate = DEFAULT_SAMPLE_RATE) :
+              float sample_rate = DEFAULT_SAMPLE_RATE) :
             ChannelData<WaveSample>(frames, channels),
             _sample_rate(sample_rate) {}
 
@@ -154,16 +148,16 @@ namespace Dynamo {
          */
         Sound(std::vector<WaveSample> samples,
               unsigned channels,
-              double sample_rate) :
+              float sample_rate) :
             ChannelData<WaveSample>(samples, channels),
             _sample_rate(sample_rate) {}
 
         /**
          * @brief Get the sample rate of the signal
          *
-         * @return double
+         * @return float
          */
-        inline double sample_rate() const { return _sample_rate; }
+        inline float sample_rate() const { return _sample_rate; }
 
         /**
          * @brief Grab a frame in the waveform and upmix or downmix to the
@@ -175,24 +169,4 @@ namespace Dynamo {
          */
         WaveFrame get_frame(const unsigned frame, const unsigned out_channels);
     };
-
-    /**
-     * @brief Normalize a wave sample
-     *
-     * @param sample Native sample format representation
-     * @return double
-     */
-    inline double norm_sample(const WaveSample sample) {
-        return sample * SAMPLE_NORM;
-    }
-
-    /**
-     * @brief Clip and denormalize a wave sample
-     *
-     * @param sample Normalized double representation
-     * @return WaveSample
-     */
-    inline WaveSample denorm_sample(const double sample) {
-        return std::clamp(sample, -1.0, 1.0) * __INT16_MAX__;
-    }
 } // namespace Dynamo

@@ -43,6 +43,6 @@ namespace Dynamo {
          * @brief Frame offset of the chunk
          *
          */
-        double frame;
+        float frame;
     };
 } // namespace Dynamo

@@ -23,7 +23,7 @@ namespace Dynamo {
      * @param deg
      * @return float
      */
-    inline double to_radians(float deg) {
+    inline float to_radians(float deg) {
         static const float factor = M_PI / 180.0;
         return deg * factor;
     }

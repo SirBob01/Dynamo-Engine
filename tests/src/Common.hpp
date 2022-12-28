@@ -9,5 +9,5 @@
  * @return Catch::Matchers::WithinAbsMatcher
  */
 Catch::Matchers::WithinAbsMatcher Approx(double x) {
-    return Catch::Matchers::WithinAbs(x, 1e-7);
+    return Catch::Matchers::WithinAbs(x, 1e-6);
 }

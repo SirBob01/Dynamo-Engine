@@ -9,8 +9,8 @@ namespace Dynamo {
      *
      */
     struct Complex {
-        double re;
-        double im;
+        float re;
+        float im;
 
         /**
          * @brief Construct a new Complex object
@@ -18,21 +18,21 @@ namespace Dynamo {
          * @param re Real part
          * @param im Imaginary part
          */
-        constexpr Complex(double re = 0, double im = 0) : re(re), im(im) {}
+        constexpr Complex(float re = 0, float im = 0) : re(re), im(im) {}
 
         /**
          * @brief Calculate the square length
          *
-         * @return double
+         * @return float
          */
-        inline double length_squared() const { return re * re + im * im; }
+        inline float length_squared() const { return re * re + im * im; }
 
         /**
          * @brief Calculate the length
          *
-         * @return double
+         * @return float
          */
-        inline double length() const { return std::sqrt(length_squared()); }
+        inline float length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Calculate the reciprocal of the complex number for use in
@@ -41,7 +41,7 @@ namespace Dynamo {
          * @return Complex
          */
         inline Complex reciprocal() const {
-            double scale = 1.0 / length_squared();
+            float scale = 1.0 / length_squared();
             return Complex(re * scale, -im * scale);
         }
 
@@ -63,7 +63,7 @@ namespace Dynamo {
          * @return Complex
          */
         inline Complex exp() const {
-            double scale = std::exp(re);
+            float scale = std::exp(re);
             return Complex(scale * std::cos(im), scale * std::sin(im));
         }
 
@@ -101,8 +101,8 @@ namespace Dynamo {
          * @return Complex
          */
         inline Complex operator*(const Complex &rhs) const {
-            double n_re = re * rhs.re - im * rhs.im;
-            double n_im = re * rhs.im + im * rhs.re;
+            float n_re = re * rhs.re - im * rhs.im;
+            float n_im = re * rhs.im + im * rhs.re;
             return Complex(n_re, n_im);
         }
 
@@ -112,7 +112,7 @@ namespace Dynamo {
          * @param scalar
          * @return Complex
          */
-        inline Complex operator*(double scalar) const {
+        inline Complex operator*(float scalar) const {
             return Complex(scalar * re, scalar * im);
         }
 
@@ -132,8 +132,8 @@ namespace Dynamo {
          * @param scalar
          * @return Complex
          */
-        inline Complex operator/(double scalar) const {
-            double inv = 1.0 / scalar;
+        inline Complex operator/(float scalar) const {
+            float inv = 1.0 / scalar;
             return *this * inv;
         }
 
@@ -168,8 +168,8 @@ namespace Dynamo {
          * @return Complex&
          */
         inline Complex &operator*=(const Complex &rhs) {
-            double n_re = re * rhs.re - im * rhs.im;
-            double n_im = re * rhs.im + im * rhs.re;
+            float n_re = re * rhs.re - im * rhs.im;
+            float n_im = re * rhs.im + im * rhs.re;
             re = n_re;
             im = n_im;
             return *this;
@@ -181,7 +181,7 @@ namespace Dynamo {
          * @param scalar
          * @return Complex&
          */
-        inline Complex &operator*=(double scalar) {
+        inline Complex &operator*=(float scalar) {
             re *= scalar;
             im *= scalar;
             return *this;
@@ -204,8 +204,8 @@ namespace Dynamo {
          * @param scalar
          * @return Complex&
          */
-        inline Complex &operator/=(double scalar) {
-            double inv = 1.0 / scalar;
+        inline Complex &operator/=(float scalar) {
+            float inv = 1.0 / scalar;
             return *this *= inv;
         }
 
