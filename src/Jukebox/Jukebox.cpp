@@ -96,14 +96,14 @@ namespace Dynamo {
         StaticSoundMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        float frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
-                                    static_cast<float>(sound.frames()));
-        float frames = frame_stop - chunk.frame;
+        double frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
+                                     static_cast<float>(sound.frames()));
+        double frames = frame_stop - chunk.frame;
 
         // Calculate the number of frames required in the original signal to
         // produce the destination frames
-        float factor = sound.sample_rate() / _output_state.sample_rate;
-        float length = frames * factor;
+        double factor = sound.sample_rate() / _output_state.sample_rate;
+        double length = frames * factor;
 
         // Resample the audio to the device sample rate
         Sound transformed(frames, _output_state.channels);
@@ -143,14 +143,14 @@ namespace Dynamo {
         DynamicSoundMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        float frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
-                                    static_cast<float>(sound.frames()));
-        float frames = frame_stop - chunk.frame;
+        double frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
+                                     static_cast<float>(sound.frames()));
+        double frames = frame_stop - chunk.frame;
 
         // Calculate the number of frames required in the original signal to
         // produce the destination frames
-        float factor = sound.sample_rate() / _output_state.sample_rate;
-        float length = frames * factor;
+        double factor = sound.sample_rate() / _output_state.sample_rate;
+        double length = frames * factor;
 
         // Resample the audio to the device sample rate
         Sound transformed(frames, _output_state.channels);

@@ -100,7 +100,7 @@ namespace Dynamo {
              * @brief Sampling rate of the buffer
              *
              */
-            float sample_rate;
+            double sample_rate;
         };
         State _input_state;
         State _output_state;
