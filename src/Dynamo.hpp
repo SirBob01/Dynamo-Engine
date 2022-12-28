@@ -8,6 +8,7 @@
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"
 
+#include "Jukebox/Filters/Attenuation.hpp"
 #include "Jukebox/Filters/Binaural.hpp"
 #include "Jukebox/Filters/Convolver.hpp"
 #include "Jukebox/Filters/Filter.hpp"
