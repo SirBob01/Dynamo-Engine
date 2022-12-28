@@ -17,7 +17,7 @@ namespace Dynamo::Fourier {
      */
     constexpr std::array<Complex, 32> construct_twiddle_table(bool inverse) {
         std::array<Complex, 32> table;
-        double sign = inverse ? 1 : -1;
+        float sign = inverse ? 1 : -1;
         for (unsigned i = 0; i < 32; i++) {
             table[i] = Complex(0, sign * 2 * M_PI / (1 << i)).exp();
         }

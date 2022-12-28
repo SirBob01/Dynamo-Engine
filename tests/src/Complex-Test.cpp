@@ -17,15 +17,15 @@ TEST_CASE("Complex number length", "[Complex]") {
 TEST_CASE("Complex number reciprocal", "[Complex]") {
     Dynamo::Complex z(3, 4);
     Dynamo::Complex reciprocal = z.reciprocal();
-    REQUIRE(reciprocal.re == 3 / 25.0);
-    REQUIRE(reciprocal.im == -4 / 25.0);
+    REQUIRE(reciprocal.re == 3 / 25.0f);
+    REQUIRE(reciprocal.im == -4 / 25.0f);
 }
 
 TEST_CASE("Complex number conjugate", "[Complex]") {
     Dynamo::Complex z(3, 4);
     Dynamo::Complex conjugate = z.conjugate();
-    REQUIRE(conjugate.re == 3.0);
-    REQUIRE(conjugate.im == -4.0);
+    REQUIRE(conjugate.re == 3);
+    REQUIRE(conjugate.im == -4);
 }
 
 TEST_CASE("Complex number exp", "[Complex]") {
@@ -76,23 +76,23 @@ TEST_CASE("Complex number multiply", "[Complex]") {
 TEST_CASE("Complex number multiply scalar", "[Complex]") {
     Dynamo::Complex a(-1, 2);
     Dynamo::Complex c = a * 3.2;
-    REQUIRE(c.re == -3.2);
-    REQUIRE(c.im == 6.4);
+    REQUIRE(c.re == -3.2f);
+    REQUIRE(c.im == 6.4f);
 }
 
 TEST_CASE("Complex number divide", "[Complex]") {
     Dynamo::Complex a(-5, 10);
     Dynamo::Complex b(3, 4);
     Dynamo::Complex c = a / b;
-    REQUIRE(c.re == 1);
-    REQUIRE(c.im == 2);
+    REQUIRE_THAT(c.re, Approx(1.0f));
+    REQUIRE_THAT(c.im, Approx(2.0f));
 }
 
 TEST_CASE("Complex number divide scalar", "[Complex]") {
     Dynamo::Complex a(-3.2, 6.4);
     Dynamo::Complex c = a / 3.2;
-    REQUIRE(c.re == -1);
-    REQUIRE(c.im == 2);
+    REQUIRE(c.re == -1.0f);
+    REQUIRE(c.im == 2.0f);
 }
 
 TEST_CASE("Complex number add in-place", "[Complex]") {
@@ -122,23 +122,23 @@ TEST_CASE("Complex number multiply in-place", "[Complex]") {
 TEST_CASE("Complex number multiply scalar in-place", "[Complex]") {
     Dynamo::Complex a(-1, 2);
     a *= 3.2;
-    REQUIRE(a.re == -3.2);
-    REQUIRE(a.im == 6.4);
+    REQUIRE(a.re == -3.2f);
+    REQUIRE(a.im == 6.4f);
 }
 
 TEST_CASE("Complex number divide in-place", "[Complex]") {
     Dynamo::Complex a(-5, 10);
     Dynamo::Complex b(3, 4);
     a /= b;
-    REQUIRE(a.re == 1);
-    REQUIRE(a.im == 2);
+    REQUIRE_THAT(a.re, Approx(1.0f));
+    REQUIRE_THAT(a.im, Approx(2.0f));
 }
 
 TEST_CASE("Complex number divide scalar in-place", "[Complex]") {
     Dynamo::Complex a(-3.2, 6.4);
     a /= 3.2;
-    REQUIRE(a.re == -1);
-    REQUIRE(a.im == 2);
+    REQUIRE(a.re == -1.0f);
+    REQUIRE(a.im == 2.0f);
 }
 
 TEST_CASE("Complex number equality", "[Complex]") {

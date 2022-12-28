@@ -130,8 +130,8 @@ namespace Dynamo {
      */
     void resample_signal(WaveSample *src,
                          WaveSample *dst,
-                         double time_offset,
-                         double src_length,
-                         double src_rate,
-                         double dst_rate);
+                         float time_offset,
+                         float src_length,
+                         float src_rate,
+                         float dst_rate);
 } // namespace Dynamo

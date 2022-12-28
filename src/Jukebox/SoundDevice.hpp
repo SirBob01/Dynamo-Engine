@@ -36,6 +36,6 @@ namespace Dynamo {
          * @brief Compatible sample rate
          *
          */
-        double sample_rate;
+        float sample_rate;
     };
 } // namespace Dynamo

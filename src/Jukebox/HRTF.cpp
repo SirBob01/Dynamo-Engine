@@ -7,7 +7,7 @@ namespace Dynamo {
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        std::vector<float> buffer(size / sizeof(float));
+        WaveForm buffer(size / sizeof(float));
         if (!file.read(reinterpret_cast<char *>(buffer.data()), size)) {
             Log::error("HRIR dataset file not found {}.", filename);
         }
@@ -27,14 +27,14 @@ namespace Dynamo {
             points.push_back({a, 270});
         }
 
-        // Read the HRIR coefficients for each point
-        _filter_length = 200;
+        // Read the HRIR samples for each point
+        _length = 200;
         unsigned offset = 0;
         for (Vec2 &point : points) {
-            _coeffs[point].resize(_filter_length, 2);
+            _impulse_responses[point].resize(_length, 2);
             for (unsigned c = 0; c < 2; c++) {
-                for (unsigned f = 0; f < _filter_length; f++) {
-                    _coeffs[point][c][f] = buffer[offset++];
+                for (unsigned f = 0; f < _length; f++) {
+                    _impulse_responses[point][c][f] = buffer[offset++];
                 }
             }
         }
@@ -43,12 +43,12 @@ namespace Dynamo {
         _triangles = Delaunay::triangulate(points);
     }
 
-    unsigned HRTF::get_filter_length() { return _filter_length; }
+    unsigned HRTF::get_length() { return _length; }
 
-    void HRTF::get_coefficients(const Vec3 &listener_position,
-                                const Quaternion &listener_rotation,
-                                const Vec3 &source_position,
-                                ChannelData<Complex> &dst_buffer) {
+    void HRTF::get_impulse_response(const Vec3 &listener_position,
+                                    const Quaternion &listener_rotation,
+                                    const Vec3 &source_position,
+                                    Sound &dst_buffer) {
         // Calculate azimuth and elevation angles
         Vec3 disp = source_position - listener_position;
         float azimuth = std::asin(disp.x / disp.length());
@@ -67,16 +67,16 @@ namespace Dynamo {
         for (const Triangle2 &triangle : _triangles) {
             Vec3 coords = triangle.barycentric(point);
             if (coords.x >= 0 && coords.y >= 0 && coords.z >= 0) {
-                ChannelData<float> &coeffs0 = _coeffs[triangle.a];
-                ChannelData<float> &coeffs1 = _coeffs[triangle.b];
-                ChannelData<float> &coeffs2 = _coeffs[triangle.c];
+                Sound &ir0 = _impulse_responses[triangle.a];
+                Sound &ir1 = _impulse_responses[triangle.b];
+                Sound &ir2 = _impulse_responses[triangle.c];
 
-                // Use barycentric coordinates to interpolate coefficients
+                // Use barycentric coordinates to interpolate samples
                 for (unsigned c = 0; c < dst_buffer.channels(); c++) {
                     for (unsigned f = 0; f < dst_buffer.frames(); f++) {
-                        dst_buffer[c][f].re = coeffs0[c][f] * coords.x +
-                                              coeffs1[c][f] * coords.y +
-                                              coeffs2[c][f] * coords.z;
+                        dst_buffer[c][f] = ir0[c][f] * coords.x +
+                                           ir1[c][f] * coords.y +
+                                           ir2[c][f] * coords.z;
                     }
                 }
                 return;

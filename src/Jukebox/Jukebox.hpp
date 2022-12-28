@@ -53,13 +53,13 @@ namespace Dynamo {
          * @brief Global volume control
          *
          */
-        double _volume;
+        float _volume;
 
         /**
          * @brief Final waveform on which all active chunks are layered onto
          *
          */
-        Sound _composite;
+        WaveForm _composite;
 
         /**
          * @brief Set of all listeners
@@ -100,7 +100,7 @@ namespace Dynamo {
              * @brief Sampling rate of the buffer
              *
              */
-            double sample_rate;
+            float sample_rate;
         };
         State _input_state;
         State _output_state;
@@ -235,9 +235,9 @@ namespace Dynamo {
         /**
          * @brief Get the master volume
          *
-         * @return double
+         * @return float
          */
-        double get_volume();
+        float get_volume();
 
         /**
          * @brief Pause audio playback
@@ -256,7 +256,7 @@ namespace Dynamo {
          *
          * @param volume
          */
-        void set_volume(double volume);
+        void set_volume(float volume);
 
         /**
          * @brief Get the sound asset manager

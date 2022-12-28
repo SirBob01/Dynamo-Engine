@@ -75,7 +75,7 @@ namespace Dynamo::Fourier {
         }
 
         // Normalize
-        double inv_N = 1.0 / N;
+        float inv_N = 1.0 / N;
         for (int f = 0; f < N; f++) {
             signal[f] *= inv_N;
         }

@@ -37,6 +37,6 @@ namespace Dynamo {
          */
         Asset<Sound> load_raw(const WaveForm waveform,
                               const unsigned channels,
-                              const double sample_rate);
+                              const float sample_rate);
     };
 } // namespace Dynamo

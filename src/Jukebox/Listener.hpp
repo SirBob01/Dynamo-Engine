@@ -21,7 +21,7 @@ namespace Dynamo {
          * @brief Listener volume
          *
          */
-        double volume = 1.0;
+        float volume = 1.0;
 
         /**
          * @brief Position of the listener in 3D space

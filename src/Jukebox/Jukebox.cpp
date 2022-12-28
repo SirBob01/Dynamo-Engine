@@ -96,17 +96,17 @@ namespace Dynamo {
         StaticSoundMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
-                                     static_cast<double>(sound.frames()));
-        double frames = frame_stop - chunk.frame;
+        float frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
+                                    static_cast<float>(sound.frames()));
+        float frames = frame_stop - chunk.frame;
 
         // Calculate the number of frames required in the original signal to
         // produce the destination frames
-        double factor = sound.sample_rate() / _output_state.sample_rate;
-        double length = frames * factor;
+        float factor = sound.sample_rate() / _output_state.sample_rate;
+        float length = frames * factor;
 
         // Resample the audio to the device sample rate
-        Sound transformed(frames, _composite.channels());
+        Sound transformed(frames, _output_state.channels);
         for (unsigned c = 0; c < transformed.channels(); c++) {
             resample_signal(sound[c],
                             transformed[c],
@@ -122,12 +122,13 @@ namespace Dynamo {
         }
 
         // Mix the filtered sound onto the composite signal
-        double volume = material.volume * _volume;
-        for (unsigned c = 0; c < transformed.channels(); c++) {
-            for (unsigned f = 0; f < transformed.frames(); f++) {
-                double s0 = norm_sample(_composite[c][f]);
-                double s1 = norm_sample(transformed[c][f]);
-                _composite[c][f] = denorm_sample((s0 + s1) * volume);
+        float volume = material.volume * _volume;
+        for (unsigned f = 0; f < transformed.frames(); f++) {
+            for (unsigned c = 0; c < transformed.channels(); c++) {
+                unsigned i = f * transformed.channels() + c;
+                float s0 = _composite[i];
+                float s1 = transformed[c][f];
+                _composite[i] = (s0 + s1) * volume;
             }
         }
 
@@ -142,17 +143,17 @@ namespace Dynamo {
         DynamicSoundMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
-                                     static_cast<double>(sound.frames()));
-        double frames = frame_stop - chunk.frame;
+        float frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
+                                    static_cast<float>(sound.frames()));
+        float frames = frame_stop - chunk.frame;
 
         // Calculate the number of frames required in the original signal to
         // produce the destination frames
-        double factor = sound.sample_rate() / _output_state.sample_rate;
-        double length = frames * factor;
+        float factor = sound.sample_rate() / _output_state.sample_rate;
+        float length = frames * factor;
 
         // Resample the audio to the device sample rate
-        Sound transformed(frames, _composite.channels());
+        Sound transformed(frames, _output_state.channels);
         for (unsigned c = 0; c < transformed.channels(); c++) {
             resample_signal(sound[c],
                             transformed[c],
@@ -173,12 +174,13 @@ namespace Dynamo {
         }
 
         // Mix the filtered sound onto the composite signal
-        double volume = material.volume * listener.volume * _volume;
-        for (unsigned c = 0; c < transformed.channels(); c++) {
-            for (unsigned f = 0; f < transformed.frames(); f++) {
-                double s0 = norm_sample(_composite[c][f]);
-                double s1 = norm_sample(transformed[c][f]);
-                _composite[c][f] = denorm_sample((s0 + s1) * volume);
+        float volume = material.volume * listener.volume * _volume;
+        for (unsigned f = 0; f < transformed.frames(); f++) {
+            for (unsigned c = 0; c < transformed.channels(); c++) {
+                unsigned i = f * transformed.channels() + c;
+                float s0 = _composite[i];
+                float s1 = transformed[c][f];
+                _composite[i] = (s0 + s1) * volume;
             }
         }
 
@@ -247,7 +249,7 @@ namespace Dynamo {
         params.channelCount = device.input_channels;
         params.device = device.id;
         params.hostApiSpecificStreamInfo = nullptr;
-        params.sampleFormat = paInt16;
+        params.sampleFormat = paFloat32;
         params.suggestedLatency = 0;
 
         err = Pa_OpenStream(&_input_stream,
@@ -292,7 +294,7 @@ namespace Dynamo {
         params.channelCount = device.output_channels;
         params.device = device.id;
         params.hostApiSpecificStreamInfo = nullptr;
-        params.sampleFormat = paInt16;
+        params.sampleFormat = paFloat32;
         params.suggestedLatency = 0;
 
         err = Pa_OpenStream(&_output_stream,
@@ -323,7 +325,7 @@ namespace Dynamo {
         // Update internal state
         _output_state.sample_rate = info->sampleRate;
         _output_state.channels = device.output_channels;
-        _composite.resize(CHUNK_LENGTH, device.output_channels);
+        _composite.resize(CHUNK_LENGTH * device.output_channels, 0);
     }
 
     bool Jukebox::is_playing() {
@@ -334,14 +336,14 @@ namespace Dynamo {
         return _input_stream != nullptr && Pa_IsStreamActive(_input_stream);
     }
 
-    double Jukebox::get_volume() { return _volume; }
+    float Jukebox::get_volume() { return _volume; }
 
     void Jukebox::pause() { Pa_StopStream(_output_stream); }
 
     void Jukebox::resume() { Pa_StartStream(_output_stream); }
 
-    void Jukebox::set_volume(double volume) {
-        _volume = std::clamp(volume, 0.0, 1.0);
+    void Jukebox::set_volume(float volume) {
+        _volume = std::clamp(volume, 0.0f, 1.0f);
     }
 
     SoundManager &Jukebox::get_sound_assets() { return _assets; }
@@ -350,13 +352,13 @@ namespace Dynamo {
 
     void Jukebox::play(Asset<Sound> &sound, StaticSoundMaterial &material) {
         Sound &data = _assets.get(sound);
-        double frame = _output_state.sample_rate * material.start_seconds;
+        float frame = _output_state.sample_rate * material.start_seconds;
         _static_chunks.push_back({data, material, frame});
     }
 
     void Jukebox::play(Asset<Sound> &sound, DynamicSoundMaterial &material) {
         Sound &data = _assets.get(sound);
-        double frame = _output_state.sample_rate * material.start_seconds;
+        float frame = _output_state.sample_rate * material.start_seconds;
         _dynamic_chunks.push_back({data, material, frame});
     }
 
@@ -368,7 +370,7 @@ namespace Dynamo {
         }
 
         // Zero-out the composite waveform
-        _composite.clear();
+        std::fill(_composite.begin(), _composite.end(), 0);
 
         // Process static chunks and mix onto the composite
         auto s_it = _static_chunks.begin();
@@ -394,11 +396,7 @@ namespace Dynamo {
             }
         }
 
-        // Write the interleaved composite to the output buffer
-        for (unsigned f = 0; f < _composite.frames(); f++) {
-            for (unsigned c = 0; c < _composite.channels(); c++) {
-                _output_state.buffer.write(_composite[c][f]);
-            }
-        }
+        // Write the composite to the output buffer
+        _output_state.buffer.write(_composite.data(), _composite.size());
     }
 } // namespace Dynamo

@@ -24,13 +24,13 @@ namespace Dynamo {
          * @brief Volume to be played relative to overall gain
          *
          */
-        double volume = 1.0;
+        float volume = 1.0;
 
         /**
          * @brief Start time in seconds
          *
          */
-        double start_seconds = 0.0;
+        float start_seconds = 0.0;
 
         /**
          * @brief Filter pipeline
@@ -48,13 +48,13 @@ namespace Dynamo {
          * @brief Volume to be played relative to overall gain
          *
          */
-        double volume = 1.0;
+        float volume = 1.0;
 
         /**
          * @brief Start time in seconds
          *
          */
-        double start_seconds = 0.0;
+        float start_seconds = 0.0;
 
         /**
          * @brief Position of the sound in 3D space

@@ -19,10 +19,10 @@ namespace Dynamo {
         HRTF &_hrtf;
 
         /**
-         * @brief Impulse response coefficients
+         * @brief Impulse response container
          *
          */
-        ChannelData<Complex> _coeffs;
+        Sound _impulse_response;
 
         /**
          * @brief Signal convolvers

@@ -23,7 +23,7 @@ namespace Dynamo {
          *
          */
         std::vector<Complex> _fft_samples;
-        std::vector<Complex> _fft_coeffs;
+        std::vector<Complex> _fft_ir;
 
         /**
          * @brief Input buffer
@@ -48,16 +48,16 @@ namespace Dynamo {
         /**
          * @brief Apply the impulse repsonse to a sound
          *
-         * @param src    Source sound buffer
-         * @param dst    Destination sound buffer
-         * @param coeffs Impulse response coefficient buffer
-         * @param N      Length of the sound to be processed
-         * @param M      Length of the impulse response buffer
+         * @param src Source sound buffer
+         * @param dst Destination sound buffer
+         * @param ir  Impulse response buffer
+         * @param N   Length of the sound to be processed
+         * @param M   Length of the impulse response buffer
          * @return Sound&
          */
         void compute(WaveSample *src,
                      WaveSample *dst,
-                     Complex *coeffs,
+                     WaveSample *ir,
                      const unsigned N,
                      const unsigned M);
     };

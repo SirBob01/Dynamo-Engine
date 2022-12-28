@@ -2,7 +2,7 @@
 
 namespace Dynamo {
     Binaural::Binaural(HRTF &hrtf) : _hrtf(hrtf) {
-        _coeffs.resize(_hrtf.get_filter_length(), 2);
+        _impulse_response.resize(_hrtf.get_length(), 2);
         _output.set_channels(2);
     }
 
@@ -12,16 +12,16 @@ namespace Dynamo {
                            const DynamicSoundMaterial &material,
                            const ListenerProperties &listener) {
         _output.set_frames(length);
-        _hrtf.get_coefficients(listener.position,
-                               listener.rotation,
-                               material.position,
-                               _coeffs);
+        _hrtf.get_impulse_response(listener.position,
+                                   listener.rotation,
+                                   material.position,
+                                   _impulse_response);
         for (int c = 0; c < 2; c++) {
             _convolvers[c].compute(src[c] + src_offset,
                                    _output[c],
-                                   _coeffs[c],
+                                   _impulse_response[c],
                                    length,
-                                   _coeffs.frames());
+                                   _impulse_response.frames());
         }
         return _output;
     }
