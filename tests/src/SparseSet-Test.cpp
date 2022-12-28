@@ -20,6 +20,7 @@ TEST_CASE("SparseSet insert", "[SparseSet]") {
     REQUIRE(set.get(c) == 'c');
 
     REQUIRE(set.size() == 3);
+    REQUIRE(!set.empty());
 }
 
 TEST_CASE("SparseSet remove", "[SparseSet]") {
@@ -37,6 +38,7 @@ TEST_CASE("SparseSet remove", "[SparseSet]") {
     REQUIRE_THROWS(set.get(a));
 
     REQUIRE(set.size() == 0);
+    REQUIRE(set.empty());
 }
 
 TEST_CASE("SparseSet clear", "[SparseSet]") {
@@ -56,7 +58,10 @@ TEST_CASE("SparseSet clear", "[SparseSet]") {
     REQUIRE(set.get(c) == 'c');
 
     set.clear();
+
     REQUIRE(set.size() == 0);
+    REQUIRE(set.empty());
+
     REQUIRE(!set.exists(a));
     REQUIRE(!set.exists(b));
     REQUIRE(!set.exists(c));
@@ -86,6 +91,7 @@ TEST_CASE("SparseSet mismatched id version", "[SparseSet]") {
     set.insert(b, 'b');
     REQUIRE(set.get(b) == 'b');
     REQUIRE(set.size() == 1);
+    REQUIRE(!set.empty());
 }
 
 TEST_CASE("SparseSet forall", "[SparseSet]") {
@@ -109,6 +115,7 @@ TEST_CASE("SparseSet forall", "[SparseSet]") {
     set.insert(d, 'd');
 
     REQUIRE(set.size() == 3);
+    REQUIRE(!set.empty());
 
     struct Pair {
         char &item;
