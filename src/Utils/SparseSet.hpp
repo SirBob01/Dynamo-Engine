@@ -64,7 +64,15 @@ namespace Dynamo {
          *
          * @return unsigned
          */
-        inline unsigned size() { return _pool.size(); }
+        inline unsigned size() const { return _pool.size(); }
+
+        /**
+         * @brief Check if the container is empty
+         *
+         * @return true
+         * @return false
+         */
+        inline bool empty() const { return size() == 0; }
 
         /**
          * @brief Find the position of a value within the dense array

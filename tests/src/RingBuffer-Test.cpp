@@ -21,7 +21,7 @@ TEST_CASE("RingBuffer write", "[RingBuffer]") {
     buffer.write(4);
     REQUIRE(buffer.size() == 4);
     REQUIRE(buffer.remaining() == 0);
-    REQUIRE(buffer.is_full());
+    REQUIRE(buffer.full());
 
     CHECK_THROWS(buffer.write(5));
 }
@@ -48,7 +48,7 @@ TEST_CASE("RingBuffer read", "[RingBuffer]") {
     REQUIRE(buffer.read() == 4);
     REQUIRE(buffer.size() == 0);
     REQUIRE(buffer.remaining() == 4);
-    REQUIRE(buffer.is_empty());
+    REQUIRE(buffer.empty());
 
     CHECK_THROWS(buffer.read());
 }
@@ -71,7 +71,7 @@ TEST_CASE("RingBuffer write buffer", "[RingBuffer]") {
     REQUIRE(buffer.write(x + 3, 3) == 1);
     REQUIRE(buffer.size() == 4);
     REQUIRE(buffer.remaining() == 0);
-    REQUIRE(buffer.is_full());
+    REQUIRE(buffer.full());
 
     CHECK_THROWS(buffer.write(5));
     for (int i = 0; i < 4; i++) {
@@ -100,7 +100,7 @@ TEST_CASE("RingBuffer read buffer", "[RingBuffer]") {
     REQUIRE(y[3] == 4);
     REQUIRE(buffer.size() == 0);
     REQUIRE(buffer.remaining() == 4);
-    REQUIRE(buffer.is_empty());
+    REQUIRE(buffer.empty());
 
     CHECK_THROWS(buffer.read());
     for (int i = 0; i < 4; i++) {
@@ -156,7 +156,7 @@ TEST_CASE("RingBuffer pop", "[RingBuffer]") {
     buffer.pop();
     REQUIRE(buffer.size() == 0);
     REQUIRE(buffer.remaining() == 4);
-    REQUIRE(buffer.is_empty());
+    REQUIRE(buffer.empty());
 
     CHECK_THROWS(buffer.pop());
 }
@@ -168,7 +168,7 @@ TEST_CASE("RingBuffer clear", "[RingBuffer]") {
 
     buffer.clear();
     REQUIRE(buffer.size() == 0);
-    REQUIRE(buffer.is_empty());
+    REQUIRE(buffer.empty());
 
     buffer.write(5);
     buffer.write(6);
@@ -177,5 +177,5 @@ TEST_CASE("RingBuffer clear", "[RingBuffer]") {
 
     buffer.clear();
     REQUIRE(buffer.size() == 0);
-    REQUIRE(buffer.is_empty());
+    REQUIRE(buffer.empty());
 }

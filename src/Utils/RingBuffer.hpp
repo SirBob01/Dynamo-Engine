@@ -39,7 +39,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_full() const { return size() == N; }
+        inline bool full() const { return size() == N; }
 
         /**
          * @brief Check if the buffer is empty
@@ -47,7 +47,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool is_empty() const { return size() == 0; }
+        inline bool empty() const { return size() == 0; }
 
         /**
          * @brief Get the size of the buffer
@@ -69,7 +69,7 @@ namespace Dynamo {
          * @return T
          */
         inline T read() {
-            DYN_ASSERT(!is_empty());
+            DYN_ASSERT(!empty());
             return _buffer[_read++ & MASK];
         }
 
@@ -79,7 +79,7 @@ namespace Dynamo {
          * @param value
          */
         inline void write(T value) {
-            DYN_ASSERT(!is_full());
+            DYN_ASSERT(!full());
             _buffer[_write++ & MASK] = value;
         }
 
@@ -139,7 +139,7 @@ namespace Dynamo {
          *
          */
         inline void pop() {
-            DYN_ASSERT(!is_empty());
+            DYN_ASSERT(!empty());
             _write--;
         }
 
