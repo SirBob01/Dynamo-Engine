@@ -1,61 +1,78 @@
 #include "./Convolver.hpp"
 
 namespace Dynamo {
-    Convolver::Convolver() {}
+    void Convolver::initialize(WaveSample *ir, const unsigned M) {
+        // Clip trailing zeros to reduce computational effort
+        unsigned length = M;
+        while (length > 0 && std::fabs(ir[length - 1]) < 1e-7f) {
+            length--;
+        }
 
-    void Convolver::initialize(unsigned frames) {
-        _fft_samples.resize(frames);
-        std::fill(_fft_samples.begin(), _fft_samples.end(), 0);
+        // Initialize the partition buffer
+        _partition_count = std::ceil(static_cast<float>(length) / BLOCK_LENGTH);
+        _partitions.resize(_partition_count * PARTITION_LENGTH);
+        std::fill(_partitions.begin(), _partitions.end(), 0);
 
-        _fft_ir.resize(frames);
-        std::fill(_fft_ir.begin(), _fft_ir.end(), 0);
+        // Copy impulse response and pre-compute the FFT of each partition
+        for (unsigned i = 0; i < _partition_count; i++) {
+            unsigned ir_offset = i * BLOCK_LENGTH;
+            unsigned partition_offset = i * PARTITION_LENGTH;
 
-        // Do not zero-fill, we want to store a queue of the input samples
-        _buffer.resize(frames);
+            unsigned copy_size = std::min(BLOCK_LENGTH, length);
+            std::copy(ir + ir_offset,
+                      ir + ir_offset + copy_size,
+                      _partitions.data() + partition_offset);
+            Fourier::transform(_partitions.data() + partition_offset,
+                               PARTITION_LENGTH);
+
+            length -= copy_size;
+        }
+
+        // Resize the frequency delay-line, do not zero out
+        _fdl.resize(_partition_count * PARTITION_LENGTH);
     }
 
-    void Convolver::compute(WaveSample *src,
-                            WaveSample *dst,
-                            WaveSample *ir,
-                            const unsigned N,
-                            const unsigned M) {
-        // Resize the buffers
-        unsigned overlap = M - 1;
-        unsigned K = N + overlap;
-        unsigned fft_length = round_pow2(K);
-        initialize(fft_length);
-
-        // Shift back first M - 1 input samples
-        for (unsigned f = 0; f < overlap; f++) {
-            _buffer[f] = _buffer[f + N];
+    void
+    Convolver::compute(WaveSample *src, WaveSample *dst, const unsigned N) {
+        // Shift back the second half of the input buffer
+        for (unsigned i = 0; i < BLOCK_LENGTH; i++) {
+            _input[i] = _input[i + BLOCK_LENGTH];
         }
 
-        // Write input samples to the tail of the buffer
-        for (unsigned f = 0; f < N; f++) {
-            _buffer[f + overlap].re = src[f];
+        // Read the latest samples, zeroing out the remainder of buffer
+        for (unsigned i = 0; i < N; i++) {
+            _input[i + BLOCK_LENGTH] = src[i];
+        }
+        for (unsigned i = N; i < BLOCK_LENGTH; i++) {
+            _input[i + BLOCK_LENGTH] = 0;
         }
 
-        // Write input samples and impulse response to the FFT buffers
-        std::copy(_buffer.begin(), _buffer.end(), _fft_samples.begin());
-        for (unsigned f = 0; f < overlap; f++) {
-            _fft_ir[f].re = ir[f];
+        // Shift up the frequency delay-line by one partition
+        for (int i = _fdl.size() - 1; i >= PARTITION_LENGTH; i--) {
+            _fdl[i] = _fdl[i - PARTITION_LENGTH];
         }
 
-        // Forward transform
-        Fourier::transform(_fft_samples.data(), fft_length);
-        Fourier::transform(_fft_ir.data(), fft_length);
+        // Forward transform the input block onto the frequency delay-line
+        std::copy(_input.begin(), _input.end(), _fdl.begin());
+        Fourier::transform(_fdl.data(), PARTITION_LENGTH);
 
-        // Multiplication
-        for (unsigned f = 0; f < fft_length; f++) {
-            _fft_samples[f] *= _fft_ir[f];
+        // Convolve with each partition
+        std::fill(_output.begin(), _output.end(), 0);
+        for (unsigned i = 0; i < _partition_count; i++) {
+            unsigned offset = PARTITION_LENGTH * i;
+
+            // Pointwise multiply and accumulate onto the output buffer
+            for (unsigned j = 0; j < PARTITION_LENGTH; j++) {
+                _output[j] += _fdl[offset + j] * _partitions[offset + j];
+            }
         }
 
-        // Inverse transform
-        Fourier::inverse(_fft_samples.data(), fft_length);
+        // Inverse transform the output buffer
+        Fourier::inverse(_output.begin(), _output.size());
 
-        // Write the last N samples the destination buffer
-        for (unsigned f = 0; f < N; f++) {
-            dst[f] = _fft_samples[f + overlap].re;
+        // Write the second half of the output buffer
+        for (unsigned i = 0; i < N; i++) {
+            dst[i] = _output[i + BLOCK_LENGTH].re;
         }
     }
 } // namespace Dynamo

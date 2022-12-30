@@ -29,7 +29,7 @@ namespace Dynamo {
      * @brief Size of the input and output ring buffers
      *
      */
-    constexpr unsigned BUFFER_SIZE = CHUNK_LENGTH * 64;
+    constexpr unsigned BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
 
     /**
      * @brief A playback track on which audio can be enqueued

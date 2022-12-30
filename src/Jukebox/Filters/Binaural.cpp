@@ -17,11 +17,9 @@ namespace Dynamo {
                                    material.position,
                                    _impulse_response);
         for (int c = 0; c < 2; c++) {
-            _convolvers[c].compute(src[c] + src_offset,
-                                   _output[c],
-                                   _impulse_response[c],
-                                   length,
-                                   _impulse_response.frames());
+            _convolvers[c].initialize(_impulse_response[c],
+                                      _impulse_response.frames());
+            _convolvers[c].compute(src[c] + src_offset, _output[c], length);
         }
         return _output;
     }
