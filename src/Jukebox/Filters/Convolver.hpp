@@ -5,60 +5,77 @@
 #include "../../Utils/Bits.hpp"
 #include "../../Utils/ChannelData.hpp"
 
+#include "../Chunk.hpp"
 #include "../Sound.hpp"
 
 namespace Dynamo {
+    /**
+     * @brief Length of a subfilter unit for convolutional processing
+     *
+     */
+    constexpr unsigned BLOCK_LENGTH = round_pow2(MAX_CHUNK_LENGTH);
+
+    /**
+     * @brief Length of a partition unit on which FFT is performed for
+     * convolutional processing
+     *
+     */
+    constexpr unsigned PARTITION_LENGTH = BLOCK_LENGTH * 2;
+
     /**
      * @brief Signal convolution engine
      *
      * This implements the overlap-save block algorithm to compute convolutions
      * in real-time
      *
-     * TODO: Implement partitioned convolution for long impulse responses
-     *
      */
     class Convolver {
         /**
-         * @brief FFT buffers
+         * @brief Input sample buffer
          *
          */
-        std::vector<Complex> _fft_samples;
-        std::vector<Complex> _fft_ir;
+        std::array<WaveSample, BLOCK_LENGTH * 2> _input = {0};
 
         /**
-         * @brief Input buffer
+         * @brief Output sample buffer
          *
          */
-        std::vector<Complex> _buffer;
+        std::array<Complex, BLOCK_LENGTH * 2> _output = {0};
 
         /**
-         * @brief Resize all buffers to fit a desired number of frames
+         * @brief Frequency delay line
          *
-         * @param frames
          */
-        void initialize(unsigned frames);
+        std::vector<Complex> _fdl;
+
+        /**
+         * @brief Partitioned FFT transforms of the impulse response
+         *
+         */
+        std::vector<Complex> _partitions;
+
+        /**
+         * @brief Number of partitions
+         *
+         */
+        unsigned _partition_count;
 
       public:
         /**
-         * @brief Construct a new Convolver object
+         * @brief Set the impulse response to convolve
          *
+         * @param ir Impulse response buffer
+         * @param M  Length of the impulse response
          */
-        Convolver();
+        void initialize(WaveSample *ir, const unsigned M);
 
         /**
-         * @brief Apply the impulse repsonse to a sound
+         * @brief Apply the impulse repsonse to a sound chunk
          *
          * @param src Source sound buffer
          * @param dst Destination sound buffer
-         * @param ir  Impulse response buffer
-         * @param N   Length of the sound to be processed
-         * @param M   Length of the impulse response buffer
-         * @return Sound&
+         * @param N   Length of the sound, must be <= MAX_CHUNK_LENGTH
          */
-        void compute(WaveSample *src,
-                     WaveSample *dst,
-                     WaveSample *ir,
-                     const unsigned N,
-                     const unsigned M);
+        void compute(WaveSample *src, WaveSample *dst, const unsigned N);
     };
 } // namespace Dynamo

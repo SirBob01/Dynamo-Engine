@@ -5,7 +5,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Number of frames in a chunk
+     * @brief Maximum number of frames in a chunk
      *
      * A larger chunk will demand more compute time, especially when
      * processing multiple simultneously, causing latency
@@ -14,7 +14,7 @@ namespace Dynamo {
      * to receive enough data when requested, causing glitches
      *
      */
-    constexpr unsigned CHUNK_LENGTH = 1 << 8;
+    constexpr unsigned MAX_CHUNK_LENGTH = 1 << 8;
 
     /**
      * @brief A chunk contains information to process a sound in small sections

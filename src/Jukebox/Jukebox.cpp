@@ -96,7 +96,7 @@ namespace Dynamo {
         StaticSoundMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
+        double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
                                      static_cast<float>(sound.frames()));
         double frames = frame_stop - chunk.frame;
 
@@ -143,7 +143,7 @@ namespace Dynamo {
         DynamicSoundMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + CHUNK_LENGTH,
+        double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
                                      static_cast<float>(sound.frames()));
         double frames = frame_stop - chunk.frame;
 
@@ -325,7 +325,7 @@ namespace Dynamo {
         // Update internal state
         _output_state.sample_rate = info->sampleRate;
         _output_state.channels = device.output_channels;
-        _composite.resize(CHUNK_LENGTH * device.output_channels, 0);
+        _composite.resize(MAX_CHUNK_LENGTH * device.output_channels, 0);
     }
 
     bool Jukebox::is_playing() {
@@ -364,7 +364,7 @@ namespace Dynamo {
 
     void Jukebox::update() {
         // Wait for there to be available space in the buffer
-        unsigned min_length = CHUNK_LENGTH * _output_state.channels;
+        unsigned min_length = MAX_CHUNK_LENGTH * _output_state.channels;
         if (_output_state.buffer.remaining() < min_length || !is_playing()) {
             return;
         }

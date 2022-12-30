@@ -20,7 +20,7 @@ namespace Dynamo {
          * @brief Data container
          *
          */
-        std::vector<T> _data;
+        std::vector<T> _container;
 
         /**
          * @brief Number of channels
@@ -52,16 +52,17 @@ namespace Dynamo {
          * @param channels Number of channels
          */
         ChannelData(std::vector<T> data, unsigned channels) :
-            _data(data), _channels(channels), _frames(data.size() / channels) {
+            _container(data), _channels(channels),
+            _frames(data.size() / channels) {
             DYN_ASSERT(data.size() % channels == 0);
         }
 
         /**
-         * @brief Get the internal data container
+         * @brief Get internal data pointer
          *
-         * @return std::vector<T>&
+         * @return T*
          */
-        inline std::vector<T> &data() { return _data; }
+        inline T *data() { return _container.data(); }
 
         /**
          * @brief Get the number of frames
@@ -81,7 +82,9 @@ namespace Dynamo {
          * @brief Default-initialize all the data
          *
          */
-        inline void clear() { std::fill(_data.begin(), _data.end(), T()); }
+        inline void clear() {
+            std::fill(_container.begin(), _container.end(), T());
+        }
 
         /**
          * @brief Set the number of frames
@@ -91,7 +94,7 @@ namespace Dynamo {
          * @param frames Number of frames
          */
         inline void set_frames(const unsigned frames) {
-            _data.resize(_channels * frames);
+            _container.resize(_channels * frames);
             _frames = frames;
         }
 
@@ -103,7 +106,7 @@ namespace Dynamo {
          * @param channels Number of channels
          */
         inline void set_channels(const unsigned channels) {
-            _data.resize(channels * _frames);
+            _container.resize(channels * _frames);
             _channels = channels;
         }
 
@@ -114,7 +117,7 @@ namespace Dynamo {
          * @param channels Number of channels
          */
         inline void resize(const unsigned frames, const unsigned channels) {
-            _data.resize(channels * frames);
+            _container.resize(channels * frames);
             _channels = channels;
             _frames = frames;
         }
@@ -128,7 +131,7 @@ namespace Dynamo {
         inline void read_frame(T *dst, const unsigned frame) const {
             DYN_ASSERT(frame < _frames);
             for (unsigned c = 0; c < _channels; c++) {
-                dst[c] = _data[(c * _frames) + frame];
+                dst[c] = _container[(c * _frames) + frame];
             }
         }
 
@@ -140,7 +143,7 @@ namespace Dynamo {
          */
         inline void read_channel(T *dst, const unsigned channel) const {
             DYN_ASSERT(channel < _channels);
-            const T *ptr = _data.data() + (channel * _frames);
+            const T *ptr = _container.data() + (channel * _frames);
             std::copy(ptr, ptr + _frames, dst);
         }
 
@@ -152,7 +155,7 @@ namespace Dynamo {
          */
         inline T *operator[](const unsigned channel) {
             DYN_ASSERT(channel < _channels);
-            return _data.data() + (channel * _frames);
+            return _container.data() + (channel * _frames);
         }
 
         /**
@@ -164,7 +167,7 @@ namespace Dynamo {
          */
         inline T at(const unsigned frame, const unsigned channel) const {
             DYN_ASSERT(frame < _frames && channel < _channels);
-            return _data[(channel * _frames) + frame];
+            return _container[(channel * _frames) + frame];
         }
     };
 } // namespace Dynamo

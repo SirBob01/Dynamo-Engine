@@ -9,7 +9,7 @@ namespace Dynamo {
      * Taken from http://graphics.stanford.edu/~seander/bithacks.html
      *
      */
-    static const std::array<unsigned char, 256> BIT_REVERSAL_TABLE = {
+    constexpr std::array<unsigned char, 256> BIT_REVERSAL_TABLE = {
         0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0,
         0x30, 0xB0, 0x70, 0xF0, 0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8,
         0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8, 0x04, 0x84, 0x44, 0xC4,
@@ -39,7 +39,7 @@ namespace Dynamo {
      * position of the least significant bit
      *
      */
-    static const std::array<int, 32> DE_BRUJIN_TABLE = {
+    constexpr std::array<int, 32> DE_BRUJIN_TABLE = {
         0,  1,  28, 2,  29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4,  8,
         31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6,  11, 5,  10, 9,
     };
@@ -49,9 +49,9 @@ namespace Dynamo {
      * integer
      *
      * @param x
-     * @return unsigned
+     * @return constexpr unsigned
      */
-    inline unsigned find_lsb(unsigned x) {
+    constexpr unsigned find_lsb(unsigned x) {
         unsigned i = ((x & -x) * 0x077CB531U);
         return DE_BRUJIN_TABLE[i >> 27];
     }
@@ -60,9 +60,9 @@ namespace Dynamo {
      * @brief Reverse the bits of an unsigned integer
      *
      * @param x
-     * @return unsigned
+     * @return constexpr unsigned
      */
-    inline unsigned reverse_bits(unsigned x) {
+    constexpr unsigned reverse_bits(unsigned x) {
         return (BIT_REVERSAL_TABLE[x & 0xFF] << 24) |
                (BIT_REVERSAL_TABLE[(x >> 8) & 0xFF] << 16) |
                (BIT_REVERSAL_TABLE[(x >> 16) & 0xFF] << 8) |
@@ -73,9 +73,9 @@ namespace Dynamo {
      * @brief Round a number to the next power of 2
      *
      * @param x
-     * @return unsigned
+     * @return constexpr unsigned
      */
-    inline unsigned round_pow2(unsigned x) {
+    constexpr unsigned round_pow2(unsigned x) {
         x--;
         x |= x >> 1;
         x |= x >> 2;
