@@ -1,15 +1,9 @@
 #include "./Convolver.hpp"
 
 namespace Dynamo {
-    void Convolver::initialize(WaveSample *ir, const unsigned M) {
-        // Clip trailing zeros to reduce computational effort
-        unsigned length = M;
-        while (length > 0 && std::fabs(ir[length - 1]) < 1e-7f) {
-            length--;
-        }
-
+    void Convolver::initialize(WaveSample *ir, unsigned M) {
         // Initialize the partition buffer
-        _partition_count = std::ceil(static_cast<float>(length) / BLOCK_LENGTH);
+        _partition_count = std::ceil(static_cast<float>(M) / BLOCK_LENGTH);
         _partitions.resize(_partition_count * PARTITION_LENGTH);
         std::fill(_partitions.begin(), _partitions.end(), 0);
 
@@ -18,22 +12,21 @@ namespace Dynamo {
             unsigned ir_offset = i * BLOCK_LENGTH;
             unsigned partition_offset = i * PARTITION_LENGTH;
 
-            unsigned copy_size = std::min(BLOCK_LENGTH, length);
+            unsigned copy_size = std::min(BLOCK_LENGTH, M);
             std::copy(ir + ir_offset,
                       ir + ir_offset + copy_size,
                       _partitions.data() + partition_offset);
             Fourier::transform(_partitions.data() + partition_offset,
                                PARTITION_LENGTH);
 
-            length -= copy_size;
+            M -= copy_size;
         }
 
         // Resize the frequency delay-line, do not zero out
         _fdl.resize(_partition_count * PARTITION_LENGTH);
     }
 
-    void
-    Convolver::compute(WaveSample *src, WaveSample *dst, const unsigned N) {
+    void Convolver::compute(WaveSample *src, WaveSample *dst, unsigned N) {
         // Shift back the second half of the input buffer
         for (unsigned i = 0; i < BLOCK_LENGTH; i++) {
             _input[i] = _input[i + BLOCK_LENGTH];
@@ -63,7 +56,8 @@ namespace Dynamo {
 
             // Pointwise multiply and accumulate onto the output buffer
             for (unsigned j = 0; j < PARTITION_LENGTH; j++) {
-                _output[j] += _fdl[offset + j] * _partitions[offset + j];
+                unsigned j_offset = offset + j;
+                _output[j] += _fdl[j_offset] * _partitions[j_offset];
             }
         }
 
