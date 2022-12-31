@@ -67,7 +67,7 @@ namespace Dynamo {
          * @param ir Impulse response buffer
          * @param M  Length of the impulse response
          */
-        void initialize(WaveSample *ir, const unsigned M);
+        void initialize(WaveSample *ir, unsigned M);
 
         /**
          * @brief Apply the impulse repsonse to a sound chunk
@@ -76,6 +76,6 @@ namespace Dynamo {
          * @param dst Destination sound buffer
          * @param N   Length of the sound, must be <= MAX_CHUNK_LENGTH
          */
-        void compute(WaveSample *src, WaveSample *dst, const unsigned N);
+        void compute(WaveSample *src, WaveSample *dst, unsigned N);
     };
 } // namespace Dynamo
