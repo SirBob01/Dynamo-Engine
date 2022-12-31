@@ -6,7 +6,7 @@
 #include "../Log/Log.hpp"
 #include "./Sound.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Number of zero-crossings in the filter
      *
@@ -134,4 +134,4 @@ namespace Dynamo {
                          double src_length,
                          double src_rate,
                          double dst_rate);
-} // namespace Dynamo
+} // namespace Dynamo::Sound

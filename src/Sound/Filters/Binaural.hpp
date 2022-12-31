@@ -2,11 +2,11 @@
 
 #include <array>
 
+#include "../Convolver.hpp"
 #include "../HRTF.hpp"
-#include "./Convolver.hpp"
 #include "./Filter.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Binaural surround sound spatial filter implementation using HRTF
      *
@@ -47,7 +47,7 @@ namespace Dynamo {
         Sound &apply(Sound &src,
                      const unsigned src_offset,
                      const unsigned length,
-                     const DynamicSoundMaterial &material,
+                     const DynamicMaterial &material,
                      const ListenerProperties &listener) override;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

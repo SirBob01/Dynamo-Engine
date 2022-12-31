@@ -2,7 +2,7 @@
 
 #include "./Filter.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Stereo panner filter implementation
      *
@@ -24,7 +24,7 @@ namespace Dynamo {
         Sound &apply(Sound &src,
                      const unsigned src_offset,
                      const unsigned length,
-                     const DynamicSoundMaterial &material,
+                     const DynamicMaterial &material,
                      const ListenerProperties &listener) override;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

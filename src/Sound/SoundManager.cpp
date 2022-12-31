@@ -1,6 +1,6 @@
 #include "SoundManager.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     Asset<Sound> SoundManager::load_file(const std::string filename) {
         SndfileHandle file(filename.c_str());
         if (file.error()) {
@@ -30,4 +30,4 @@ namespace Dynamo {
                                         const float sample_rate) {
         return allocate(waveform, channels, sample_rate);
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

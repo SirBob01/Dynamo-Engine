@@ -5,7 +5,7 @@
 #include "../Utils/IdTracker.hpp"
 #include "../Utils/SparseSet.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Unique listener in the Jukebox engine
      *
@@ -125,4 +125,4 @@ namespace Dynamo {
             return _properties.at(index);
         }
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

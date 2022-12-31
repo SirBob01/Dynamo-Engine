@@ -20,11 +20,11 @@
 #include "./HRTF.hpp"
 #include "./Listener.hpp"
 #include "./Sound.hpp"
-#include "./SoundDevice.hpp"
+#include "./Device.hpp"
 #include "./SoundManager.hpp"
-#include "./SoundMaterial.hpp"
+#include "./Material.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Size of the input and output ring buffers
      *
@@ -71,13 +71,13 @@ namespace Dynamo {
          * @brief Static chunk list
          *
          */
-        std::vector<Chunk<StaticSoundMaterial>> _static_chunks;
+        std::vector<Chunk<StaticMaterial>> _static_chunks;
 
         /**
          * @brief Dynamic chunk list
          *
          */
-        std::vector<Chunk<DynamicSoundMaterial>> _dynamic_chunks;
+        std::vector<Chunk<DynamicMaterial>> _dynamic_chunks;
 
         /**
          * @brief Internal state shared with the PortAudio callback
@@ -146,14 +146,14 @@ namespace Dynamo {
          *
          * @param chunk Static chunk
          */
-        void process_chunk(Chunk<StaticSoundMaterial> &chunk);
+        void process_chunk(Chunk<StaticMaterial> &chunk);
 
         /**
          * @brief Process a dynamic chunk
          *
          * @param chunk Dynamic chunk
          */
-        void process_chunk(Chunk<DynamicSoundMaterial> &chunk);
+        void process_chunk(Chunk<DynamicMaterial> &chunk);
 
         /**
          * @brief Find the closest listener to a sound
@@ -162,7 +162,7 @@ namespace Dynamo {
          * @return ListenerProperties&
          */
         ListenerProperties &
-        find_closest_listener(const DynamicSoundMaterial &material);
+        find_closest_listener(const DynamicMaterial &material);
 
       public:
         /**
@@ -180,9 +180,9 @@ namespace Dynamo {
         /**
          * @brief Get all available sound devices
          *
-         * @return const std::vector<SoundDevice>
+         * @return const std::vector<Device>
          */
-        const std::vector<SoundDevice> get_devices();
+        const std::vector<Device> get_devices();
 
         /**
          * @brief Set the input device
@@ -191,7 +191,7 @@ namespace Dynamo {
          *
          * @param device
          */
-        void set_input_device(const SoundDevice &device);
+        void set_input_device(const Device &device);
 
         /**
          * @brief Set the output device
@@ -200,7 +200,7 @@ namespace Dynamo {
          *
          * @param device
          */
-        void set_output_device(const SoundDevice &device);
+        void set_output_device(const Device &device);
 
         /**
          * @brief Get the sample rate of the input stream
@@ -278,7 +278,7 @@ namespace Dynamo {
          * @param sound    Sound asset
          * @param material Playback properties
          */
-        void play(Asset<Sound> &sound, StaticSoundMaterial &material);
+        void play(Asset<Sound> &sound, StaticMaterial &material);
 
         /**
          * @brief Play a dynamic sound
@@ -290,7 +290,7 @@ namespace Dynamo {
          * @param sound    Sound asset
          * @param material Playback properties
          */
-        void play(Asset<Sound> &sound, DynamicSoundMaterial &material);
+        void play(Asset<Sound> &sound, DynamicMaterial &material);
 
         /**
          * @brief Update Jukebox's internal state and process all chunks
@@ -299,4 +299,4 @@ namespace Dynamo {
          */
         void update();
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

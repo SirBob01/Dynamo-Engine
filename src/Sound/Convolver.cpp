@@ -1,6 +1,6 @@
 #include "./Convolver.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     void Convolver::initialize(WaveSample *ir, unsigned M) {
         // Initialize the partition buffer
         _partition_count = std::ceil(static_cast<float>(M) / BLOCK_LENGTH);
@@ -69,4 +69,4 @@ namespace Dynamo {
             dst[i] = _output[i + BLOCK_LENGTH].re;
         }
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

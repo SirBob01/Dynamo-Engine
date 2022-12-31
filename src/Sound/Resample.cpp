@@ -1,6 +1,6 @@
 #include "Resample.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     void resample_signal(WaveSample *src,
                          WaveSample *dst,
                          double time_offset,
@@ -63,4 +63,4 @@ namespace Dynamo {
             time += time_increment;
         }
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

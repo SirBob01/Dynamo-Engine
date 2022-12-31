@@ -1,6 +1,6 @@
 #include "./Attenuation.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     Attenuation::Attenuation(float inner_radius, float cutoff_radius) :
         _inner_radius(inner_radius), _cutoff_radius(cutoff_radius) {}
 
@@ -17,7 +17,7 @@ namespace Dynamo {
     Sound &Attenuation::apply(Sound &src,
                               const unsigned src_offset,
                               const unsigned length,
-                              const DynamicSoundMaterial &material,
+                              const DynamicMaterial &material,
                               const ListenerProperties &listener) {
         _output.resize(length, src.channels());
         float distance = (material.position - listener.position).length();
@@ -30,4 +30,4 @@ namespace Dynamo {
         }
         return _output;
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

@@ -7,7 +7,7 @@
 #include "../Core/Display.hpp"
 #include "../Core/Input.hpp"
 
-#include "../Jukebox/Jukebox.hpp"
+#include "../Sound/Jukebox.hpp"
 
 #include "../Log/Log.hpp"
 #include "../Utils/Random.hpp"
@@ -24,7 +24,7 @@ namespace Dynamo {
         std::unique_ptr<Display> _display;
         std::unique_ptr<Input> _input;
         std::unique_ptr<Clock> _clock;
-        std::unique_ptr<Jukebox> _jukebox;
+        std::unique_ptr<Sound::Jukebox> _jukebox;
 
       public:
         /**
@@ -60,7 +60,7 @@ namespace Dynamo {
          *
          * @return Jukebox&
          */
-        Jukebox &get_jukebox();
+        Sound::Jukebox &get_jukebox();
 
         /**
          * @brief Is the application still running?

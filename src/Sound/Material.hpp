@@ -6,7 +6,7 @@
 #include "../Math/Vec3.hpp"
 #include "./Sound.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Forward declarations for the filter types
      *
@@ -19,7 +19,7 @@ namespace Dynamo {
      * sounds during playback
      *
      */
-    struct StaticSoundMaterial {
+    struct StaticMaterial {
         /**
          * @brief Volume to be played relative to overall gain
          *
@@ -43,7 +43,7 @@ namespace Dynamo {
      * @brief Parameters that describe spatial information about the sound
      *
      */
-    struct DynamicSoundMaterial {
+    struct DynamicMaterial {
         /**
          * @brief Volume to be played relative to overall gain
          *
@@ -75,4 +75,4 @@ namespace Dynamo {
          */
         std::vector<std::unique_ptr<DynamicFilter>> filters;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

@@ -17,7 +17,7 @@ namespace Dynamo {
         _clock = std::make_unique<Clock>();
 
         // Rendering submodules
-        _jukebox = std::make_unique<Jukebox>();
+        _jukebox = std::make_unique<Sound::Jukebox>();
 
         // Seed the random number generator
         int seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -28,7 +28,7 @@ namespace Dynamo {
 
     Core Engine::get_core() { return {*_display, *_input, *_clock}; }
 
-    Jukebox &Engine::get_jukebox() { return *_jukebox; }
+    Sound::Jukebox &Engine::get_jukebox() { return *_jukebox; }
 
     bool Engine::is_running() { return !_display->is_closed(); }
 

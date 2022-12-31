@@ -1,12 +1,12 @@
 #include "./Stereo.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     Stereo::Stereo() { _output.set_channels(2); }
 
     Sound &Stereo::apply(Sound &src,
                          const unsigned src_offset,
                          const unsigned length,
-                         const DynamicSoundMaterial &material,
+                         const DynamicMaterial &material,
                          const ListenerProperties &listener) {
         Vec3 delta = material.position - listener.position;
         Vec3 up = listener.rotation.up();
@@ -34,4 +34,4 @@ namespace Dynamo {
         }
         return _output;
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

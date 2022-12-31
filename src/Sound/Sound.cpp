@@ -1,6 +1,6 @@
 #include "Sound.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     WaveFrame Sound::get_frame(const unsigned frame,
                                const unsigned out_channels) {
         WaveFrame output;
@@ -24,4 +24,4 @@ namespace Dynamo {
         }
         return output;
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

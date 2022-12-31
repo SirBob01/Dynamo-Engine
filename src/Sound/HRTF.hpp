@@ -13,9 +13,9 @@
 #include "../Math/Vec3.hpp"
 #include "../Utils/ChannelData.hpp"
 
-#include "./Filters/Convolver.hpp"
+#include "./Convolver.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Head-related transfer function for producing realistic 3D sounds
      * relative to a listener
@@ -69,4 +69,4 @@ namespace Dynamo {
                                   const Vec3 &source_position,
                                   Sound &dst_buffer);
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound
