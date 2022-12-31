@@ -10,7 +10,7 @@
 #include "./Resample.hpp"
 #include "./Sound.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Sound asset manager
      *
@@ -39,4 +39,4 @@ namespace Dynamo {
                               const unsigned channels,
                               const float sample_rate);
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

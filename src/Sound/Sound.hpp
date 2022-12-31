@@ -9,7 +9,7 @@
 #include "../Math/Fourier.hpp"
 #include "../Utils/ChannelData.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Indiviual sample ranges between [−1.0, +1.0]
      *
@@ -169,4 +169,4 @@ namespace Dynamo {
          */
         WaveFrame get_frame(const unsigned frame, const unsigned out_channels);
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

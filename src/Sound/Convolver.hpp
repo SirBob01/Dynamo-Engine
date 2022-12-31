@@ -1,14 +1,17 @@
 #pragma once
 
-#include "../../Math/Complex.hpp"
-#include "../../Math/Fourier.hpp"
-#include "../../Utils/Bits.hpp"
-#include "../../Utils/ChannelData.hpp"
+#include <array>
+#include <vector>
 
-#include "../Chunk.hpp"
-#include "../Sound.hpp"
+#include "../Math/Complex.hpp"
+#include "../Math/Fourier.hpp"
+#include "../Utils/Bits.hpp"
+#include "../Utils/ChannelData.hpp"
 
-namespace Dynamo {
+#include "./Chunk.hpp"
+#include "./Sound.hpp"
+
+namespace Dynamo::Sound {
     /**
      * @brief Length of a subfilter unit for convolutional processing
      *
@@ -78,4 +81,4 @@ namespace Dynamo {
          */
         void compute(WaveSample *src, WaveSample *dst, unsigned N);
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

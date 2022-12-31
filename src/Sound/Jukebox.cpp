@@ -1,6 +1,6 @@
 #include "Jukebox.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     Jukebox::Jukebox() {
         _volume = 1.0f;
 
@@ -20,14 +20,14 @@ namespace Dynamo {
         }
 
         // Set the default input and output devices
-        const std::vector<SoundDevice> devices = get_devices();
-        for (const SoundDevice &device : devices) {
+        const std::vector<Device> devices = get_devices();
+        for (const Device &device : devices) {
             if (device.id == Pa_GetDefaultOutputDevice()) {
                 set_output_device(device);
                 break;
             }
         }
-        for (const SoundDevice &device : devices) {
+        for (const Device &device : devices) {
             if (device.id != Pa_GetDefaultInputDevice() &&
                 device.input_channels > 0) {
                 set_input_device(device);
@@ -91,9 +91,9 @@ namespace Dynamo {
         return 0;
     }
 
-    void Jukebox::process_chunk(Chunk<StaticSoundMaterial> &chunk) {
+    void Jukebox::process_chunk(Chunk<StaticMaterial> &chunk) {
         Sound &sound = chunk.sound.get();
-        StaticSoundMaterial &material = chunk.material.get();
+        StaticMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
         double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
@@ -136,11 +136,11 @@ namespace Dynamo {
         chunk.frame += length;
     }
 
-    void Jukebox::process_chunk(Chunk<DynamicSoundMaterial> &chunk) {
+    void Jukebox::process_chunk(Chunk<DynamicMaterial> &chunk) {
         if (_listeners.size() == 0) return;
 
         Sound &sound = chunk.sound.get();
-        DynamicSoundMaterial &material = chunk.material.get();
+        DynamicMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
         double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
@@ -189,7 +189,7 @@ namespace Dynamo {
     }
 
     ListenerProperties &
-    Jukebox::find_closest_listener(const DynamicSoundMaterial &material) {
+    Jukebox::find_closest_listener(const DynamicMaterial &material) {
         unsigned closest_index = 0;
         for (unsigned i = 0; i < _listeners.size(); i++) {
             Vec3 best = _listeners[i].position;
@@ -204,8 +204,8 @@ namespace Dynamo {
         return _listeners[closest_index];
     }
 
-    const std::vector<SoundDevice> Jukebox::get_devices() {
-        std::vector<SoundDevice> devices;
+    const std::vector<Device> Jukebox::get_devices() {
+        std::vector<Device> devices;
         PaError err;
 
         // Count the devices
@@ -219,7 +219,7 @@ namespace Dynamo {
         // List all devices
         for (int index = 0; index < device_count; index++) {
             const PaDeviceInfo *device_info = Pa_GetDeviceInfo(index);
-            SoundDevice device;
+            Device device;
             device.id = index;
             device.name = device_info->name;
             device.input_channels = device_info->maxInputChannels;
@@ -231,7 +231,7 @@ namespace Dynamo {
         return devices;
     }
 
-    void Jukebox::set_input_device(const SoundDevice &device) {
+    void Jukebox::set_input_device(const Device &device) {
         PaError err;
         if (_input_stream) {
             err = Pa_CloseStream(_input_stream);
@@ -279,7 +279,7 @@ namespace Dynamo {
         _input_state.sample_rate = info->sampleRate;
     }
 
-    void Jukebox::set_output_device(const SoundDevice &device) {
+    void Jukebox::set_output_device(const Device &device) {
         PaError err;
         if (_output_stream) {
             err = Pa_CloseStream(_output_stream);
@@ -350,13 +350,13 @@ namespace Dynamo {
 
     ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
-    void Jukebox::play(Asset<Sound> &sound, StaticSoundMaterial &material) {
+    void Jukebox::play(Asset<Sound> &sound, StaticMaterial &material) {
         Sound &data = _assets.get(sound);
         float frame = _output_state.sample_rate * material.start_seconds;
         _static_chunks.push_back({data, material, frame});
     }
 
-    void Jukebox::play(Asset<Sound> &sound, DynamicSoundMaterial &material) {
+    void Jukebox::play(Asset<Sound> &sound, DynamicMaterial &material) {
         Sound &data = _assets.get(sound);
         float frame = _output_state.sample_rate * material.start_seconds;
         _dynamic_chunks.push_back({data, material, frame});
@@ -375,7 +375,7 @@ namespace Dynamo {
         // Process static chunks and mix onto the composite
         auto s_it = _static_chunks.begin();
         while (s_it != _static_chunks.end()) {
-            Chunk<StaticSoundMaterial> &chunk = *s_it;
+            Chunk<StaticMaterial> &chunk = *s_it;
             if (chunk.frame >= chunk.sound.get().frames()) {
                 s_it = _static_chunks.erase(s_it);
             } else {
@@ -387,7 +387,7 @@ namespace Dynamo {
         // Process dynamic chunks and mix onto the composite
         auto d_it = _dynamic_chunks.begin();
         while (d_it != _dynamic_chunks.end()) {
-            Chunk<DynamicSoundMaterial> &chunk = *d_it;
+            Chunk<DynamicMaterial> &chunk = *d_it;
             if (chunk.frame >= chunk.sound.get().frames()) {
                 d_it = _dynamic_chunks.erase(d_it);
             } else {
@@ -399,4 +399,4 @@ namespace Dynamo {
         // Write the composite to the output buffer
         _output_state.buffer.write(_composite.data(), _composite.size());
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

@@ -2,12 +2,12 @@
 
 #include <string>
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Device for reading and/or writing audio data
      *
      */
-    struct SoundDevice {
+    struct Device {
         /**
          * @brief Unique identifier of the device
          *
@@ -38,4 +38,4 @@ namespace Dynamo {
          */
         float sample_rate;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

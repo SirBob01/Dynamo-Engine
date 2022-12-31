@@ -1,6 +1,6 @@
 #include "./Binaural.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     Binaural::Binaural(HRTF &hrtf) : _hrtf(hrtf) {
         _impulse_response.resize(_hrtf.get_length(), 2);
         _output.set_channels(2);
@@ -9,7 +9,7 @@ namespace Dynamo {
     Sound &Binaural::apply(Sound &src,
                            const unsigned src_offset,
                            const unsigned length,
-                           const DynamicSoundMaterial &material,
+                           const DynamicMaterial &material,
                            const ListenerProperties &listener) {
         _output.set_frames(length);
         _hrtf.get_impulse_response(listener.position,
@@ -23,4 +23,4 @@ namespace Dynamo {
         }
         return _output;
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound

@@ -2,7 +2,7 @@
 
 #include "./Filter.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Distance attenuation filter allows a sound to decrease in volume
      * as it moves further away from the listener
@@ -47,7 +47,7 @@ namespace Dynamo {
         Sound &apply(Sound &src,
                      const unsigned src_offset,
                      const unsigned length,
-                     const DynamicSoundMaterial &material,
+                     const DynamicMaterial &material,
                      const ListenerProperties &listener) override;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

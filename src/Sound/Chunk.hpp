@@ -1,9 +1,9 @@
 #pragma once
 
 #include "./Sound.hpp"
-#include "./SoundMaterial.hpp"
+#include "./Material.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Maximum number of frames in a chunk
      *
@@ -20,13 +20,13 @@ namespace Dynamo {
      * @brief A chunk contains information to process a sound in small sections
      * every tick
      *
-     * @tparam SoundMaterial Playback properties
+     * @tparam Material Playback properties
      */
-    template <typename SoundMaterial>
+    template <typename Material>
     struct Chunk {
         static_assert(
-            std::is_convertible<SoundMaterial, StaticSoundMaterial>::value ||
-            std::is_convertible<SoundMaterial, DynamicSoundMaterial>::value);
+            std::is_convertible<Material, StaticMaterial>::value ||
+            std::is_convertible<Material, DynamicMaterial>::value);
         /**
          * @brief Reference to the Sound data
          *
@@ -37,7 +37,7 @@ namespace Dynamo {
          * @brief Reference to the playback material
          *
          */
-        std::reference_wrapper<SoundMaterial> material;
+        std::reference_wrapper<Material> material;
 
         /**
          * @brief Frame offset of the chunk
@@ -45,4 +45,4 @@ namespace Dynamo {
          */
         float frame;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

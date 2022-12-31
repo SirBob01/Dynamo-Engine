@@ -5,9 +5,9 @@
 
 #include "../Listener.hpp"
 #include "../Sound.hpp"
-#include "../SoundMaterial.hpp"
+#include "../Material.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     /**
      * @brief Abstract base class for a static audio filter
      *
@@ -50,7 +50,7 @@ namespace Dynamo {
         virtual Sound &apply(Sound &src,
                              const unsigned src_offset,
                              const unsigned length,
-                             const DynamicSoundMaterial &material,
+                             const DynamicMaterial &material,
                              const ListenerProperties &listener) = 0;
     };
-} // namespace Dynamo
+} // namespace Dynamo::Sound

@@ -1,6 +1,6 @@
 #include "HRTF.hpp"
 
-namespace Dynamo {
+namespace Dynamo::Sound {
     HRTF::HRTF(std::string filename) {
         // Open the file
         std::ifstream file(filename, std::ios::binary | std::ios::ate);
@@ -83,4 +83,4 @@ namespace Dynamo {
             }
         }
     }
-} // namespace Dynamo
+} // namespace Dynamo::Sound
