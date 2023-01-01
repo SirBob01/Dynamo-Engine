@@ -115,7 +115,7 @@ namespace Dynamo::Sound {
      * @brief The default sample rate is defined to be 44.1KHz
      *
      */
-    constexpr float DEFAULT_SAMPLE_RATE = 44100;
+    static constexpr float DEFAULT_SAMPLE_RATE = 44100;
 
     /**
      * @brief Sound asset represented as a signal holding multiple channels of

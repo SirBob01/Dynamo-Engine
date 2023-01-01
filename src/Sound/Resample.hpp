@@ -11,19 +11,19 @@ namespace Dynamo::Sound {
      * @brief Number of zero-crossings in the filter
      *
      */
-    constexpr unsigned FILTER_ZERO_CROSSINGS = 32;
+    static constexpr unsigned FILTER_ZERO_CROSSINGS = 32;
 
     /**
      * @brief Number of coefficients per zero crossing
      *
      */
-    constexpr unsigned FILTER_PRECISION = 4;
+    static constexpr unsigned FILTER_PRECISION = 4;
 
     /**
      * @brief Length of one wing in the filter
      *
      */
-    constexpr unsigned FILTER_HALF_LENGTH =
+    static constexpr unsigned FILTER_HALF_LENGTH =
         FILTER_ZERO_CROSSINGS * FILTER_PRECISION + 1;
 
     /**

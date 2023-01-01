@@ -16,14 +16,14 @@ namespace Dynamo::Sound {
      * @brief Length of a subfilter unit for convolutional processing
      *
      */
-    constexpr unsigned BLOCK_LENGTH = round_pow2(MAX_CHUNK_LENGTH);
+    static constexpr unsigned BLOCK_LENGTH = round_pow2(MAX_CHUNK_LENGTH);
 
     /**
      * @brief Length of a partition unit on which FFT is performed for
      * convolutional processing
      *
      */
-    constexpr unsigned PARTITION_LENGTH = BLOCK_LENGTH * 2;
+    static constexpr unsigned PARTITION_LENGTH = BLOCK_LENGTH * 2;
 
     /**
      * @brief Signal convolution engine
