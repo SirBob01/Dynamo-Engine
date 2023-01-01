@@ -1,7 +1,7 @@
 #pragma once
 
-#include "./Sound.hpp"
 #include "./Material.hpp"
+#include "./Sound.hpp"
 
 namespace Dynamo::Sound {
     /**
@@ -14,7 +14,7 @@ namespace Dynamo::Sound {
      * to receive enough data when requested, causing glitches
      *
      */
-    constexpr unsigned MAX_CHUNK_LENGTH = 1 << 8;
+    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 8;
 
     /**
      * @brief A chunk contains information to process a sound in small sections
@@ -24,9 +24,8 @@ namespace Dynamo::Sound {
      */
     template <typename Material>
     struct Chunk {
-        static_assert(
-            std::is_convertible<Material, StaticMaterial>::value ||
-            std::is_convertible<Material, DynamicMaterial>::value);
+        static_assert(std::is_convertible<Material, StaticMaterial>::value ||
+                      std::is_convertible<Material, DynamicMaterial>::value);
         /**
          * @brief Reference to the Sound data
          *

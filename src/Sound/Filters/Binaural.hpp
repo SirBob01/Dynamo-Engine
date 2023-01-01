@@ -13,12 +13,6 @@ namespace Dynamo::Sound {
      */
     class Binaural : public DynamicFilter {
         /**
-         * @brief Reference to the HRTF impulse response generator
-         *
-         */
-        HRTF &_hrtf;
-
-        /**
          * @brief Impulse response container
          *
          */
@@ -40,9 +34,8 @@ namespace Dynamo::Sound {
         /**
          * @brief Construct a new Binaural filter object
          *
-         * @param hrtf
          */
-        Binaural(HRTF &hrtf);
+        Binaural();
 
         Sound &apply(Sound &src,
                      const unsigned src_offset,
