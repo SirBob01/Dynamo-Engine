@@ -15,6 +15,7 @@ namespace Dynamo {
         if (width == 0) width = mode->width;
         if (height == 0) height = mode->height;
 
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         _window =
             glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         _size = Vec2(width, height);
