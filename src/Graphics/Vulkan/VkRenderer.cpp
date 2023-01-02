@@ -8,9 +8,13 @@ namespace Dynamo::Graphics {
 
         create_physical_device();
         create_logical_device();
+        create_swapchain();
     }
 
-    VkRenderer::~VkRenderer() {}
+    VkRenderer::~VkRenderer() {
+        // Wait for the device to finish all operations
+        _logical->waitIdle();
+    }
 
     void VkRenderer::enumerate_extensions() {
         // Get supported extensions from GLFW
@@ -137,12 +141,12 @@ namespace Dynamo::Graphics {
     }
 
     void VkRenderer::create_logical_device() {
-        vk::PhysicalDevice &physical_handle = _physical->get_handle();
-        QueueProperties graphics_queue_properties =
+        const vk::PhysicalDevice &physical_handle = _physical->get_handle();
+        const QueueProperties &graphics_queue_properties =
             _physical->get_graphics_queue_properties();
-        QueueProperties present_queue_properties =
+        const QueueProperties &present_queue_properties =
             _physical->get_present_queue_properties();
-        QueueProperties transfer_queue_properties =
+        const QueueProperties &transfer_queue_properties =
             _physical->get_transfer_queue_properties();
 
         // Get all unique queue families
@@ -181,7 +185,7 @@ namespace Dynamo::Graphics {
         descriptor_indexing.descriptorBindingVariableDescriptorCount = true;
 
         // Create the logical device
-        const auto &extensions = _physical->get_extensions();
+        auto &extensions = _physical->get_extensions();
 
         vk::DeviceCreateInfo device_info;
         device_info.queueCreateInfoCount = queue_infos.size();
@@ -205,5 +209,12 @@ namespace Dynamo::Graphics {
         // image_memory_ =
         //     std::make_unique<ImageMemoryAllocator>(logical_.get(),
         //     *physical_);
+    }
+
+    void VkRenderer::create_swapchain() {
+        _swapchain = std::make_unique<VkSwapchain>(_display,
+                                                   *_physical,
+                                                   *_logical,
+                                                   *_surface);
     }
 } // namespace Dynamo::Graphics

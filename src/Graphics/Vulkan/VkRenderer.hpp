@@ -7,12 +7,15 @@
 #endif
 
 #include <memory>
+#include <set>
+#include <vector>
 
 #include <vulkan/vulkan.hpp>
 
 #include "../Renderer.hpp"
 #include "./VkDebugger.hpp"
 #include "./VkPhysical.hpp"
+#include "./VkSwapchain.hpp"
 
 namespace Dynamo::Graphics {
     /**
@@ -45,6 +48,12 @@ namespace Dynamo::Graphics {
         vk::Queue _graphics_queue;
         vk::Queue _present_queue;
         vk::Queue _transfer_queue;
+
+        /**
+         * @brief Rendering swapchain
+         *
+         */
+        std::unique_ptr<VkSwapchain> _swapchain;
 
         /**
          * @brief Physical device
@@ -107,6 +116,12 @@ namespace Dynamo::Graphics {
          *
          */
         void create_logical_device();
+
+        /**
+         * @brief Create the swapchain
+         *
+         */
+        void create_swapchain();
 
       public:
         /**
