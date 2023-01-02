@@ -51,15 +51,6 @@ Anyone is welcome to open a pull request! State the issue being solved and expla
 
 For high-level suggestions on improving the engine, open an issue so we can have a discussion.
 
-## TODO
-
-- `Renderer` submodule
-- `Scene` management system
-- `ECS` submodule
-- SIMD instructions for math constructs
-- Integrate `ImGUI` for engine interface
-- Integrate `Mono C#` for scripting
-
 ## License
 
 Code and documentation Copyright (c) 2019-2022 Keith Leonardo

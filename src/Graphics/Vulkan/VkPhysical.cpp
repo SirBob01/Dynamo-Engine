@@ -1,13 +1,13 @@
 #include "./VkPhysical.hpp"
 
 namespace Dynamo::Graphics {
-    VkPhysical::VkPhysical(vk::PhysicalDevice &handle,
-                           vk::SurfaceKHR &surface) :
-        _handle(handle),
+    VkPhysical::VkPhysical(vk::PhysicalDevice handle, vk::SurfaceKHR &surface) :
         _surface(surface) {
-        _properties = _handle.get().getProperties();
-        _memory_properties = _handle.get().getMemoryProperties();
-        _features = _handle.get().getFeatures();
+        _handle = handle;
+
+        _properties = _handle.getProperties();
+        _memory_properties = _handle.getMemoryProperties();
+        _features = _handle.getFeatures();
 
         // Add the extensions required by all devices
         _extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
@@ -15,7 +15,7 @@ namespace Dynamo::Graphics {
         // Enable portability subset extension if available
         const char *portability_ext = "VK_KHR_portability_subset";
         for (vk::ExtensionProperties &ext :
-             _handle.get().enumerateDeviceExtensionProperties()) {
+             _handle.enumerateDeviceExtensionProperties()) {
             if (!std::strcmp(ext.extensionName, portability_ext)) {
                 _extensions.push_back(portability_ext);
             }
@@ -32,7 +32,7 @@ namespace Dynamo::Graphics {
     }
 
     bool VkPhysical::is_supporting_extensions() const {
-        auto available = _handle.get().enumerateDeviceExtensionProperties();
+        auto available = _handle.enumerateDeviceExtensionProperties();
         std::set<std::string> required(_extensions.begin(), _extensions.end());
 
         for (vk::ExtensionProperties &extension : available) {
@@ -47,10 +47,11 @@ namespace Dynamo::Graphics {
     }
 
     void VkPhysical::enumerate_command_queues() {
-        auto families = _handle.get().getQueueFamilyProperties();
+        auto families = _handle.getQueueFamilyProperties();
         unsigned index = 0;
         for (vk::QueueFamilyProperties &family : families) {
-            if (_handle.get().getSurfaceSupportKHR(index, _surface.get())) {
+            // Dedicated presentation queue
+            if (_handle.getSurfaceSupportKHR(index, _surface)) {
                 _present_queue_properties.family_id = index;
                 _present_queue_properties.count = family.queueCount;
             }
@@ -83,7 +84,7 @@ namespace Dynamo::Graphics {
         }
     }
 
-    vk::PhysicalDevice &VkPhysical::get_handle() { return _handle.get(); }
+    const vk::PhysicalDevice &VkPhysical::get_handle() const { return _handle; }
 
     const std::string VkPhysical::get_name() const {
         return _properties.deviceName;
@@ -95,9 +96,9 @@ namespace Dynamo::Graphics {
 
     const SwapchainOptions &VkPhysical::get_swapchain_options() {
         _swapchain_options = {
-            _handle.get().getSurfaceCapabilitiesKHR(_surface),
-            _handle.get().getSurfaceFormatsKHR(_surface),
-            _handle.get().getSurfacePresentModesKHR(_surface),
+            _handle.getSurfaceCapabilitiesKHR(_surface),
+            _handle.getSurfaceFormatsKHR(_surface),
+            _handle.getSurfacePresentModesKHR(_surface),
         };
         return _swapchain_options;
     }
@@ -124,7 +125,7 @@ namespace Dynamo::Graphics {
         }
 
         // Dedicated GPU are prioritized
-        auto discrete = vk::PhysicalDeviceType::eDiscreteGpu;
+        vk::PhysicalDeviceType discrete = vk::PhysicalDeviceType::eDiscreteGpu;
         if (_properties.deviceType == discrete) {
             score += 1000;
         }

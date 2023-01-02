@@ -53,7 +53,7 @@ namespace Dynamo::Graphics {
      *
      */
     class VkPhysical {
-        std::reference_wrapper<vk::PhysicalDevice> _handle;
+        vk::PhysicalDevice _handle;
         std::reference_wrapper<vk::SurfaceKHR> _surface;
 
         /**
@@ -131,14 +131,14 @@ namespace Dynamo::Graphics {
          * @param handle
          * @param surface
          */
-        VkPhysical(vk::PhysicalDevice &handle, vk::SurfaceKHR &surface);
+        VkPhysical(vk::PhysicalDevice handle, vk::SurfaceKHR &surface);
 
         /**
          * @brief Get the handle object to the vk::PhysicalDevice
          *
-         * @return vk::PhysicalDevice&
+         * @return const vk::PhysicalDevice&
          */
-        vk::PhysicalDevice &get_handle();
+        const vk::PhysicalDevice &get_handle() const;
 
         /**
          * @brief Get the name of the device
