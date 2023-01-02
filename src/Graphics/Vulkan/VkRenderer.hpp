@@ -1,9 +1,9 @@
 #pragma once
 #define GLFW_INCLUDE_VULKAN
 #ifndef NDEBUG
-#define VKDEBUG true
+#define VK_DEBUG true
 #else
-#define VKDEBUG false
+#define VK_DEBUG false
 #endif
 
 #include <memory>
@@ -12,6 +12,7 @@
 
 #include "../Renderer.hpp"
 #include "./VkDebugger.hpp"
+#include "./VkPhysical.hpp"
 
 namespace Dynamo::Graphics {
     /**
@@ -19,22 +20,64 @@ namespace Dynamo::Graphics {
      *
      */
     class VkRenderer : public Renderer {
+        /**
+         * @brief Vulkan instance
+         *
+         */
         vk::UniqueInstance _instance;
+
+        /**
+         * @brief Surface
+         *
+         */
+        vk::UniqueSurfaceKHR _surface;
+
+        /**
+         * @brief Logical device
+         *
+         */
+        vk::UniqueDevice _logical;
+
+        /**
+         * @brief Command queues
+         *
+         */
+        vk::Queue _graphics_queue;
+        vk::Queue _present_queue;
+        vk::Queue _transfer_queue;
+
+        /**
+         * @brief Physical device
+         *
+         */
+        std::unique_ptr<VkPhysical> _physical;
+
+        /**
+         * @brief Debugger
+         *
+         */
         std::unique_ptr<VkDebugger> _debugger;
 
         /**
-         * @brief Extensions and validation layers
+         * @brief List of supported extensions
          *
          */
-        std::vector<const char *> _extensions = {
-            VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-        };
-        std::vector<const char *> _validation_layers = {
-            "VK_LAYER_KHRONOS_validation",
-        };
+        std::vector<const char *> _extensions;
 
         /**
-         * @brief Check if the system supports the required validation layers
+         * @brief List of enabled validation layers for debugging
+         *
+         */
+        std::vector<const char *> _validation_layers;
+
+        /**
+         * @brief Enumerate all the supported extensions
+         *
+         */
+        void enumerate_extensions();
+
+        /**
+         * @brief Check if the system supports the enabled validation layers
          *
          * @return true
          * @return false
@@ -46,6 +89,24 @@ namespace Dynamo::Graphics {
          *
          */
         void create_instance();
+
+        /**
+         * @brief Attach the GLFW window to a vk::Surface
+         *
+         */
+        void create_surface();
+
+        /**
+         * @brief Select the appropriate GPU
+         *
+         */
+        void create_physical_device();
+
+        /**
+         * @brief Create a logical device given the selected physical device
+         *
+         */
+        void create_logical_device();
 
       public:
         /**

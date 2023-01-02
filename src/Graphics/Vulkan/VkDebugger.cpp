@@ -42,10 +42,17 @@ namespace Dynamo::Graphics {
         VkDebugUtilsMessengerCallbackDataEXT const *data,
         void *user_data) {
 
-        Log::warn("---- VkRenderer Warning ----");
+        Log::warn("--- VkDebugger Message ---");
         Log::warn("Message name: {}", data->pMessageIdName);
         Log::warn("Message Id: {}", data->messageIdNumber);
-        Log::warn(data->pMessage);
+
+        // Terminate on error
+        if (static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(severity) ==
+            vk::DebugUtilsMessageSeverityFlagBitsEXT::eError) {
+            Log::error(data->pMessage);
+        } else {
+            Log::warn(data->pMessage);
+        }
         return VK_FALSE;
     }
 
