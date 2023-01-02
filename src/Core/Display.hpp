@@ -19,6 +19,8 @@ namespace Dynamo {
         Vec2 _size;
         bool _vsync;
 
+        std::string _title;
+
       public:
         /**
          * @brief Construct a new Display object
@@ -63,6 +65,13 @@ namespace Dynamo {
          * @return Vec2
          */
         Vec2 get_size();
+
+        /**
+         * @brief Get the title of the window
+         *
+         * @return const std::string
+         */
+        const std::string get_title();
 
         /**
          * @brief Is the display closed?

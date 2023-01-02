@@ -19,6 +19,7 @@ namespace Dynamo {
             glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         _size = Vec2(width, height);
         _vsync = vsync;
+        _title = title;
 
         if (!_window) {
             Log::error("Failed to create a GLFW window");
@@ -41,6 +42,8 @@ namespace Dynamo {
 
     Vec2 Display::get_size() { return _size; }
 
+    const std::string Display::get_title() { return _title; }
+
     bool Display::is_closed() { return glfwWindowShouldClose(_window); }
 
     bool Display::is_fullscreen() {
@@ -55,7 +58,8 @@ namespace Dynamo {
     }
 
     void Display::set_title(std::string title) {
-        glfwSetWindowTitle(_window, title.c_str());
+        _title = title;
+        glfwSetWindowTitle(_window, _title.c_str());
     }
 
     void Display::set_fullscreen(bool fullscreen) {

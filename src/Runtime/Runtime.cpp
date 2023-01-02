@@ -1,7 +1,10 @@
-#include "Engine.hpp"
+#include "Runtime.hpp"
 
 namespace Dynamo {
-    Engine::Engine(std::string title, int width, int height, EngineFlag flags) {
+    Runtime::Runtime(std::string title,
+                     int width,
+                     int height,
+                     RuntimeFlag flags) {
         // Initialize GLFW
         if (!glfwInit()) {
             Log::error("Failed to initialize GLFW.");
@@ -11,12 +14,13 @@ namespace Dynamo {
         _display = std::make_unique<Display>(width,
                                              height,
                                              title,
-                                             flags & EngineFlag::FullScreen,
-                                             flags & EngineFlag::VSync);
+                                             flags & RuntimeFlag::FullScreen,
+                                             flags & RuntimeFlag::VSync);
         _input = std::make_unique<Input>(*_display);
         _clock = std::make_unique<Clock>();
 
-        // Rendering submodules
+        // Graphics and sound submodules
+        _renderer = std::make_unique<Graphics::VkRenderer>(*_display);
         _jukebox = std::make_unique<Sound::Jukebox>();
 
         // Seed the random number generator
@@ -24,15 +28,17 @@ namespace Dynamo {
         Random::seed(seed);
     }
 
-    Engine::~Engine() { glfwTerminate(); }
+    Runtime::~Runtime() { glfwTerminate(); }
 
-    Core Engine::get_core() { return {*_display, *_input, *_clock}; }
+    Core Runtime::get_core() { return {*_display, *_input, *_clock}; }
 
-    Sound::Jukebox &Engine::get_jukebox() { return *_jukebox; }
+    Graphics::Renderer &Runtime::get_renderer() { return *_renderer; }
 
-    bool Engine::is_running() { return !_display->is_closed(); }
+    Sound::Jukebox &Runtime::get_jukebox() { return *_jukebox; }
 
-    void Engine::run() {
+    bool Runtime::is_running() { return !_display->is_closed(); }
+
+    void Runtime::run() {
         // TODO: Use semi-fixed timestep to update game logic
         // (https://gafferongames.com/post/fix_your_timestep/)
         _input->poll();

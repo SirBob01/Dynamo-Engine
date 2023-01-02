@@ -1,9 +1,9 @@
 #include <Dynamo.hpp>
 
 int main() {
-    Dynamo::Engine engine("Hello, world!", 640, 480);
-    while (engine.is_running()) {
-        engine.run();
+    Dynamo::Runtime runtime("Hello, world!", 640, 480);
+    while (runtime.is_running()) {
+        runtime.run();
     }
     return 0;
 }
