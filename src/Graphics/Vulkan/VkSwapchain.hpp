@@ -10,45 +10,6 @@
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Create a vk::UniqueImage instance
-     *
-     * @param logical
-     * @param width
-     * @param height
-     * @param mip_levels
-     * @param format
-     * @param tiling
-     * @param usage
-     * @param samples
-     * @return vk::UniqueImage
-     */
-    vk::UniqueImage create_vk_image(vk::Device &logical,
-                                    unsigned width,
-                                    unsigned height,
-                                    unsigned mip_levels,
-                                    vk::Format format,
-                                    vk::ImageTiling tiling,
-                                    vk::Flags<vk::ImageUsageFlagBits> usage,
-                                    vk::SampleCountFlagBits samples);
-
-    /**
-     * @brief Create a vk::UniqueImageView instance from an image
-     *
-     * @param logical
-     * @param image
-     * @param format
-     * @param aspect_mask
-     * @param mip_levels
-     * @return vk::UniqueImageView
-     */
-    vk::UniqueImageView
-    create_vk_image_view(vk::Device &logical,
-                         vk::Image &image,
-                         vk::Format format,
-                         vk::Flags<vk::ImageAspectFlagBits> aspect_mask,
-                         unsigned mip_levels);
-
-    /**
      * @brief Wrapper class for a Vulkan swapchain
      *
      */
