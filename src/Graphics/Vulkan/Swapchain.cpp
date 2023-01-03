@@ -1,10 +1,12 @@
-#include "./VkSwapchain.hpp"
+#include "./Swapchain.hpp"
 
-namespace Dynamo::Graphics {
-    VkSwapchain::VkSwapchain(Display &display,
-                             VkPhysical &physical,
-                             vk::Device &logical,
-                             vk::SurfaceKHR &surface) {
+namespace Dynamo::Graphics::Vulkan {
+    Swapchain::Swapchain(Display &display,
+                         Device &device,
+                         vk::SurfaceKHR &surface) {
+        PhysicalDevice &physical = device.get_physical();
+        vk::Device &logical = device.get_handle();
+
         const SwapchainOptions &options = physical.get_swapchain_options();
         calculate_extent(options.capabilities, display);
         select_format(options.formats);
@@ -37,11 +39,11 @@ namespace Dynamo::Graphics {
 
         // Allow multiple command queues to access the images concurrently
         const QueueProperties &graphics_queue_properties =
-            physical.get_graphics_queue_properties();
-        const QueueProperties &present_queue_properties =
-            physical.get_present_queue_properties();
+            physical.get_queue_properties(QueueFamily::Graphics);
         const QueueProperties &transfer_queue_properties =
-            physical.get_transfer_queue_properties();
+            physical.get_queue_properties(QueueFamily::Transfer);
+        const QueueProperties &present_queue_properties =
+            physical.get_queue_properties(QueueFamily::Present);
 
         std::array<unsigned, 3> index_arr;
         index_arr[0] = present_queue_properties.family_id;
@@ -82,9 +84,9 @@ namespace Dynamo::Graphics {
         }
     }
 
-    void VkSwapchain::calculate_extent(
-        const vk::SurfaceCapabilitiesKHR &capabilities,
-        Display &display) {
+    void
+    Swapchain::calculate_extent(const vk::SurfaceCapabilitiesKHR &capabilities,
+                                Display &display) {
         int width, height;
         glfwGetFramebufferSize(display.get_window(), &width, &height);
 
@@ -96,8 +98,8 @@ namespace Dynamo::Graphics {
                                     capabilities.maxImageExtent.height);
     }
 
-    void VkSwapchain::select_format(
-        const std::vector<vk::SurfaceFormatKHR> &formats) {
+    void
+    Swapchain::select_format(const std::vector<vk::SurfaceFormatKHR> &formats) {
         _format = formats[0];
         for (const vk::SurfaceFormatKHR &format : formats) {
             if (format.format == vk::Format::eB8G8R8A8Srgb &&
@@ -108,7 +110,7 @@ namespace Dynamo::Graphics {
         }
     }
 
-    void VkSwapchain::set_presentation_mode(
+    void Swapchain::set_presentation_mode(
         const std::vector<vk::PresentModeKHR> &present_modes,
         Display &display) {
         _present_mode = vk::PresentModeKHR::eFifo;
@@ -121,23 +123,23 @@ namespace Dynamo::Graphics {
         }
     }
 
-    const vk::SwapchainKHR &VkSwapchain::get_handle() const { return *_handle; }
+    const vk::SwapchainKHR &Swapchain::get_handle() const { return *_handle; }
 
-    const std::vector<vk::Image> &VkSwapchain::get_images() const {
+    const std::vector<vk::Image> &Swapchain::get_images() const {
         return _images;
     }
 
-    const std::vector<vk::UniqueImageView> &VkSwapchain::get_views() const {
+    const std::vector<vk::UniqueImageView> &Swapchain::get_views() const {
         return _views;
     }
 
-    const vk::Extent2D &VkSwapchain::get_extent() const { return _extent; }
+    const vk::Extent2D &Swapchain::get_extent() const { return _extent; }
 
-    const vk::SurfaceFormatKHR &VkSwapchain::get_format() const {
+    const vk::SurfaceFormatKHR &Swapchain::get_format() const {
         return _format;
     }
 
-    const vk::PresentModeKHR &VkSwapchain::get_present_mode() const {
+    const vk::PresentModeKHR &Swapchain::get_present_mode() const {
         return _present_mode;
     }
-} // namespace Dynamo::Graphics
+} // namespace Dynamo::Graphics::Vulkan

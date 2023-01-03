@@ -6,18 +6,14 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../../Core/Display.hpp"
-#include "./VkPhysical.hpp"
+#include "./Device.hpp"
 
-namespace Dynamo::Graphics {
+namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Wrapper class for a Vulkan swapchain
      *
      */
-    class VkSwapchain {
-        /**
-         * @brief Swapchain handle
-         *
-         */
+    class Swapchain {
         vk::UniqueSwapchainKHR _handle;
 
         /**
@@ -34,7 +30,7 @@ namespace Dynamo::Graphics {
         vk::Extent2D _extent;
 
         /**
-         * @brief Color format and color space
+         * @brief Pixel format and color space
          *
          */
         vk::SurfaceFormatKHR _format;
@@ -73,17 +69,13 @@ namespace Dynamo::Graphics {
 
       public:
         /**
-         * @brief Construct a new VkSwapchain object
+         * @brief Construct a new Swapchain object
          *
          * @param display
-         * @param physical
-         * @param logical
+         * @param device
          * @param surface
          */
-        VkSwapchain(Display &display,
-                    VkPhysical &physical,
-                    vk::Device &logical,
-                    vk::SurfaceKHR &surface);
+        Swapchain(Display &display, Device &device, vk::SurfaceKHR &surface);
 
         /**
          * @brief Get the handle to the vk::SwapchainKHR
@@ -128,4 +120,4 @@ namespace Dynamo::Graphics {
          */
         const vk::PresentModeKHR &get_present_mode() const;
     };
-} // namespace Dynamo::Graphics
+} // namespace Dynamo::Graphics::Vulkan

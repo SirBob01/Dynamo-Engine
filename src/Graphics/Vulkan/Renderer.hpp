@@ -7,65 +7,49 @@
 #endif
 
 #include <memory>
-#include <set>
+#include <unordered_set>
 #include <vector>
 
 #include <vulkan/vulkan.hpp>
 
 #include "../Renderer.hpp"
-#include "./VkDebugger.hpp"
-#include "./VkPhysical.hpp"
-#include "./VkSwapchain.hpp"
+#include "./Debugger.hpp"
+#include "./Device.hpp"
+#include "./Image.hpp"
+#include "./ImageAllocator.hpp"
+#include "./PhysicalDevice.hpp"
+#include "./Swapchain.hpp"
 
-namespace Dynamo::Graphics {
+namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Renderer powered by the Vulkan API
      *
      */
-    class VkRenderer : public Renderer {
-        /**
-         * @brief Vulkan instance
-         *
-         */
+    class Renderer : public Dynamo::Graphics::Renderer {
         vk::UniqueInstance _instance;
-
-        /**
-         * @brief Surface
-         *
-         */
         vk::UniqueSurfaceKHR _surface;
 
-        /**
-         * @brief Logical device
-         *
-         */
-        vk::UniqueDevice _logical;
+        std::unique_ptr<Device> _device;
+
+        std::unique_ptr<ImageAllocator> _image_allocator;
+
+        std::unique_ptr<Swapchain> _swapchain;
 
         /**
-         * @brief Command queues
+         * @brief Depth and color buffers
          *
          */
-        vk::Queue _graphics_queue;
-        vk::Queue _present_queue;
-        vk::Queue _transfer_queue;
+        std::unique_ptr<Image> _depth_image;
+        std::unique_ptr<Image> _color_image;
 
-        /**
-         * @brief Rendering swapchain
-         *
-         */
-        std::unique_ptr<VkSwapchain> _swapchain;
-
-        /**
-         * @brief Physical device
-         *
-         */
-        std::unique_ptr<VkPhysical> _physical;
+        vk::UniqueImageView _depth_view;
+        vk::UniqueImageView _color_view;
 
         /**
          * @brief Debugger
          *
          */
-        std::unique_ptr<VkDebugger> _debugger;
+        std::unique_ptr<Debugger> _debugger;
 
         /**
          * @brief List of supported extensions
@@ -106,16 +90,17 @@ namespace Dynamo::Graphics {
         void create_surface();
 
         /**
-         * @brief Select the appropriate GPU
+         * @brief Select a suitable hardware device and create the logical
+         * device
          *
          */
-        void create_physical_device();
+        void create_device();
 
         /**
-         * @brief Create a logical device given the selected physical device
+         * @brief Create the memory allocators
          *
          */
-        void create_logical_device();
+        void create_memory_allocators();
 
         /**
          * @brief Create the swapchain
@@ -123,18 +108,30 @@ namespace Dynamo::Graphics {
          */
         void create_swapchain();
 
+        /**
+         * @brief Create the depth buffer
+         *
+         */
+        void create_depth_buffer();
+
+        /**
+         * @brief Create the color buffer
+         *
+         */
+        void create_color_buffer();
+
       public:
         /**
-         * @brief Construct a new VkRenderer object
+         * @brief Construct a new Renderer object
          *
          * @param display
          */
-        VkRenderer(Display &display);
+        Renderer(Display &display);
 
         /**
-         * @brief Destroy the VkRenderer object
+         * @brief Destroy the Renderer object
          *
          */
-        ~VkRenderer();
+        ~Renderer();
     };
-} // namespace Dynamo::Graphics
+} // namespace Dynamo::Graphics::Vulkan

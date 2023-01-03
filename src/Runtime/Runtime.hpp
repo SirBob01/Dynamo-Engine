@@ -8,7 +8,7 @@
 #include "../Core/Input.hpp"
 
 #include "../Graphics/Renderer.hpp"
-#include "../Graphics/Vulkan/VkRenderer.hpp"
+#include "../Graphics/Vulkan/Renderer.hpp"
 
 #include "../Sound/Jukebox.hpp"
 

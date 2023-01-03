@@ -1,11 +1,38 @@
 #pragma once
 
-#include <set>
+#include <array>
+#include <unordered_set>
 #include <vector>
 
 #include <vulkan/vulkan.hpp>
 
-namespace Dynamo::Graphics {
+#include "../../Log/Log.hpp"
+
+namespace Dynamo::Graphics::Vulkan {
+    /**
+     * @brief Enumerates the different queue families
+     *
+     */
+    enum class QueueFamily : unsigned {
+        /**
+         * @brief Graphics commands
+         *
+         */
+        Graphics,
+
+        /**
+         * @brief Buffer transfer commands
+         *
+         */
+        Transfer,
+
+        /**
+         * @brief Presentation commands
+         *
+         */
+        Present
+    };
+
     /**
      * @brief Properties of a command queue
      *
@@ -52,7 +79,7 @@ namespace Dynamo::Graphics {
      * @brief Wrapper class for a Vulkan physical device
      *
      */
-    class VkPhysical {
+    class PhysicalDevice {
         vk::PhysicalDevice _handle;
         std::reference_wrapper<vk::SurfaceKHR> _surface;
 
@@ -126,12 +153,12 @@ namespace Dynamo::Graphics {
 
       public:
         /**
-         * @brief Construct a new VkPhysical object
+         * @brief Construct a new Physical object
          *
          * @param handle
          * @param surface
          */
-        VkPhysical(vk::PhysicalDevice handle, vk::SurfaceKHR &surface);
+        PhysicalDevice(vk::PhysicalDevice handle, vk::SurfaceKHR &surface);
 
         /**
          * @brief Get the handle object to the vk::PhysicalDevice
@@ -162,25 +189,40 @@ namespace Dynamo::Graphics {
         const SwapchainOptions &get_swapchain_options();
 
         /**
-         * @brief Get the graphics queue properties
+         * @brief Get the properties of a queue
          *
          * @return const QueueProperties&
          */
-        const QueueProperties &get_graphics_queue_properties() const;
+        const QueueProperties &get_queue_properties(QueueFamily family) const;
 
         /**
-         * @brief Get the presentation queue properties
+         * @brief Get the properties of a pixel format
          *
-         * @return const QueueProperties&
+         * @param format
+         * @return vk::FormatProperties
          */
-        const QueueProperties &get_present_queue_properties() const;
+        vk::FormatProperties get_format_properties(vk::Format format) const;
 
         /**
-         * @brief Get the transfer queue properties
+         * @brief Get the memory properties of the hardware
          *
-         * @return const QueueProperties&
+         * @return const vk::PhysicalDeviceMemoryProperties
          */
-        const QueueProperties &get_transfer_queue_properties() const;
+        const vk::PhysicalDeviceMemoryProperties get_memory_properties() const;
+
+        /**
+         * @brief Get the anti-aliasing sample count supported by the device
+         *
+         * @return vk::SampleCountFlagBits
+         */
+        vk::SampleCountFlagBits get_msaa_samples() const;
+
+        /**
+         * @brief Get the supported pixel format for the depth buffer
+         *
+         * @return vk::Format
+         */
+        vk::Format get_depth_format() const;
 
         /**
          * @brief Calculate heuristic for selecting the best device
@@ -189,4 +231,4 @@ namespace Dynamo::Graphics {
          */
         int calculate_score() const;
     };
-} // namespace Dynamo::Graphics
+} // namespace Dynamo::Graphics::Vulkan
