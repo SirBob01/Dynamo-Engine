@@ -8,8 +8,7 @@
 #include "Core/Input.hpp"
 
 #include "Graphics/Renderer.hpp"
-#include "Graphics/Vulkan/VkDebugger.hpp"
-#include "Graphics/Vulkan/VkRenderer.hpp"
+#include "Graphics/Vulkan/Renderer.hpp"
 
 #include "Sound/Chunk.hpp"
 #include "Sound/Convolver.hpp"

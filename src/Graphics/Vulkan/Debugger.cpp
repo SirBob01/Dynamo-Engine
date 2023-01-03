@@ -1,4 +1,4 @@
-#include "./VkDebugger.hpp"
+#include "./Debugger.hpp"
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugUtilsMessengerEXT(
     VkInstance instance,
@@ -18,8 +18,8 @@ vkDestroyDebugUtilsMessengerEXT(VkInstance instance,
     vk_destroy_debugger_dispatch(instance, messenger, allocator);
 }
 
-namespace Dynamo::Graphics {
-    VkDebugger::VkDebugger(vk::Instance &instance) {
+namespace Dynamo::Graphics::Vulkan {
+    Debugger::Debugger(vk::Instance &instance) {
         load_proxies(instance);
 
         // Create the debug messenger
@@ -36,13 +36,13 @@ namespace Dynamo::Graphics {
         _messenger = instance.createDebugUtilsMessengerEXTUnique(create_info);
     }
 
-    VKAPI_ATTR VkBool32 VKAPI_CALL VkDebugger::message_callback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-        VkDebugUtilsMessageTypeFlagsEXT type,
-        VkDebugUtilsMessengerCallbackDataEXT const *data,
-        void *user_data) {
+    VKAPI_ATTR VkBool32 VKAPI_CALL
+    Debugger::message_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                               VkDebugUtilsMessageTypeFlagsEXT type,
+                               VkDebugUtilsMessengerCallbackDataEXT const *data,
+                               void *user_data) {
 
-        Log::warn("--- VkDebugger Message ---");
+        Log::warn("--- Vulkan Debugger Message ---");
         Log::warn("Message name: {}", data->pMessageIdName);
         Log::warn("Message Id: {}", data->messageIdNumber);
 
@@ -53,10 +53,11 @@ namespace Dynamo::Graphics {
         } else {
             Log::warn(data->pMessage);
         }
+        Log::warn("");
         return VK_FALSE;
     }
 
-    void VkDebugger::load_proxies(vk::Instance &instance) {
+    void Debugger::load_proxies(vk::Instance &instance) {
         vk_create_debugger_dispatch =
             reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
                 instance.getProcAddr("vkCreateDebugUtilsMessengerEXT"));
@@ -64,4 +65,4 @@ namespace Dynamo::Graphics {
             reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
                 instance.getProcAddr("vkDestroyDebugUtilsMessengerEXT"));
     }
-} // namespace Dynamo::Graphics
+} // namespace Dynamo::Graphics::Vulkan

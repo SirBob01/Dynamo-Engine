@@ -20,7 +20,7 @@ namespace Dynamo {
         _clock = std::make_unique<Clock>();
 
         // Graphics and sound submodules
-        _renderer = std::make_unique<Graphics::VkRenderer>(*_display);
+        _renderer = std::make_unique<Graphics::Vulkan::Renderer>(*_display);
         _jukebox = std::make_unique<Sound::Jukebox>();
 
         // Seed the random number generator

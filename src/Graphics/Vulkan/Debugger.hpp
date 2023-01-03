@@ -34,12 +34,12 @@ vkDestroyDebugUtilsMessengerEXT(VkInstance instance,
                                 VkDebugUtilsMessengerEXT messenger,
                                 VkAllocationCallbacks const *allocator);
 
-namespace Dynamo::Graphics {
+namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Wrapper class for the Vulkan debugger extension
      *
      */
-    class VkDebugger {
+    class Debugger {
         vk::UniqueDebugUtilsMessengerEXT _messenger;
 
         /**
@@ -66,10 +66,10 @@ namespace Dynamo::Graphics {
 
       public:
         /**
-         * @brief Construct a new VkDebugger object
+         * @brief Construct a new Debugger object
          *
          * @param instance
          */
-        VkDebugger(vk::Instance &instance);
+        Debugger(vk::Instance &instance);
     };
-} // namespace Dynamo::Graphics
+} // namespace Dynamo::Graphics::Vulkan
