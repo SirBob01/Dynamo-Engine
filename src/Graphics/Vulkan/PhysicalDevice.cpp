@@ -2,9 +2,9 @@
 
 namespace Dynamo::Graphics::Vulkan {
     PhysicalDevice::PhysicalDevice(vk::PhysicalDevice handle,
-                                   vk::SurfaceKHR &surface) :
-        _surface(surface) {
+                                   vk::SurfaceKHR surface) {
         _handle = handle;
+        _surface = surface;
 
         _properties = _handle.getProperties();
         _memory_properties = _handle.getMemoryProperties();

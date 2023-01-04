@@ -7,6 +7,8 @@
 
 #include "../../Core/Display.hpp"
 #include "./Device.hpp"
+#include "./Image.hpp"
+#include "./ImageView.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -14,31 +16,14 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class Swapchain {
-        vk::UniqueSwapchainKHR _handle;
+        vk::SwapchainKHR _handle;
+        std::reference_wrapper<Device> _device;
 
-        /**
-         * @brief Swapchain images and their views
-         *
-         */
-        std::vector<vk::Image> _images;
-        std::vector<vk::UniqueImageView> _views;
+        std::vector<std::unique_ptr<SwapchainImage>> _images;
+        std::vector<std::unique_ptr<ImageView>> _views;
 
-        /**
-         * @brief Extent of the swapchain (dimensions of the drawable area)
-         *
-         */
         vk::Extent2D _extent;
-
-        /**
-         * @brief Pixel format and color space
-         *
-         */
         vk::SurfaceFormatKHR _format;
-
-        /**
-         * @brief Presentation mode
-         *
-         */
         vk::PresentModeKHR _present_mode;
 
         /**
@@ -75,7 +60,13 @@ namespace Dynamo::Graphics::Vulkan {
          * @param device
          * @param surface
          */
-        Swapchain(Display &display, Device &device, vk::SurfaceKHR &surface);
+        Swapchain(Display &display, Device &device, vk::SurfaceKHR surface);
+
+        /**
+         * @brief Destroy the Swapchain object
+         *
+         */
+        ~Swapchain();
 
         /**
          * @brief Get the handle to the vk::SwapchainKHR
@@ -87,17 +78,17 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the array of presentable images
          *
-         * @return const std::vector<vk::Image>&
+         * @return const std::vector<std::unique_ptr<SwapchainImage>>&
          */
-        const std::vector<vk::Image> &get_images() const;
+        const std::vector<std::unique_ptr<SwapchainImage>> &get_images() const;
 
         /**
          * @brief Get the array of image views, which map one-to-one with the
          * presentable images array
          *
-         * @return const std::vector<vk::UniqueImageView>&
+         * @return const std::vector<std::unique_ptr<ImageView>>&
          */
-        const std::vector<vk::UniqueImageView> &get_views() const;
+        const std::vector<std::unique_ptr<ImageView>> &get_views() const;
 
         /**
          * @brief Get the extent of the swapchain

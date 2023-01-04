@@ -3,10 +3,9 @@
 namespace Dynamo::Graphics::Vulkan {
     Swapchain::Swapchain(Display &display,
                          Device &device,
-                         vk::SurfaceKHR &surface) {
+                         vk::SurfaceKHR surface) :
+        _device(device) {
         PhysicalDevice &physical = device.get_physical();
-        vk::Device &logical = device.get_handle();
-
         const SwapchainOptions &options = physical.get_swapchain_options();
         calculate_extent(options.capabilities, display);
         select_format(options.formats);
@@ -63,25 +62,23 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Create the swapchain and its images
-        _handle = logical.createSwapchainKHRUnique(swapchain_info);
-        _images = logical.getSwapchainImagesKHR(_handle.get());
-
-        // Create the image views for each swapchain image
-        for (vk::Image &image : _images) {
-            vk::ImageViewCreateInfo view_info;
-            view_info.image = image;
-            view_info.viewType = vk::ImageViewType::e2D;
-            view_info.format = _format.format;
-
-            view_info.subresourceRange.aspectMask =
-                vk::ImageAspectFlagBits::eColor;
-            view_info.subresourceRange.baseMipLevel = 0;
-            view_info.subresourceRange.levelCount = 1;
-            view_info.subresourceRange.baseArrayLayer = 0;
-            view_info.subresourceRange.layerCount = 1;
-
-            _views.push_back(logical.createImageViewUnique(view_info));
+        const vk::Device &logical = device.get_handle();
+        _handle = logical.createSwapchainKHR(swapchain_info);
+        for (vk::Image &vkimg : logical.getSwapchainImagesKHR(_handle)) {
+            std::unique_ptr<SwapchainImage> image =
+                std::make_unique<SwapchainImage>(device, vkimg, _format.format);
+            std::unique_ptr<ImageView> view =
+                std::make_unique<ImageView>(*image,
+                                            vk::ImageViewType::e2D,
+                                            vk::ImageAspectFlagBits::eColor,
+                                            1);
+            _images.emplace_back(std::move(image));
+            _views.emplace_back(std::move(view));
         }
+    }
+
+    Swapchain::~Swapchain() {
+        _device.get().get_handle().destroySwapchainKHR(_handle);
     }
 
     void
@@ -123,13 +120,15 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
-    const vk::SwapchainKHR &Swapchain::get_handle() const { return *_handle; }
+    const vk::SwapchainKHR &Swapchain::get_handle() const { return _handle; }
 
-    const std::vector<vk::Image> &Swapchain::get_images() const {
+    const std::vector<std::unique_ptr<SwapchainImage>> &
+    Swapchain::get_images() const {
         return _images;
     }
 
-    const std::vector<vk::UniqueImageView> &Swapchain::get_views() const {
+    const std::vector<std::unique_ptr<ImageView>> &
+    Swapchain::get_views() const {
         return _views;
     }
 

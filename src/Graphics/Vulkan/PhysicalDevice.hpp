@@ -81,44 +81,18 @@ namespace Dynamo::Graphics::Vulkan {
      */
     class PhysicalDevice {
         vk::PhysicalDevice _handle;
-        std::reference_wrapper<vk::SurfaceKHR> _surface;
+        vk::SurfaceKHR _surface;
 
-        /**
-         * @brief Device properties
-         *
-         */
         vk::PhysicalDeviceProperties _properties;
         vk::PhysicalDeviceMemoryProperties _memory_properties;
         vk::PhysicalDeviceFeatures _features;
 
-        /**
-         * @brief Available swapchain options
-         *
-         */
         SwapchainOptions _swapchain_options;
 
-        /**
-         * @brief Queue for graphics commands
-         *
-         */
         QueueProperties _graphics_queue_properties;
-
-        /**
-         * @brief Queue for presentation commands
-         *
-         */
         QueueProperties _present_queue_properties;
-
-        /**
-         * @brief Queue for buffer transfer commands
-         *
-         */
         QueueProperties _transfer_queue_properties;
 
-        /**
-         * @brief Required extensions
-         *
-         */
         std::vector<const char *> _extensions;
 
         /**
@@ -155,10 +129,10 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Construct a new Physical object
          *
-         * @param handle
-         * @param surface
+         * @param handle  Vulkan PhysicalDevice handle
+         * @param surface Vulkan window surface
          */
-        PhysicalDevice(vk::PhysicalDevice handle, vk::SurfaceKHR &surface);
+        PhysicalDevice(vk::PhysicalDevice handle, vk::SurfaceKHR surface);
 
         /**
          * @brief Get the handle object to the vk::PhysicalDevice
@@ -193,12 +167,19 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @return const QueueProperties&
          */
+
+        /**
+         * @brief Get the properties of a queue
+         *
+         * @param family Class of commands handled by the queue
+         * @return const QueueProperties&
+         */
         const QueueProperties &get_queue_properties(QueueFamily family) const;
 
         /**
          * @brief Get the properties of a pixel format
          *
-         * @param format
+         * @param format Pixel format
          * @return vk::FormatProperties
          */
         vk::FormatProperties get_format_properties(vk::Format format) const;
