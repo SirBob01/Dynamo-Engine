@@ -51,19 +51,22 @@ namespace Dynamo::Graphics::Vulkan {
         device_info.pEnabledFeatures = &device_features;
         device_info.pNext = &descriptor_indexing;
 
-        _handle = _physical.get_handle().createDeviceUnique(device_info);
+        _handle = _physical.get_handle().createDevice(device_info);
     }
 
-    Device::~Device() { wait_idle(); }
+    Device::~Device() {
+        wait();
+        _handle.destroy();
+    }
 
-    vk::Device &Device::get_handle() { return *_handle; }
+    const vk::Device &Device::get_handle() const { return _handle; }
 
     PhysicalDevice &Device::get_physical() { return _physical; }
 
     vk::Queue Device::get_queue(QueueFamily family, unsigned index) {
         QueueProperties properties = _physical.get_queue_properties(family);
-        return _handle->getQueue(properties.family_id, index);
+        return _handle.getQueue(properties.family_id, index);
     }
 
-    void Device::wait_idle() { _handle->waitIdle(); }
+    void Device::wait() { _handle.waitIdle(); }
 } // namespace Dynamo::Graphics::Vulkan

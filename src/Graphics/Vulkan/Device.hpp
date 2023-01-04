@@ -12,14 +12,14 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class Device {
-        vk::UniqueDevice _handle;
+        vk::Device _handle;
         PhysicalDevice _physical;
 
       public:
         /**
          * @brief Construct a new Device object
          *
-         * @param physical
+         * @param physical Physical device
          */
         Device(PhysicalDevice &physical);
 
@@ -32,9 +32,9 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the handle to vk::Device
          *
-         * @return vk::Device&
+         * @return const vk::Device&
          */
-        vk::Device &get_handle();
+        const vk::Device &get_handle() const;
 
         /**
          * @brief Get the physical device
@@ -46,8 +46,8 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the graphics queue
          *
-         * @param family
-         * @param index
+         * @param family Class of commands handled by the queue
+         * @param index  Queue index
          * @return vk::Queue
          */
         vk::Queue get_queue(QueueFamily family, unsigned index = 0);
@@ -56,6 +56,6 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Wait for all queue operations to finish
          *
          */
-        void wait_idle();
+        void wait();
     };
 } // namespace Dynamo::Graphics::Vulkan

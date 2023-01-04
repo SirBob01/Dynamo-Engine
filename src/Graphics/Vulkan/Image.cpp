@@ -1,54 +1,79 @@
 #include "./Image.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
+    Image::Image(Device &device, vk::Image handle, vk::Format format) :
+        _handle(handle), _device(device), _format(format) {}
+
     Image::Image(Device &device,
                  unsigned width,
                  unsigned height,
+                 unsigned depth,
                  unsigned mip_levels,
+                 unsigned layer_count,
                  vk::Format format,
+                 vk::ImageType type,
                  vk::ImageTiling tiling,
                  vk::Flags<vk::ImageUsageFlagBits> usage) :
-        _device(device),
-        _format(format) {
+        _device(device) {
         vk::ImageCreateInfo image_info;
-        image_info.imageType = vk::ImageType::e2D;
-        image_info.format = _format;
+        image_info.imageType = type;
+        image_info.format = format;
 
         image_info.extent.width = width;
         image_info.extent.height = height;
-        image_info.extent.depth = 1;
+        image_info.extent.depth = depth;
 
         image_info.mipLevels = mip_levels;
-        image_info.arrayLayers = 1;
+        image_info.arrayLayers = layer_count;
         image_info.samples = device.get_physical().get_msaa_samples();
 
         image_info.tiling = tiling;
         image_info.usage = usage;
         image_info.sharingMode = vk::SharingMode::eExclusive;
 
-        _handle = _device.get().get_handle().createImageUnique(image_info);
+        _handle = device.get_handle().createImage(image_info);
+        _format = format;
     }
 
-    const vk::Image &Image::get_handle() const { return *_handle; }
+    const vk::Image &Image::get_handle() const { return _handle; }
 
-    vk::UniqueImageView
-    Image::create_view(vk::Flags<vk::ImageAspectFlagBits> aspect_mask,
-                       unsigned mip_levels) const {
-        vk::ImageViewCreateInfo view_info;
-        view_info.image = *_handle;
-        view_info.viewType = vk::ImageViewType::e2D;
-        view_info.format = _format;
+    Device &Image::get_device() { return _device.get(); }
 
-        view_info.subresourceRange.aspectMask = aspect_mask;
-        view_info.subresourceRange.baseMipLevel = 0;
-        view_info.subresourceRange.levelCount = mip_levels;
-        view_info.subresourceRange.baseArrayLayer = 0;
-        view_info.subresourceRange.layerCount = 1;
-
-        return _device.get().get_handle().createImageViewUnique(view_info);
-    }
+    vk::Format Image::get_format() { return _format; }
 
     vk::MemoryRequirements Image::get_memory_requirements() {
-        return _device.get().get_handle().getImageMemoryRequirements(*_handle);
+        return _device.get().get_handle().getImageMemoryRequirements(_handle);
     }
+
+    UserImage::UserImage(Device &device,
+                         unsigned width,
+                         unsigned height,
+                         unsigned depth,
+                         unsigned mip_levels,
+                         unsigned layer_count,
+                         vk::Format format,
+                         vk::ImageType type,
+                         vk::ImageTiling tiling,
+                         vk::Flags<vk::ImageUsageFlagBits> usage) :
+        Image(device,
+              width,
+              height,
+              depth,
+              mip_levels,
+              layer_count,
+              format,
+              type,
+              tiling,
+              usage) {}
+
+    UserImage::~UserImage() {
+        _device.get().get_handle().destroyImage(_handle);
+    }
+
+    SwapchainImage::SwapchainImage(Device &device,
+                                   vk::Image handle,
+                                   vk::Format format) :
+        Image(device, handle, format) {}
+
+    SwapchainImage::~SwapchainImage() {}
 } // namespace Dynamo::Graphics::Vulkan

@@ -30,20 +30,14 @@ namespace Dynamo::Graphics::Vulkan {
         vk::UniqueSurfaceKHR _surface;
 
         std::unique_ptr<Device> _device;
-
         std::unique_ptr<ImageAllocator> _image_allocator;
-
         std::unique_ptr<Swapchain> _swapchain;
 
-        /**
-         * @brief Depth and color buffers
-         *
-         */
-        std::unique_ptr<Image> _depth_image;
-        std::unique_ptr<Image> _color_image;
+        std::unique_ptr<UserImage> _depth_image;
+        std::unique_ptr<ImageView> _depth_view;
 
-        vk::UniqueImageView _depth_view;
-        vk::UniqueImageView _color_view;
+        std::unique_ptr<UserImage> _color_image;
+        std::unique_ptr<ImageView> _color_view;
 
         /**
          * @brief Debugger

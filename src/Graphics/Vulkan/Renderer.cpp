@@ -152,31 +152,43 @@ namespace Dynamo::Graphics::Vulkan {
 
     void Renderer::create_depth_buffer() {
         vk::Extent2D extent = _swapchain->get_extent();
-        _depth_image = std::make_unique<Image>(
+        _depth_image = std::make_unique<UserImage>(
             *_device,
             extent.width,
             extent.height,
             1,
+            1,
+            1,
             _device->get_physical().get_depth_format(),
+            vk::ImageType::e2D,
             vk::ImageTiling::eOptimal,
             vk::ImageUsageFlagBits::eDepthStencilAttachment);
         _image_allocator->allocate(*_depth_image);
         _depth_view =
-            _depth_image->create_view(vk::ImageAspectFlagBits::eDepth, 1);
+            std::make_unique<ImageView>(*_depth_image,
+                                        vk::ImageViewType::e2D,
+                                        vk::ImageAspectFlagBits::eDepth,
+                                        1);
     }
 
     void Renderer::create_color_buffer() {
         vk::Extent2D extent = _swapchain->get_extent();
-        _color_image =
-            std::make_unique<Image>(*_device,
-                                    extent.width,
-                                    extent.height,
-                                    1,
-                                    _swapchain->get_format().format,
-                                    vk::ImageTiling::eOptimal,
-                                    vk::ImageUsageFlagBits::eColorAttachment);
+        _color_image = std::make_unique<UserImage>(
+            *_device,
+            extent.width,
+            extent.height,
+            1,
+            1,
+            1,
+            _swapchain->get_format().format,
+            vk::ImageType::e2D,
+            vk::ImageTiling::eOptimal,
+            vk::ImageUsageFlagBits::eColorAttachment);
         _image_allocator->allocate(*_color_image);
         _color_view =
-            _color_image->create_view(vk::ImageAspectFlagBits::eColor, 1);
+            std::make_unique<ImageView>(*_color_image,
+                                        vk::ImageViewType::e2D,
+                                        vk::ImageAspectFlagBits::eColor,
+                                        1);
     }
 } // namespace Dynamo::Graphics::Vulkan
