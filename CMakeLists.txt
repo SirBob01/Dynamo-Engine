@@ -15,6 +15,7 @@ add_subdirectory("submodules/fmt")
 add_subdirectory("submodules/glfw")
 add_subdirectory("submodules/portaudio")
 add_subdirectory("submodules/libsndfile")
+add_subdirectory("submodules/tinyobjloader")
 
 # Dynamo library files
 file(GLOB_RECURSE INCLUDE "./src/*.hpp" "./src/*.h")
@@ -22,7 +23,7 @@ file(GLOB_RECURSE SOURCES "./src/*.cpp" "./src/*.c")
 
 # Make Dynamo a shared library
 add_library(Dynamo STATIC ${SOURCES} ${INCLUDE} ${STB_SOURCES})
-target_include_directories(Dynamo PUBLIC "./src" "./submodules/stb")
+target_include_directories(Dynamo PUBLIC "./src" "./submodules/stb" "./submodules/tinyobjloader")
 
 # Link all libraries together
 target_link_libraries(Dynamo fmt glfw Vulkan::Vulkan PortAudio sndfile)
