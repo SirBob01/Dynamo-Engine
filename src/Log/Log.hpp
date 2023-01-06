@@ -1,5 +1,9 @@
 #pragma once
 #ifndef NDEBUG
+#define DYN_DEBUG
+#endif
+
+#ifdef DYN_DEBUG
 #define DYN_ASSERT(cond)                                                       \
     !(cond) ? Dynamo::Log::error("Assertion {} failed: {}, Line {}",           \
                                  #cond,                                        \

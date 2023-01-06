@@ -166,7 +166,8 @@ namespace Dynamo {
          * @return T
          */
         inline T at(const unsigned frame, const unsigned channel) const {
-            DYN_ASSERT(frame < _frames && channel < _channels);
+            DYN_ASSERT(frame < _frames);
+            DYN_ASSERT(channel < _channels);
             return _container[(channel * _frames) + frame];
         }
     };

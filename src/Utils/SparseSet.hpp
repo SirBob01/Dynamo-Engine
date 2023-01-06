@@ -182,7 +182,8 @@ namespace Dynamo {
          * @return T&
          */
         inline T &at(int index) {
-            DYN_ASSERT(index >= 0 && index < _pool.size());
+            DYN_ASSERT(index >= 0);
+            DYN_ASSERT(index < _pool.size());
             return _pool[index];
         }
 

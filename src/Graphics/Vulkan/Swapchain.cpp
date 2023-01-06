@@ -1,8 +1,8 @@
 #include "./Swapchain.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    Swapchain::Swapchain(Display &display,
-                         Device &device,
+    Swapchain::Swapchain(Device &device,
+                         Display &display,
                          vk::SurfaceKHR surface) :
         _device(device) {
         PhysicalDevice &physical = device.get_physical();
