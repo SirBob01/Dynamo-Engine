@@ -1,10 +1,5 @@
 #pragma once
 #define GLFW_INCLUDE_VULKAN
-#ifndef NDEBUG
-#define VK_DEBUG true
-#else
-#define VK_DEBUG false
-#endif
 
 #include <memory>
 #include <unordered_set>
@@ -12,11 +7,12 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Log/Log.hpp"
 #include "../Renderer.hpp"
+#include "./Allocator.hpp"
 #include "./Debugger.hpp"
 #include "./Device.hpp"
 #include "./Image.hpp"
-#include "./ImageAllocator.hpp"
 #include "./PhysicalDevice.hpp"
 #include "./Swapchain.hpp"
 
@@ -30,7 +26,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::UniqueSurfaceKHR _surface;
 
         std::unique_ptr<Device> _device;
-        std::unique_ptr<ImageAllocator> _image_allocator;
+        std::unique_ptr<Allocator> _allocator;
         std::unique_ptr<Swapchain> _swapchain;
 
         std::unique_ptr<UserImage> _depth_image;
@@ -91,10 +87,10 @@ namespace Dynamo::Graphics::Vulkan {
         void create_device();
 
         /**
-         * @brief Create the memory allocators
+         * @brief Create the memory allocator
          *
          */
-        void create_memory_allocators();
+        void create_allocator();
 
         /**
          * @brief Create the swapchain

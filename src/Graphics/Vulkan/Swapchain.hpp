@@ -56,11 +56,11 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Construct a new Swapchain object
          *
-         * @param display
-         * @param device
-         * @param surface
+         * @param device  Reference to the logical device
+         * @param display Reference to the display window
+         * @param surface Vulkan surface handle
          */
-        Swapchain(Display &display, Device &device, vk::SurfaceKHR surface);
+        Swapchain(Device &device, Display &display, vk::SurfaceKHR surface);
 
         /**
          * @brief Destroy the Swapchain object

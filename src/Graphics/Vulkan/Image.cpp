@@ -46,6 +46,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     UserImage::UserImage(Device &device,
+                         Allocator &allocator,
                          unsigned width,
                          unsigned height,
                          unsigned depth,
@@ -64,7 +65,18 @@ namespace Dynamo::Graphics::Vulkan {
               format,
               type,
               tiling,
-              usage) {}
+              usage) {
+        std::optional<Allocation> allocation =
+            allocator.allocate(get_memory_requirements(),
+                               vk::MemoryPropertyFlagBits::eDeviceLocal);
+        if (!allocation.has_value()) {
+            Log::error("Unable to allocate memory for the Vulkan image.");
+        }
+        _device.get().get_handle().bindImageMemory(
+            _handle,
+            allocation.value().memory.get().get_handle(),
+            allocation.value().offset);
+    }
 
     UserImage::~UserImage() {
         _device.get().get_handle().destroyImage(_handle);

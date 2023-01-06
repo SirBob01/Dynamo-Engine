@@ -7,7 +7,7 @@ namespace Dynamo::Graphics::Vulkan {
         create_surface();
 
         create_device();
-        create_memory_allocators();
+        create_allocator();
         create_swapchain();
 
         create_depth_buffer();
@@ -24,16 +24,16 @@ namespace Dynamo::Graphics::Vulkan {
             _extensions.push_back(extensions[i]);
         }
 
-        // Enable validation layers if on debug mode
-        if (VK_DEBUG) {
-            _validation_layers.push_back("VK_LAYER_KHRONOS_validation");
-            _extensions.push_back("VK_EXT_debug_utils");
-            Log::info("--- Vulkan Extensions ---");
-            for (const char *extension : _extensions) {
-                Log::info("* {}", extension);
-            }
-            Log::info("");
+#ifdef DYN_DEBUG
+        // Enable validation layers on debug mode
+        _validation_layers.push_back("VK_LAYER_KHRONOS_validation");
+        _extensions.push_back("VK_EXT_debug_utils");
+        Log::info("--- Vulkan Extensions ---");
+        for (const char *extension : _extensions) {
+            Log::info("* {}", extension);
         }
+        Log::info("");
+#endif
     }
 
     bool Renderer::is_supporting_layers() {
@@ -49,9 +49,11 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Renderer::create_instance() {
-        if (!is_supporting_layers() && VK_DEBUG) {
+#ifdef DYN_DEBUG
+        if (!is_supporting_layers()) {
             Log::error("Requested Vulkan validation layers unavailable.");
         }
+#endif
 
         // Setup the application and Vulkan instance
         vk::ApplicationInfo app_info;
@@ -72,21 +74,19 @@ namespace Dynamo::Graphics::Vulkan {
         instance_info.enabledExtensionCount = _extensions.size();
         instance_info.ppEnabledExtensionNames = _extensions.data();
 
+#ifdef DYN_DEBUG
         // Include more validation layers on debug mode
         std::vector<vk::ValidationFeatureEnableEXT> layer_extensions = {
             vk::ValidationFeatureEnableEXT::eBestPractices,
             vk::ValidationFeatureEnableEXT::eDebugPrintf,
         };
         vk::ValidationFeaturesEXT features_info(layer_extensions);
-        if (VK_DEBUG) {
-            instance_info.pNext = &features_info;
-        }
+        instance_info.pNext = &features_info;
+#endif
 
-        // Create the instance and, if necessary, the debugger
+        // Create the instance and debugger
         _instance = vk::createInstanceUnique(instance_info);
-        if (VK_DEBUG) {
-            _debugger = std::make_unique<Debugger>(*_instance);
-        }
+        _debugger = std::make_unique<Debugger>(*_instance);
     }
 
     void Renderer::create_surface() {
@@ -124,36 +124,36 @@ namespace Dynamo::Graphics::Vulkan {
                 return a.calculate_score() < b.calculate_score();
             }));
 
-        if (VK_DEBUG) {
-            Log::info("--- Vulkan Physical Devices ---");
-            for (PhysicalDevice &device : physical_devices) {
-                if (device.get_handle() ==
-                    _device->get_physical().get_handle()) {
-                    Log::info("* {} | Score: {} [Selected]",
-                              device.get_name(),
-                              device.calculate_score());
-                } else {
-                    Log::info("* {} | Score: {}",
-                              device.get_name(),
-                              device.calculate_score());
-                }
+#ifdef DYN_DEBUG
+        Log::info("--- Vulkan Physical Devices ---");
+        for (PhysicalDevice &device : physical_devices) {
+            if (device.get_handle() == _device->get_physical().get_handle()) {
+                Log::info("* {} | Score: {} [Selected]",
+                          device.get_name(),
+                          device.calculate_score());
+            } else {
+                Log::info("* {} | Score: {}",
+                          device.get_name(),
+                          device.calculate_score());
             }
-            Log::info("");
         }
+        Log::info("");
+#endif
     }
 
-    void Renderer::create_memory_allocators() {
-        _image_allocator = std::make_unique<ImageAllocator>(*_device);
+    void Renderer::create_allocator() {
+        _allocator = std::make_unique<Allocator>(*_device);
     }
 
     void Renderer::create_swapchain() {
-        _swapchain = std::make_unique<Swapchain>(_display, *_device, *_surface);
+        _swapchain = std::make_unique<Swapchain>(*_device, _display, *_surface);
     }
 
     void Renderer::create_depth_buffer() {
         vk::Extent2D extent = _swapchain->get_extent();
         _depth_image = std::make_unique<UserImage>(
             *_device,
+            *_allocator,
             extent.width,
             extent.height,
             1,
@@ -163,7 +163,6 @@ namespace Dynamo::Graphics::Vulkan {
             vk::ImageType::e2D,
             vk::ImageTiling::eOptimal,
             vk::ImageUsageFlagBits::eDepthStencilAttachment);
-        _image_allocator->allocate(*_depth_image);
         _depth_view =
             std::make_unique<ImageView>(*_depth_image,
                                         vk::ImageViewType::e2D,
@@ -175,6 +174,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::Extent2D extent = _swapchain->get_extent();
         _color_image = std::make_unique<UserImage>(
             *_device,
+            *_allocator,
             extent.width,
             extent.height,
             1,
@@ -184,7 +184,6 @@ namespace Dynamo::Graphics::Vulkan {
             vk::ImageType::e2D,
             vk::ImageTiling::eOptimal,
             vk::ImageUsageFlagBits::eColorAttachment);
-        _image_allocator->allocate(*_color_image);
         _color_view =
             std::make_unique<ImageView>(*_color_image,
                                         vk::ImageViewType::e2D,

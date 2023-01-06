@@ -189,7 +189,7 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @return const vk::PhysicalDeviceMemoryProperties
          */
-        const vk::PhysicalDeviceMemoryProperties get_memory_properties() const;
+        const vk::PhysicalDeviceMemoryProperties &get_memory_properties() const;
 
         /**
          * @brief Get the anti-aliasing sample count supported by the device

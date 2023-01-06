@@ -128,7 +128,7 @@ namespace Dynamo::Graphics::Vulkan {
         return _handle.getFormatProperties(format);
     }
 
-    const vk::PhysicalDeviceMemoryProperties
+    const vk::PhysicalDeviceMemoryProperties &
     PhysicalDevice::get_memory_properties() const {
         return _memory_properties;
     }
