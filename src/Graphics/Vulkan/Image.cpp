@@ -65,24 +65,15 @@ namespace Dynamo::Graphics::Vulkan {
               format,
               type,
               tiling,
-              usage) {
-        std::optional<Allocation> result =
+              usage),
+        _allocation(
             allocator.allocate(get_memory_requirements(),
-                               vk::MemoryPropertyFlagBits::eDeviceLocal);
-        if (!result.has_value()) {
-            Log::error("Unable to allocate memory for a Vulkan image.");
-        }
-
-        _allocation = std::make_unique<Allocation>(result.value());
-        _device.get().get_handle().bindImageMemory(
-            _handle,
-            _allocation->memory.get().get_handle(),
-            _allocation->offset);
+                               vk::MemoryPropertyFlagBits::eDeviceLocal)) {
+        _allocation.bind(_handle);
     }
 
     UserImage::~UserImage() {
         _device.get().get_handle().destroyImage(_handle);
-        _allocation->memory.get().free(_allocation->offset);
     }
 
     SwapchainImage::SwapchainImage(Device &device,

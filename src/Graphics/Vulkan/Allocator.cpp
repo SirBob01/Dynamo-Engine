@@ -1,6 +1,38 @@
 #include "./Allocator.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
+    Allocation::Allocation(Memory &memory, unsigned offset, unsigned size) :
+        _memory(memory), _offset(offset), _size(size) {}
+
+    Allocation::Allocation(Allocation &&rhs) :
+        _memory(rhs._memory), _offset(rhs._offset), _size(rhs._size) {}
+
+    Allocation::~Allocation() { _memory.get().free(_offset); }
+
+    const vk::DeviceMemory &Allocation::get_handle() const {
+        return _memory.get().get_handle();
+    }
+
+    unsigned Allocation::offset() const { return _offset; }
+
+    unsigned Allocation::size() const { return _size; }
+
+    void Allocation::read(char *dst, unsigned offset, unsigned length) {
+        _memory.get().read(dst, offset + _offset, length);
+    }
+
+    void Allocation::write(char *src, unsigned offset, unsigned length) {
+        _memory.get().write(src, offset + _offset, length);
+    }
+
+    void Allocation::bind(vk::Image vkimage) {
+        _memory.get().bind(vkimage, _offset);
+    }
+
+    void Allocation::bind(vk::Buffer vkbuffer) {
+        _memory.get().bind(vkbuffer, _offset);
+    }
+
     Allocator::Allocator(Device &device) : _device(device) {}
 
     bool Allocator::is_compatible(Memory &memory,
@@ -20,18 +52,18 @@ namespace Dynamo::Graphics::Vulkan {
         return false;
     }
 
-    std::optional<Allocation>
-    Allocator::allocate(vk::MemoryRequirements requirements,
-                        vk::MemoryPropertyFlagBits properties) {
+    Allocation Allocator::allocate(vk::MemoryRequirements requirements,
+                                   vk::MemoryPropertyFlagBits properties) {
         // Look for an existing compatible pool
         for (std::unique_ptr<Memory> &memory : _pools) {
             if (is_compatible(*memory, requirements, properties)) {
-                std::optional<unsigned> offset =
+                std::optional<unsigned> result =
                     memory.get()->reserve(requirements.size,
                                           requirements.alignment);
-                if (offset.has_value()) {
-                    return std::optional<Allocation>(
-                        {std::ref(*memory), offset.value()});
+                if (result.has_value()) {
+                    return Allocation(std::ref(*memory),
+                                      result.value(),
+                                      requirements.size);
                 }
             }
         }
@@ -49,8 +81,11 @@ namespace Dynamo::Graphics::Vulkan {
         std::unique_ptr<Memory> &memory = _pools.back();
 
         // Allocate memory
-        std::optional<unsigned> offset =
+        std::optional<unsigned> result =
             memory.get()->reserve(requirements.size, requirements.alignment);
-        return std::optional<Allocation>({std::ref(*memory), offset.value()});
+        if (!result.has_value()) {
+            Log::error("Unable to allocate Vulkan memory");
+        }
+        return Allocation(std::ref(*memory), result.value(), requirements.size);
     }
 } // namespace Dynamo::Graphics::Vulkan

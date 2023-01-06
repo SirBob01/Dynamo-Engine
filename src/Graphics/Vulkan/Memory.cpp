@@ -82,6 +82,8 @@ namespace Dynamo::Graphics::Vulkan {
 
     const vk::MemoryType &Memory::get_type() const { return _type; }
 
+    Device &Memory::get_device() { return _device; }
+
     unsigned Memory::get_capacity() const { return _capacity; }
 
     void Memory::read(char *dst, unsigned offset, unsigned length) {
@@ -94,6 +96,14 @@ namespace Dynamo::Graphics::Vulkan {
         DYN_ASSERT(_mapped != nullptr);
         DYN_ASSERT(offset + length <= _capacity);
         std::memcpy(_mapped + offset, src, length);
+    }
+
+    void Memory::bind(vk::Image vkimage, unsigned offset) {
+        _device.get().get_handle().bindImageMemory(vkimage, _handle, offset);
+    }
+
+    void Memory::bind(vk::Buffer vkbuffer, unsigned offset) {
+        _device.get().get_handle().bindBufferMemory(vkbuffer, _handle, offset);
     }
 
     std::optional<unsigned> Memory::reserve(unsigned size, unsigned alignment) {
