@@ -89,7 +89,7 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class UserImage : public Image {
-        std::unique_ptr<Allocation> _allocation;
+        Allocation _allocation;
 
       public:
         /**
@@ -108,7 +108,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param usage       Usage flags
          */
         UserImage(Device &device,
-                  Allocator &memory_groups,
+                  Allocator &allocator,
                   unsigned width,
                   unsigned height,
                   unsigned depth,
