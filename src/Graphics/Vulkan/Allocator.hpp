@@ -24,13 +24,13 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Reference to the memory
          *
          */
-        std::reference_wrapper<Memory> memory;
+        const std::reference_wrapper<Memory> memory;
 
         /**
          * @brief Reserved offset within the memory
          *
          */
-        unsigned offset;
+        const unsigned offset;
     };
 
     /**

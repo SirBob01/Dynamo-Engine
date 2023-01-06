@@ -89,6 +89,8 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class UserImage : public Image {
+        std::unique_ptr<Allocation> _allocation;
+
       public:
         /**
          * @brief Construct a new UserImage object
