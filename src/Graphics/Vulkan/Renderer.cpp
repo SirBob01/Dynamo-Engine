@@ -12,6 +12,10 @@ namespace Dynamo::Graphics::Vulkan {
 
         create_depth_buffer();
         create_color_buffer();
+
+        create_sampler();
+        create_renderpass();
+        create_framebuffers();
     }
 
     Renderer::~Renderer() {}
@@ -189,5 +193,35 @@ namespace Dynamo::Graphics::Vulkan {
                                         vk::ImageViewType::e2D,
                                         vk::ImageAspectFlagBits::eColor,
                                         1);
+    }
+
+    void Renderer::create_sampler() {
+        constexpr unsigned max_lod = 3;
+        _sampler = std::make_unique<Sampler>(*_device, max_lod);
+    }
+
+    void Renderer::create_renderpass() {
+        _renderpass = std::make_unique<RenderPass>(*_device, *_swapchain);
+    }
+
+    void Renderer::create_framebuffers() {
+        for (const std::unique_ptr<ImageView> &view : _swapchain->get_views()) {
+            std::array<vk::ImageView, 3> views = {
+                _color_view->get_handle(),
+                _depth_view->get_handle(),
+                view->get_handle(),
+            };
+            vk::FramebufferCreateInfo framebuffer_info;
+            framebuffer_info.renderPass = _renderpass->get_handle();
+            framebuffer_info.attachmentCount = views.size();
+            framebuffer_info.pAttachments = views.data();
+            framebuffer_info.width = _swapchain->get_extent().width;
+            framebuffer_info.height = _swapchain->get_extent().height;
+            framebuffer_info.layers = 1;
+
+            _framebuffers.push_back(
+                _device->get_handle().createFramebufferUnique(
+                    framebuffer_info));
+        }
     }
 } // namespace Dynamo::Graphics::Vulkan

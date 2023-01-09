@@ -1,0 +1,73 @@
+#pragma once
+
+#include <array>
+#include <functional>
+#include <map>
+#include <vector>
+
+#include <vulkan/vulkan.hpp>
+
+#include "../../Log/Log.hpp"
+#include "./Device.hpp"
+#include "./ShaderModule.hpp"
+
+namespace Dynamo::Graphics::Vulkan {
+    /**
+     * @brief Wrapper class for a Vulkan pipeline layout
+     *
+     */
+    class PipelineLayout {
+        vk::PipelineLayout _handle;
+        std::reference_wrapper<Device> _device;
+
+        ShaderList _shaders;
+
+        std::vector<vk::PushConstantRange> _push_constant_ranges;
+        std::vector<vk::DescriptorSetLayout> _descriptor_set_layouts;
+
+        /**
+         * @brief Auxillary datatypes to group descriptor bindings from each
+         * shader stage by set index
+         *
+         */
+        using LayoutBindings = std::vector<vk::DescriptorSetLayoutBinding>;
+        using BindingGroups = std::map<unsigned, LayoutBindings>;
+
+      public:
+        /**
+         * @brief Construct a new PipelineLayout object
+         *
+         * @param device  Reference to the logical device
+         * @param shaders List of shader stage modules
+         */
+        PipelineLayout(Device &device, ShaderList &shaders);
+
+        /**
+         * @brief Destroy the PipelineLayout object
+         *
+         */
+        ~PipelineLayout();
+
+        /**
+         * @brief Get the handle object
+         *
+         * @return const vk::PipelineLayout&
+         */
+        const vk::PipelineLayout &get_handle() const;
+
+        /**
+         * @brief Get the shader list
+         *
+         * @return const ShaderList&
+         */
+        const ShaderList &get_shaders() const;
+
+        /**
+         * @brief Get the descriptor set layout list
+         *
+         * @return const std::vector<vk::DescriptorSetLayout>&
+         */
+        const std::vector<vk::DescriptorSetLayout> &
+        get_descriptor_set_layouts() const;
+    };
+} // namespace Dynamo::Graphics::Vulkan
