@@ -14,6 +14,8 @@
 #include "./Device.hpp"
 #include "./Image.hpp"
 #include "./PhysicalDevice.hpp"
+#include "./RenderPass.hpp"
+#include "./Sampler.hpp"
 #include "./Swapchain.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -34,6 +36,11 @@ namespace Dynamo::Graphics::Vulkan {
 
         std::unique_ptr<UserImage> _color_image;
         std::unique_ptr<ImageView> _color_view;
+
+        std::unique_ptr<Sampler> _sampler;
+        std::unique_ptr<RenderPass> _renderpass;
+
+        std::vector<vk::UniqueFramebuffer> _framebuffers;
 
         /**
          * @brief Debugger
@@ -109,6 +116,24 @@ namespace Dynamo::Graphics::Vulkan {
          *
          */
         void create_color_buffer();
+
+        /**
+         * @brief Create the image sampler
+         *
+         */
+        void create_sampler();
+
+        /**
+         * @brief Create the render pass
+         *
+         */
+        void create_renderpass();
+
+        /**
+         * @brief Create the framebuffers for each swapchain view
+         *
+         */
+        void create_framebuffers();
 
       public:
         /**

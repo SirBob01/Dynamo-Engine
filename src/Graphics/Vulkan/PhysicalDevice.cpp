@@ -133,6 +133,10 @@ namespace Dynamo::Graphics::Vulkan {
         return _memory_properties;
     }
 
+    const vk::PhysicalDeviceLimits &PhysicalDevice::get_limits() const {
+        return _properties.limits;
+    }
+
     vk::SampleCountFlagBits PhysicalDevice::get_msaa_samples() const {
         vk::SampleCountFlags counts =
             _properties.limits.framebufferColorSampleCounts;

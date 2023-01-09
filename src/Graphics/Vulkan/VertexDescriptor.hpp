@@ -11,8 +11,8 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Binding description of a Vertex
      *
      */
-    constexpr vk::VertexInputBindingDescription VERTEX_BINDING_DESCRIPTION =
-        vk::VertexInputBindingDescription(
+    static constexpr vk::VertexInputBindingDescription
+        VERTEX_BINDING_DESCRIPTION = vk::VertexInputBindingDescription(
             0,             // Index in array of bindings
             sizeof(Vertex) // Stride (memory buffer traversal)
         );
@@ -21,8 +21,8 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Attribute descriptions of a Vertex
      *
      */
-    constexpr std::array<vk::VertexInputAttributeDescription, 4>
-        VERTEX_ATTRIBUTE_DESCRIPTION = {
+    static constexpr std::array<vk::VertexInputAttributeDescription, 3>
+        VERTEX_ATTRIBUTE_DESCRIPTIONS = {
             vk::VertexInputAttributeDescription(0,
                                                 0,
                                                 vk::Format::eR32G32B32Sfloat,
