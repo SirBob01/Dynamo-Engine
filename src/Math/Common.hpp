@@ -27,4 +27,16 @@ namespace Dynamo {
         static const float factor = M_PI / 180.0;
         return deg * factor;
     }
+
+    /**
+     * @brief Linearly interpolate between a and b
+     * 
+     * @param a Start value
+     * @param b End value
+     * @param t Interpolation factor
+     * @return float 
+     */
+    inline float lerp(float a, float b, float t) {
+        return a + (b - a) * t;
+    }
 } // namespace Dynamo

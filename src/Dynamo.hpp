@@ -41,6 +41,7 @@
 #include "Math/Triangle2.hpp"
 #include "Math/Vec2.hpp"
 #include "Math/Vec3.hpp"
+#include "Math/Color.hpp"
 
 #include "Utils/Bits.hpp"
 #include "Utils/ChannelData.hpp"
