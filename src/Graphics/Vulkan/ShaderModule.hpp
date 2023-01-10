@@ -12,7 +12,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Descriptor set layout information
+     * @brief Descriptor set binding information
      *
      */
     struct DescriptorBinding {

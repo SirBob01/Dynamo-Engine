@@ -44,5 +44,6 @@ namespace Dynamo {
         _input->poll();
         _clock->tick();
         _jukebox->update();
+        _renderer->refresh();
     }
 } // namespace Dynamo

@@ -141,4 +141,27 @@ namespace Dynamo::Graphics::Vulkan {
     const vk::PresentModeKHR &Swapchain::get_present_mode() const {
         return _present_mode;
     }
+
+    std::optional<unsigned>
+    Swapchain::get_presentation_image(const Semaphore &semaphore) const {
+        vk::ResultValue<unsigned> acquired =
+            _device.get().get_handle().acquireNextImageKHR(
+                _handle,
+                UINT64_MAX,
+                semaphore.get_handle(),
+                nullptr);
+
+        switch (acquired.result) {
+        case vk::Result::eSuccess:
+            return acquired.value;
+        case vk::Result::eSuboptimalKHR:
+        case vk::Result::eErrorOutOfDateKHR:
+            return {};
+        default:
+            Log::error("Could not acquire image from the Vulkan swapchain: {}",
+                       vk::to_string(acquired.result));
+            break;
+        }
+        return acquired.value;
+    }
 } // namespace Dynamo::Graphics::Vulkan
