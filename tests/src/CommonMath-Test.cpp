@@ -30,3 +30,9 @@ TEST_CASE("To radians", "[Math]") {
     rad = 2 * M_PI;
     REQUIRE_THAT(Dynamo::to_radians(deg), Approx(rad));
 }
+
+TEST_CASE("Lerp", "[Math]") {
+    REQUIRE_THAT(Dynamo::lerp(0, 1, 0), Approx(0));
+    REQUIRE_THAT(Dynamo::lerp(0, 1, 1), Approx(1));
+    REQUIRE_THAT(Dynamo::lerp(0, 1, 0.3), Approx(0.3));
+}
