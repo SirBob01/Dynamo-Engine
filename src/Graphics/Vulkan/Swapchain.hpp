@@ -6,9 +6,11 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../../Core/Display.hpp"
+#include "../../Log/Log.hpp"
 #include "./Device.hpp"
 #include "./Image.hpp"
 #include "./ImageView.hpp"
+#include "./Semaphore.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -110,5 +112,14 @@ namespace Dynamo::Graphics::Vulkan {
          * @return const vk::PresentModeKHR&
          */
         const vk::PresentModeKHR &get_present_mode() const;
+
+        /**
+         * @brief Acquire the index to the next presentation target image
+         *
+         * @param semaphore Semaphore to signal
+         * @return std::optional<unsigned>
+         */
+        std::optional<unsigned>
+        get_presentation_image(const Semaphore &semaphore) const;
     };
 } // namespace Dynamo::Graphics::Vulkan

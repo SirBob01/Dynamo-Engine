@@ -13,6 +13,14 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
+     * @brief Auxillary datatypes to group descriptor bindings from each
+     * shader stage by set index
+     *
+     */
+    using LayoutBindings = std::vector<vk::DescriptorSetLayoutBinding>;
+    using BindingGroups = std::map<unsigned, LayoutBindings>;
+
+    /**
      * @brief Wrapper class for a Vulkan pipeline layout
      *
      */
@@ -23,15 +31,8 @@ namespace Dynamo::Graphics::Vulkan {
         ShaderList _shaders;
 
         std::vector<vk::PushConstantRange> _push_constant_ranges;
+        std::vector<LayoutBindings> _descriptor_set_bindings;
         std::vector<vk::DescriptorSetLayout> _descriptor_set_layouts;
-
-        /**
-         * @brief Auxillary datatypes to group descriptor bindings from each
-         * shader stage by set index
-         *
-         */
-        using LayoutBindings = std::vector<vk::DescriptorSetLayoutBinding>;
-        using BindingGroups = std::map<unsigned, LayoutBindings>;
 
       public:
         /**
@@ -69,5 +70,12 @@ namespace Dynamo::Graphics::Vulkan {
          */
         const std::vector<vk::DescriptorSetLayout> &
         get_descriptor_set_layouts() const;
+
+        /**
+         * @brief Get the descriptor set bindings list
+         *
+         * @return const std::vector<LayoutBindings>&
+         */
+        const std::vector<LayoutBindings> &get_descriptor_set_bindings() const;
     };
 } // namespace Dynamo::Graphics::Vulkan

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core/Display.hpp"
+#include "../Math/Color.hpp"
 
 namespace Dynamo::Graphics {
     /**
@@ -28,6 +29,18 @@ namespace Dynamo::Graphics {
          *
          */
         virtual ~Renderer() = 0;
+
+        /**
+         * @brief Refresh the renderer to update the display
+         *
+         */
+        virtual void refresh() = 0;
+
+        /**
+         * @brief Clear the display with a color
+         *
+         */
+        virtual void clear(Color color) = 0;
     };
     inline Renderer::~Renderer() = default;
 } // namespace Dynamo::Graphics

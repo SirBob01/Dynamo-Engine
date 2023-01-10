@@ -7,18 +7,27 @@ namespace Dynamo::Graphics::Vulkan {
         create_surface();
 
         create_device();
-        create_allocator();
+        create_allocators();
+
         create_swapchain();
+        create_synchronizers();
 
         create_depth_buffer();
         create_color_buffer();
 
-        create_sampler();
-        create_renderpass();
         create_framebuffers();
+        create_pipeline();
+        create_command_buffers();
+
+        clear(Color(0, 0, 0));
+        _depth_clear.depthStencil.depth = 1;
+        _depth_clear.depthStencil.stencil = 0;
     }
 
-    Renderer::~Renderer() {}
+    Renderer::~Renderer() {
+        // Wait for all queues to finish processing commands
+        _device->wait();
+    }
 
     void Renderer::enumerate_extensions() {
         // Get supported extensions from GLFW
@@ -127,6 +136,7 @@ namespace Dynamo::Graphics::Vulkan {
             [&](const PhysicalDevice &a, const PhysicalDevice &b) {
                 return a.calculate_score() < b.calculate_score();
             }));
+        _sampler = std::make_unique<Sampler>(*_device, 3);
 
 #ifdef DYN_DEBUG
         Log::info("--- Vulkan Physical Devices ---");
@@ -145,12 +155,31 @@ namespace Dynamo::Graphics::Vulkan {
 #endif
     }
 
-    void Renderer::create_allocator() {
+    void Renderer::create_allocators() {
         _allocator = std::make_unique<Allocator>(*_device);
+        _descriptor_allocator = std::make_unique<DescriptorAllocator>(*_device);
+        _graphics_command_allocator =
+            std::make_unique<CommandAllocator>(*_device, QueueFamily::Graphics);
+        _transfer_command_allocator =
+            std::make_unique<CommandAllocator>(*_device, QueueFamily::Transfer);
     }
 
     void Renderer::create_swapchain() {
         _swapchain = std::make_unique<Swapchain>(*_device, _display, *_surface);
+    }
+
+    void Renderer::create_synchronizers() {
+        _signal_image_ready.clear();
+        _signal_render_done.clear();
+        _fences.clear();
+
+        for (int i = 0; i < _max_frames_processing; i++) {
+            _signal_image_ready.push_back(
+                std::make_unique<Semaphore>(*_device));
+            _signal_render_done.push_back(
+                std::make_unique<Semaphore>(*_device));
+            _fences.push_back(std::make_unique<Fence>(*_device));
+        }
     }
 
     void Renderer::create_depth_buffer() {
@@ -195,33 +224,183 @@ namespace Dynamo::Graphics::Vulkan {
                                         1);
     }
 
-    void Renderer::create_sampler() {
-        constexpr unsigned max_lod = 3;
-        _sampler = std::make_unique<Sampler>(*_device, max_lod);
-    }
-
-    void Renderer::create_renderpass() {
-        _renderpass = std::make_unique<RenderPass>(*_device, *_swapchain);
-    }
-
     void Renderer::create_framebuffers() {
-        for (const std::unique_ptr<ImageView> &view : _swapchain->get_views()) {
-            std::array<vk::ImageView, 3> views = {
-                _color_view->get_handle(),
-                _depth_view->get_handle(),
-                view->get_handle(),
-            };
-            vk::FramebufferCreateInfo framebuffer_info;
-            framebuffer_info.renderPass = _renderpass->get_handle();
-            framebuffer_info.attachmentCount = views.size();
-            framebuffer_info.pAttachments = views.data();
-            framebuffer_info.width = _swapchain->get_extent().width;
-            framebuffer_info.height = _swapchain->get_extent().height;
-            framebuffer_info.layers = 1;
+        _renderpass = std::make_unique<RenderPass>(*_device, *_swapchain);
+        vk::Extent2D extent = _swapchain->get_extent();
 
-            _framebuffers.push_back(
-                _device->get_handle().createFramebufferUnique(
-                    framebuffer_info));
+        _framebuffers.clear();
+        for (const std::unique_ptr<ImageView> &view : _swapchain->get_views()) {
+            _framebuffers.push_back(std::make_unique<Framebuffer>(*_device,
+                                                                  extent,
+                                                                  *_renderpass,
+                                                                  *_color_view,
+                                                                  *_depth_view,
+                                                                  *view));
         }
+    }
+
+    void Renderer::create_pipeline() {
+        // Default shaders
+        _vertex_shader =
+            std::make_unique<ShaderModule>(*_device,
+                                           "vert.spv",
+                                           vk::ShaderStageFlagBits::eVertex);
+        _fragment_shader =
+            std::make_unique<ShaderModule>(*_device,
+                                           "frag.spv",
+                                           vk::ShaderStageFlagBits::eFragment);
+
+        // Create the pipeline and allocate the descriptors
+        ShaderList shaders = {
+            *_vertex_shader,
+            *_fragment_shader,
+        };
+        _pipeline_layout = std::make_unique<PipelineLayout>(*_device, shaders);
+        _pipeline =
+            std::make_unique<Pipeline>(*_device,
+                                       *_renderpass,
+                                       *_swapchain,
+                                       *_pipeline_layout,
+                                       vk::PrimitiveTopology::eTriangleList,
+                                       vk::PolygonMode::eFill);
+        _descriptor_allocator->allocate(*_pipeline_layout, *_swapchain);
+    }
+
+    void Renderer::create_command_buffers() {
+        // Define the command queues
+        _graphics_queue = _device->get_queue(QueueFamily::Graphics);
+        _transfer_queue = _device->get_queue(QueueFamily::Transfer);
+        _present_queue = _device->get_queue(QueueFamily::Present);
+
+        // Create command buffers for each family
+        _graphics_command_buffers = _graphics_command_allocator->allocate(
+            vk::CommandBufferLevel::ePrimary,
+            _framebuffers.size());
+
+        _transfer_command_buffers = _graphics_command_allocator->allocate(
+            vk::CommandBufferLevel::ePrimary,
+            1);
+    }
+
+    void Renderer::record_commands() {
+        _graphics_queue.waitIdle();
+        _graphics_command_allocator->reset(
+            vk::CommandPoolResetFlagBits::eReleaseResources);
+
+        vk::Rect2D render_area;
+        render_area.offset.x = 0;
+        render_area.offset.y = 0;
+        render_area.extent = _swapchain->get_extent();
+
+        std::array<vk::ClearValue, 2> clear_values = {
+            _color_clear,
+            _depth_clear,
+        };
+
+        vk::CommandBufferBeginInfo begin_info;
+        for (unsigned i = 0; i < _framebuffers.size(); i++) {
+            // Start recording
+            _graphics_command_buffers[i]->begin(begin_info);
+
+            // Start the render pass
+            vk::RenderPassBeginInfo render_begin_info;
+            render_begin_info.renderPass = _renderpass->get_handle();
+            render_begin_info.framebuffer = _framebuffers[i]->get_handle();
+            render_begin_info.renderArea = render_area;
+            render_begin_info.clearValueCount = clear_values.size();
+            render_begin_info.pClearValues = clear_values.data();
+
+            _graphics_command_buffers[i]->beginRenderPass(
+                render_begin_info,
+                vk::SubpassContents::eInline);
+
+            // Bind the command buffer to the graphics pipeline
+            _graphics_command_buffers[i]->bindPipeline(
+                vk::PipelineBindPoint::eGraphics,
+                _pipeline->get_handle());
+
+            // Stop recording
+            _graphics_command_buffers[i]->endRenderPass();
+            _graphics_command_buffers[i]->end();
+        }
+    }
+
+    void Renderer::reset_swapchain() {
+        // Wait for all GPU processes to finish
+        _device->wait();
+
+        // Recreate objects
+        create_swapchain();
+        create_synchronizers();
+
+        create_depth_buffer();
+        create_color_buffer();
+
+        create_framebuffers();
+        create_pipeline();
+        create_command_buffers();
+    }
+
+    void Renderer::refresh() {
+        // Record the command buffers
+        record_commands();
+
+        // Grab the next available swapchain image presentation target
+        std::optional<unsigned> acquired =
+            _swapchain->get_presentation_image(*_signal_image_ready[_frame]);
+        if (!acquired.has_value()) {
+            reset_swapchain();
+            return;
+        }
+        unsigned image_index = acquired.value();
+
+        // Wait for the fence to finish and reset before proceeding
+        _fences[_frame]->wait();
+        _fences[_frame]->reset();
+
+        // Submit commands to the graphics queue for rendering to that image
+        vk::PipelineStageFlags wait_stage =
+            vk::PipelineStageFlagBits::eColorAttachmentOutput;
+        vk::SubmitInfo submit_info;
+        submit_info.pWaitDstStageMask = &wait_stage;
+        submit_info.waitSemaphoreCount = 1;
+        submit_info.pWaitSemaphores =
+            &_signal_image_ready[_frame]->get_handle();
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers =
+            &_graphics_command_buffers[image_index].get();
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores =
+            &_signal_render_done[_frame]->get_handle();
+
+        // Render to the target attachment and signal the current fence
+        _graphics_queue.submit(submit_info, _fences[_frame]->get_handle());
+
+        // Present rendered image to the display
+        vk::PresentInfoKHR present_info;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pWaitSemaphores =
+            &_signal_render_done[_frame]->get_handle();
+        present_info.swapchainCount = 1;
+        present_info.pSwapchains = &_swapchain->get_handle();
+        present_info.pImageIndices = &image_index;
+
+        try {
+            vk::Result result = _present_queue.presentKHR(present_info);
+
+            // Sometimes, it does not throw an error
+            if (result != vk::Result::eSuccess) {
+                reset_swapchain();
+            }
+        } catch (vk::OutOfDateKHRError e) {
+            reset_swapchain();
+        }
+
+        // Advance the frame
+        _frame = (_frame + 1) % _max_frames_processing;
+    }
+
+    void Renderer::clear(Color color) {
+        _color_clear.color.setFloat32(color.to_array());
     }
 } // namespace Dynamo::Graphics::Vulkan

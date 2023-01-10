@@ -9,9 +9,14 @@
 namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Wrapper class for a Vulkan render pass that defines the
-     * relationships between different attachments (color, depth, stencil
-     * and buffers), how these attachments are loaded and stored, and their
+     * relationships between different attachments (color, depth, and stencil
+     * buffers), how these attachments are loaded and stored, and their
      * dependencies
+     *
+     * TODO: Does it make sense for this to be a class? RenderPass is a very
+     * static object with a default state. It might be better to write
+     * create_*_renderpass() functions instead if we plan to make custom
+     * passes / subpasses
      *
      */
     class RenderPass {

@@ -35,9 +35,12 @@ namespace Dynamo::Graphics::Vulkan {
             vk::DescriptorSetLayoutCreateInfo layout_info;
             layout_info.bindingCount = bindings.size();
             layout_info.pBindings = bindings.data();
-            _descriptor_set_layouts.push_back(
+
+            vk::DescriptorSetLayout layout =
                 _device.get().get_handle().createDescriptorSetLayout(
-                    layout_info));
+                    layout_info);
+            _descriptor_set_layouts.push_back(layout);
+            _descriptor_set_bindings.push_back(bindings);
         }
 
         // Create the pipeline layout
@@ -69,5 +72,10 @@ namespace Dynamo::Graphics::Vulkan {
     const std::vector<vk::DescriptorSetLayout> &
     PipelineLayout::get_descriptor_set_layouts() const {
         return _descriptor_set_layouts;
+    }
+
+    const std::vector<LayoutBindings> &
+    PipelineLayout::get_descriptor_set_bindings() const {
+        return _descriptor_set_bindings;
     }
 } // namespace Dynamo::Graphics::Vulkan
