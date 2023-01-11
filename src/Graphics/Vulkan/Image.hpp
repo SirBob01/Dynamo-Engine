@@ -4,8 +4,8 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "./Allocator.hpp"
 #include "./Device.hpp"
+#include "./MemoryPool.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -89,14 +89,14 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class UserImage : public Image {
-        Allocation _allocation;
+        MemoryBlock _block;
 
       public:
         /**
          * @brief Construct a new UserImage object
          *
          * @param device      Reference to the logical device
-         * @param allocator   Reference to the memory allocator
+         * @param memory_pool Reference to the memory pool
          * @param width       Width of the image
          * @param height      Height of the image
          * @param depth       Depth of the image (3D texture)
@@ -108,7 +108,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param usage       Usage flags
          */
         UserImage(Device &device,
-                  Allocator &allocator,
+                  MemoryPool &memory_pool,
                   unsigned width,
                   unsigned height,
                   unsigned depth,

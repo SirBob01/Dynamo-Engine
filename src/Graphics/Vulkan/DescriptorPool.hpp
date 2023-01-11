@@ -26,7 +26,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Wrapper class abstraction over Vulkan descriptor pool
      *
      */
-    class DescriptorAllocator {
+    class DescriptorPool {
         std::vector<vk::DescriptorPool> _pools;
         std::reference_wrapper<Device> _device;
 
@@ -63,21 +63,22 @@ namespace Dynamo::Graphics::Vulkan {
          */
         std::vector<vk::DescriptorSet>
         try_allocate(const vk::DescriptorSetLayout &layout,
-                     const LayoutBindings &bindings,Swapchain &swapchain);
+                     const LayoutBindings &bindings,
+                     Swapchain &swapchain);
 
       public:
         /**
-         * @brief Construct a new DescriptorAllocator object
+         * @brief Construct a new DescriptorPool object
          *
          * @param device    Reference to the logical device
          */
-        DescriptorAllocator(Device &device);
+        DescriptorPool(Device &device);
 
         /**
-         * @brief Destroy the DescriptorAllocator object
+         * @brief Destroy the DescriptorPool object
          *
          */
-        ~DescriptorAllocator();
+        ~DescriptorPool();
 
         /**
          * @brief Allocate descriptor sets grouped by layout and ordered by set

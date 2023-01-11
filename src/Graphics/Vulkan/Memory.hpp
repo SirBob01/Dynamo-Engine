@@ -7,73 +7,23 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../../Log/Log.hpp"
+#include "./Allocator.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Round up a size to be a multiple of alignment
-     *
-     * @param size      Size in bytes
-     * @param alignment Alignment in bytes
-     * @return unsigned
-     */
-    inline unsigned align_size(unsigned size, unsigned alignment) {
-        return ((size + alignment - 1) / alignment) * alignment;
-    }
-
-    /**
-     * @brief Block of reserved memory
-     *
-     */
-    struct MemoryBlock {
-        /**
-         * @brief Offset of the block within the allocated memory
-         *
-         */
-        unsigned offset;
-
-        /**
-         * @brief Size of the block in bytes
-         *
-         */
-        unsigned size;
-    };
-
-    /**
-     * @brief Wrapper class for Vulkan device memory that implements the
-     * block allocation and deallocation algorithms
-     *
-     * TODO: Improve allocator runtime complexity
+     * @brief Wrapper class for Vulkan device memory
      *
      */
     class Memory {
         vk::DeviceMemory _handle;
         std::reference_wrapper<Device> _device;
+        Allocator _allocator;
 
         vk::MemoryType _type;
         unsigned _capacity;
 
         char *_mapped;
-
-        std::list<MemoryBlock> _blocks;
-
-        /**
-         * @brief Recycle an existing block
-         *
-         * @param size
-         * @param offset
-         * @return std::optional<unsigned>
-         */
-        std::optional<unsigned> recycle_old(unsigned size, unsigned offset);
-
-        /**
-         * @brief Reserve a new block
-         *
-         * @param size
-         * @param alignment
-         * @return std::optional<unsigned>
-         */
-        std::optional<unsigned> reserve_new(unsigned size, unsigned alignment);
 
       public:
         /**

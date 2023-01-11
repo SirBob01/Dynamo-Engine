@@ -1,176 +1,81 @@
 #pragma once
 
-#include <functional>
+#include <list>
 #include <optional>
-#include <vector>
+#include <unordered_map>
 
-#include <vulkan/vulkan.hpp>
-
+#include "../../Log/Log.hpp"
 #include "../../Utils/Bits.hpp"
-#include "./Device.hpp"
-#include "./Memory.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Minimum capacity of a Memory object
+     * @brief Round up a size to be a multiple of alignment
      *
+     * @param size      Size in bytes
+     * @param alignment Alignment in bytes
+     * @return unsigned
      */
-    constexpr unsigned MINIMUM_MEMORY_CAPACITY = 256 * (1 << 20);
+    inline unsigned align_size(unsigned size, unsigned alignment) {
+        return ((size + alignment - 1) / alignment) * alignment;
+    }
 
     /**
-     * @brief Allocation exposes a similar interface to Memory for managing an
-     * underlying block of memory at an offset
-     *
-     */
-    class Allocation {
-        /**
-         * @brief Reference to the memory
-         *
-         */
-        std::reference_wrapper<Memory> _memory;
-
-        /**
-         * @brief Reserved offset within the memory
-         *
-         */
-        unsigned _offset;
-
-        /**
-         * @brief Size of the reserveed block
-         *
-         */
-        unsigned _size;
-
-      public:
-        /**
-         * @brief Construct a new Allocation object
-         *
-         * @param memory Reference to the memory
-         * @param offset Reserved block offset in bytes
-         * @param size   Reserved block size in bytes
-         */
-        Allocation(Memory &memory, unsigned offset, unsigned size);
-
-        /**
-         * @brief Move constructor
-         *
-         * @param rhs
-         */
-        Allocation(Allocation &&rhs);
-
-        /**
-         * @brief Copy constructor
-         *
-         * @param rhs
-         */
-        Allocation(Allocation &rhs) = delete;
-
-        /**
-         * @brief Destroy the Allocation object
-         *
-         */
-        ~Allocation();
-
-        /**
-         * @brief Get the handle to vk::DeviceMemory
-         *
-         * @return const vk::DeviceMemory&
-         */
-        const vk::DeviceMemory &get_handle() const;
-
-        /**
-         * @brief Get the offset
-         *
-         * @return unsigned
-         */
-        unsigned offset() const;
-
-        /**
-         * @brief Get the size of the allocation
-         *
-         * @return unsigned
-         */
-        unsigned size() const;
-
-        /**
-         * @brief Read from the underlying memory at an offset relative to this
-         * allocation
-         *
-         * @param dst    Destination buffer
-         * @param offset Offset within the memory map in bytes
-         * @param length Length of the read in bytes
-         */
-        void read(char *dst, unsigned offset, unsigned length);
-
-        /**
-         * @brief Write to the underlying memory at an offset relative to this
-         * allocation
-         *
-         * @param dst    Source buffer
-         * @param offset Offset within the memory map in bytes
-         * @param length Length of the read in bytes
-         */
-        void write(char *src, unsigned offset, unsigned length);
-
-        /**
-         * @brief Bind a vk::Image to the memory
-         *
-         * @param vkimage
-         */
-        void bind(vk::Image vkimage);
-
-        /**
-         * @brief Bind a vk::Buffer to the memory
-         *
-         * @param vkbuffer
-         */
-        void bind(vk::Buffer vkbuffer);
-    };
-
-    /**
-     * @brief Dynamic memory allocator
-     *
-     * Memory objects are grouped based on their type so allocations with
-     * desired properties can be queried
+     * @brief Implements the block allocation and deallocation strategy for
+     * dynamic heap memory management
      *
      */
     class Allocator {
-        std::reference_wrapper<Device> _device;
-
-        using Pool = std::vector<std::unique_ptr<Memory>>;
-        Pool _pools;
+        struct Block {
+            unsigned offset;
+            unsigned size;
+        };
+        std::list<Block> _free;
+        std::unordered_map<unsigned, unsigned> _used;
 
         /**
-         * @brief Check if a memory pool is compatible with the given
-         * requirements and properties
+         * @brief Join adjacent blocks
          *
-         * @param memory
-         * @param requirements
-         * @param properties
-         * @return true
-         * @return false
+         * @param it Reference block
          */
-        bool is_compatible(Memory &memory,
-                           vk::MemoryRequirements requirements,
-                           vk::MemoryPropertyFlagBits properties);
+        void defragment(std::list<Block>::iterator it);
 
       public:
         /**
          * @brief Construct a new Allocator object
          *
-         * @param device Reference to the logical device
+         * @param capacity Capacity of the heap
          */
-        Allocator(Device &device);
+        Allocator(unsigned capacity);
 
         /**
-         * @brief Allocate a block of memory with specific requirements and
-         * properties
+         * @brief Reserve a block of memory with specific alignment
+         * requirements, returning the offset within the pool.
          *
-         * @param requirements Memory requirements
-         * @param properties   Memory properties
-         * @return Allocation
+         * This find the first free block that will fit the size (with the given
+         * offset alignment) and allocate.
+         *
+         * @param size      Desired size in bytes
+         * @param alignment Alignment requirement in bytes
+         * @return std::optional<unsigned>
          */
-        Allocation allocate(vk::MemoryRequirements requirements,
-                            vk::MemoryPropertyFlagBits properties);
+        std::optional<unsigned> reserve(unsigned size, unsigned alignment);
+
+        /**
+         * @brief Free the block of reserved memory at an offset
+         *
+         * This will iterate over the free blocks and find the first one whose
+         * right boundary coincides with the allocated offset. This block and
+         * the next are then merged together, minimizing defragmentation.
+         *
+         * @param offset Offset within the pool in bytes returned by reserve()
+         */
+        void free(unsigned offset);
+
+        /**
+         * @brief Generate the human-readable string to visualize the state
+         * of the allocator (for debugging)
+         *
+         */
+        std::string print();
     };
 } // namespace Dynamo::Graphics::Vulkan

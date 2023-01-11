@@ -1,17 +1,17 @@
-#include "./DescriptorAllocator.hpp"
+#include "./DescriptorPool.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    DescriptorAllocator::DescriptorAllocator(Device &device) :
+    DescriptorPool::DescriptorPool(Device &device) :
         _device(device) {}
 
-    DescriptorAllocator::~DescriptorAllocator() {
+    DescriptorPool::~DescriptorPool() {
         for (const vk::DescriptorPool &pool : _pools) {
             _device.get().get_handle().destroyDescriptorPool(pool);
         }
     }
 
     vk::DescriptorPool
-    DescriptorAllocator::create_pool(const vk::DescriptorSetLayout &layout,
+    DescriptorPool::create_pool(const vk::DescriptorSetLayout &layout,
                                      const LayoutBindings &bindings) {
         // Determine the pool sizes from the bindings associated with the layout
         std::vector<vk::DescriptorPoolSize> pool_sizes;
@@ -33,7 +33,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     std::vector<vk::DescriptorSet>
-    DescriptorAllocator::allocate_set(const vk::DescriptorSetLayout &layout,
+    DescriptorPool::allocate_set(const vk::DescriptorSetLayout &layout,
                                       const LayoutBindings &bindings,
                                       const vk::DescriptorPool &pool,
                                       Swapchain &swapchain) {
@@ -50,7 +50,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     std::vector<vk::DescriptorSet>
-    DescriptorAllocator::try_allocate(const vk::DescriptorSetLayout &layout,
+    DescriptorPool::try_allocate(const vk::DescriptorSetLayout &layout,
                                       const LayoutBindings &bindings,
                                       Swapchain &swapchain) {
         bool found_pool = false;
@@ -77,7 +77,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     std::vector<DescriptorSetGroup>
-    DescriptorAllocator::allocate(PipelineLayout &pipeline_layout,
+    DescriptorPool::allocate(PipelineLayout &pipeline_layout,
                                   Swapchain &swapchain) {
         const std::vector<vk::DescriptorSetLayout> &layouts =
             pipeline_layout.get_descriptor_set_layouts();
@@ -95,7 +95,7 @@ namespace Dynamo::Graphics::Vulkan {
         return groups;
     }
 
-    void DescriptorAllocator::reset() {
+    void DescriptorPool::reset() {
         // Reset all active descriptor pools and move them to the inactive queue
         for (vk::DescriptorPool &pool : _pools) {
             _device.get().get_handle().resetDescriptorPool(pool);

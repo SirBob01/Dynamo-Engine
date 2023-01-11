@@ -12,25 +12,25 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Wrapper class for a Vulkan command pool
      *
      */
-    class CommandAllocator {
+    class CommandPool {
         vk::CommandPool _handle;
         std::reference_wrapper<Device> _device;
         QueueFamily _family;
 
       public:
         /**
-         * @brief Construct a new CommandAllocator object
+         * @brief Construct a new CommandPool object
          *
          * @param device Reference to the logical device
          * @param family Queue family
          */
-        CommandAllocator(Device &device, QueueFamily family);
+        CommandPool(Device &device, QueueFamily family);
 
         /**
-         * @brief Destroy the CommandAllocator object
+         * @brief Destroy the CommandPool object
          *
          */
-        ~CommandAllocator();
+        ~CommandPool();
 
         /**
          * @brief Get the handle to vk::CommandPool
