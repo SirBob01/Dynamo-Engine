@@ -25,93 +25,6 @@ namespace Dynamo::Sound {
     using WaveForm = std::vector<WaveSample>;
 
     /**
-     * @brief Frame in the audio waveform containing mono or stereo samples
-     *
-     */
-    struct WaveFrame {
-        std::array<WaveSample, 2> samples;
-        unsigned channels;
-    };
-
-    /**
-     * @brief Channels in a waveform
-     *
-     */
-    enum class Channel {
-        FL = 0,
-        FC = 1,
-        FR = 2,
-        SL = 3,
-        SR = 4,
-        BL = 5,
-        BC = 6,
-        BR = 7,
-        LFE = 8
-    };
-
-    /**
-     * @brief Order of the channels depending on number of channels
-     *
-     */
-    static const std::vector<Channel> CHANNEL_ORDERS[8] = {
-        {Channel::FC},
-        {Channel::FL, Channel::FR},
-        {Channel::FL, Channel::FC, Channel::FR},
-        {Channel::FL, Channel::FR, Channel::BL, Channel::BR},
-        {Channel::FL, Channel::FC, Channel::FR, Channel::BL, Channel::BR},
-        {Channel::FL,
-         Channel::FC,
-         Channel::FR,
-         Channel::BL,
-         Channel::BR,
-         Channel::LFE},
-        {Channel::FL,
-         Channel::FC,
-         Channel::FR,
-         Channel::BL,
-         Channel::BR,
-         Channel::BC,
-         Channel::LFE},
-        {Channel::FL,
-         Channel::FC,
-         Channel::FR,
-         Channel::SL,
-         Channel::SR,
-         Channel::BL,
-         Channel::BR,
-         Channel::LFE},
-    };
-
-    /**
-     * @brief Gain coefficients for downmixing a waveform to mono or stereo
-     *
-     */
-    static const double DOWNMIX_COEFFS[2][9][2] = {
-        {
-            {M_SQRT1_2},
-            {1},
-            {M_SQRT1_2},
-            {0.5},
-            {0.5},
-            {0.5},
-            {0.25},
-            {0.5},
-            {0.25},
-        },
-        {
-            {1, 0},
-            {M_SQRT1_2, M_SQRT1_2},
-            {0, 1},
-            {M_SQRT1_2, 0},
-            {0, M_SQRT1_2},
-            {M_SQRT1_2, 0},
-            {0.5, 0.5},
-            {0, M_SQRT1_2},
-            {0.5, 0.5},
-        },
-    };
-
-    /**
      * @brief The default sample rate is defined to be 44.1KHz
      *
      */
@@ -158,15 +71,5 @@ namespace Dynamo::Sound {
          * @return float
          */
         inline float sample_rate() const { return _sample_rate; }
-
-        /**
-         * @brief Grab a frame in the waveform and upmix or downmix to the
-         * desired number of channels
-         *
-         * @param frame        Frame index
-         * @param out_channels Target number of channels
-         * @return WaveFrame
-         */
-        WaveFrame get_frame(const unsigned frame, const unsigned out_channels);
     };
 } // namespace Dynamo::Sound
