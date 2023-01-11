@@ -4,7 +4,8 @@ namespace Dynamo::Graphics::Vulkan {
     Memory::Memory(Device &device,
                    vk::MemoryRequirements requirements,
                    vk::MemoryPropertyFlagBits properties) :
-        _device(device) {
+        _device(device),
+        _allocator(requirements.size) {
         // Find the appropriate type index
         const vk::PhysicalDeviceMemoryProperties &physical_memory =
             _device.get().get_physical().get_memory_properties();
@@ -41,43 +42,6 @@ namespace Dynamo::Graphics::Vulkan {
         _device.get().get_handle().freeMemory(_handle);
     }
 
-    std::optional<unsigned> Memory::recycle_old(unsigned size,
-                                                unsigned alignment) {
-        MemoryBlock block;
-        auto it = _blocks.begin();
-        while (it != std::prev(_blocks.end())) {
-            MemoryBlock &curr = *it;
-            MemoryBlock &next = *std::next(it);
-
-            // Find a big enough gap between existing blocks
-            block.offset = align_size(curr.offset + curr.size, alignment);
-            block.size = size;
-            if (block.offset + block.size <= next.offset) {
-                _blocks.insert(std::next(it), block);
-                return block.offset;
-            }
-        }
-        return {};
-    }
-
-    std::optional<unsigned> Memory::reserve_new(unsigned size,
-                                                unsigned alignment) {
-        MemoryBlock block;
-        if (_blocks.empty()) {
-            block.offset = 0;
-            block.size = size;
-        } else {
-            MemoryBlock &last = _blocks.back();
-            block.offset = align_size(last.offset + last.size, alignment);
-            block.size = size;
-        }
-        if (block.offset + block.size <= _capacity) {
-            _blocks.push_back(block);
-            return block.offset;
-        }
-        return {};
-    }
-
     const vk::DeviceMemory &Memory::get_handle() const { return _handle; }
 
     const vk::MemoryType &Memory::get_type() const { return _type; }
@@ -107,24 +71,8 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     std::optional<unsigned> Memory::reserve(unsigned size, unsigned alignment) {
-        std::optional<unsigned> offset = recycle_old(size, alignment);
-        if (!offset.has_value()) {
-            offset = reserve_new(size, alignment);
-        }
-        return offset;
+        return _allocator.reserve(size, alignment);
     }
 
-    void Memory::free(unsigned offset) {
-        auto it = _blocks.begin();
-        while (it != _blocks.end()) {
-            if (it->offset == offset) {
-                _blocks.erase(it);
-                return;
-            }
-            it++;
-        }
-
-        // This should never happen, free only valid offsets
-        DYN_ASSERT(false);
-    }
+    void Memory::free(unsigned offset) { return _allocator.free(offset); }
 } // namespace Dynamo::Graphics::Vulkan

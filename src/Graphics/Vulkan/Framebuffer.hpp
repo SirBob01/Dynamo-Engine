@@ -2,7 +2,6 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "./Allocator.hpp"
 #include "./Device.hpp"
 #include "./Image.hpp"
 #include "./ImageView.hpp"

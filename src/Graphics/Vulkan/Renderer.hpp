@@ -9,14 +9,14 @@
 
 #include "../../Log/Log.hpp"
 #include "../Renderer.hpp"
-#include "./Allocator.hpp"
-#include "./CommandAllocator.hpp"
+#include "./CommandPool.hpp"
 #include "./Debugger.hpp"
-#include "./DescriptorAllocator.hpp"
+#include "./DescriptorPool.hpp"
 #include "./Device.hpp"
 #include "./Fence.hpp"
 #include "./Framebuffer.hpp"
 #include "./Image.hpp"
+#include "./MemoryPool.hpp"
 #include "./PhysicalDevice.hpp"
 #include "./Pipeline.hpp"
 #include "./PipelineLayout.hpp"
@@ -40,11 +40,11 @@ namespace Dynamo::Graphics::Vulkan {
 
         std::unique_ptr<Swapchain> _swapchain;
 
-        // Allocators
-        std::unique_ptr<Allocator> _allocator;
-        std::unique_ptr<DescriptorAllocator> _descriptor_allocator;
-        std::unique_ptr<CommandAllocator> _graphics_command_allocator;
-        std::unique_ptr<CommandAllocator> _transfer_command_allocator;
+        // Pools
+        std::unique_ptr<MemoryPool> _memory_pool;
+        std::unique_ptr<DescriptorPool> _descriptor_pool;
+        std::unique_ptr<CommandPool> _graphics_command_pool;
+        std::unique_ptr<CommandPool> _transfer_command_pool;
 
         // Framebuffers
         std::unique_ptr<UserImage> _depth_image;
@@ -159,7 +159,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Create the allocators
          *
          */
-        void create_allocators();
+        void create_pools();
 
         /**
          * @brief Create the depth buffer

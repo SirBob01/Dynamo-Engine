@@ -13,9 +13,9 @@ namespace Dynamo::Fourier {
      * @brief Pre-compute the twiddle factor tables
      *
      * @param inverse Forward or inverse transform table
-     * @return constexpr std::array<Complex, 32>
+     * @return std::array<Complex, 32>
      */
-    constexpr std::array<Complex, 32> construct_twiddle_table(bool inverse) {
+    static std::array<Complex, 32> construct_twiddle_table(bool inverse) {
         std::array<Complex, 32> table;
         float sign = inverse ? 1 : -1;
         for (unsigned i = 0; i < 32; i++) {

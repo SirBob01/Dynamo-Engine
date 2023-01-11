@@ -46,7 +46,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     UserImage::UserImage(Device &device,
-                         Allocator &allocator,
+                         MemoryPool &memory_pool,
                          unsigned width,
                          unsigned height,
                          unsigned depth,
@@ -66,10 +66,9 @@ namespace Dynamo::Graphics::Vulkan {
               type,
               tiling,
               usage),
-        _allocation(
-            allocator.allocate(get_memory_requirements(),
-                               vk::MemoryPropertyFlagBits::eDeviceLocal)) {
-        _allocation.bind(_handle);
+        _block(memory_pool.allocate(get_memory_requirements(),
+                                    vk::MemoryPropertyFlagBits::eDeviceLocal)) {
+        _block.bind(_handle);
     }
 
     UserImage::~UserImage() {

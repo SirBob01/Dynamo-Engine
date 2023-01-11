@@ -7,7 +7,7 @@ namespace Dynamo::Graphics::Vulkan {
         create_surface();
 
         create_device();
-        create_allocators();
+        create_pools();
 
         create_swapchain();
         create_synchronizers();
@@ -155,13 +155,13 @@ namespace Dynamo::Graphics::Vulkan {
 #endif
     }
 
-    void Renderer::create_allocators() {
-        _allocator = std::make_unique<Allocator>(*_device);
-        _descriptor_allocator = std::make_unique<DescriptorAllocator>(*_device);
-        _graphics_command_allocator =
-            std::make_unique<CommandAllocator>(*_device, QueueFamily::Graphics);
-        _transfer_command_allocator =
-            std::make_unique<CommandAllocator>(*_device, QueueFamily::Transfer);
+    void Renderer::create_pools() {
+        _memory_pool = std::make_unique<MemoryPool>(*_device);
+        _descriptor_pool = std::make_unique<DescriptorPool>(*_device);
+        _graphics_command_pool =
+            std::make_unique<CommandPool>(*_device, QueueFamily::Graphics);
+        _transfer_command_pool =
+            std::make_unique<CommandPool>(*_device, QueueFamily::Transfer);
     }
 
     void Renderer::create_swapchain() {
@@ -186,7 +186,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::Extent2D extent = _swapchain->get_extent();
         _depth_image = std::make_unique<UserImage>(
             *_device,
-            *_allocator,
+            *_memory_pool,
             extent.width,
             extent.height,
             1,
@@ -207,7 +207,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::Extent2D extent = _swapchain->get_extent();
         _color_image = std::make_unique<UserImage>(
             *_device,
-            *_allocator,
+            *_memory_pool,
             extent.width,
             extent.height,
             1,
@@ -263,7 +263,7 @@ namespace Dynamo::Graphics::Vulkan {
                                        *_pipeline_layout,
                                        vk::PrimitiveTopology::eTriangleList,
                                        vk::PolygonMode::eFill);
-        _descriptor_allocator->allocate(*_pipeline_layout, *_swapchain);
+        _descriptor_pool->allocate(*_pipeline_layout, *_swapchain);
     }
 
     void Renderer::create_command_buffers() {
@@ -273,18 +273,18 @@ namespace Dynamo::Graphics::Vulkan {
         _present_queue = _device->get_queue(QueueFamily::Present);
 
         // Create command buffers for each family
-        _graphics_command_buffers = _graphics_command_allocator->allocate(
-            vk::CommandBufferLevel::ePrimary,
-            _framebuffers.size());
+        _graphics_command_buffers =
+            _graphics_command_pool->allocate(vk::CommandBufferLevel::ePrimary,
+                                             _framebuffers.size());
 
-        _transfer_command_buffers = _graphics_command_allocator->allocate(
-            vk::CommandBufferLevel::ePrimary,
-            1);
+        _transfer_command_buffers =
+            _graphics_command_pool->allocate(vk::CommandBufferLevel::ePrimary,
+                                             1);
     }
 
     void Renderer::record_commands() {
         _graphics_queue.waitIdle();
-        _graphics_command_allocator->reset(
+        _graphics_command_pool->reset(
             vk::CommandPoolResetFlagBits::eReleaseResources);
 
         vk::Rect2D render_area;
@@ -328,6 +328,14 @@ namespace Dynamo::Graphics::Vulkan {
     void Renderer::reset_swapchain() {
         // Wait for all GPU processes to finish
         _device->wait();
+
+        // Reset the views before image to prevent invalid references (segfault)
+        // TODO: Best to use shared_ptr or some custom refcount implementation
+        _depth_view.reset();
+        _color_view.reset();
+
+        // Free the swapchain
+        _swapchain.reset();
 
         // Recreate objects
         create_swapchain();
