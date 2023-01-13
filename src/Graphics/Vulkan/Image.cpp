@@ -13,7 +13,7 @@ namespace Dynamo::Graphics::Vulkan {
                  vk::Format format,
                  vk::ImageType type,
                  vk::ImageTiling tiling,
-                 vk::Flags<vk::ImageUsageFlagBits> usage) :
+                 vk::ImageUsageFlags usage) :
         _device(device) {
         vk::ImageCreateInfo image_info;
         image_info.imageType = type;
@@ -41,7 +41,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     vk::Format Image::get_format() { return _format; }
 
-    vk::MemoryRequirements Image::get_memory_requirements() {
+    vk::MemoryRequirements Image::get_memory_requirements() const {
         return _device.get().get_handle().getImageMemoryRequirements(_handle);
     }
 
@@ -55,7 +55,7 @@ namespace Dynamo::Graphics::Vulkan {
                          vk::Format format,
                          vk::ImageType type,
                          vk::ImageTiling tiling,
-                         vk::Flags<vk::ImageUsageFlagBits> usage) :
+                         vk::ImageUsageFlags usage) :
         Image(device,
               width,
               height,

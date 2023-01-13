@@ -2,34 +2,51 @@
 
 namespace Dynamo::Graphics::Vulkan {
     MemoryBlock::MemoryBlock(Memory &memory, unsigned offset, unsigned size) :
-        _memory(memory), _offset(offset), _size(size) {}
+        _memory(memory), _offset(offset), _size(size), _moved(false) {}
 
     MemoryBlock::MemoryBlock(MemoryBlock &&rhs) :
-        _memory(rhs._memory), _offset(rhs._offset), _size(rhs._size) {}
+        _memory(rhs._memory), _offset(rhs._offset), _size(rhs._size) {
+        rhs._moved = true;
+    }
 
-    MemoryBlock::~MemoryBlock() { _memory.get().free(_offset); }
+    MemoryBlock::~MemoryBlock() {
+        if (!_moved) {
+            _memory.get().free(_offset);
+        }
+    }
 
     const vk::DeviceMemory &MemoryBlock::get_handle() const {
+        DYN_ASSERT(!_moved);
         return _memory.get().get_handle();
     }
 
-    unsigned MemoryBlock::offset() const { return _offset; }
+    unsigned MemoryBlock::offset() const {
+        DYN_ASSERT(!_moved);
+        return _offset;
+    }
 
-    unsigned MemoryBlock::size() const { return _size; }
+    unsigned MemoryBlock::size() const {
+        DYN_ASSERT(!_moved);
+        return _size;
+    }
 
     void MemoryBlock::read(char *dst, unsigned offset, unsigned length) {
+        DYN_ASSERT(!_moved);
         _memory.get().read(dst, offset + _offset, length);
     }
 
     void MemoryBlock::write(char *src, unsigned offset, unsigned length) {
+        DYN_ASSERT(!_moved);
         _memory.get().write(src, offset + _offset, length);
     }
 
     void MemoryBlock::bind(vk::Image vkimage) {
+        DYN_ASSERT(!_moved);
         _memory.get().bind(vkimage, _offset);
     }
 
     void MemoryBlock::bind(vk::Buffer vkbuffer) {
+        DYN_ASSERT(!_moved);
         _memory.get().bind(vkbuffer, _offset);
     }
 
@@ -37,7 +54,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     bool MemoryPool::is_compatible(Memory &memory,
                                    vk::MemoryRequirements requirements,
-                                   vk::MemoryPropertyFlagBits properties) {
+                                   vk::MemoryPropertyFlags properties) {
         const vk::PhysicalDeviceMemoryProperties &physical_memory =
             _device.get().get_physical().get_memory_properties();
         unsigned index;
@@ -53,7 +70,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     MemoryBlock MemoryPool::allocate(vk::MemoryRequirements requirements,
-                                     vk::MemoryPropertyFlagBits properties) {
+                                     vk::MemoryPropertyFlags properties) {
         // Look for an existing compatible pool
         for (std::unique_ptr<Memory> &memory : _pools) {
             if (is_compatible(*memory, requirements, properties)) {
@@ -89,5 +106,12 @@ namespace Dynamo::Graphics::Vulkan {
         return MemoryBlock(std::ref(*memory),
                            result.value(),
                            requirements.size);
+    }
+
+    void MemoryBlock::operator=(MemoryBlock &&rhs) {
+        _memory = rhs._memory;
+        _offset = rhs._offset;
+        _size = rhs._size;
+        rhs._moved = true;
     }
 } // namespace Dynamo::Graphics::Vulkan

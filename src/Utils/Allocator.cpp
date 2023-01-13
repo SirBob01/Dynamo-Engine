@@ -1,7 +1,7 @@
 #include "./Allocator.hpp"
 
-namespace Dynamo::Graphics::Vulkan {
-    Allocator::Allocator(unsigned capacity) {
+namespace Dynamo {
+    Allocator::Allocator(unsigned capacity) : _capacity(capacity) {
         // Create the initial free block that encompasses the heap
         Block heap_block;
         heap_block.offset = 0;
@@ -14,49 +14,34 @@ namespace Dynamo::Graphics::Vulkan {
         Log::info("Defragmentation target: {} {}",
                   it->offset,
                   it->offset + it->size);
-        Log::info("Before: {}", print());
+        Log::info("Before defragmentation: {}", print());
 #endif
         Block block = *it;
         unsigned new_offset = block.offset;
         unsigned new_size = block.size;
 
-        // Scan left
+        // Join left node
         if (it != _free.begin()) {
-            auto l = std::prev(it);
-            unsigned left_bound = block.offset;
-            while (l->offset + l->size == left_bound) {
-                new_offset -= l->size;
-                new_size += l->size;
-                left_bound = new_offset;
-
-                // Advance backward
-                if (l != _free.begin()) {
-                    auto prev = std::prev(l);
-                    _free.erase(l);
-                    l = prev;
-                } else {
-                    _free.erase(l);
-                }
+            auto left = std::prev(it);
+            if (left->offset + left->size == block.offset) {
+                new_offset = left->offset;
+                new_size += left->size;
+                _free.erase(left);
             }
         }
 
-        // Scan right
-        if (it != _free.end()) {
-            auto r = std::next(it);
-            unsigned right_bound = block.offset + block.size;
-            while (r != _free.end() && r->offset == right_bound) {
-                new_size += r->size;
-                right_bound += r->size;
-                r = _free.erase(r);
-            }
+        // Join right node
+        auto right = std::next(it);
+        if (right != _free.end() && it->offset + it->size == right->offset) {
+            new_size += right->size;
+            _free.erase(right);
         }
 
         it->offset = new_offset;
         it->size = new_size;
 
 #ifdef DYN_DEBUG
-        Log::info("After: {}", print());
-        Log::info("");
+        Log::info("After defragmentation: {}", print());
 #endif
     }
 
@@ -100,7 +85,9 @@ namespace Dynamo::Graphics::Vulkan {
 
     void Allocator::free(unsigned offset) {
         if (_used.count(offset) == 0) {
-            Log::error("Allocator::free() failed, invalid offset.");
+            Log::error("Allocator::free() failed, invalid offset {}: {}",
+                       offset,
+                       print());
         }
 
         // New free block
@@ -146,10 +133,40 @@ namespace Dynamo::Graphics::Vulkan {
         DYN_ASSERT(false);
     }
 
-    std::string Allocator::print() {
+    void Allocator::grow(unsigned capacity) {
+#ifdef DYN_DEBUG
+        Log::info("Before grow: {}", print());
+#endif
+        DYN_ASSERT(capacity >= _capacity);
+        if (capacity == _capacity) {
+            return;
+        }
+        Block new_free;
+        new_free.offset = _capacity;
+        new_free.size = capacity - _capacity;
+        _capacity = capacity;
+
+        // Add the new free block and defragment
+        _free.push_back(new_free);
+        defragment(std::prev(_free.end()));
+
+#ifdef DYN_DEBUG
+        Log::info("After grow: {}", print());
+#endif
+    }
+
+    bool Allocator::is_reserved(unsigned offset) const {
+        return _used.count(offset) > 0;
+    }
+
+    unsigned Allocator::capacity() const { return _capacity; }
+
+    unsigned Allocator::size(unsigned offset) const { return _used.at(offset); }
+
+    std::string Allocator::print() const {
         std::string str;
         if (_free.empty()) {
-            return str;
+            return " | ******** | ";
         }
 
         // Allocation before the first free block
@@ -170,7 +187,13 @@ namespace Dynamo::Graphics::Vulkan {
             }
             it++;
         }
+
+        Block last = _free.back();
+        if (last.offset + last.size != _capacity) {
+            str += " | ********";
+        }
+
         str += " | ";
         return str;
     }
-} // namespace Dynamo::Graphics::Vulkan
+} // namespace Dynamo

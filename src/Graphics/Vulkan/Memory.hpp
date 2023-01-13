@@ -7,7 +7,7 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../../Log/Log.hpp"
-#include "./Allocator.hpp"
+#include "../../Utils/Allocator.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -35,7 +35,7 @@ namespace Dynamo::Graphics::Vulkan {
          */
         Memory(Device &device,
                vk::MemoryRequirements requirements,
-               vk::MemoryPropertyFlagBits properties);
+               vk::MemoryPropertyFlags properties);
 
         /**
          * @brief Destroy the Memory object

@@ -9,6 +9,7 @@
 
 #include "../../Log/Log.hpp"
 #include "../Renderer.hpp"
+#include "./Buffer.hpp"
 #include "./CommandPool.hpp"
 #include "./Debugger.hpp"
 #include "./DescriptorPool.hpp"
@@ -69,6 +70,11 @@ namespace Dynamo::Graphics::Vulkan {
 
         std::vector<vk::UniqueCommandBuffer> _graphics_command_buffers;
         std::vector<vk::UniqueCommandBuffer> _transfer_command_buffers;
+
+        // Buffers
+        std::unique_ptr<Buffer> _staging_buffer;
+        std::unique_ptr<Buffer> _object_buffer;
+        std::unique_ptr<Buffer> _uniform_buffer;
 
         // Synchronizers
         // Semaphores synchronize the graphic and present commands
@@ -190,6 +196,12 @@ namespace Dynamo::Graphics::Vulkan {
          *
          */
         void create_command_buffers();
+
+        /**
+         * @brief Create the buffers for reading and writing data to the GPU
+         *
+         */
+        void create_buffers();
 
         /**
          * @brief Record the draw commands

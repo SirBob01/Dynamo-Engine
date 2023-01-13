@@ -19,6 +19,8 @@ namespace Dynamo::Graphics::Vulkan {
         create_pipeline();
         create_command_buffers();
 
+        create_buffers();
+
         clear(Color(0, 0, 0));
         _depth_clear.depthStencil.depth = 1;
         _depth_clear.depthStencil.stencil = 0;
@@ -280,6 +282,49 @@ namespace Dynamo::Graphics::Vulkan {
         _transfer_command_buffers =
             _graphics_command_pool->allocate(vk::CommandBufferLevel::ePrimary,
                                              1);
+    }
+
+    void Renderer::create_buffers() {
+        // Staging buffer for memory copies
+        vk::MemoryPropertyFlags staging_memory_properties =
+            vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent |
+            vk::MemoryPropertyFlagBits::eHostCached;
+        vk::BufferUsageFlags staging_buffer_usage =
+            vk::BufferUsageFlagBits::eTransferSrc;
+        _staging_buffer = std::make_unique<Buffer>(*_device,
+                                                   *_memory_pool,
+                                                   *_transfer_command_pool,
+                                                   _transfer_queue,
+                                                   staging_buffer_usage,
+                                                   staging_memory_properties);
+
+        // Object mesh buffer
+        vk::MemoryPropertyFlags object_memory_properties =
+            vk::MemoryPropertyFlagBits::eDeviceLocal;
+        vk::BufferUsageFlags object_buffer_usage =
+            vk::BufferUsageFlagBits::eIndexBuffer |
+            vk::BufferUsageFlagBits::eVertexBuffer;
+        _object_buffer = std::make_unique<Buffer>(*_device,
+                                                  *_memory_pool,
+                                                  *_transfer_command_pool,
+                                                  _transfer_queue,
+                                                  object_buffer_usage,
+                                                  object_memory_properties);
+
+        // Uniform buffer
+        vk::MemoryPropertyFlags uniform_memory_properties =
+            vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent |
+            vk::MemoryPropertyFlagBits::eHostCached;
+        vk::BufferUsageFlags uniform_buffer_usage =
+            vk::BufferUsageFlagBits::eUniformBuffer;
+        _uniform_buffer = std::make_unique<Buffer>(*_device,
+                                                   *_memory_pool,
+                                                   *_transfer_command_pool,
+                                                   _transfer_queue,
+                                                   uniform_buffer_usage,
+                                                   uniform_memory_properties);
     }
 
     void Renderer::record_commands() {
