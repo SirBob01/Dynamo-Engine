@@ -13,9 +13,7 @@ namespace Dynamo::Graphics::Vulkan {
         _device.get().get_handle().destroyCommandPool(_handle);
     }
 
-    const vk::CommandPool &CommandPool::get_handle() const {
-        return _handle;
-    }
+    const vk::CommandPool &CommandPool::get_handle() const { return _handle; }
 
     QueueFamily CommandPool::get_family() const { return _family; }
 

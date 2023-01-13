@@ -4,10 +4,9 @@
 #include <optional>
 #include <unordered_map>
 
-#include "../../Log/Log.hpp"
-#include "../../Utils/Bits.hpp"
+#include "../Log/Log.hpp"
 
-namespace Dynamo::Graphics::Vulkan {
+namespace Dynamo {
     /**
      * @brief Round up a size to be a multiple of alignment
      *
@@ -20,8 +19,8 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     /**
-     * @brief Implements the block allocation and deallocation strategy for
-     * dynamic heap memory management
+     * @brief Implements the allocation and deallocation strategy for
+     * dynamic virtual heap memory management
      *
      */
     class Allocator {
@@ -31,6 +30,8 @@ namespace Dynamo::Graphics::Vulkan {
         };
         std::list<Block> _free;
         std::unordered_map<unsigned, unsigned> _used;
+
+        unsigned _capacity;
 
         /**
          * @brief Join adjacent blocks
@@ -51,9 +52,6 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Reserve a block of memory with specific alignment
          * requirements, returning the offset within the pool.
          *
-         * This find the first free block that will fit the size (with the given
-         * offset alignment) and allocate.
-         *
          * @param size      Desired size in bytes
          * @param alignment Alignment requirement in bytes
          * @return std::optional<unsigned>
@@ -63,19 +61,46 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Free the block of reserved memory at an offset
          *
-         * This will iterate over the free blocks and find the first one whose
-         * right boundary coincides with the allocated offset. This block and
-         * the next are then merged together, minimizing defragmentation.
-         *
          * @param offset Offset within the pool in bytes returned by reserve()
          */
         void free(unsigned offset);
+
+        /**
+         * @brief Grow the total capacity, expanding the free blocks
+         *
+         * @param capacity New capacity in bytes >= current_capacity
+         */
+        void grow(unsigned capacity);
+
+        /**
+         * @brief Check if an offset is mapped to a reserved block
+         *
+         * @param offset Offset within the pool in bytes returned by reserve()
+         * @return true
+         * @return false
+         */
+        bool is_reserved(unsigned offset) const;
+
+        /**
+         * @brief Get the capacity of the allocator
+         *
+         * @return unsigned
+         */
+        unsigned capacity() const;
+
+        /**
+         * @brief Get the size of a reserved block
+         *
+         * @param offset Offset within the pool in bytes returned by reserve()
+         * @return unsigned
+         */
+        unsigned size(unsigned offset) const;
 
         /**
          * @brief Generate the human-readable string to visualize the state
          * of the allocator (for debugging)
          *
          */
-        std::string print();
+        std::string print() const;
     };
-} // namespace Dynamo::Graphics::Vulkan
+} // namespace Dynamo

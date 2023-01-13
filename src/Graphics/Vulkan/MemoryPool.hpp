@@ -19,27 +19,16 @@ namespace Dynamo::Graphics::Vulkan {
 
     /**
      * @brief MemoryBlock exposes a similar interface to Memory for managing an
-     * underlying block of memory at an offset
+     * underlying block of memory at an offset, but is similar to
+     * std::unique_ptr in that it can only be moved and not copied
      *
      */
     class MemoryBlock {
-        /**
-         * @brief Reference to the memory
-         *
-         */
         std::reference_wrapper<Memory> _memory;
-
-        /**
-         * @brief Reserved offset within the memory
-         *
-         */
         unsigned _offset;
-
-        /**
-         * @brief Size of the reserveed block
-         *
-         */
         unsigned _size;
+
+        bool _moved;
 
       public:
         /**
@@ -57,13 +46,6 @@ namespace Dynamo::Graphics::Vulkan {
          * @param rhs
          */
         MemoryBlock(MemoryBlock &&rhs);
-
-        /**
-         * @brief Copy constructor
-         *
-         * @param rhs
-         */
-        MemoryBlock(MemoryBlock &rhs) = delete;
 
         /**
          * @brief Destroy the MemoryBlock object
@@ -123,6 +105,13 @@ namespace Dynamo::Graphics::Vulkan {
          * @param vkbuffer
          */
         void bind(vk::Buffer vkbuffer);
+
+        /**
+         * @brief Move assignment operator
+         *
+         * @param rhs
+         */
+        void operator=(MemoryBlock &&rhs);
     };
 
     /**
@@ -150,7 +139,7 @@ namespace Dynamo::Graphics::Vulkan {
          */
         bool is_compatible(Memory &memory,
                            vk::MemoryRequirements requirements,
-                           vk::MemoryPropertyFlagBits properties);
+                           vk::MemoryPropertyFlags properties);
 
       public:
         /**
@@ -169,6 +158,6 @@ namespace Dynamo::Graphics::Vulkan {
          * @return Allocation
          */
         MemoryBlock allocate(vk::MemoryRequirements requirements,
-                             vk::MemoryPropertyFlagBits properties);
+                             vk::MemoryPropertyFlags properties);
     };
 } // namespace Dynamo::Graphics::Vulkan

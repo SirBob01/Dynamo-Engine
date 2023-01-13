@@ -30,6 +30,7 @@
 
 #include "Math/Box2.hpp"
 #include "Math/Circle.hpp"
+#include "Math/Color.hpp"
 #include "Math/Common.hpp"
 #include "Math/Complex.hpp"
 #include "Math/Delaunay.hpp"
@@ -41,8 +42,8 @@
 #include "Math/Triangle2.hpp"
 #include "Math/Vec2.hpp"
 #include "Math/Vec3.hpp"
-#include "Math/Color.hpp"
 
+#include "Utils/Allocator.hpp"
 #include "Utils/Bits.hpp"
 #include "Utils/ChannelData.hpp"
 #include "Utils/IdTracker.hpp"

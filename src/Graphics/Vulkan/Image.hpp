@@ -51,7 +51,7 @@ namespace Dynamo::Graphics::Vulkan {
               vk::Format format,
               vk::ImageType type,
               vk::ImageTiling tiling,
-              vk::Flags<vk::ImageUsageFlagBits> usage);
+              vk::ImageUsageFlags usage);
         virtual ~Image() = 0;
 
         /**
@@ -80,7 +80,7 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @return vk::MemoryRequirements
          */
-        vk::MemoryRequirements get_memory_requirements();
+        vk::MemoryRequirements get_memory_requirements() const;
     };
     inline Image::~Image() = default;
 
@@ -117,7 +117,7 @@ namespace Dynamo::Graphics::Vulkan {
                   vk::Format format,
                   vk::ImageType type,
                   vk::ImageTiling tiling,
-                  vk::Flags<vk::ImageUsageFlagBits> usage);
+                  vk::ImageUsageFlags usage);
 
         /**
          * @brief Destroy the UserImage object

@@ -3,7 +3,7 @@
 namespace Dynamo::Graphics::Vulkan {
     Memory::Memory(Device &device,
                    vk::MemoryRequirements requirements,
-                   vk::MemoryPropertyFlagBits properties) :
+                   vk::MemoryPropertyFlags properties) :
         _device(device),
         _allocator(requirements.size) {
         // Find the appropriate type index
