@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include <stb_image.h>
 #include <vulkan/vulkan.hpp>
 
 #include "../../Log/Log.hpp"
@@ -26,6 +27,7 @@
 #include "./Semaphore.hpp"
 #include "./ShaderModule.hpp"
 #include "./Swapchain.hpp"
+#include "./Texture.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -69,7 +71,6 @@ namespace Dynamo::Graphics::Vulkan {
         vk::Queue _present_queue;
 
         std::vector<vk::UniqueCommandBuffer> _graphics_command_buffers;
-        std::vector<vk::UniqueCommandBuffer> _transfer_command_buffers;
 
         // Buffers
         std::unique_ptr<Buffer> _staging_buffer;
@@ -230,15 +231,23 @@ namespace Dynamo::Graphics::Vulkan {
         ~Renderer();
 
         /**
-         * @brief Update the renderer and present to the display surface
+         * @brief Create a texture from an image file
          *
+         * @param filename
+         * @return Texture
          */
-        void refresh() override;
+        Texture create_texture(std::string filename);
 
         /**
          * @brief Clear the display with a color
          *
          */
         void clear(Color color) override;
+
+        /**
+         * @brief Update the renderer and present to the display surface
+         *
+         */
+        void refresh() override;
     };
 } // namespace Dynamo::Graphics::Vulkan

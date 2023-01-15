@@ -41,6 +41,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param type        1D, 2D, or 3D
          * @param tiling      Tiling mode of the texels in-memory
          * @param usage       Usage flags
+         * @param samples     MSAA sample count
          */
         Image(Device &device,
               unsigned width,
@@ -51,7 +52,8 @@ namespace Dynamo::Graphics::Vulkan {
               vk::Format format,
               vk::ImageType type,
               vk::ImageTiling tiling,
-              vk::ImageUsageFlags usage);
+              vk::ImageUsageFlags usage,
+              vk::SampleCountFlagBits samples);
         virtual ~Image() = 0;
 
         /**
@@ -106,6 +108,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param type        1D, 2D, or 3D
          * @param tiling      Tiling mode of the texels in-memory
          * @param usage       Usage flags
+         * @param samples     MSAA sample count
          */
         UserImage(Device &device,
                   MemoryPool &memory_pool,
@@ -117,7 +120,8 @@ namespace Dynamo::Graphics::Vulkan {
                   vk::Format format,
                   vk::ImageType type,
                   vk::ImageTiling tiling,
-                  vk::ImageUsageFlags usage);
+                  vk::ImageUsageFlags usage,
+                  vk::SampleCountFlagBits samples);
 
         /**
          * @brief Destroy the UserImage object

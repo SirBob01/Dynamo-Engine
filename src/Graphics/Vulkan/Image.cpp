@@ -13,7 +13,8 @@ namespace Dynamo::Graphics::Vulkan {
                  vk::Format format,
                  vk::ImageType type,
                  vk::ImageTiling tiling,
-                 vk::ImageUsageFlags usage) :
+                 vk::ImageUsageFlags usage,
+                 vk::SampleCountFlagBits samples) :
         _device(device) {
         vk::ImageCreateInfo image_info;
         image_info.imageType = type;
@@ -25,7 +26,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         image_info.mipLevels = mip_levels;
         image_info.arrayLayers = layer_count;
-        image_info.samples = device.get_physical().get_msaa_samples();
+        image_info.samples = samples;
 
         image_info.tiling = tiling;
         image_info.usage = usage;
@@ -55,7 +56,8 @@ namespace Dynamo::Graphics::Vulkan {
                          vk::Format format,
                          vk::ImageType type,
                          vk::ImageTiling tiling,
-                         vk::ImageUsageFlags usage) :
+                         vk::ImageUsageFlags usage,
+                         vk::SampleCountFlagBits samples) :
         Image(device,
               width,
               height,
@@ -65,7 +67,8 @@ namespace Dynamo::Graphics::Vulkan {
               format,
               type,
               tiling,
-              usage),
+              usage,
+              samples),
         _block(memory_pool.allocate(get_memory_requirements(),
                                     vk::MemoryPropertyFlagBits::eDeviceLocal)) {
         _block.bind(_handle);
