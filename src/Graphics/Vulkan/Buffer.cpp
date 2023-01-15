@@ -59,8 +59,7 @@ namespace Dynamo::Graphics::Vulkan {
         new_memory.bind(new_handle);
 
         // Reset the command pool
-        _device.get().get_handle().resetCommandPool(
-            _command_pool.get().get_handle(),
+        _command_pool.get().reset(
             vk::CommandPoolResetFlagBits::eReleaseResources);
 
         // Perform the copy
@@ -145,8 +144,7 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Reset the command pool
-        _device.get().get_handle().resetCommandPool(
-            _command_pool.get().get_handle(),
+        _command_pool.get().reset(
             vk::CommandPoolResetFlagBits::eReleaseResources);
 
         // Perform the copy

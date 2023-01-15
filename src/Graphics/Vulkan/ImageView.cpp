@@ -3,7 +3,7 @@
 namespace Dynamo::Graphics::Vulkan {
     ImageView::ImageView(Image &image,
                          vk::ImageViewType type,
-                         vk::Flags<vk::ImageAspectFlagBits> aspect_mask,
+                         vk::ImageAspectFlags aspect_mask,
                          unsigned mip_levels,
                          unsigned layer_count) :
         _image(image) {

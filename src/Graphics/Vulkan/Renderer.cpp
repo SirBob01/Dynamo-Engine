@@ -197,7 +197,8 @@ namespace Dynamo::Graphics::Vulkan {
             _device->get_physical().get_depth_format(),
             vk::ImageType::e2D,
             vk::ImageTiling::eOptimal,
-            vk::ImageUsageFlagBits::eDepthStencilAttachment);
+            vk::ImageUsageFlagBits::eDepthStencilAttachment,
+            _device->get_physical().get_msaa_samples());
         _depth_view =
             std::make_unique<ImageView>(*_depth_image,
                                         vk::ImageViewType::e2D,
@@ -218,7 +219,8 @@ namespace Dynamo::Graphics::Vulkan {
             _swapchain->get_format().format,
             vk::ImageType::e2D,
             vk::ImageTiling::eOptimal,
-            vk::ImageUsageFlagBits::eColorAttachment);
+            vk::ImageUsageFlagBits::eColorAttachment,
+            _device->get_physical().get_msaa_samples());
         _color_view =
             std::make_unique<ImageView>(*_color_image,
                                         vk::ImageViewType::e2D,
@@ -278,10 +280,6 @@ namespace Dynamo::Graphics::Vulkan {
         _graphics_command_buffers =
             _graphics_command_pool->allocate(vk::CommandBufferLevel::ePrimary,
                                              _framebuffers.size());
-
-        _transfer_command_buffers =
-            _graphics_command_pool->allocate(vk::CommandBufferLevel::ePrimary,
-                                             1);
     }
 
     void Renderer::create_buffers() {
@@ -394,6 +392,31 @@ namespace Dynamo::Graphics::Vulkan {
         create_command_buffers();
     }
 
+    Texture Renderer::create_texture(std::string filename) {
+        int width, height, channels;
+        stbi_uc *raw_data = stbi_load(filename.c_str(),
+                                      &width,
+                                      &height,
+                                      &channels,
+                                      STBI_rgb_alpha);
+        std::vector<unsigned char> pixels(width * height * STBI_rgb_alpha);
+        std::copy(raw_data, raw_data + pixels.size(), pixels.data());
+        stbi_image_free(raw_data);
+
+        return Texture(pixels.data(),
+                       width,
+                       height,
+                       *_device,
+                       *_memory_pool,
+                       *_staging_buffer,
+                       *_graphics_command_pool,
+                       _graphics_queue);
+    }
+
+    void Renderer::clear(Color color) {
+        _color_clear.color.setFloat32(color.to_array());
+    }
+
     void Renderer::refresh() {
         // Record the command buffers
         record_commands();
@@ -451,9 +474,5 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Advance the frame
         _frame = (_frame + 1) % _max_frames_processing;
-    }
-
-    void Renderer::clear(Color color) {
-        _color_clear.color.setFloat32(color.to_array());
     }
 } // namespace Dynamo::Graphics::Vulkan
