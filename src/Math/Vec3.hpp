@@ -3,7 +3,7 @@
 #include <cmath>
 #include <functional>
 
-#include "Mat4.hpp"
+#include "Matrix.hpp"
 
 namespace Dynamo {
     /**
@@ -143,7 +143,7 @@ namespace Dynamo {
         inline Vec3 &normalize() { return *this /= length(); }
 
         /**
-         * @brief Apply a transform with a 3x3 matrix
+         * @brief Apply a transform with a 4x4 matrix
          *
          * @param mat
          * @return Vec3&

@@ -97,7 +97,7 @@ TEST_CASE("Vec3 normalize", "[Vec3]") {
 
 TEST_CASE("Vec3 transform", "[Vec3]") {
     Dynamo::Vec3 a(1, 2, 2);
-    Dynamo::Mat4 mat;
+    Dynamo::Matrix<4> mat;
     a.transform(mat);
     REQUIRE(a.x == 1);
     REQUIRE(a.y == 2);
