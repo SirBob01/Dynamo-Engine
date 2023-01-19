@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RuntimeFlag.hpp"
+#include "ApplicationFlag.hpp"
 
 #include "../Core/Clock.hpp"
 #include "../Core/Core.hpp"
@@ -17,11 +17,47 @@
 
 namespace Dynamo {
     /**
+     * @brief Application startup configuration options
+     *
+     */
+    struct ApplicationConfiguration {
+        /**
+         * @brief Title of the display
+         *
+         */
+        std::string title;
+
+        /**
+         * @brief Width of the display
+         *
+         */
+        unsigned width;
+
+        /**
+         * @brief Height of the display
+         *
+         */
+        unsigned height;
+
+        /**
+         * @brief Runtime settings
+         *
+         */
+        ApplicationFlag flags = ApplicationFlag::None;
+
+        /**
+         * @brief Root asset directory
+         *
+         */
+        std::string asset_directory;
+    };
+
+    /**
      * @brief Main runtime synchronizes the game loop, rendering, sound, and
      * scenes
      *
      */
-    class Runtime {
+    class Application {
         std::unique_ptr<Display> _display;
         std::unique_ptr<Input> _input;
         std::unique_ptr<Clock> _clock;
@@ -31,25 +67,19 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Construct a new Runtime object
+         * @brief Construct a new Application object
          *
-         * @param title  Title of the window
-         * @param width  Initial width of the display (0 if width of screen)
-         * @param height Initial height of the display (0 if height of screen)
-         * @param flags  Initial configuration settings
+         * @param config Initialization options
          */
-        Runtime(std::string title,
-                int width = 0,
-                int height = 0,
-                RuntimeFlag flags = RuntimeFlag::None);
+        Application(ApplicationConfiguration config);
 
         /**
-         * @brief Destroy the Runtime object
+         * @brief Destroy the Application object
          *
          * This will clean up the scenes and the GLFW instance
          *
          */
-        ~Runtime();
+        ~Application();
 
         /**
          * @brief Get the core modules

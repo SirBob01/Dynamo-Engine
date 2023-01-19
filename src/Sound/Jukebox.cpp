@@ -1,7 +1,8 @@
 #include "Jukebox.hpp"
 
 namespace Dynamo::Sound {
-    Jukebox::Jukebox() {
+    Jukebox::Jukebox(const std::string asset_directory) :
+        _assets(asset_directory) {
         _volume = 1.0f;
 
         // Initialize state
@@ -346,20 +347,18 @@ namespace Dynamo::Sound {
         _volume = std::clamp(volume, 0.0f, 1.0f);
     }
 
-    SoundManager &Jukebox::get_sound_assets() { return _assets; }
+    SoundCache &Jukebox::get_sounds() { return _assets; }
 
     ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
     void Jukebox::play(Asset<Sound> &sound, StaticMaterial &material) {
-        Sound &data = _assets.get(sound);
         float frame = _output_state.sample_rate * material.start_seconds;
-        _static_chunks.push_back({data, material, frame});
+        _static_chunks.push_back({*sound, material, frame});
     }
 
     void Jukebox::play(Asset<Sound> &sound, DynamicMaterial &material) {
-        Sound &data = _assets.get(sound);
         float frame = _output_state.sample_rate * material.start_seconds;
-        _dynamic_chunks.push_back({data, material, frame});
+        _dynamic_chunks.push_back({*sound, material, frame});
     }
 
     void Jukebox::update() {
