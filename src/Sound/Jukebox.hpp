@@ -15,14 +15,14 @@
 #include "../Utils/SparseSet.hpp"
 
 #include "./Chunk.hpp"
+#include "./Device.hpp"
 #include "./Filters/Binaural.hpp"
 #include "./Filters/Filter.hpp"
 #include "./HRTF.hpp"
 #include "./Listener.hpp"
-#include "./Sound.hpp"
-#include "./Device.hpp"
-#include "./SoundManager.hpp"
 #include "./Material.hpp"
+#include "./Sound.hpp"
+#include "./SoundCache.hpp"
 
 namespace Dynamo::Sound {
     /**
@@ -45,7 +45,7 @@ namespace Dynamo::Sound {
      *
      */
     class Jukebox {
-        SoundManager _assets;
+        SoundCache _assets;
         PaStream *_input_stream;
         PaStream *_output_stream;
 
@@ -168,8 +168,9 @@ namespace Dynamo::Sound {
         /**
          * @brief Construct a new Jukebox object
          *
+         * @param asset_directory Root asset directory
          */
-        Jukebox();
+        Jukebox(const std::string asset_directory);
 
         /**
          * @brief Destroy the Jukebox object
@@ -259,11 +260,11 @@ namespace Dynamo::Sound {
         void set_volume(float volume);
 
         /**
-         * @brief Get the sound asset manager
+         * @brief Get the sound asset cache
          *
-         * @return SoundManager&
+         * @return SoundCache&
          */
-        SoundManager &get_sound_assets();
+        SoundCache &get_sounds();
 
         /**
          * @brief Get the set of listeners

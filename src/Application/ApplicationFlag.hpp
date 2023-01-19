@@ -5,7 +5,7 @@ namespace Dynamo {
      * @brief Customizable flags for initializing the engine
      *
      */
-    enum class RuntimeFlag : unsigned {
+    enum class ApplicationFlag : unsigned {
         /**
          * @brief None
          *
@@ -32,7 +32,7 @@ namespace Dynamo {
      * @param rhs
      * @return unsigned
      */
-    inline unsigned operator&(RuntimeFlag lhs, RuntimeFlag rhs) {
+    inline unsigned operator&(ApplicationFlag lhs, ApplicationFlag rhs) {
         using T = unsigned;
         return static_cast<T>(lhs) & static_cast<T>(rhs);
     }
@@ -42,11 +42,11 @@ namespace Dynamo {
      *
      * @param lhs
      * @param rhs
-     * @return RuntimeFlag
+     * @return ApplicationFlag
      */
-    inline RuntimeFlag operator|(RuntimeFlag lhs, RuntimeFlag rhs) {
+    inline ApplicationFlag operator|(ApplicationFlag lhs, ApplicationFlag rhs) {
         using T = unsigned;
-        return static_cast<RuntimeFlag>(static_cast<T>(lhs) |
+        return static_cast<ApplicationFlag>(static_cast<T>(lhs) |
                                        static_cast<T>(rhs));
     }
 
@@ -55,9 +55,9 @@ namespace Dynamo {
      *
      * @param lhs
      * @param rhs
-     * @return RuntimeFlag
+     * @return ApplicationFlag
      */
-    inline RuntimeFlag operator|=(RuntimeFlag &lhs, RuntimeFlag rhs) {
+    inline ApplicationFlag operator|=(ApplicationFlag &lhs, ApplicationFlag rhs) {
         lhs = lhs | rhs;
         return lhs;
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Runtime/Runtime.hpp"
+#include "Application/Application.hpp"
 
 #include "Core/Clock.hpp"
 #include "Core/Core.hpp"
@@ -23,10 +23,10 @@
 #include "Sound/Material.hpp"
 #include "Sound/Resample.hpp"
 #include "Sound/Sound.hpp"
-#include "Sound/SoundManager.hpp"
+#include "Sound/SoundCache.hpp"
 
 #include "Asset/Asset.hpp"
-#include "Asset/AssetManager.hpp"
+#include "Asset/AssetCache.hpp"
 
 #include "Math/Box2.hpp"
 #include "Math/Circle.hpp"

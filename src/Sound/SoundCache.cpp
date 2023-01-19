@@ -1,10 +1,13 @@
-#include "SoundManager.hpp"
+#include "SoundCache.hpp"
 
 namespace Dynamo::Sound {
-    Asset<Sound> SoundManager::load_file(const std::string filename) {
-        SndfileHandle file(filename.c_str());
+    SoundCache::SoundCache(const std::string asset_directory) :
+        AssetCache<Sound>(asset_directory) {}
+
+    Sound *SoundCache::load(const std::string filepath) {
+        SndfileHandle file(filepath.c_str());
         if (file.error()) {
-            Log::error("Could not load sound file `{}`", filename);
+            Log::error("Could not load sound file `{}`", filepath);
         }
 
         unsigned frames = file.frames();
@@ -22,12 +25,6 @@ namespace Dynamo::Sound {
                 waveform[c * frames + f] = interleaved[f * channels + c];
             }
         }
-        return allocate(waveform, channels, sample_rate);
-    }
-
-    Asset<Sound> SoundManager::load_raw(const WaveForm waveform,
-                                        const unsigned channels,
-                                        const float sample_rate) {
-        return allocate(waveform, channels, sample_rate);
+        return new Sound(waveform, channels, sample_rate);
     }
 } // namespace Dynamo::Sound
