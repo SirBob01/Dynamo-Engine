@@ -7,8 +7,8 @@ namespace Dynamo::Sound {
                         Sound &dst_buffer) {
         // Calculate azimuth and elevation angles
         Vec3 disp = source_position - listener_position;
-        float azimuth = std::asin(disp.x / disp.length());
-        float elevation = std::atan2(-disp.z, disp.y);
+        f32 azimuth = std::asin(disp.x / disp.length());
+        f32 elevation = std::atan2(-disp.z, disp.y);
         if (disp.y < 0 && disp.z < 0) {
             elevation += 2 * M_PI;
         }
@@ -28,8 +28,8 @@ namespace Dynamo::Sound {
                 Sound &ir2 = HRIR_MAP[triangle.c];
 
                 // Use barycentric coordinates to interpolate samples
-                for (unsigned c = 0; c < dst_buffer.channels(); c++) {
-                    for (unsigned f = 0; f < dst_buffer.frames(); f++) {
+                for (u32 c = 0; c < dst_buffer.channels(); c++) {
+                    for (u32 f = 0; f < dst_buffer.frames(); f++) {
                         dst_buffer[c][f] = ir0[c][f] * coords.x +
                                            ir1[c][f] * coords.y +
                                            ir2[c][f] * coords.z;

@@ -18,7 +18,7 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<tinyobj::material_t> materials;
         std::string warning, error;
 
-        bool result = tinyobj::LoadObj(&attrib,
+        b8 result = tinyobj::LoadObj(&attrib,
                                        &shapes,
                                        &materials,
                                        &warning,
@@ -29,7 +29,7 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Calculate the index array
-        std::unordered_map<Vertex, unsigned> unique_vertices;
+        std::unordered_map<Vertex, u32> unique_vertices;
         for (const tinyobj::shape_t &shape : shapes) {
             for (const tinyobj::index_t &index : shape.mesh.indices) {
                 Vertex vert;

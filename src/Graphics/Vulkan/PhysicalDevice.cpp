@@ -14,7 +14,7 @@ namespace Dynamo::Graphics::Vulkan {
         _extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
         // Enable portability subset extension if available
-        const char *portability_ext = "VK_KHR_portability_subset";
+        const i8 *portability_ext = "VK_KHR_portability_subset";
         for (vk::ExtensionProperties &ext :
              _handle.enumerateDeviceExtensionProperties()) {
             if (!std::strcmp(ext.extensionName, portability_ext)) {
@@ -26,13 +26,13 @@ namespace Dynamo::Graphics::Vulkan {
         get_swapchain_options();
     }
 
-    bool PhysicalDevice::is_complete() const {
+    b8 PhysicalDevice::is_complete() const {
         return _graphics_queue_properties.count > 0 &&
                _present_queue_properties.count > 0 &&
                _transfer_queue_properties.count > 0;
     }
 
-    bool PhysicalDevice::is_supporting_extensions() const {
+    b8 PhysicalDevice::is_supporting_extensions() const {
         auto available = _handle.enumerateDeviceExtensionProperties();
         std::unordered_set<std::string> required(_extensions.begin(),
                                                  _extensions.end());
@@ -43,14 +43,14 @@ namespace Dynamo::Graphics::Vulkan {
         return required.empty();
     }
 
-    bool PhysicalDevice::is_supporting_swapchain() const {
+    b8 PhysicalDevice::is_supporting_swapchain() const {
         return !_swapchain_options.formats.empty() &&
                !_swapchain_options.present_modes.empty();
     }
 
     void PhysicalDevice::enumerate_command_queues() {
         auto families = _handle.getQueueFamilyProperties();
-        unsigned index = 0;
+        u32 index = 0;
         for (vk::QueueFamilyProperties &family : families) {
             // Dedicated presentation queue
             if (_handle.getSurfaceSupportKHR(index, _surface)) {
@@ -94,7 +94,7 @@ namespace Dynamo::Graphics::Vulkan {
         return _properties.deviceName;
     }
 
-    const std::vector<const char *> &PhysicalDevice::get_extensions() const {
+    const std::vector<const i8 *> &PhysicalDevice::get_extensions() const {
         return _extensions;
     }
 
@@ -183,8 +183,8 @@ namespace Dynamo::Graphics::Vulkan {
         return query[0];
     }
 
-    int PhysicalDevice::calculate_score() const {
-        int score = 0;
+    i32 PhysicalDevice::calculate_score() const {
+        i32 score = 0;
 
         // Ensure all necessary features are present
         if (!is_complete() || !is_supporting_extensions() ||

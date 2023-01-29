@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../Types.hpp"
 #include "./Filter.hpp"
 
 namespace Dynamo::Sound {
@@ -19,21 +20,21 @@ namespace Dynamo::Sound {
          * @brief Minimum distance to attenuate
          *
          */
-        float _inner_radius;
+        f32 _inner_radius;
 
         /**
          * @brief Maximum distance to attenuate where the audio is cutoff
          *
          */
-        float _cutoff_radius;
+        f32 _cutoff_radius;
 
         /**
          * @brief Linear attenuation function
          *
          * @param distance
-         * @return float
+         * @return f32
          */
-        float linear(float distance);
+        f32 linear(f32 distance);
 
       public:
         /**
@@ -42,11 +43,11 @@ namespace Dynamo::Sound {
          * @param inner_radius  Minimum distance to start attenuation
          * @param cutoff_radius Maximum distance to cutoff the sound
          */
-        Attenuation(float inner_radius, float cutoff_radius);
+        Attenuation(f32 inner_radius, f32 cutoff_radius);
 
         Sound &apply(Sound &src,
-                     const unsigned src_offset,
-                     const unsigned length,
+                     const u32 src_offset,
+                     const u32 length,
                      const DynamicMaterial &material,
                      const ListenerProperties &listener) override;
     };

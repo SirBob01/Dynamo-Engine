@@ -3,14 +3,16 @@
 #include <cmath>
 #include <functional>
 
+#include "../Types.hpp"
+
 namespace Dynamo {
     /**
      * @brief Complex number with real and imaginary components
      *
      */
     struct Complex {
-        float re;
-        float im;
+        f32 re;
+        f32 im;
 
         /**
          * @brief Construct a new Complex object
@@ -18,21 +20,21 @@ namespace Dynamo {
          * @param re Real part
          * @param im Imaginary part
          */
-        constexpr Complex(float re = 0, float im = 0) : re(re), im(im) {}
+        constexpr Complex(f32 re = 0, f32 im = 0) : re(re), im(im) {}
 
         /**
          * @brief Calculate the square length
          *
-         * @return float
+         * @return f32
          */
-        inline float length_squared() const { return re * re + im * im; }
+        inline f32 length_squared() const { return re * re + im * im; }
 
         /**
          * @brief Calculate the length
          *
-         * @return float
+         * @return f32
          */
-        inline float length() const { return std::sqrt(length_squared()); }
+        inline f32 length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Calculate the reciprocal of the complex number for use in
@@ -41,7 +43,7 @@ namespace Dynamo {
          * @return Complex
          */
         inline Complex reciprocal() const {
-            float scale = 1.0 / length_squared();
+            f32 scale = 1.0 / length_squared();
             return Complex(re * scale, -im * scale);
         }
 
@@ -63,7 +65,7 @@ namespace Dynamo {
          * @return Complex
          */
         inline Complex exp() const {
-            float scale = std::exp(re);
+            f32 scale = std::exp(re);
             return Complex(scale * std::cos(im), scale * std::sin(im));
         }
 
@@ -101,8 +103,8 @@ namespace Dynamo {
          * @return Complex
          */
         inline Complex operator*(const Complex &rhs) const {
-            float n_re = re * rhs.re - im * rhs.im;
-            float n_im = re * rhs.im + im * rhs.re;
+            f32 n_re = re * rhs.re - im * rhs.im;
+            f32 n_im = re * rhs.im + im * rhs.re;
             return Complex(n_re, n_im);
         }
 
@@ -112,7 +114,7 @@ namespace Dynamo {
          * @param scalar
          * @return Complex
          */
-        inline Complex operator*(float scalar) const {
+        inline Complex operator*(f32 scalar) const {
             return Complex(scalar * re, scalar * im);
         }
 
@@ -132,8 +134,8 @@ namespace Dynamo {
          * @param scalar
          * @return Complex
          */
-        inline Complex operator/(float scalar) const {
-            float inv = 1.0 / scalar;
+        inline Complex operator/(f32 scalar) const {
+            f32 inv = 1.0 / scalar;
             return *this * inv;
         }
 
@@ -168,8 +170,8 @@ namespace Dynamo {
          * @return Complex&
          */
         inline Complex &operator*=(const Complex &rhs) {
-            float n_re = re * rhs.re - im * rhs.im;
-            float n_im = re * rhs.im + im * rhs.re;
+            f32 n_re = re * rhs.re - im * rhs.im;
+            f32 n_im = re * rhs.im + im * rhs.re;
             re = n_re;
             im = n_im;
             return *this;
@@ -181,7 +183,7 @@ namespace Dynamo {
          * @param scalar
          * @return Complex&
          */
-        inline Complex &operator*=(float scalar) {
+        inline Complex &operator*=(f32 scalar) {
             re *= scalar;
             im *= scalar;
             return *this;
@@ -204,8 +206,8 @@ namespace Dynamo {
          * @param scalar
          * @return Complex&
          */
-        inline Complex &operator/=(float scalar) {
-            float inv = 1.0 / scalar;
+        inline Complex &operator/=(f32 scalar) {
+            f32 inv = 1.0 / scalar;
             return *this *= inv;
         }
 
@@ -216,7 +218,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Complex &rhs) const {
+        inline b8 operator==(const Complex &rhs) const {
             return rhs.re == re && rhs.im == im;
         }
 
@@ -227,7 +229,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Complex &rhs) const {
+        inline b8 operator!=(const Complex &rhs) const {
             return !(*this == rhs);
         }
     };
@@ -241,8 +243,8 @@ namespace Dynamo {
 template <>
 struct std::hash<Dynamo::Complex> {
     inline size_t operator()(const Dynamo::Complex &complex) const {
-        long tre = complex.re * 73856093;
-        long tim = complex.im * 19349663;
+        Dynamo::i64 tre = complex.re * 73856093;
+        Dynamo::i64 tim = complex.im * 19349663;
         return tre ^ tim;
     }
 };

@@ -12,19 +12,19 @@ namespace Dynamo {
         _last_time = get_time();
     }
 
-    double Clock::get_time() { return glfwGetTime(); }
+    f64 Clock::get_time() { return glfwGetTime(); }
 
-    double Clock::get_delta() { return _delta; }
+    f64 Clock::get_delta() { return _delta; }
 
-    double Clock::get_fps() { return _fps; }
+    f64 Clock::get_fps() { return _fps; }
 
-    int Clock::get_frames() { return _frames; }
+    i32 Clock::get_frames() { return _frames; }
 
     void Clock::tick() {
         _frames++;
 
         // Calculate delta time
-        double now = glfwGetTime();
+        f64 now = glfwGetTime();
         _delta = now - _last_time;
         _last_time = now;
 

@@ -1,9 +1,9 @@
 #include "./Texture.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    Texture::Texture(unsigned char pixels[],
-                     unsigned width,
-                     unsigned height,
+    Texture::Texture(u8 pixels[],
+                     u32 width,
+                     u32 height,
                      Device &device,
                      MemoryPool &memory_pool,
                      Buffer &staging_buffer,
@@ -102,11 +102,11 @@ namespace Dynamo::Graphics::Vulkan {
         _graphics_queue.waitIdle();
     }
 
-    void Texture::copy_pixels(unsigned char pixels[], Buffer &staging_buffer) {
+    void Texture::copy_pixels(u8 pixels[], Buffer &staging_buffer) {
         // Copy the pixel data to the staging buffer
-        unsigned image_size = _width * _height * 4;
-        unsigned offset = staging_buffer.reserve(image_size, 1);
-        staging_buffer.write(reinterpret_cast<char *>(pixels),
+        u32 image_size = _width * _height * 4;
+        u32 offset = staging_buffer.reserve(image_size, 1);
+        staging_buffer.write(reinterpret_cast<i8 *>(pixels),
                              offset,
                              image_size);
         staging_buffer.free(offset);
@@ -181,9 +181,9 @@ namespace Dynamo::Graphics::Vulkan {
         begin_info.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
         _command_buffer->begin(begin_info);
 
-        unsigned mip_width = _width;
-        unsigned mip_height = _height;
-        for (unsigned i = 1; i < _mip_levels; i++) {
+        u32 mip_width = _width;
+        u32 mip_height = _height;
+        for (u32 i = 1; i < _mip_levels; i++) {
             barrier.subresourceRange.baseMipLevel = i - 1;
             barrier.oldLayout = vk::ImageLayout::eTransferDstOptimal;
             barrier.newLayout = vk::ImageLayout::eTransferSrcOptimal;

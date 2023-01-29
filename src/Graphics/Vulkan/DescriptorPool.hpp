@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./DescriptorSet.hpp"
 #include "./Device.hpp"
 #include "./PipelineLayout.hpp"
@@ -20,7 +21,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Maximum number of descriptor sets per pool
      *
      */
-    constexpr unsigned MAX_DESCRIPTOR_SETS_PER_POOL = 1000;
+    constexpr u32 MAX_DESCRIPTOR_SETS_PER_POOL = 1000;
 
     /**
      * @brief Wrapper class abstraction over Vulkan descriptor pool

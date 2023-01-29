@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Utils/Allocator.hpp"
 #include "./CommandPool.hpp"
 #include "./Device.hpp"
@@ -14,7 +15,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Initial size of a Vulkan buffer
      *
      */
-    constexpr unsigned DEFAULT_BUFFER_SIZE = (1 << 20);
+    constexpr u32 DEFAULT_BUFFER_SIZE = (1 << 20);
 
     /**
      * @brief Wrapper class of Vulkan Buffer
@@ -44,7 +45,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return vk::Buffer
          */
         static vk::Buffer create_raw_buffer(const vk::Device &device,
-                                            unsigned size,
+                                            u32 size,
                                             vk::BufferUsageFlags usage);
 
         /**
@@ -52,7 +53,7 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @param size
          */
-        void grow(unsigned size);
+        void grow(u32 size);
 
       public:
         /**
@@ -67,7 +68,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param properties     Underlying buffer memory propertes
          */
         Buffer(Device &device,
-               unsigned size,
+               u32 size,
                MemoryPool &memory_pool,
                CommandPool &command_pool,
                vk::Queue &transfer_queue,
@@ -117,30 +118,30 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @param size      Desired size in bytes
          * @param alignment Alignment requirement in bytes
-         * @return unsigned
+         * @return u32
          */
-        unsigned reserve(unsigned size, unsigned alignment);
+        u32 reserve(u32 size, u32 alignment);
 
         /**
          * @brief Free the block of reserved memory at an offset
          *
          * @param offset Offset within the buffer in bytes returned by reserve()
          */
-        void free(unsigned offset);
+        void free(u32 offset);
 
         /**
          * @brief Get the total capacity of the buffer
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned capacity() const;
+        u32 capacity() const;
 
         /**
          * @brief Get the size of a reserved memory block
          *
          * @param offset Offset within the buffer in bytes returned by reserve()
          */
-        unsigned size(unsigned offset) const;
+        u32 size(u32 offset) const;
 
         /**
          * @brief Write to the underlying memory
@@ -149,7 +150,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the buffer in bytes returned by reserve()
          * @param length Length of the write in bytes
          */
-        void write(char *src, unsigned offset, unsigned length);
+        void write(i8 *src, u32 offset, u32 length);
 
         /**
          * @brief Read from the underlying memory
@@ -158,7 +159,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the buffer in bytes returned by reserve()
          * @param length Length of the read in bytes
          */
-        void read(char *dst, unsigned offset, unsigned length);
+        void read(i8 *dst, u32 offset, u32 length);
 
         /**
          * @brief Copy the contents of a buffer block to another bufffer
@@ -169,8 +170,8 @@ namespace Dynamo::Graphics::Vulkan {
          * @param length     Length of the copy <= destination block size
          */
         void copy(Buffer &dst,
-                  unsigned src_offset,
-                  unsigned dst_offset,
-                  unsigned length);
+                  u32 src_offset,
+                  u32 dst_offset,
+                  u32 length);
     };
 } // namespace Dynamo::Graphics::Vulkan

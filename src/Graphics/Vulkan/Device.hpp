@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./PhysicalDevice.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -50,7 +51,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param index  Queue index
          * @return vk::Queue
          */
-        vk::Queue get_queue(QueueFamily family, unsigned index = 0);
+        vk::Queue get_queue(QueueFamily family, u32 index = 0);
 
         /**
          * @brief Wait for all queue operations to finish

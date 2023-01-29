@@ -7,6 +7,7 @@
 #include <spirv_reflect.h>
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
 #include "./Device.hpp"
 
@@ -16,7 +17,7 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     struct DescriptorBinding {
-        unsigned set;
+        u32 set;
         vk::DescriptorSetLayoutBinding binding;
     };
 
@@ -26,7 +27,7 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class ShaderModule {
-        std::vector<char> _bytecode;
+        std::vector<i8> _bytecode;
         std::reference_wrapper<Device> _device;
 
         std::string _filename;
@@ -79,9 +80,9 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the bytecode of the shader program
          *
-         * @return const std::vector<char>&
+         * @return const std::vector<i8>&
          */
-        const std::vector<char> &get_bytecode();
+        const std::vector<i8> &get_bytecode();
 
         /**
          * @brief Get the filename of the shader module

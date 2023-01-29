@@ -5,6 +5,7 @@
 
 #include <sndfile.hh>
 
+#include "../Types.hpp"
 #include "../Asset/AssetCache.hpp"
 #include "../Log/Log.hpp"
 #include "./Resample.hpp"

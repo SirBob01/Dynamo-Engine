@@ -4,8 +4,8 @@ namespace Dynamo::Graphics::Vulkan {
     ImageView::ImageView(Image &image,
                          vk::ImageViewType type,
                          vk::ImageAspectFlags aspect_mask,
-                         unsigned mip_levels,
-                         unsigned layer_count) :
+                         u32 mip_levels,
+                         u32 layer_count) :
         _image(image) {
         vk::ImageViewCreateInfo view_info;
         view_info.image = image.get_handle();

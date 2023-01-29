@@ -28,16 +28,16 @@ namespace Dynamo::Graphics::Vulkan {
 
     void
     ShaderModule::parse_descriptor_layouts(SpvReflectShaderModule &module) {
-        unsigned count = 0;
+        u32 count = 0;
         SpvReflectDescriptorSet *spv_sets;
         spvReflectEnumerateDescriptorSets(&module, &count, nullptr);
         spvReflectEnumerateDescriptorSets(&module, &count, &spv_sets);
 
-        for (unsigned i = 0; i < count; i++) {
+        for (u32 i = 0; i < count; i++) {
             SpvReflectDescriptorSet &spv_set = spv_sets[i];
 
             // Enumerate each binding
-            for (unsigned j = 0; j < spv_set.binding_count; j++) {
+            for (u32 j = 0; j < spv_set.binding_count; j++) {
                 SpvReflectDescriptorBinding &spv_binding = *spv_set.bindings[j];
 
                 DescriptorBinding binding;
@@ -50,8 +50,8 @@ namespace Dynamo::Graphics::Vulkan {
 
                 // Compute the descriptor count
                 binding.binding.descriptorCount = 1;
-                for (unsigned k = 0; k < spv_binding.array.dims_count; k++) {
-                    unsigned dim = spv_binding.array.dims[k];
+                for (u32 k = 0; k < spv_binding.array.dims_count; k++) {
+                    u32 dim = spv_binding.array.dims[k];
                     binding.binding.descriptorCount *= dim;
                 }
                 _descriptor_bindings.push_back(binding);
@@ -72,12 +72,12 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void ShaderModule::parse_push_constants(SpvReflectShaderModule &module) {
-        unsigned count = 0;
+        u32 count = 0;
         SpvReflectBlockVariable *blocks;
         spvReflectEnumeratePushConstantBlocks(&module, &count, nullptr);
         spvReflectEnumeratePushConstantBlocks(&module, &count, &blocks);
 
-        for (unsigned i = 0; i < count; i++) {
+        for (u32 i = 0; i < count; i++) {
             SpvReflectBlockVariable &block = blocks[i];
             vk::PushConstantRange range;
             range.stageFlags = _stage;
@@ -91,7 +91,7 @@ namespace Dynamo::Graphics::Vulkan {
                       block.name,
                       block.size,
                       block.offset);
-            for (unsigned j = 0; j < block.member_count; j++) {
+            for (u32 j = 0; j < block.member_count; j++) {
                 SpvReflectBlockVariable &member = block.members[j];
                 Log::info("* {} ({} b)", member.name, member.size);
             }
@@ -104,14 +104,14 @@ namespace Dynamo::Graphics::Vulkan {
         // Create the shader module from the file
         vk::ShaderModuleCreateInfo shader_info;
         shader_info.codeSize = _bytecode.size();
-        shader_info.pCode = reinterpret_cast<unsigned *>(_bytecode.data());
+        shader_info.pCode = reinterpret_cast<u32 *>(_bytecode.data());
 
         return _device.get().get_handle().createShaderModuleUnique(shader_info);
     }
 
     vk::ShaderStageFlagBits ShaderModule::get_stage() const { return _stage; }
 
-    const std::vector<char> &ShaderModule::get_bytecode() { return _bytecode; }
+    const std::vector<i8> &ShaderModule::get_bytecode() { return _bytecode; }
 
     const std::string &ShaderModule::get_filename() const { return _filename; }
 

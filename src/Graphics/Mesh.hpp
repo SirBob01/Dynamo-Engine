@@ -6,6 +6,7 @@
 #include <tiny_obj_loader.h>
 
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 #include "./Vertex.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -13,7 +14,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Enumeration of the different 3D file types
      *
      */
-    enum class File3D : unsigned {
+    enum class File3D : u32 {
         /**
          * @brief Wavefront Obj file
          *
@@ -27,7 +28,7 @@ namespace Dynamo::Graphics::Vulkan {
      */
     struct Mesh {
         std::vector<Vertex> vertices;
-        std::vector<unsigned> indices;
+        std::vector<u32> indices;
 
         /**
          * @brief Construct a new Mesh object

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <functional>
 
+#include "../Types.hpp"
 #include "Matrix.hpp"
 
 namespace Dynamo {
@@ -11,7 +12,7 @@ namespace Dynamo {
      *
      */
     struct Vec2 {
-        float x, y;
+        f32 x, y;
 
         /**
          * @brief Construct a new Vec2 object
@@ -19,21 +20,21 @@ namespace Dynamo {
          * @param x
          * @param y
          */
-        constexpr Vec2(float x = 0, float y = 0) : x(x), y(y) {}
+        constexpr Vec2(f32 x = 0, f32 y = 0) : x(x), y(y) {}
 
         /**
          * @brief Calculate the squared length
          *
-         * @return float
+         * @return f32
          */
-        inline float length_squared() const { return x * x + y * y; }
+        inline f32 length_squared() const { return x * x + y * y; }
 
         /**
          * @brief Calculate the length
          *
-         * @return float
+         * @return f32
          */
-        inline float length() const { return std::sqrt(length_squared()); }
+        inline f32 length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Get the left normal perpendicular to this vector
@@ -75,7 +76,7 @@ namespace Dynamo {
          * @param scalar
          * @return Vec2
          */
-        inline Vec2 operator*(float scalar) const {
+        inline Vec2 operator*(f32 scalar) const {
             return Vec2(x * scalar, y * scalar);
         }
 
@@ -85,8 +86,8 @@ namespace Dynamo {
          * @param scalar
          * @return Vec2
          */
-        inline Vec2 operator/(float scalar) const {
-            const float inv = 1.0f / scalar;
+        inline Vec2 operator/(f32 scalar) const {
+            const f32 inv = 1.0f / scalar;
             return *this * inv;
         }
 
@@ -127,7 +128,7 @@ namespace Dynamo {
          * @param scalar
          * @return Vec2&
          */
-        inline Vec2 &operator*=(float scalar) {
+        inline Vec2 &operator*=(f32 scalar) {
             x *= scalar;
             y *= scalar;
             return *this;
@@ -139,8 +140,8 @@ namespace Dynamo {
          * @param scalar
          * @return Vec2&
          */
-        inline Vec2 &operator/=(float scalar) {
-            float inv = 1.0 / scalar;
+        inline Vec2 &operator/=(f32 scalar) {
+            f32 inv = 1.0 / scalar;
             return *this *= inv;
         }
 
@@ -159,7 +160,7 @@ namespace Dynamo {
          */
         inline Vec2 &transform(const Mat3 &mat) {
             const auto &vals = mat.values;
-            float w = 1.0 / (vals[6] * x + vals[7] * y + vals[8]);
+            f32 w = 1.0 / (vals[6] * x + vals[7] * y + vals[8]);
             x = (vals[0] * x + vals[1] * y + vals[2]) * w;
             y = (vals[3] * x + vals[4] * y + vals[5]) * w;
             return *this;
@@ -169,9 +170,9 @@ namespace Dynamo {
          * @brief Dot product
          *
          * @param rhs
-         * @return float
+         * @return f32
          */
-        inline float operator*(const Vec2 &rhs) const {
+        inline f32 operator*(const Vec2 &rhs) const {
             return x * rhs.x + y * rhs.y;
         }
 
@@ -179,9 +180,9 @@ namespace Dynamo {
          * @brief 2D cross product
          *
          * @param rhs
-         * @return float
+         * @return f32
          */
-        inline float cross(const Vec2 &rhs) const {
+        inline f32 cross(const Vec2 &rhs) const {
             return x * rhs.y - y * rhs.x;
         }
 
@@ -192,7 +193,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Vec2 &rhs) const {
+        inline b8 operator==(const Vec2 &rhs) const {
             return x == rhs.x && y == rhs.y;
         }
 
@@ -203,9 +204,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Vec2 &rhs) const {
-            return !(*this == rhs);
-        }
+        inline b8 operator!=(const Vec2 &rhs) const { return !(*this == rhs); }
     };
 } // namespace Dynamo
 
@@ -217,8 +216,8 @@ namespace Dynamo {
 template <>
 struct std::hash<Dynamo::Vec2> {
     inline size_t operator()(const Dynamo::Vec2 &point) const {
-        long tx = point.x * 73856093;
-        long ty = point.y * 19349663;
+        Dynamo::i64 tx = point.x * 73856093;
+        Dynamo::i64 ty = point.y * 19349663;
         return tx ^ ty;
     }
 };

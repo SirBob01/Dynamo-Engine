@@ -1,11 +1,13 @@
 #pragma once
 
+#include "../Types.hpp"
+
 namespace Dynamo {
     /**
      * @brief Customizable flags for initializing the engine
      *
      */
-    enum class ApplicationFlag : unsigned {
+    enum class ApplicationFlag : u32 {
         /**
          * @brief None
          *
@@ -30,10 +32,10 @@ namespace Dynamo {
      *
      * @param lhs
      * @param rhs
-     * @return unsigned
+     * @return u32
      */
-    inline unsigned operator&(ApplicationFlag lhs, ApplicationFlag rhs) {
-        using T = unsigned;
+    inline u32 operator&(ApplicationFlag lhs, ApplicationFlag rhs) {
+        using T = u32;
         return static_cast<T>(lhs) & static_cast<T>(rhs);
     }
 
@@ -45,9 +47,9 @@ namespace Dynamo {
      * @return ApplicationFlag
      */
     inline ApplicationFlag operator|(ApplicationFlag lhs, ApplicationFlag rhs) {
-        using T = unsigned;
+        using T = u32;
         return static_cast<ApplicationFlag>(static_cast<T>(lhs) |
-                                       static_cast<T>(rhs));
+                                            static_cast<T>(rhs));
     }
 
     /**
@@ -57,7 +59,8 @@ namespace Dynamo {
      * @param rhs
      * @return ApplicationFlag
      */
-    inline ApplicationFlag operator|=(ApplicationFlag &lhs, ApplicationFlag rhs) {
+    inline ApplicationFlag operator|=(ApplicationFlag &lhs,
+                                      ApplicationFlag rhs) {
         lhs = lhs | rhs;
         return lhs;
     }

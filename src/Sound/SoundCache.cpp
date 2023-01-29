@@ -10,9 +10,9 @@ namespace Dynamo::Sound {
             Log::error("Could not load sound file `{}`", filepath);
         }
 
-        unsigned frames = file.frames();
-        unsigned channels = file.channels();
-        unsigned sample_rate = file.samplerate();
+        u32 frames = file.frames();
+        u32 channels = file.channels();
+        u32 sample_rate = file.samplerate();
 
         // Read the PCM data
         WaveForm interleaved(frames * channels);
@@ -20,8 +20,8 @@ namespace Dynamo::Sound {
 
         // De-interleave the data into the final waveform buffer
         WaveForm waveform(frames * channels);
-        for (unsigned f = 0; f < frames; f++) {
-            for (unsigned c = 0; c < channels; c++) {
+        for (u32 f = 0; f < frames; f++) {
+            for (u32 c = 0; c < channels; c++) {
                 waveform[c * frames + f] = interleaved[f * channels + c];
             }
         }

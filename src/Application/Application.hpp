@@ -1,19 +1,16 @@
 #pragma once
 
-#include "ApplicationFlag.hpp"
-
 #include "../Core/Clock.hpp"
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Core/Input.hpp"
-
 #include "../Graphics/Renderer.hpp"
 #include "../Graphics/Vulkan/Renderer.hpp"
-
-#include "../Sound/Jukebox.hpp"
-
 #include "../Log/Log.hpp"
+#include "../Sound/Jukebox.hpp"
+#include "../Types.hpp"
 #include "../Utils/Random.hpp"
+#include "ApplicationFlag.hpp"
 
 namespace Dynamo {
     /**
@@ -31,13 +28,13 @@ namespace Dynamo {
          * @brief Width of the display
          *
          */
-        unsigned width;
+        u32 width;
 
         /**
          * @brief Height of the display
          *
          */
-        unsigned height;
+        u32 height;
 
         /**
          * @brief Runtime settings
@@ -108,7 +105,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_running();
+        b8 is_running();
 
         /**
          * @brief Perform a single frame update

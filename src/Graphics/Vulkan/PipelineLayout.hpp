@@ -7,6 +7,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
 #include "./Device.hpp"
 #include "./ShaderModule.hpp"
@@ -18,7 +19,7 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     using LayoutBindings = std::vector<vk::DescriptorSetLayoutBinding>;
-    using BindingGroups = std::map<unsigned, LayoutBindings>;
+    using BindingGroups = std::map<u32, LayoutBindings>;
 
     /**
      * @brief Wrapper class for a Vulkan pipeline layout

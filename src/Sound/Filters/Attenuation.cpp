@@ -1,10 +1,10 @@
 #include "./Attenuation.hpp"
 
 namespace Dynamo::Sound {
-    Attenuation::Attenuation(float inner_radius, float cutoff_radius) :
+    Attenuation::Attenuation(f32 inner_radius, f32 cutoff_radius) :
         _inner_radius(inner_radius), _cutoff_radius(cutoff_radius) {}
 
-    float Attenuation::linear(float distance) {
+    f32 Attenuation::linear(f32 distance) {
         if (distance < _inner_radius) {
             return 1;
         }
@@ -15,16 +15,16 @@ namespace Dynamo::Sound {
     }
 
     Sound &Attenuation::apply(Sound &src,
-                              const unsigned src_offset,
-                              const unsigned length,
+                              const u32 src_offset,
+                              const u32 length,
                               const DynamicMaterial &material,
                               const ListenerProperties &listener) {
         _output.resize(length, src.channels());
-        float distance = (material.position - listener.position).length();
-        float gain = linear(distance);
+        f32 distance = (material.position - listener.position).length();
+        f32 gain = linear(distance);
 
-        for (unsigned c = 0; c < _output.channels(); c++) {
-            for (unsigned f = 0; f < _output.frames(); f++) {
+        for (u32 c = 0; c < _output.channels(); c++) {
+            for (u32 f = 0; f < _output.frames(); f++) {
                 _output[c][f] = src[c][f + src_offset] * gain;
             }
         }

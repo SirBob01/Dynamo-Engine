@@ -25,7 +25,7 @@ namespace Dynamo::Delaunay {
         triangles.push_back(super_triangle);
 
         // Edge buffer
-        std::unordered_map<Segment2, int> edges;
+        std::unordered_map<Segment2, i32> edges;
 
         for (const Vec2 &point : points) {
             // Find triangles whose circumcircle contains the query point

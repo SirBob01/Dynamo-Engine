@@ -13,7 +13,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Determines the number of images to be rendered to
         // This allows multiple buffering
-        unsigned image_count = options.capabilities.minImageCount + 1;
+        u32 image_count = options.capabilities.minImageCount + 1;
         if (options.capabilities.maxImageCount) {
             image_count =
                 std::min(image_count, options.capabilities.maxImageCount);
@@ -44,9 +44,9 @@ namespace Dynamo::Graphics::Vulkan {
         const QueueProperties &present_queue_properties =
             physical.get_queue_properties(QueueFamily::Present);
 
-        std::array<unsigned, 3> index_arr;
+        std::array<u32, 3> index_arr;
         index_arr[0] = present_queue_properties.family_id;
-        unsigned index_count = 1;
+        u32 index_count = 1;
         if (graphics_queue_properties.family_id !=
             present_queue_properties.family_id) {
             index_arr[index_count++] = graphics_queue_properties.family_id;
@@ -84,13 +84,13 @@ namespace Dynamo::Graphics::Vulkan {
     void
     Swapchain::calculate_extent(const vk::SurfaceCapabilitiesKHR &capabilities,
                                 Display &display) {
-        int width, height;
+        i32 width, height;
         glfwGetFramebufferSize(display.get_window(), &width, &height);
 
-        _extent.width = std::clamp(static_cast<unsigned>(width),
+        _extent.width = std::clamp(static_cast<u32>(width),
                                    capabilities.minImageExtent.width,
                                    capabilities.maxImageExtent.width);
-        _extent.height = std::clamp(static_cast<unsigned>(height),
+        _extent.height = std::clamp(static_cast<u32>(height),
                                     capabilities.minImageExtent.height,
                                     capabilities.maxImageExtent.height);
     }
@@ -142,9 +142,9 @@ namespace Dynamo::Graphics::Vulkan {
         return _present_mode;
     }
 
-    std::optional<unsigned>
+    std::optional<u32>
     Swapchain::get_presentation_image(const Semaphore &semaphore) const {
-        vk::ResultValue<unsigned> acquired =
+        vk::ResultValue<u32> acquired =
             _device.get().get_handle().acquireNextImageKHR(
                 _handle,
                 UINT64_MAX,

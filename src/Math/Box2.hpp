@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include "../Types.hpp"
 #include "./Vec2.hpp"
 
 namespace Dynamo {
@@ -28,7 +29,7 @@ namespace Dynamo {
          * @param width
          * @param height
          */
-        Box2(Vec2 center, float width, float height) {
+        Box2(Vec2 center, f32 width, f32 height) {
             Vec2 halfdim(width * 0.5, height * 0.5);
             min = center - halfdim;
             max = center + halfdim;
@@ -44,23 +45,23 @@ namespace Dynamo {
         /**
          * @brief Get the width of this box
          *
-         * @return float
+         * @return f32
          */
-        inline float width() const { return max.x - min.x; }
+        inline f32 width() const { return max.x - min.x; }
 
         /**
          * @brief Get the height of this box
          *
-         * @return float
+         * @return f32
          */
-        inline float height() const { return max.y - min.y; }
+        inline f32 height() const { return max.y - min.y; }
 
         /**
          * @brief Get the area of this box
          *
-         * @return float
+         * @return f32
          */
-        inline float area() const { return width() * height(); }
+        inline f32 area() const { return width() * height(); }
 
         /**
          * @brief Translate this box by an offset vector
@@ -92,9 +93,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool intersects(const Box2 &box) const {
-            bool h = max.x < box.min.x || min.x > box.max.x;
-            bool v = max.y < box.min.y || min.y > box.max.y;
+        inline b8 intersects(const Box2 &box) const {
+            b8 h = max.x < box.min.x || min.x > box.max.x;
+            b8 v = max.y < box.min.y || min.y > box.max.y;
             return !(h || v);
         }
 
@@ -105,9 +106,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool contains(const Vec2 &point) const {
-            bool h = point.x >= min.x && point.x <= max.x;
-            bool v = point.y >= min.y && point.y <= max.y;
+        inline b8 contains(const Vec2 &point) const {
+            b8 h = point.x >= min.x && point.x <= max.x;
+            b8 v = point.y >= min.y && point.y <= max.y;
             return h && v;
         }
 
@@ -118,9 +119,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool contains(const Box2 &box) const {
-            bool h = box.min.x >= min.x && box.max.x <= max.x;
-            bool v = box.min.y >= min.y && box.max.y <= max.y;
+        inline b8 contains(const Box2 &box) const {
+            b8 h = box.min.x >= min.x && box.max.x <= max.x;
+            b8 v = box.min.y >= min.y && box.max.y <= max.y;
             return h && v;
         }
 
@@ -131,7 +132,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Box2 &rhs) const {
+        inline b8 operator==(const Box2 &rhs) const {
             return min == rhs.min && max == rhs.max;
         }
 
@@ -142,9 +143,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Box2 &rhs) const {
-            return !(*this == rhs);
-        }
+        inline b8 operator!=(const Box2 &rhs) const { return !(*this == rhs); }
 
         /**
          * @brief Test if the bounding volume is valid (min is less than max)
@@ -152,7 +151,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool valid() const { return width() >= 0 && height() >= 0; }
+        inline b8 valid() const { return width() >= 0 && height() >= 0; }
     };
 } // namespace Dynamo
 

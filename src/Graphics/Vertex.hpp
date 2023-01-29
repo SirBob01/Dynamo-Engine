@@ -2,6 +2,7 @@
 
 #include "../Math/Vec2.hpp"
 #include "../Math/Vec3.hpp"
+#include "../Types.hpp"
 
 namespace Dynamo::Graphics {
     /**
@@ -20,7 +21,7 @@ namespace Dynamo::Graphics {
          * @return true
          * @return false
          */
-        inline bool operator==(const Vertex &rhs) const {
+        inline b8 operator==(const Vertex &rhs) const {
             return position == rhs.position && normal == rhs.normal &&
                    texture == rhs.texture;
         }

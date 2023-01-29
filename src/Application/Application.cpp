@@ -22,7 +22,7 @@ namespace Dynamo {
         _jukebox = std::make_unique<Sound::Jukebox>(config.asset_directory);
 
         // Seed the random number generator
-        int seed = std::chrono::system_clock::now().time_since_epoch().count();
+        i32 seed = std::chrono::system_clock::now().time_since_epoch().count();
         Random::seed(seed);
     }
 
@@ -34,7 +34,7 @@ namespace Dynamo {
 
     Sound::Jukebox &Application::get_jukebox() { return *_jukebox; }
 
-    bool Application::is_running() { return !_display->is_closed(); }
+    b8 Application::is_running() { return !_display->is_closed(); }
 
     void Application::run() {
         // TODO: Use semi-fixed timestep to update game logic

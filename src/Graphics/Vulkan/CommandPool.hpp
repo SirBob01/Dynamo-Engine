@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Device.hpp"
 #include "./PhysicalDevice.hpp"
 
@@ -54,7 +55,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return std::vector<vk::UniqueCommandBuffer>
          */
         std::vector<vk::UniqueCommandBuffer>
-        allocate(vk::CommandBufferLevel level, unsigned count);
+        allocate(vk::CommandBufferLevel level, u32 count);
 
         /**
          * @brief Reset the command pool

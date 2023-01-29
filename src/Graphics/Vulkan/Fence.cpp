@@ -12,7 +12,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     const vk::Fence &Fence::get_handle() const { return _handle; }
 
-    void Fence::wait(unsigned long timeout) {
+    void Fence::wait(u64 timeout) {
         vk::Result result =
             _device.get().get_handle().waitForFences(_handle, true, timeout);
         if (result != vk::Result::eSuccess) {
@@ -21,7 +21,7 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
-    bool Fence::is_signaled() {
+    b8 Fence::is_signaled() {
         return _device.get().get_handle().getFenceStatus(_handle) ==
                vk::Result::eSuccess;
     }

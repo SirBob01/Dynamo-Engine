@@ -37,7 +37,7 @@ namespace Dynamo::Graphics::Vulkan {
                                       const LayoutBindings &bindings,
                                       const vk::DescriptorPool &pool,
                                       Swapchain &swapchain) {
-        unsigned image_count = swapchain.get_images().size();
+        u32 image_count = swapchain.get_images().size();
 
         // Allocate new descriptor sets within the pool
         std::vector<vk::DescriptorSetLayout> set_layouts(image_count, layout);
@@ -53,7 +53,7 @@ namespace Dynamo::Graphics::Vulkan {
     DescriptorPool::try_allocate(const vk::DescriptorSetLayout &layout,
                                       const LayoutBindings &bindings,
                                       Swapchain &swapchain) {
-        bool found_pool = false;
+        b8 found_pool = false;
         std::vector<vk::DescriptorSet> vksets;
         for (vk::DescriptorPool &pool : _pools) {
             try {
@@ -85,7 +85,7 @@ namespace Dynamo::Graphics::Vulkan {
             pipeline_layout.get_descriptor_set_bindings();
 
         std::vector<DescriptorSetGroup> groups(layouts.size());
-        for (unsigned i = 0; i < layouts.size(); i++) {
+        for (u32 i = 0; i < layouts.size(); i++) {
             for (vk::DescriptorSet &vkset :
                  try_allocate(layouts[i], bindings[i], swapchain)) {
                 groups[i].push_back(

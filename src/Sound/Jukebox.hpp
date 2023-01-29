@@ -10,6 +10,7 @@
 #include "../Asset/Asset.hpp"
 #include "../Log/Log.hpp"
 #include "../Math/Vec3.hpp"
+#include "../Types.hpp"
 #include "../Utils/IdTracker.hpp"
 #include "../Utils/RingBuffer.hpp"
 #include "../Utils/SparseSet.hpp"
@@ -29,7 +30,7 @@ namespace Dynamo::Sound {
      * @brief Size of the input and output ring buffers
      *
      */
-    static constexpr unsigned BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
+    static constexpr u32 BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
 
     /**
      * @brief A playback track on which audio can be enqueued
@@ -53,7 +54,7 @@ namespace Dynamo::Sound {
          * @brief Global volume control
          *
          */
-        float _volume;
+        f32 _volume;
 
         /**
          * @brief Final waveform on which all active chunks are layered onto
@@ -94,13 +95,13 @@ namespace Dynamo::Sound {
              * @brief Number of channels in the buffer
              *
              */
-            unsigned channels;
+            u32 channels;
 
             /**
              * @brief Sampling rate of the buffer
              *
              */
-            double sample_rate;
+            f64 sample_rate;
         };
         State _input_state;
         State _output_state;
@@ -114,9 +115,9 @@ namespace Dynamo::Sound {
          * @param time_info    Time information in seconds
          * @param status_flags Status flags
          * @param data         User data
-         * @return int
+         * @return i32
          */
-        static int input_callback(const void *input,
+        static i32 input_callback(const void *input,
                                   void *output,
                                   unsigned long frame_count,
                                   const PaStreamCallbackTimeInfo *time_info,
@@ -132,9 +133,9 @@ namespace Dynamo::Sound {
          * @param time_info    Time information in seconds
          * @param status_flags Status flags
          * @param data         User data
-         * @return int
+         * @return i32
          */
-        static int output_callback(const void *input,
+        static i32 output_callback(const void *input,
                                    void *output,
                                    unsigned long frame_count,
                                    const PaStreamCallbackTimeInfo *time_info,
@@ -206,16 +207,16 @@ namespace Dynamo::Sound {
         /**
          * @brief Get the sample rate of the input stream
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned get_input_sample_rate();
+        u32 get_input_sample_rate();
 
         /**
          * @brief Get the sample rate of the output stream
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned get_output_sample_rate();
+        u32 get_output_sample_rate();
 
         /**
          * @brief Is the output device playing?
@@ -223,7 +224,7 @@ namespace Dynamo::Sound {
          * @return true
          * @return false
          */
-        bool is_playing();
+        b8 is_playing();
 
         /**
          * @brief Is the input device listening
@@ -231,14 +232,14 @@ namespace Dynamo::Sound {
          * @return true
          * @return false
          */
-        bool is_recording();
+        b8 is_recording();
 
         /**
          * @brief Get the master volume
          *
-         * @return float
+         * @return f32
          */
-        float get_volume();
+        f32 get_volume();
 
         /**
          * @brief Pause audio playback
@@ -257,7 +258,7 @@ namespace Dynamo::Sound {
          *
          * @param volume
          */
-        void set_volume(float volume);
+        void set_volume(f32 volume);
 
         /**
          * @brief Get the sound asset cache
