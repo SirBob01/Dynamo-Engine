@@ -247,6 +247,10 @@ namespace Dynamo::Graphics::Vulkan {
         return *_shader_assets;
     }
 
+    Dynamo::Graphics::MaterialSystem &Renderer::get_material_system() {
+        return *_material_system;
+    }
+
     std::unique_ptr<Dynamo::Graphics::MeshInstance>
     Renderer::upload_mesh(Mesh &mesh) {
         return std::make_unique<MeshInstance>(mesh,

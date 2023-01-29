@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "../Types.hpp"
+
 namespace Dynamo::Graphics {
     /**
      * @brief Model texture
@@ -21,9 +23,7 @@ namespace Dynamo::Graphics {
          * @param width  Width of the texture image
          * @param height Height of the texture image
          */
-        Texture(std::vector<u8> &pixels,
-                u32 width,
-                u32 height);
+        Texture(std::vector<u8> &pixels, u32 width, u32 height);
 
         /**
          * @brief Destroy the Texture object
@@ -36,20 +36,20 @@ namespace Dynamo::Graphics {
          *
          * @return u32
          */
-        u32 get_width() const;
+        inline u32 get_width() const { return _width; }
 
         /**
          * @brief Get the height of the texture
          *
          * @return u32
          */
-        u32 get_height() const;
+        inline u32 get_height() const { return _height; }
 
         /**
          * @brief Get the pixels object
          *
          * @return const std::vector<u8>&
          */
-        const std::vector<u8> &get_pixels() const;
+        inline const std::vector<u8> &get_pixels() const { return _pixels; }
     };
 } // namespace Dynamo::Graphics

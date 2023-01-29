@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Types.hpp"
 #include "./Mesh.hpp"
 
 namespace Dynamo::Graphics {

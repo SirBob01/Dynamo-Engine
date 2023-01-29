@@ -80,7 +80,7 @@ namespace Dynamo::Graphics {
          *
          * @param layers Ordered list of layers
          */
-        virtual void set_layers(std::vector<Layer> &layers);
+        virtual void set_layers(std::vector<Layer> &layers) = 0;
 
         /**
          * @brief Draw instanced models

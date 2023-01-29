@@ -8,10 +8,10 @@ namespace Dynamo::Graphics::Vulkan {
         _device(device),
         _swapchain(swapchain), _descriptor_pool(descriptor_pool),
         _uniform_buffer(uniform_buffer),
-        _renderpass(create_base_pass(_device, _swapchain)), _cache(device) {}
+        _renderpass(create_base_3d_pass(_device, _swapchain)), _cache(device) {}
 
     void MaterialSystem::reset(Swapchain &swapchain) {
-        _renderpass = create_base_pass(_device, _swapchain);
+        _renderpass = create_base_3d_pass(_device, _swapchain);
     }
 
     std::unique_ptr<Dynamo::Graphics::Material>
