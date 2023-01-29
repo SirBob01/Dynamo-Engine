@@ -8,9 +8,11 @@
 #include "../../Types.hpp"
 #include "../../Core/Display.hpp"
 #include "../../Log/Log.hpp"
+
 #include "./Device.hpp"
 #include "./Image.hpp"
 #include "./ImageView.hpp"
+#include "./MemoryPool.hpp"
 #include "./Semaphore.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -24,6 +26,12 @@ namespace Dynamo::Graphics::Vulkan {
 
         std::vector<std::unique_ptr<SwapchainImage>> _images;
         std::vector<std::unique_ptr<ImageView>> _views;
+
+        std::unique_ptr<UserImage> _color_buffer;
+        std::unique_ptr<UserImage> _depth_buffer;
+
+        std::unique_ptr<ImageView> _color_view;
+        std::unique_ptr<ImageView> _depth_view;
 
         vk::Extent2D _extent;
         vk::SurfaceFormatKHR _format;
@@ -55,15 +63,26 @@ namespace Dynamo::Graphics::Vulkan {
             const std::vector<vk::PresentModeKHR> &present_modes,
             Display &display);
 
+        /**
+         * @brief Create the swapchain images and their views
+         *
+         * @param memory_pool
+         */
+        void create_images(MemoryPool &memory_pool);
+
       public:
         /**
          * @brief Construct a new Swapchain object
          *
-         * @param device  Reference to the logical device
-         * @param display Reference to the display window
-         * @param surface Vulkan surface handle
+         * @param device      Reference to the logical device
+         * @param display     Reference to the display window
+         * @param memory_pool Reference to the memory pool
+         * @param surface     Vulkan surface handle
          */
-        Swapchain(Device &device, Display &display, vk::SurfaceKHR surface);
+        Swapchain(Device &device,
+                  MemoryPool &memory_pool,
+                  Display &display,
+                  vk::SurfaceKHR surface);
 
         /**
          * @brief Destroy the Swapchain object
@@ -92,6 +111,20 @@ namespace Dynamo::Graphics::Vulkan {
          * @return const std::vector<std::unique_ptr<ImageView>>&
          */
         const std::vector<std::unique_ptr<ImageView>> &get_views() const;
+
+        /**
+         * @brief Get the color buffer view
+         *
+         * @return const ImageView&
+         */
+        const ImageView &get_color_view() const;
+
+        /**
+         * @brief Get the depth buffer view
+         *
+         * @return const ImageView&
+         */
+        const ImageView &get_depth_view() const;
 
         /**
          * @brief Get the extent of the swapchain

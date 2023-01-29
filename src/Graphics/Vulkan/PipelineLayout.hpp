@@ -10,7 +10,7 @@
 #include "../../Types.hpp"
 #include "../../Log/Log.hpp"
 #include "./Device.hpp"
-#include "./ShaderModule.hpp"
+#include "./Shader.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**

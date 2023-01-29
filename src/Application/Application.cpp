@@ -18,7 +18,9 @@ namespace Dynamo {
         _clock = std::make_unique<Clock>();
 
         // Graphics and sound submodules
-        _renderer = std::make_unique<Graphics::Vulkan::Renderer>(*_display);
+        _renderer = std::make_unique<Graphics::Vulkan::Renderer>(
+            *_display,
+            config.asset_directory);
         _jukebox = std::make_unique<Sound::Jukebox>(config.asset_directory);
 
         // Seed the random number generator

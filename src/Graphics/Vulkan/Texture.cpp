@@ -1,7 +1,7 @@
 #include "./Texture.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    Texture::Texture(u8 pixels[],
+    Texture::Texture(std::vector<u8> &pixels,
                      u32 width,
                      u32 height,
                      Device &device,
@@ -9,8 +9,7 @@ namespace Dynamo::Graphics::Vulkan {
                      Buffer &staging_buffer,
                      CommandPool &command_pool,
                      vk::Queue graphics_queue) :
-        _width(width),
-        _height(height),
+        Dynamo::Graphics::Texture(pixels, width, height),
         _mip_levels(std::floor(std::log2(std::max(width, height))) + 1),
         _image(device,
                memory_pool,
@@ -35,7 +34,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         transition_layout(vk::ImageLayout::eUndefined,
                           vk::ImageLayout::eTransferDstOptimal);
-        copy_pixels(pixels, staging_buffer);
+        copy_pixels(pixels.data(), staging_buffer);
         generate_mipmaps();
     }
 

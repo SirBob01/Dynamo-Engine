@@ -265,7 +265,7 @@ namespace Dynamo::Sound {
          *
          * @return SoundCache&
          */
-        SoundCache &get_sounds();
+        SoundCache &get_sound_assets();
 
         /**
          * @brief Get the set of listeners
@@ -277,10 +277,10 @@ namespace Dynamo::Sound {
         /**
          * @brief Play a static sound
          *
-         * @param sound    Sound asset
+         * @param sound    Sound
          * @param material Playback properties
          */
-        void play(Asset<Sound> &sound, StaticMaterial &material);
+        void play(Sound &sound, StaticMaterial &material);
 
         /**
          * @brief Play a dynamic sound
@@ -289,10 +289,10 @@ namespace Dynamo::Sound {
          * sound and the listeners. If there are multiple listeners attached,
          * the sound will be processed for all of them and mixed.
          *
-         * @param sound    Sound asset
+         * @param sound    Sound
          * @param material Playback properties
          */
-        void play(Asset<Sound> &sound, DynamicMaterial &material);
+        void play(Sound &sound, DynamicMaterial &material);
 
         /**
          * @brief Update Jukebox's internal state and process all chunks

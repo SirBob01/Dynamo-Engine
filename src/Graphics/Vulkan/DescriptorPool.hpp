@@ -5,17 +5,16 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../../Types.hpp"
-#include "./DescriptorSet.hpp"
 #include "./Device.hpp"
 #include "./PipelineLayout.hpp"
 #include "./Swapchain.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Group of descriptor sets
+     * @brief Descriptor sets grouped by layout and ordered by set index
      *
      */
-    using DescriptorSetGroup = std::vector<std::unique_ptr<DescriptorSet>>;
+    using DescriptorSetGroup = std::vector<vk::DescriptorSet>;
 
     /**
      * @brief Maximum number of descriptor sets per pool
@@ -47,25 +46,27 @@ namespace Dynamo::Graphics::Vulkan {
          * @param layout   Descriptor set layout
          * @param bindings List of bindings for the layout
          * @param pool     Descriptor pool
+         * @param count    Number of descriptor sets to create
          * @return std::vector<vk::DescriptorSet>
          */
         std::vector<vk::DescriptorSet>
         allocate_set(const vk::DescriptorSetLayout &layout,
                      const LayoutBindings &bindings,
                      const vk::DescriptorPool &pool,
-                     Swapchain &swapchain);
+                     u32 count);
 
         /**
          * @brief Select a pool and allocate
          *
-         * @param layout
-         * @param bindings
+         * @param layout   Descriptor set layout
+         * @param bindings List of bindings
+         * @param count    Number of descriptor sets to create
          * @return std::vector<vk::DescriptorSet>
          */
         std::vector<vk::DescriptorSet>
         try_allocate(const vk::DescriptorSetLayout &layout,
                      const LayoutBindings &bindings,
-                     Swapchain &swapchain);
+                     u32 count);
 
       public:
         /**
@@ -82,8 +83,7 @@ namespace Dynamo::Graphics::Vulkan {
         ~DescriptorPool();
 
         /**
-         * @brief Allocate descriptor sets grouped by layout and ordered by set
-         * index
+         * @brief Allocate descriptor set groups
          *
          * @param pipeline_layout Reference to the pipeline layout
          * @param swapchain       Reference to the swapchain

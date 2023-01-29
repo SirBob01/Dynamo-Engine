@@ -53,8 +53,8 @@ namespace Dynamo::Graphics::Vulkan {
     MemoryPool::MemoryPool(Device &device) : _device(device) {}
 
     b8 MemoryPool::is_compatible(Memory &memory,
-                                   vk::MemoryRequirements requirements,
-                                   vk::MemoryPropertyFlags properties) {
+                                 vk::MemoryRequirements requirements,
+                                 vk::MemoryPropertyFlags properties) {
         const vk::PhysicalDeviceMemoryProperties &physical_memory =
             _device.get().get_physical().get_memory_properties();
         u32 index;
@@ -75,8 +75,7 @@ namespace Dynamo::Graphics::Vulkan {
         for (std::unique_ptr<Memory> &memory : _pools) {
             if (is_compatible(*memory, requirements, properties)) {
                 std::optional<u32> result =
-                    memory.get()->reserve(requirements.size,
-                                          requirements.alignment);
+                    memory->reserve(requirements.size, requirements.alignment);
                 if (result.has_value()) {
                     return MemoryBlock(std::ref(*memory),
                                        result.value(),
@@ -99,7 +98,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Allocate memory
         std::optional<u32> result =
-            memory.get()->reserve(requirements.size, requirements.alignment);
+            memory->reserve(requirements.size, requirements.alignment);
         if (!result.has_value()) {
             Log::error("Unable to allocate Vulkan memory");
         }

@@ -5,6 +5,7 @@ namespace Dynamo::Graphics::Vulkan {
                        RenderPass &renderpass,
                        Swapchain &swapchain,
                        PipelineLayout &layout,
+                       PipelineCache &cache,
                        vk::PrimitiveTopology primitive_topology,
                        vk::PolygonMode polygon_mode) :
         _device(device) {
@@ -36,10 +37,11 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<vk::PipelineShaderStageCreateInfo> shader_stage_infos;
         const ShaderList &shaders = layout.get_shaders();
         for (u32 i = 0; i < shaders.size(); i++) {
-            shader_modules.push_back(shaders[i].get().get_handle());
+            Shader &shader = shaders[i].get();
+            shader_modules.push_back(shader.get_handle());
             shader_stage_infos.push_back(
                 create_shader_stage(shader_modules[i].get(),
-                                    shaders[i].get().get_stage()));
+                                    convert_shader_stage(shader.get_stage())));
         }
         pipeline_info.stageCount = shader_stage_infos.size();
         pipeline_info.pStages = shader_stage_infos.data();
@@ -55,7 +57,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         vk::ResultValue<vk::Pipeline> result =
             _device.get().get_handle().createGraphicsPipeline(
-                nullptr, // TODO: Pipeline cache
+                cache.get_handle(),
                 pipeline_info);
         _handle = result.value;
     }

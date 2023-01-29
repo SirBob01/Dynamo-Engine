@@ -6,7 +6,7 @@ namespace Dynamo::Graphics::Vulkan {
         // Extract reflection information from the shaders to construct
         // descriptor layouts and push constant ranges
         BindingGroups binding_groups;
-        for (std::reference_wrapper<ShaderModule> shader : _shaders) {
+        for (std::reference_wrapper<Shader> shader : _shaders) {
             for (const vk::PushConstantRange &range :
                  shader.get().get_push_constant_ranges()) {
                 _push_constant_ranges.push_back(range);
