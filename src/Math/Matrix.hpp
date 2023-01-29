@@ -2,24 +2,26 @@
 
 #include <array>
 
+#include "../Types.hpp"
+
 namespace Dynamo {
     /**
      * @brief A square matrix
      *
      * @tparam N Number of rows or columns
      */
-    template <unsigned N>
+    template <u32 N>
     struct Matrix {
-        static constexpr unsigned N2 = N * N;
-        std::array<float, N2> values;
+        static constexpr u32 N2 = N * N;
+        std::array<f32, N2> values;
 
         /**
          * @brief Construct a new Matrix object
          *
          */
         constexpr Matrix() {
-            for (unsigned i = 0; i < N; i++) {
-                for (unsigned j = 0; j < N; j++) {
+            for (u32 i = 0; i < N; i++) {
+                for (u32 j = 0; j < N; j++) {
                     values[i * N + j] = (i == j);
                 }
             }
@@ -29,8 +31,8 @@ namespace Dynamo {
          * @brief Construct a new Matrix object
          *
          */
-        constexpr Matrix(float v) {
-            for (unsigned i = 0; i < N2; i++) {
+        constexpr Matrix(f32 v) {
+            for (u32 i = 0; i < N2; i++) {
                 values[i] = v;
             }
         }
@@ -42,7 +44,7 @@ namespace Dynamo {
          */
         inline Matrix<N> operator-() {
             Matrix<N> result;
-            for (unsigned i = 0; i < N2; i++) {
+            for (u32 i = 0; i < N2; i++) {
                 result.values[i] = -values[i];
             }
             return result;
@@ -56,7 +58,7 @@ namespace Dynamo {
          */
         inline Matrix<N> operator+(const Matrix<N> &rhs) {
             Matrix<N> result;
-            for (unsigned i = 0; i < N2; i++) {
+            for (u32 i = 0; i < N2; i++) {
                 result.values[i] = values[i] + rhs.values[i];
             }
             return result;
@@ -70,7 +72,7 @@ namespace Dynamo {
          */
         inline Matrix<N> operator-(const Matrix<N> &rhs) {
             Matrix<N> result;
-            for (unsigned i = 0; i < N2; i++) {
+            for (u32 i = 0; i < N2; i++) {
                 result.values[i] = values[i] - rhs.values[i];
             }
             return result;
@@ -84,10 +86,10 @@ namespace Dynamo {
          */
         inline Matrix<N> operator*(const Matrix<N> &rhs) {
             Matrix<N> result;
-            for (unsigned i = 0; i < N; i++) {
-                for (unsigned j = 0; j < N; j++) {
-                    float dot = 0;
-                    for (unsigned c = 0; c < N; c++) {
+            for (u32 i = 0; i < N; i++) {
+                for (u32 j = 0; j < N; j++) {
+                    f32 dot = 0;
+                    for (u32 c = 0; c < N; c++) {
                         dot += values[i * N + c] * rhs.values[c * N + j];
                     }
                     result.values[i * N + j] = dot;
@@ -102,9 +104,9 @@ namespace Dynamo {
          * @param rhs
          * @return Matrix<N>
          */
-        inline Matrix<N> operator*(float rhs) {
+        inline Matrix<N> operator*(f32 rhs) {
             Matrix<N> result;
-            for (unsigned i = 0; i < N2; i++) {
+            for (u32 i = 0; i < N2; i++) {
                 result.values[i] = values[i] * rhs;
             }
             return result;
@@ -116,8 +118,8 @@ namespace Dynamo {
          * @param rhs
          * @return Matrix<N>
          */
-        inline Matrix<N> operator/(float rhs) {
-            float inv = 1.0 / rhs;
+        inline Matrix<N> operator/(f32 rhs) {
+            f32 inv = 1.0 / rhs;
             return (*this) * inv;
         }
 
@@ -128,7 +130,7 @@ namespace Dynamo {
          * @return Matrix<N>
          */
         inline Matrix<N> &operator+=(const Matrix<N> &rhs) {
-            for (unsigned i = 0; i < N2; i++) {
+            for (u32 i = 0; i < N2; i++) {
                 values[i] += rhs.values[i];
             }
             return *this;
@@ -141,7 +143,7 @@ namespace Dynamo {
          * @return Matrix<N>
          */
         inline Matrix<N> &operator-=(const Matrix<N> &rhs) {
-            for (unsigned i = 0; i < N2; i++) {
+            for (u32 i = 0; i < N2; i++) {
                 values[i] -= rhs.values[i];
             }
             return *this;
@@ -155,10 +157,10 @@ namespace Dynamo {
          */
         inline Matrix<N> &operator*=(const Matrix<N> &rhs) {
             Matrix<N> result;
-            for (unsigned i = 0; i < N; i++) {
-                for (unsigned j = 0; j < N; j++) {
-                    float dot = 0;
-                    for (unsigned c = 0; c < N; c++) {
+            for (u32 i = 0; i < N; i++) {
+                for (u32 j = 0; j < N; j++) {
+                    f32 dot = 0;
+                    for (u32 c = 0; c < N; c++) {
                         dot += values[i * N + c] * rhs.values[c * N + j];
                     }
                     result.values[i * N + j] = dot;
@@ -174,8 +176,8 @@ namespace Dynamo {
          * @param rhs
          * @return Matrix<N>
          */
-        inline Matrix<N> operator*=(float rhs) {
-            for (unsigned i = 0; i < N2; i++) {
+        inline Matrix<N> operator*=(f32 rhs) {
+            for (u32 i = 0; i < N2; i++) {
                 values[i] *= rhs;
             }
             return *this;
@@ -187,8 +189,8 @@ namespace Dynamo {
          * @param rhs
          * @return Matrix<N>
          */
-        inline Matrix<N> operator/=(float rhs) {
-            float inv = 1.0 / rhs;
+        inline Matrix<N> operator/=(f32 rhs) {
+            f32 inv = 1.0 / rhs;
             return (*this) *= inv;
         }
 
@@ -198,8 +200,8 @@ namespace Dynamo {
          * @return Matrix<N>&
          */
         inline Matrix<N> &transpose() {
-            for (int i = 0; i < N; i++) {
-                for (int j = 0; j < N; j++) {
+            for (i32 i = 0; i < N; i++) {
+                for (i32 j = 0; j < N; j++) {
                     std::swap(values[i + j * N], values[j + i * N]);
                 }
             }
@@ -213,8 +215,8 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Matrix<N> &rhs) const {
-            for (unsigned i = 0; i < N2; i++) {
+        inline b8 operator==(const Matrix<N> &rhs) const {
+            for (u32 i = 0; i < N2; i++) {
                 if (values[i] != rhs.values[i]) {
                     return false;
                 }
@@ -229,7 +231,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Matrix<N> &rhs) const {
+        inline b8 operator!=(const Matrix<N> &rhs) const {
             return !(*this == rhs);
         }
     };

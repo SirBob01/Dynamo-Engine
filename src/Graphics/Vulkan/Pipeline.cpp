@@ -35,7 +35,7 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<vk::UniqueShaderModule> shader_modules;
         std::vector<vk::PipelineShaderStageCreateInfo> shader_stage_infos;
         const ShaderList &shaders = layout.get_shaders();
-        for (unsigned i = 0; i < shaders.size(); i++) {
+        for (u32 i = 0; i < shaders.size(); i++) {
             shader_modules.push_back(shaders[i].get().get_handle());
             shader_stage_infos.push_back(
                 create_shader_stage(shader_modules[i].get(),

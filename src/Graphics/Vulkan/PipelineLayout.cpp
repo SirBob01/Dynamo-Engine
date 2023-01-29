@@ -17,7 +17,7 @@ namespace Dynamo::Graphics::Vulkan {
 
                 // Find duplicate binding in the set (i.e., from another shader
                 // stage) and merge their flags
-                bool found = false;
+                b8 found = false;
                 for (vk::DescriptorSetLayoutBinding &rhs : bindings) {
                     if (rhs.binding == data.binding.binding) {
                         rhs.stageFlags |= data.binding.stageFlags;

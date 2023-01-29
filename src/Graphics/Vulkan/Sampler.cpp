@@ -1,7 +1,7 @@
 #include "./Sampler.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    Sampler::Sampler(Device &device, unsigned max_lod) : _device(device) {
+    Sampler::Sampler(Device &device, u32 max_lod) : _device(device) {
         vk::SamplerCreateInfo sampler_info;
         sampler_info.magFilter = vk::Filter::eLinear;
         sampler_info.minFilter = vk::Filter::eLinear;

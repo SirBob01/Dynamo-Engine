@@ -6,6 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -13,7 +14,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Enumerates the different queue families
      *
      */
-    enum class QueueFamily : unsigned {
+    enum class QueueFamily : u32 {
         /**
          * @brief Graphics commands
          *
@@ -42,13 +43,13 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Family identifier
          *
          */
-        unsigned family_id = 0;
+        u32 family_id = 0;
 
         /**
          * @brief Number of available queues
          *
          */
-        unsigned count = 0;
+        u32 count = 0;
     };
 
     /**
@@ -93,7 +94,7 @@ namespace Dynamo::Graphics::Vulkan {
         QueueProperties _present_queue_properties;
         QueueProperties _transfer_queue_properties;
 
-        std::vector<const char *> _extensions;
+        std::vector<const i8 *> _extensions;
 
         /**
          * @brief Check if the device contains the required queue families
@@ -101,7 +102,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return true
          * @return false
          */
-        bool is_complete() const;
+        b8 is_complete() const;
 
         /**
          * @brief Check if the device supports the required extensions
@@ -109,7 +110,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return true
          * @return false
          */
-        bool is_supporting_extensions() const;
+        b8 is_supporting_extensions() const;
 
         /**
          * @brief Check if the device supports swapchaining
@@ -117,7 +118,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return true
          * @return false
          */
-        bool is_supporting_swapchain() const;
+        b8 is_supporting_swapchain() const;
 
         /**
          * @brief Enumerate the available queue familes
@@ -151,9 +152,9 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the extensions list
          *
-         * @return const std::vector<const *char>&
+         * @return const std::vector<const *i8>&
          */
-        const std::vector<const char *> &get_extensions() const;
+        const std::vector<const i8 *> &get_extensions() const;
 
         /**
          * @brief Get the available options for the swapchain
@@ -215,8 +216,8 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Calculate heuristic for selecting the best device
          *
-         * @return int
+         * @return i32
          */
-        int calculate_score() const;
+        i32 calculate_score() const;
     };
 } // namespace Dynamo::Graphics::Vulkan

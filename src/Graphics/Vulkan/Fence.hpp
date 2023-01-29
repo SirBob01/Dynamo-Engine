@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -45,7 +46,7 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @param timeout
          */
-        void wait(unsigned long timeout = UINT64_MAX);
+        void wait(u64 timeout = UINT64_MAX);
 
         /**
          * @brief Test if the fence is signaled
@@ -53,7 +54,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return true
          * @return false
          */
-        bool is_signaled();
+        b8 is_signaled();
 
         /**
          * @brief Reset the fence

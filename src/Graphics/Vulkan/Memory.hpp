@@ -6,6 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
 #include "../../Utils/Allocator.hpp"
 #include "./Device.hpp"
@@ -21,9 +22,9 @@ namespace Dynamo::Graphics::Vulkan {
         Allocator _allocator;
 
         vk::MemoryType _type;
-        unsigned _capacity;
+        u32 _capacity;
 
-        char *_mapped;
+        i8 *_mapped;
 
       public:
         /**
@@ -67,9 +68,9 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the total capacity of the memory
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned get_capacity() const;
+        u32 get_capacity() const;
 
         /**
          * @brief Read from mapped memory
@@ -78,7 +79,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the memory map in bytes
          * @param length Length of the read in bytes
          */
-        void read(char *dst, unsigned offset, unsigned length);
+        void read(i8 *dst, u32 offset, u32 length);
 
         /**
          * @brief Write to mapped memory
@@ -87,7 +88,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the memory map in bytes
          * @param length Length of the write in bytes
          */
-        void write(char *src, unsigned offset, unsigned length);
+        void write(i8 *src, u32 offset, u32 length);
 
         /**
          * @brief Bind a vk::Image to the underlying vk::Memory
@@ -95,7 +96,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param vkimage Handle to vk::Image
          * @param offset  Offset within the memory map in bytes
          */
-        void bind(vk::Image vkimage, unsigned offset);
+        void bind(vk::Image vkimage, u32 offset);
 
         /**
          * @brief Bind a vk::Buffer to the underlying vk::Memory
@@ -103,7 +104,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param vkbuffer Handle to vk::Buffer
          * @param offset   Offset within the memory map in bytes
          */
-        void bind(vk::Buffer vkbuffer, unsigned offset);
+        void bind(vk::Buffer vkbuffer, u32 offset);
 
         /**
          * @brief Reserve a block of memory with specific alignment
@@ -111,15 +112,15 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @param size      Desired size in bytes
          * @param alignment Alignment requirement in bytes
-         * @return std::optional<unsigned>
+         * @return std::optional<u32>
          */
-        std::optional<unsigned> reserve(unsigned size, unsigned alignment);
+        std::optional<u32> reserve(u32 size, u32 alignment);
 
         /**
          * @brief Free the block of reserved memory at an offset
          *
          * @param offset Offset within the pool in bytes returned by reserve()
          */
-        void free(unsigned offset);
+        void free(u32 offset);
     };
 } // namespace Dynamo::Graphics::Vulkan

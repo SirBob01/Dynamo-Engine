@@ -7,7 +7,7 @@ namespace Dynamo {
 
         // On cursor motion
         glfwSetCursorPosCallback(_display.get_window(),
-                                 [](GLFWwindow *window, double x, double y) {
+                                 [](GLFWwindow *window, f64 x, f64 y) {
                                      InputState *state =
                                          static_cast<InputState *>(
                                              glfwGetWindowUserPointer(window));
@@ -17,7 +17,7 @@ namespace Dynamo {
 
         // On scroll
         glfwSetScrollCallback(_display.get_window(),
-                              [](GLFWwindow *window, double x, double y) {
+                              [](GLFWwindow *window, f64 x, f64 y) {
                                   InputState *state = static_cast<InputState *>(
                                       glfwGetWindowUserPointer(window));
                                   state->scroll_offset.x = x;
@@ -28,10 +28,10 @@ namespace Dynamo {
         glfwSetKeyCallback(
             _display.get_window(),
             [](GLFWwindow *window,
-               int key,
-               int scancode,
-               int action,
-               int mods) {
+               i32 key,
+               i32 scancode,
+               i32 action,
+               i32 mods) {
                 InputState *state =
                     static_cast<InputState *>(glfwGetWindowUserPointer(window));
                 switch (action) {
@@ -49,7 +49,7 @@ namespace Dynamo {
         // On mouse button state change
         glfwSetMouseButtonCallback(
             _display.get_window(),
-            [](GLFWwindow *window, int button, int action, int mods) {
+            [](GLFWwindow *window, i32 button, i32 action, i32 mods) {
                 InputState *state =
                     static_cast<InputState *>(glfwGetWindowUserPointer(window));
                 switch (action) {
@@ -74,30 +74,30 @@ namespace Dynamo {
         return _state.scroll_offset;
     }
 
-    bool Input::is_pressed(KeyCode code) {
+    b8 Input::is_pressed(KeyCode code) {
         return _state.key_pressed.count(code);
     }
 
-    bool Input::is_pressed(MouseCode code) {
+    b8 Input::is_pressed(MouseCode code) {
         return _state.mouse_pressed.count(code);
     }
 
-    bool Input::is_released(KeyCode code) {
+    b8 Input::is_released(KeyCode code) {
         return _state.key_released.count(code);
     }
 
-    bool Input::is_released(MouseCode code) {
+    b8 Input::is_released(MouseCode code) {
         return _state.mouse_released.count(code);
     }
 
-    bool Input::is_down(KeyCode code) {
-        return glfwGetKey(_display.get_window(), static_cast<int>(code)) ==
+    b8 Input::is_down(KeyCode code) {
+        return glfwGetKey(_display.get_window(), static_cast<i32>(code)) ==
                GLFW_PRESS;
     }
 
-    bool Input::is_down(MouseCode code) {
+    b8 Input::is_down(MouseCode code) {
         return glfwGetMouseButton(_display.get_window(),
-                                  static_cast<int>(code)) == GLFW_PRESS;
+                                  static_cast<i32>(code)) == GLFW_PRESS;
     }
 
     void Input::poll() {

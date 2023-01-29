@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Device.hpp"
 #include "./MemoryPool.hpp"
 
@@ -44,11 +45,11 @@ namespace Dynamo::Graphics::Vulkan {
          * @param samples     MSAA sample count
          */
         Image(Device &device,
-              unsigned width,
-              unsigned height,
-              unsigned depth,
-              unsigned mip_levels,
-              unsigned layer_count,
+              u32 width,
+              u32 height,
+              u32 depth,
+              u32 mip_levels,
+              u32 layer_count,
               vk::Format format,
               vk::ImageType type,
               vk::ImageTiling tiling,
@@ -112,11 +113,11 @@ namespace Dynamo::Graphics::Vulkan {
          */
         UserImage(Device &device,
                   MemoryPool &memory_pool,
-                  unsigned width,
-                  unsigned height,
-                  unsigned depth,
-                  unsigned mip_levels,
-                  unsigned layer_count,
+                  u32 width,
+                  u32 height,
+                  u32 depth,
+                  u32 mip_levels,
+                  u32 layer_count,
                   vk::Format format,
                   vk::ImageType type,
                   vk::ImageTiling tiling,

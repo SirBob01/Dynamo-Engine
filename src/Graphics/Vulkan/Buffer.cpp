@@ -2,7 +2,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     Buffer::Buffer(Device &device,
-                   unsigned size,
+                   u32 size,
                    MemoryPool &memory_pool,
                    CommandPool &command_pool,
                    vk::Queue &transfer_queue,
@@ -39,7 +39,7 @@ namespace Dynamo::Graphics::Vulkan {
     Buffer::~Buffer() { _device.get().get_handle().destroyBuffer(_handle); }
 
     vk::Buffer Buffer::create_raw_buffer(const vk::Device &device,
-                                         unsigned size,
+                                         u32 size,
                                          vk::BufferUsageFlags usage) {
         vk::BufferCreateInfo buffer_info;
         buffer_info.size = size;
@@ -49,7 +49,7 @@ namespace Dynamo::Graphics::Vulkan {
         return device.createBuffer(buffer_info);
     }
 
-    void Buffer::grow(unsigned size) {
+    void Buffer::grow(u32 size) {
         // Allocate new memory and buffer
         vk::Buffer new_handle =
             create_raw_buffer(_device.get().get_handle(), size, _usage);
@@ -98,12 +98,12 @@ namespace Dynamo::Graphics::Vulkan {
         return _device.get().get_handle().getBufferMemoryRequirements(_handle);
     }
 
-    unsigned Buffer::reserve(unsigned size, unsigned alignment) {
-        std::optional<unsigned> result = _allocator.reserve(size, alignment);
+    u32 Buffer::reserve(u32 size, u32 alignment) {
+        std::optional<u32> result = _allocator.reserve(size, alignment);
         if (result.has_value()) {
             return result.value();
         } else {
-            unsigned current = _allocator.capacity();
+            u32 current = _allocator.capacity();
             grow(std::max(align_size(current + size, 2), current * 2));
 
             // If this fails, we're in trouble...
@@ -111,32 +111,32 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
-    void Buffer::free(unsigned offset) { return _allocator.free(offset); }
+    void Buffer::free(u32 offset) { return _allocator.free(offset); }
 
-    void Buffer::write(char *src, unsigned offset, unsigned length) {
+    void Buffer::write(i8 *src, u32 offset, u32 length) {
         if (!_allocator.is_reserved(offset)) {
             Log::error("Invalid Vulkan buffer offset write");
         }
         _memory.write(src, offset, length);
     }
 
-    void Buffer::read(char *dst, unsigned offset, unsigned length) {
+    void Buffer::read(i8 *dst, u32 offset, u32 length) {
         if (!_allocator.is_reserved(offset)) {
             Log::error("Invalid Vulkan buffer offset read");
         }
         _memory.read(dst, offset, length);
     }
 
-    unsigned Buffer::capacity() const { return _allocator.capacity(); }
+    u32 Buffer::capacity() const { return _allocator.capacity(); }
 
-    unsigned Buffer::size(unsigned offset) const {
+    u32 Buffer::size(u32 offset) const {
         return _allocator.size(offset);
     }
 
     void Buffer::copy(Buffer &dst,
-                      unsigned src_offset,
-                      unsigned dst_offset,
-                      unsigned length) {
+                      u32 src_offset,
+                      u32 dst_offset,
+                      u32 length) {
         // Make sure there is enough space
         if (length > dst.size(dst_offset)) {
             Log::error("Attempted to copy Vulkan buffer contents to "

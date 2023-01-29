@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include "../Types.hpp"
 #include "./Vec2.hpp"
 
 namespace Dynamo {
@@ -23,16 +24,16 @@ namespace Dynamo {
         /**
          * @brief Calculate the squared length
          *
-         * @return float
+         * @return f32
          */
-        inline float length_squared() const { return (a - b).length_squared(); }
+        inline f32 length_squared() const { return (a - b).length_squared(); }
 
         /**
          * @brief Calculate the length
          *
-         * @return float
+         * @return f32
          */
-        inline float length() const { return (a - b).length(); }
+        inline f32 length() const { return (a - b).length(); }
 
         /**
          * @brief Equality operator
@@ -41,7 +42,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Segment2 &rhs) const {
+        inline b8 operator==(const Segment2 &rhs) const {
             return (a == rhs.a && b == rhs.b) || (b == rhs.a && a == rhs.b);
         }
 
@@ -52,7 +53,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Segment2 &rhs) const {
+        inline b8 operator!=(const Segment2 &rhs) const {
             return !(*this == rhs);
         }
     };

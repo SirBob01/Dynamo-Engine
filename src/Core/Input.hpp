@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../Math/Vec2.hpp"
+#include "../Types.hpp"
 #include "Display.hpp"
 
 namespace Dynamo {
@@ -197,7 +198,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_pressed(KeyCode code);
+        b8 is_pressed(KeyCode code);
 
         /**
          * @brief Is the mouse button pressed?
@@ -209,7 +210,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_pressed(MouseCode code);
+        b8 is_pressed(MouseCode code);
 
         /**
          * @brief Is the key released?
@@ -221,7 +222,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_released(KeyCode code);
+        b8 is_released(KeyCode code);
 
         /**
          * @brief Is the mouse button released?
@@ -233,7 +234,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_released(MouseCode code);
+        b8 is_released(MouseCode code);
 
         /**
          * @brief Is the key held down?
@@ -242,7 +243,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_down(KeyCode code);
+        b8 is_down(KeyCode code);
 
         /**
          * @brief Is the mouse button held down?
@@ -251,7 +252,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_down(MouseCode code);
+        b8 is_down(MouseCode code);
 
         /**
          * @brief Poll input and update internal state

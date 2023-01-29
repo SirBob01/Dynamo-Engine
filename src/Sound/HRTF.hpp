@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../Types.hpp"
 #include "../Math/Common.hpp"
 #include "../Math/Complex.hpp"
 #include "../Math/Delaunay.hpp"
@@ -25,7 +26,7 @@ namespace Dynamo::Sound {
      * @return WaveForm
      */
     static WaveForm read_HRIR_coefficients() {
-        WaveForm buffer(HRIR_bin_len / sizeof(float));
+        WaveForm buffer(HRIR_bin_len / sizeof(f32));
         std::memcpy(buffer.data(), HRIR_bin, HRIR_bin_len);
         return buffer;
     }
@@ -40,7 +41,7 @@ namespace Dynamo::Sound {
      * @brief Length of an HRIR
      *
      */
-    static constexpr unsigned HRIR_LENGTH = 200;
+    static constexpr u32 HRIR_LENGTH = 200;
 
     /**
      * @brief Generate the HRIR mapping
@@ -49,15 +50,15 @@ namespace Dynamo::Sound {
      */
     static std::unordered_map<Vec2, Sound> generate_HRIR_map() {
         // Generate the point space
-        std::array<float, 27> azimuths = {
+        std::array<f32, 27> azimuths = {
             -90, -80, -65, -55, -45, -40, -35, -30, -25, -20, -15, -10, -5, 0,
             5,   10,  15,  20,  25,  30,  35,  40,  45,  55,  65,  80,  90,
         };
         std::vector<Vec2> points;
-        for (const float &a : azimuths) {
+        for (const f32 &a : azimuths) {
             points.push_back({a, -90});
-            for (unsigned i = 0; i < 50; i++) {
-                float e = -45 + 5.625 * i;
+            for (u32 i = 0; i < 50; i++) {
+                f32 e = -45 + 5.625 * i;
                 points.push_back({a, e});
             }
             points.push_back({a, 270});
@@ -65,11 +66,11 @@ namespace Dynamo::Sound {
 
         // Read the HRIR samples for each point
         std::unordered_map<Vec2, Sound> map;
-        unsigned offset = 0;
+        u32 offset = 0;
         for (Vec2 &point : points) {
             map[point].resize(HRIR_LENGTH, 2);
-            for (unsigned c = 0; c < 2; c++) {
-                for (unsigned f = 0; f < HRIR_LENGTH; f++) {
+            for (u32 c = 0; c < 2; c++) {
+                for (u32 f = 0; f < HRIR_LENGTH; f++) {
                     map[point][c][f] = HRIR_COEFFICIENTS[offset++];
                 }
             }

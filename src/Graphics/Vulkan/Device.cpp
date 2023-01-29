@@ -16,7 +16,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Allocate queues
         std::vector<vk::DeviceQueueCreateInfo> queue_infos;
-        std::vector<std::vector<float>> priorities;
+        std::vector<std::vector<f32>> priorities;
         for (const QueueProperties &queue_properties : unique_families) {
             // Priorities influence scheduling command buffer execution
             priorities.emplace_back(queue_properties.count, 0.0f);
@@ -63,7 +63,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     PhysicalDevice &Device::get_physical() { return _physical; }
 
-    vk::Queue Device::get_queue(QueueFamily family, unsigned index) {
+    vk::Queue Device::get_queue(QueueFamily family, u32 index) {
         QueueProperties properties = _physical.get_queue_properties(family);
         return _handle.getQueue(properties.family_id, index);
     }

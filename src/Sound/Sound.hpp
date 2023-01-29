@@ -5,6 +5,7 @@
 #include <cmath>
 #include <vector>
 
+#include "../Types.hpp"
 #include "../Log/Log.hpp"
 #include "../Math/Fourier.hpp"
 #include "../Utils/ChannelData.hpp"
@@ -14,7 +15,7 @@ namespace Dynamo::Sound {
      * @brief Indiviual sample ranges between [−1.0, +1.0]
      *
      */
-    using WaveSample = float;
+    using WaveSample = f32;
 
     /**
      * @brief An array of samples, a discrete representation of a sound wave
@@ -30,7 +31,7 @@ namespace Dynamo::Sound {
      */
     struct WaveFrame {
         std::array<WaveSample, 2> samples;
-        unsigned channels;
+        u32 channels;
     };
 
     /**
@@ -86,7 +87,7 @@ namespace Dynamo::Sound {
      * @brief Gain coefficients for downmixing a waveform to mono or stereo
      *
      */
-    static const double DOWNMIX_COEFFS[2][9][2] = {
+    static const f64 DOWNMIX_COEFFS[2][9][2] = {
         {
             {M_SQRT1_2},
             {1},
@@ -115,7 +116,7 @@ namespace Dynamo::Sound {
      * @brief The default sample rate is defined to be 44.1KHz
      *
      */
-    static constexpr float DEFAULT_SAMPLE_RATE = 44100;
+    static constexpr f32 DEFAULT_SAMPLE_RATE = 44100;
 
     /**
      * @brief Sound asset represented as a signal holding multiple channels of
@@ -123,7 +124,7 @@ namespace Dynamo::Sound {
      *
      */
     class Sound : public ChannelData<WaveSample> {
-        float _sample_rate;
+        f32 _sample_rate;
 
       public:
         /**
@@ -133,9 +134,9 @@ namespace Dynamo::Sound {
          * @param channels    Number of channels
          * @param sample_rate Sample rate
          */
-        Sound(unsigned frames = 0,
-              unsigned channels = 0,
-              float sample_rate = DEFAULT_SAMPLE_RATE) :
+        Sound(u32 frames = 0,
+              u32 channels = 0,
+              f32 sample_rate = DEFAULT_SAMPLE_RATE) :
             ChannelData<WaveSample>(frames, channels),
             _sample_rate(sample_rate) {}
 
@@ -147,17 +148,17 @@ namespace Dynamo::Sound {
          * @param sample_rate Sample rate
          */
         Sound(std::vector<WaveSample> samples,
-              unsigned channels,
-              float sample_rate) :
+              u32 channels,
+              f32 sample_rate) :
             ChannelData<WaveSample>(samples, channels),
             _sample_rate(sample_rate) {}
 
         /**
          * @brief Get the sample rate of the signal
          *
-         * @return float
+         * @return f32
          */
-        inline float sample_rate() const { return _sample_rate; }
+        inline f32 sample_rate() const { return _sample_rate; }
 
         /**
          * @brief Grab a frame in the waveform and upmix or downmix to the
@@ -167,6 +168,6 @@ namespace Dynamo::Sound {
          * @param out_channels Target number of channels
          * @return WaveFrame
          */
-        WaveFrame get_frame(const unsigned frame, const unsigned out_channels);
+        WaveFrame get_frame(const u32 frame, const u32 out_channels);
     };
 } // namespace Dynamo::Sound

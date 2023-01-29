@@ -2,10 +2,11 @@
 
 #include "../../Math/Quaternion.hpp"
 #include "../../Math/Vec3.hpp"
+#include "../../Types.hpp"
 
 #include "../Listener.hpp"
-#include "../Sound.hpp"
 #include "../Material.hpp"
+#include "../Sound.hpp"
 
 namespace Dynamo::Sound {
     /**
@@ -25,7 +26,7 @@ namespace Dynamo::Sound {
          * @return Sound&
          */
         virtual Sound &
-        apply(Sound &src, const unsigned src_offset, const unsigned length) = 0;
+        apply(Sound &src, const u32 src_offset, const u32 length) = 0;
     };
 
     /**
@@ -48,8 +49,8 @@ namespace Dynamo::Sound {
          * @return Sound&
          */
         virtual Sound &apply(Sound &src,
-                             const unsigned src_offset,
-                             const unsigned length,
+                             const u32 src_offset,
+                             const u32 length,
                              const DynamicMaterial &material,
                              const ListenerProperties &listener) = 0;
     };

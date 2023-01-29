@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 #include "./Box2.hpp"
 #include "./Circle.hpp"
 #include "./Segment2.hpp"

@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../Types.hpp"
+
 namespace Dynamo::Sound {
     /**
      * @brief Device for reading and/or writing audio data
@@ -12,7 +14,7 @@ namespace Dynamo::Sound {
          * @brief Unique identifier of the device
          *
          */
-        int id;
+        i32 id;
 
         /**
          * @brief Name of the device
@@ -24,18 +26,18 @@ namespace Dynamo::Sound {
          * @brief Number of available input channels
          *
          */
-        unsigned input_channels;
+        u32 input_channels;
 
         /**
          * @brief Number of available output channels
          *
          */
-        unsigned output_channels;
+        u32 output_channels;
 
         /**
          * @brief Compatible sample rate
          *
          */
-        float sample_rate;
+        f32 sample_rate;
     };
 } // namespace Dynamo::Sound

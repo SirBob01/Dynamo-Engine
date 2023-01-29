@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 
 #include "Asset.hpp"
 
@@ -44,9 +45,9 @@ namespace Dynamo {
         /**
          * @brief Count the number of loaded assets
          *
-         * @return unsigned
+         * @return u32
          */
-        inline unsigned size() { return _pool.size(); }
+        inline u32 size() { return _pool.size(); }
 
         /**
          * @brief Check if an asset file is in cache
@@ -55,7 +56,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool contains(const std::string filename) {
+        inline b8 contains(const std::string filename) {
             return _pool.count(filename) > 0;
         }
 

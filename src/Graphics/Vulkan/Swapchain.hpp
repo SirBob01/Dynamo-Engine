@@ -5,6 +5,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Core/Display.hpp"
 #include "../../Log/Log.hpp"
 #include "./Device.hpp"
@@ -117,9 +118,9 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Acquire the index to the next presentation target image
          *
          * @param semaphore Semaphore to signal
-         * @return std::optional<unsigned>
+         * @return std::optional<u32>
          */
-        std::optional<unsigned>
+        std::optional<u32>
         get_presentation_image(const Semaphore &semaphore) const;
     };
 } // namespace Dynamo::Graphics::Vulkan

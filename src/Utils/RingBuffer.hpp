@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "../Types.hpp"
+
 namespace Dynamo {
     /**
      * @brief A circular buffer such that writing will automatically loop back
@@ -14,17 +16,17 @@ namespace Dynamo {
      * @tparam T Type of element, must be trivially copyable
      * @tparam N Maximum size of the container (power of 2)
      */
-    template <typename T, unsigned N>
+    template <typename T, u32 N>
     class RingBuffer {
-        static const unsigned MASK = N - 1;
+        static const u32 MASK = N - 1;
         static_assert(N > 0 && (N & MASK) == 0,
                       "RingBuffer size (> 0) should be a power of 2");
         static_assert(std::is_trivially_copyable<T>::value,
                       "RingBuffer element type must be trivially copyable");
 
         std::array<T, N> _buffer;
-        unsigned _read;
-        unsigned _write;
+        u32 _read;
+        u32 _write;
 
       public:
         /**
@@ -39,7 +41,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool full() const { return size() == N; }
+        inline b8 full() const { return size() == N; }
 
         /**
          * @brief Check if the buffer is empty
@@ -47,21 +49,21 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool empty() const { return size() == 0; }
+        inline b8 empty() const { return size() == 0; }
 
         /**
          * @brief Get the size of the buffer
          *
-         * @return unsigned
+         * @return u32
          */
-        inline unsigned size() const { return (_write - _read); }
+        inline u32 size() const { return (_write - _read); }
 
         /**
          * @brief Get the number of writes that can still be performed
          *
-         * @return unsigned
+         * @return u32
          */
-        inline unsigned remaining() const { return N - size(); }
+        inline u32 remaining() const { return N - size(); }
 
         /**
          * @brief Read a value from the buffer, advancing the read pointer
@@ -91,14 +93,14 @@ namespace Dynamo {
          *
          * @param dst
          * @param n
-         * @return unsigned
+         * @return u32
          */
-        inline unsigned read(T *dst, const unsigned n) {
+        inline u32 read(T *dst, const u32 n) {
             // Compute copy partitions
-            unsigned offset = _read & MASK;
-            unsigned length = std::min(n, size());
-            unsigned l_length = std::min(length, N - offset);
-            unsigned r_length = length - l_length;
+            u32 offset = _read & MASK;
+            u32 length = std::min(n, size());
+            u32 l_length = std::min(length, N - offset);
+            u32 r_length = length - l_length;
 
             T *src = _buffer.data();
             std::copy(src + offset, src + offset + l_length, dst);
@@ -117,13 +119,13 @@ namespace Dynamo {
          *
          * @param src
          * @param n
-         * @return unsigned
+         * @return u32
          */
-        inline unsigned write(const T *src, const unsigned n) {
+        inline u32 write(const T *src, const u32 n) {
             // Compute copy partitions
-            unsigned offset = _write & MASK;
-            unsigned length = std::min(n, remaining());
-            unsigned l_length = std::min(length, N - offset);
+            u32 offset = _write & MASK;
+            u32 length = std::min(n, remaining());
+            u32 l_length = std::min(length, N - offset);
 
             T *dst = _buffer.data();
             std::copy(src, src + l_length, dst + offset);

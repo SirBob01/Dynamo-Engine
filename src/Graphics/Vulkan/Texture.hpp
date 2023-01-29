@@ -2,6 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Buffer.hpp"
 #include "./CommandPool.hpp"
 #include "./Device.hpp"
@@ -22,9 +23,9 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class Texture {
-        unsigned _width;
-        unsigned _height;
-        unsigned _mip_levels;
+        u32 _width;
+        u32 _height;
+        u32 _mip_levels;
 
         UserImage _image;
         ImageView _view;
@@ -49,7 +50,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param pixels
          * @param staging_buffer
          */
-        void copy_pixels(unsigned char pixels[], Buffer &staging_buffer);
+        void copy_pixels(u8 pixels[], Buffer &staging_buffer);
 
         /**
          * @brief Generate the image mip maps
@@ -58,9 +59,9 @@ namespace Dynamo::Graphics::Vulkan {
         void generate_mipmaps();
 
       public:
-        Texture(unsigned char pixels[],
-                unsigned width,
-                unsigned height,
+        Texture(u8 pixels[],
+                u32 width,
+                u32 height,
                 Device &device,
                 MemoryPool &memory_pool,
                 Buffer &staging_buffer,

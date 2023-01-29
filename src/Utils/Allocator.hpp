@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 
 namespace Dynamo {
     /**
@@ -12,9 +13,9 @@ namespace Dynamo {
      *
      * @param size      Size in bytes
      * @param alignment Alignment in bytes
-     * @return unsigned
+     * @return u32
      */
-    inline unsigned align_size(unsigned size, unsigned alignment) {
+    inline u32 align_size(u32 size, u32 alignment) {
         return ((size + alignment - 1) / alignment) * alignment;
     }
 
@@ -25,13 +26,13 @@ namespace Dynamo {
      */
     class Allocator {
         struct Block {
-            unsigned offset;
-            unsigned size;
+            u32 offset;
+            u32 size;
         };
         std::list<Block> _free;
-        std::unordered_map<unsigned, unsigned> _used;
+        std::unordered_map<u32, u32> _used;
 
-        unsigned _capacity;
+        u32 _capacity;
 
         /**
          * @brief Join adjacent blocks
@@ -46,7 +47,7 @@ namespace Dynamo {
          *
          * @param capacity Capacity of the heap
          */
-        Allocator(unsigned capacity);
+        Allocator(u32 capacity);
 
         /**
          * @brief Reserve a block of memory with specific alignment
@@ -54,23 +55,23 @@ namespace Dynamo {
          *
          * @param size      Desired size in bytes
          * @param alignment Alignment requirement in bytes
-         * @return std::optional<unsigned>
+         * @return std::optional<u32>
          */
-        std::optional<unsigned> reserve(unsigned size, unsigned alignment);
+        std::optional<u32> reserve(u32 size, u32 alignment);
 
         /**
          * @brief Free the block of reserved memory at an offset
          *
          * @param offset Offset within the pool in bytes returned by reserve()
          */
-        void free(unsigned offset);
+        void free(u32 offset);
 
         /**
          * @brief Grow the total capacity, expanding the free blocks
          *
          * @param capacity New capacity in bytes >= current_capacity
          */
-        void grow(unsigned capacity);
+        void grow(u32 capacity);
 
         /**
          * @brief Check if an offset is mapped to a reserved block
@@ -79,22 +80,22 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_reserved(unsigned offset) const;
+        b8 is_reserved(u32 offset) const;
 
         /**
          * @brief Get the capacity of the allocator
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned capacity() const;
+        u32 capacity() const;
 
         /**
          * @brief Get the size of a reserved block
          *
          * @param offset Offset within the pool in bytes returned by reserve()
-         * @return unsigned
+         * @return u32
          */
-        unsigned size(unsigned offset) const;
+        u32 size(u32 offset) const;
 
         /**
          * @brief Generate the human-readable string to visualize the state

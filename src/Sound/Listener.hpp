@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Types.hpp"
 #include "../Math/Quaternion.hpp"
 #include "../Math/Vec3.hpp"
 #include "../Utils/IdTracker.hpp"
@@ -21,7 +22,7 @@ namespace Dynamo::Sound {
          * @brief Listener volume
          *
          */
-        float volume = 1.0;
+        f32 volume = 1.0;
 
         /**
          * @brief Position of the listener in 3D space
@@ -63,9 +64,9 @@ namespace Dynamo::Sound {
         /**
          * @brief Get the number of listeners
          *
-         * @return unsigned
+         * @return u32
          */
-        inline unsigned size() { return _properties.size(); }
+        inline u32 size() { return _properties.size(); }
 
         /**
          * @brief Create a new listener
@@ -121,7 +122,7 @@ namespace Dynamo::Sound {
          * @param index
          * @return ListenerProperties&
          */
-        inline ListenerProperties &operator[](unsigned index) {
+        inline ListenerProperties &operator[](u32 index) {
             return _properties.at(index);
         }
     };

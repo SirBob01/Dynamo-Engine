@@ -68,7 +68,7 @@ namespace Dynamo::Sound {
         }
     }
 
-    int Jukebox::input_callback(const void *input,
+    i32 Jukebox::input_callback(const void *input,
                                 void *output,
                                 unsigned long frame_count,
                                 const PaStreamCallbackTimeInfo *time_info,
@@ -80,7 +80,7 @@ namespace Dynamo::Sound {
         return 0;
     }
 
-    int Jukebox::output_callback(const void *input,
+    i32 Jukebox::output_callback(const void *input,
                                  void *output,
                                  unsigned long frame_count,
                                  const PaStreamCallbackTimeInfo *time_info,
@@ -97,18 +97,18 @@ namespace Dynamo::Sound {
         StaticMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
-                                     static_cast<float>(sound.frames()));
-        double frames = frame_stop - chunk.frame;
+        f64 frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
+                                  static_cast<f32>(sound.frames()));
+        f64 frames = frame_stop - chunk.frame;
 
         // Calculate the number of frames required in the original signal to
         // produce the destination frames
-        double factor = sound.sample_rate() / _output_state.sample_rate;
-        double length = frames * factor;
+        f64 factor = sound.sample_rate() / _output_state.sample_rate;
+        f64 length = frames * factor;
 
         // Resample the audio to the device sample rate
         Sound transformed(frames, _output_state.channels);
-        for (unsigned c = 0; c < transformed.channels(); c++) {
+        for (u32 c = 0; c < transformed.channels(); c++) {
             resample_signal(sound[c],
                             transformed[c],
                             chunk.frame,
@@ -123,12 +123,12 @@ namespace Dynamo::Sound {
         }
 
         // Mix the filtered sound onto the composite signal
-        float volume = material.volume * _volume;
-        for (unsigned f = 0; f < transformed.frames(); f++) {
-            for (unsigned c = 0; c < transformed.channels(); c++) {
-                unsigned i = f * transformed.channels() + c;
-                float s0 = _composite[i];
-                float s1 = transformed[c][f];
+        f32 volume = material.volume * _volume;
+        for (u32 f = 0; f < transformed.frames(); f++) {
+            for (u32 c = 0; c < transformed.channels(); c++) {
+                u32 i = f * transformed.channels() + c;
+                f32 s0 = _composite[i];
+                f32 s1 = transformed[c][f];
                 _composite[i] = (s0 + s1) * volume;
             }
         }
@@ -144,18 +144,18 @@ namespace Dynamo::Sound {
         DynamicMaterial &material = chunk.material.get();
 
         // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
-                                     static_cast<float>(sound.frames()));
-        double frames = frame_stop - chunk.frame;
+        f64 frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
+                                  static_cast<f32>(sound.frames()));
+        f64 frames = frame_stop - chunk.frame;
 
         // Calculate the number of frames required in the original signal to
         // produce the destination frames
-        double factor = sound.sample_rate() / _output_state.sample_rate;
-        double length = frames * factor;
+        f64 factor = sound.sample_rate() / _output_state.sample_rate;
+        f64 length = frames * factor;
 
         // Resample the audio to the device sample rate
         Sound transformed(frames, _output_state.channels);
-        for (unsigned c = 0; c < transformed.channels(); c++) {
+        for (u32 c = 0; c < transformed.channels(); c++) {
             resample_signal(sound[c],
                             transformed[c],
                             chunk.frame,
@@ -175,12 +175,12 @@ namespace Dynamo::Sound {
         }
 
         // Mix the filtered sound onto the composite signal
-        float volume = material.volume * listener.volume * _volume;
-        for (unsigned f = 0; f < transformed.frames(); f++) {
-            for (unsigned c = 0; c < transformed.channels(); c++) {
-                unsigned i = f * transformed.channels() + c;
-                float s0 = _composite[i];
-                float s1 = transformed[c][f];
+        f32 volume = material.volume * listener.volume * _volume;
+        for (u32 f = 0; f < transformed.frames(); f++) {
+            for (u32 c = 0; c < transformed.channels(); c++) {
+                u32 i = f * transformed.channels() + c;
+                f32 s0 = _composite[i];
+                f32 s1 = transformed[c][f];
                 _composite[i] = (s0 + s1) * volume;
             }
         }
@@ -191,13 +191,13 @@ namespace Dynamo::Sound {
 
     ListenerProperties &
     Jukebox::find_closest_listener(const DynamicMaterial &material) {
-        unsigned closest_index = 0;
-        for (unsigned i = 0; i < _listeners.size(); i++) {
+        u32 closest_index = 0;
+        for (u32 i = 0; i < _listeners.size(); i++) {
             Vec3 best = _listeners[i].position;
             Vec3 curr = _listeners[closest_index].position;
 
-            float a = (best - material.position).length_squared();
-            float b = (curr - material.position).length_squared();
+            f32 a = (best - material.position).length_squared();
+            f32 b = (curr - material.position).length_squared();
             if (b < a) {
                 closest_index = i;
             }
@@ -210,7 +210,7 @@ namespace Dynamo::Sound {
         PaError err;
 
         // Count the devices
-        int device_count = Pa_GetDeviceCount();
+        i32 device_count = Pa_GetDeviceCount();
         if (device_count < 0) {
             err = device_count;
             Log::error("PortAudio failed to count sound devices: {}",
@@ -218,7 +218,7 @@ namespace Dynamo::Sound {
         }
 
         // List all devices
-        for (int index = 0; index < device_count; index++) {
+        for (i32 index = 0; index < device_count; index++) {
             const PaDeviceInfo *device_info = Pa_GetDeviceInfo(index);
             Device device;
             device.id = index;
@@ -329,21 +329,21 @@ namespace Dynamo::Sound {
         _composite.resize(MAX_CHUNK_LENGTH * device.output_channels, 0);
     }
 
-    bool Jukebox::is_playing() {
+    b8 Jukebox::is_playing() {
         return _output_stream != nullptr && Pa_IsStreamActive(_output_stream);
     }
 
-    bool Jukebox::is_recording() {
+    b8 Jukebox::is_recording() {
         return _input_stream != nullptr && Pa_IsStreamActive(_input_stream);
     }
 
-    float Jukebox::get_volume() { return _volume; }
+    f32 Jukebox::get_volume() { return _volume; }
 
     void Jukebox::pause() { Pa_StopStream(_output_stream); }
 
     void Jukebox::resume() { Pa_StartStream(_output_stream); }
 
-    void Jukebox::set_volume(float volume) {
+    void Jukebox::set_volume(f32 volume) {
         _volume = std::clamp(volume, 0.0f, 1.0f);
     }
 
@@ -352,18 +352,18 @@ namespace Dynamo::Sound {
     ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
     void Jukebox::play(Asset<Sound> &sound, StaticMaterial &material) {
-        float frame = _output_state.sample_rate * material.start_seconds;
+        f32 frame = _output_state.sample_rate * material.start_seconds;
         _static_chunks.push_back({*sound, material, frame});
     }
 
     void Jukebox::play(Asset<Sound> &sound, DynamicMaterial &material) {
-        float frame = _output_state.sample_rate * material.start_seconds;
+        f32 frame = _output_state.sample_rate * material.start_seconds;
         _dynamic_chunks.push_back({*sound, material, frame});
     }
 
     void Jukebox::update() {
         // Wait for there to be available space in the buffer
-        unsigned min_length = MAX_CHUNK_LENGTH * _output_state.channels;
+        u32 min_length = MAX_CHUNK_LENGTH * _output_state.channels;
         if (_output_state.buffer.remaining() < min_length || !is_playing()) {
             return;
         }

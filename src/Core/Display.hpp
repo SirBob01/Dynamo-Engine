@@ -5,6 +5,7 @@
 
 #include "../Log/Log.hpp"
 #include "../Math/Vec2.hpp"
+#include "../Types.hpp"
 
 namespace Dynamo {
     /**
@@ -17,7 +18,7 @@ namespace Dynamo {
         GLFWwindow *_window;
 
         Vec2 _size;
-        bool _vsync;
+        b8 _vsync;
 
         std::string _title;
 
@@ -31,11 +32,11 @@ namespace Dynamo {
          * @param fullscreen Toggle fullscreen mode
          * @param vsync      Toggle vsync
          */
-        Display(int width,
-                int height,
+        Display(i32 width,
+                i32 height,
                 std::string title,
-                bool fullscreen,
-                bool vsync);
+                b8 fullscreen,
+                b8 vsync);
 
         /**
          * @brief Destroy the Display object
@@ -79,7 +80,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_closed();
+        b8 is_closed();
 
         /**
          * @brief Is the display windowed or in fullscreen?
@@ -87,7 +88,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_fullscreen();
+        b8 is_fullscreen();
 
         /**
          * @brief Is vsync enabled?
@@ -95,7 +96,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        bool is_vsync();
+        b8 is_vsync();
 
         /**
          * @brief Set the logical size of the display
@@ -116,14 +117,14 @@ namespace Dynamo {
          *
          * @param fullscreen
          */
-        void set_fullscreen(bool fullscreen);
+        void set_fullscreen(b8 fullscreen);
 
         /**
          * @brief Toggle vsync
          *
          * @param vsync
          */
-        void set_vsync(bool vsync);
+        void set_vsync(b8 vsync);
 
         /**
          * @brief Set the icon of the window

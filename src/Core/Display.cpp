@@ -2,11 +2,11 @@
 #include "Display.hpp"
 
 namespace Dynamo {
-    Display::Display(int width,
-                     int height,
+    Display::Display(i32 width,
+                     i32 height,
                      std::string title,
-                     bool fullscreen,
-                     bool vsync) {
+                     b8 fullscreen,
+                     b8 vsync) {
         _monitor = glfwGetPrimaryMonitor();
         if (!_monitor) {
             Log::error("GLFW could not find primary monitor device.");
@@ -36,7 +36,7 @@ namespace Dynamo {
     GLFWwindow *Display::get_window() { return _window; }
 
     Vec2 Display::get_window_size() {
-        int width, height;
+        i32 width, height;
         glfwGetWindowSize(_window, &width, &height);
         return Vec2(width, height);
     }
@@ -45,13 +45,13 @@ namespace Dynamo {
 
     const std::string Display::get_title() { return _title; }
 
-    bool Display::is_closed() { return glfwWindowShouldClose(_window); }
+    b8 Display::is_closed() { return glfwWindowShouldClose(_window); }
 
-    bool Display::is_fullscreen() {
+    b8 Display::is_fullscreen() {
         return glfwGetWindowMonitor(_window) != nullptr;
     }
 
-    bool Display::is_vsync() { return _vsync; }
+    b8 Display::is_vsync() { return _vsync; }
 
     void Display::set_size(Vec2 size) {
         _size.x = size.x;
@@ -63,7 +63,7 @@ namespace Dynamo {
         glfwSetWindowTitle(_window, _title.c_str());
     }
 
-    void Display::set_fullscreen(bool fullscreen) {
+    void Display::set_fullscreen(b8 fullscreen) {
         const GLFWvidmode *mode = glfwGetVideoMode(_monitor);
         if (fullscreen) {
             glfwSetWindowMonitor(_window,
@@ -84,7 +84,7 @@ namespace Dynamo {
         }
     }
 
-    void Display::set_vsync(bool vsync) {
+    void Display::set_vsync(b8 vsync) {
         _vsync = vsync;
         if (vsync) {
             glfwSwapInterval(1);
@@ -94,7 +94,7 @@ namespace Dynamo {
     }
 
     void Display::set_icon(std::string filename) {
-        int width, height, channels;
+        i32 width, height, channels;
         stbi_uc *pixels = stbi_load(filename.c_str(),
                                     &width,
                                     &height,

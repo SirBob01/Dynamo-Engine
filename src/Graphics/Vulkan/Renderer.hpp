@@ -8,6 +8,7 @@
 #include <stb_image.h>
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
 #include "../Renderer.hpp"
 #include "./Buffer.hpp"
@@ -90,8 +91,8 @@ namespace Dynamo::Graphics::Vulkan {
         vk::ClearValue _depth_clear;
 
         // Frame counters
-        unsigned _frame = 0;
-        unsigned _max_frames_processing = 3;
+        u32 _frame = 0;
+        u32 _max_frames_processing = 3;
 
         /**
          * @brief Debugger
@@ -103,13 +104,13 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief List of supported extensions
          *
          */
-        std::vector<const char *> _extensions;
+        std::vector<const i8 *> _extensions;
 
         /**
          * @brief List of enabled validation layers for debugging
          *
          */
-        std::vector<const char *> _validation_layers;
+        std::vector<const i8 *> _validation_layers;
 
         /**
          * @brief Enumerate all the supported extensions
@@ -123,7 +124,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return true
          * @return false
          */
-        bool is_supporting_layers();
+        b8 is_supporting_layers();
 
         /**
          * @brief Create a new vk::UniqueInstance

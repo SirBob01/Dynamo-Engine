@@ -6,6 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Device.hpp"
 #include "./PipelineLayout.hpp"
 #include "./RenderPass.hpp"

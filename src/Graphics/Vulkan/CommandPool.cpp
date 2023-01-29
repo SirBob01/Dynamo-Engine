@@ -18,7 +18,7 @@ namespace Dynamo::Graphics::Vulkan {
     QueueFamily CommandPool::get_family() const { return _family; }
 
     std::vector<vk::UniqueCommandBuffer>
-    CommandPool::allocate(vk::CommandBufferLevel level, unsigned count) {
+    CommandPool::allocate(vk::CommandBufferLevel level, u32 count) {
         vk::CommandBufferAllocateInfo alloc_info;
         alloc_info.commandPool = _handle;
         alloc_info.level = level;

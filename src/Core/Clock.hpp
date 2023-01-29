@@ -2,20 +2,22 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../Types.hpp"
+
 namespace Dynamo {
     /**
      * @brief Internal timing system
      *
      */
     class Clock {
-        int _frames;
-        int _fps_period;
+        i32 _frames;
+        i32 _fps_period;
 
-        double _fps_start;
-        double _fps;
+        f64 _fps_start;
+        f64 _fps;
 
-        double _delta;
-        double _last_time;
+        f64 _delta;
+        f64 _last_time;
 
       public:
         /**
@@ -28,33 +30,33 @@ namespace Dynamo {
          * @brief Get the high precision time since the engine was initialized
          * in seconds
          *
-         * @return double
+         * @return f64
          */
-        double get_time();
+        f64 get_time();
 
         /**
          * @brief Get the high precision delta time for the current frame in
          * seconds
          *
-         * @return double
+         * @return f64
          */
-        double get_delta();
+        f64 get_delta();
 
         /**
          * @brief Get the current FPS averaged over a fixed number of frames
          *
-         * @return double
+         * @return f64
          */
-        double get_fps();
+        f64 get_fps();
 
         /**
          * @brief Get the number of frames since the engine was initialized
          *
          * This is simply a counter that is incremented every tick
          *
-         * @return int
+         * @return i32
          */
-        int get_frames();
+        i32 get_frames();
 
         /**
          * @brief Update the clock

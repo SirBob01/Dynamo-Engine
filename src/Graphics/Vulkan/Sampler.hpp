@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -24,7 +25,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param device  Reference to the logical device
          * @param max_lod Maximum level of detail
          */
-        Sampler(Device &device, unsigned max_lod);
+        Sampler(Device &device, u32 max_lod);
 
         /**
          * @brief Destroy the Sampler object

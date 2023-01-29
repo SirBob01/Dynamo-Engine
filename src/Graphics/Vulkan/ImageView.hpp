@@ -4,6 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "./Device.hpp"
 #include "./Image.hpp"
 
@@ -29,8 +30,8 @@ namespace Dynamo::Graphics::Vulkan {
         ImageView(Image &image,
                   vk::ImageViewType type,
                   vk::ImageAspectFlags aspect_mask,
-                  unsigned mip_levels,
-                  unsigned layer_count = 1);
+                  u32 mip_levels,
+                  u32 layer_count = 1);
 
         /**
          * @brief Destroy the ImageView object

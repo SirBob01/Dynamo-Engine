@@ -33,9 +33,9 @@ namespace Dynamo::Graphics::Vulkan {
 
     void Renderer::enumerate_extensions() {
         // Get supported extensions from GLFW
-        unsigned count;
-        const char **extensions = glfwGetRequiredInstanceExtensions(&count);
-        for (int i = 0; i < count; i++) {
+        u32 count;
+        const i8 **extensions = glfwGetRequiredInstanceExtensions(&count);
+        for (i32 i = 0; i < count; i++) {
             _extensions.push_back(extensions[i]);
         }
 
@@ -44,16 +44,16 @@ namespace Dynamo::Graphics::Vulkan {
         _validation_layers.push_back("VK_LAYER_KHRONOS_validation");
         _extensions.push_back("VK_EXT_debug_utils");
         Log::info("--- Vulkan Extensions ---");
-        for (const char *extension : _extensions) {
+        for (const i8 *extension : _extensions) {
             Log::info("* {}", extension);
         }
         Log::info("");
 #endif
     }
 
-    bool Renderer::is_supporting_layers() {
+    b8 Renderer::is_supporting_layers() {
         auto layer_properties = vk::enumerateInstanceLayerProperties();
-        for (const char *requested : _validation_layers) {
+        for (const i8 *requested : _validation_layers) {
             for (vk::LayerProperties &available : layer_properties) {
                 if (!std::strcmp(requested, available.layerName)) {
                     return true;
@@ -175,7 +175,7 @@ namespace Dynamo::Graphics::Vulkan {
         _signal_render_done.clear();
         _fences.clear();
 
-        for (int i = 0; i < _max_frames_processing; i++) {
+        for (i32 i = 0; i < _max_frames_processing; i++) {
             _signal_image_ready.push_back(
                 std::make_unique<Semaphore>(*_device));
             _signal_render_done.push_back(
@@ -341,7 +341,7 @@ namespace Dynamo::Graphics::Vulkan {
         };
 
         vk::CommandBufferBeginInfo begin_info;
-        for (unsigned i = 0; i < _framebuffers.size(); i++) {
+        for (u32 i = 0; i < _framebuffers.size(); i++) {
             // Start recording
             _graphics_command_buffers[i]->begin(begin_info);
 
@@ -393,13 +393,13 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     Texture Renderer::create_texture(std::string filename) {
-        int width, height, channels;
+        i32 width, height, channels;
         stbi_uc *raw_data = stbi_load(filename.c_str(),
                                       &width,
                                       &height,
                                       &channels,
                                       STBI_rgb_alpha);
-        std::vector<unsigned char> pixels(width * height * STBI_rgb_alpha);
+        std::vector<u8> pixels(width * height * STBI_rgb_alpha);
         std::copy(raw_data, raw_data + pixels.size(), pixels.data());
         stbi_image_free(raw_data);
 
@@ -422,13 +422,13 @@ namespace Dynamo::Graphics::Vulkan {
         record_commands();
 
         // Grab the next available swapchain image presentation target
-        std::optional<unsigned> acquired =
+        std::optional<u32> acquired =
             _swapchain->get_presentation_image(*_signal_image_ready[_frame]);
         if (!acquired.has_value()) {
             reset_swapchain();
             return;
         }
-        unsigned image_index = acquired.value();
+        u32 image_index = acquired.value();
 
         // Wait for the fence to finish and reset before proceeding
         _fences[_frame]->wait();

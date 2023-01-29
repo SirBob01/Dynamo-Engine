@@ -6,6 +6,7 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include "../../Types.hpp"
 #include "../../Utils/Bits.hpp"
 #include "./Device.hpp"
 #include "./Memory.hpp"
@@ -15,7 +16,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Minimum capacity of a Memory object
      *
      */
-    constexpr unsigned MINIMUM_MEMORY_CAPACITY = 256 * (1 << 20);
+    constexpr u32 MINIMUM_MEMORY_CAPACITY = 256 * (1 << 20);
 
     /**
      * @brief MemoryBlock exposes a similar interface to Memory for managing an
@@ -25,10 +26,10 @@ namespace Dynamo::Graphics::Vulkan {
      */
     class MemoryBlock {
         std::reference_wrapper<Memory> _memory;
-        unsigned _offset;
-        unsigned _size;
+        u32 _offset;
+        u32 _size;
 
-        bool _moved;
+        b8 _moved;
 
       public:
         /**
@@ -38,7 +39,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Reserved block offset in bytes
          * @param size   Reserved block size in bytes
          */
-        MemoryBlock(Memory &memory, unsigned offset, unsigned size);
+        MemoryBlock(Memory &memory, u32 offset, u32 size);
 
         /**
          * @brief Move constructor
@@ -63,16 +64,16 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the offset
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned offset() const;
+        u32 offset() const;
 
         /**
          * @brief Get the size of the allocation
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned size() const;
+        u32 size() const;
 
         /**
          * @brief Read from the underlying memory at an offset
@@ -81,7 +82,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the memory map in bytes
          * @param length Length of the read in bytes
          */
-        void read(char *dst, unsigned offset, unsigned length);
+        void read(i8 *dst, u32 offset, u32 length);
 
         /**
          * @brief Write to the underlying memory at an offset
@@ -90,7 +91,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the memory map in bytes
          * @param length Length of the read in bytes
          */
-        void write(char *src, unsigned offset, unsigned length);
+        void write(i8 *src, u32 offset, u32 length);
 
         /**
          * @brief Bind a vk::Image to the block
@@ -137,7 +138,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @return true
          * @return false
          */
-        bool is_compatible(Memory &memory,
+        b8 is_compatible(Memory &memory,
                            vk::MemoryRequirements requirements,
                            vk::MemoryPropertyFlags properties);
 
