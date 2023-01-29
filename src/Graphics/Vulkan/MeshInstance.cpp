@@ -19,10 +19,10 @@ namespace Dynamo::Graphics::Vulkan {
             _object_buffer.get().reserve(index_buffer_length, 1);
 
         // Write mesh data to the staging buffer
-        staging_buffer.write(reinterpret_cast<char *>(mesh.vertices.data()),
+        staging_buffer.write(reinterpret_cast<u8 *>(mesh.vertices.data()),
                              vs_offset,
                              vertex_buffer_length);
-        staging_buffer.write(reinterpret_cast<char *>(mesh.indices.data()),
+        staging_buffer.write(reinterpret_cast<u8 *>(mesh.indices.data()),
                              is_offset,
                              index_buffer_length);
 

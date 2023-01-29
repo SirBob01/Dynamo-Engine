@@ -63,7 +63,6 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Create the swapchain and its images
-        const vk::Device &logical = device.get_handle();
         _handle = _device.get().get_handle().createSwapchainKHR(swapchain_info);
         create_images(memory_pool);
     }

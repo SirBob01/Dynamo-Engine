@@ -28,7 +28,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Map memory once if possible
         if (properties & vk::MemoryPropertyFlagBits::eHostVisible) {
-            _mapped = reinterpret_cast<i8 *>(
+            _mapped = reinterpret_cast<u8 *>(
                 _device.get().get_handle().mapMemory(_handle, 0, _capacity));
         } else {
             _mapped = nullptr;
@@ -50,13 +50,13 @@ namespace Dynamo::Graphics::Vulkan {
 
     u32 Memory::get_capacity() const { return _capacity; }
 
-    void Memory::read(i8 *dst, u32 offset, u32 length) {
+    void Memory::read(u8 *dst, u32 offset, u32 length) {
         DYN_ASSERT(_mapped != nullptr);
         DYN_ASSERT(offset + length <= _capacity);
         std::memcpy(dst, _mapped + offset, length);
     }
 
-    void Memory::write(i8 *src, u32 offset, u32 length) {
+    void Memory::write(u8 *src, u32 offset, u32 length) {
         DYN_ASSERT(_mapped != nullptr);
         DYN_ASSERT(offset + length <= _capacity);
         std::memcpy(_mapped + offset, src, length);

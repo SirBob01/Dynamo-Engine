@@ -44,7 +44,7 @@ namespace Dynamo::Graphics::Vulkan {
         return _descriptor_set_groups;
     }
 
-    void Material::set(const std::string field, char *src, u32 size) {
+    void Material::set(const std::string field, u8 *src, u32 size) {
         // TODO: Copy data into the buffer
     }
 

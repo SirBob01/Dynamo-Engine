@@ -10,7 +10,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         _bytecode.resize(file.tellg());
         file.seekg(0);
-        file.read(_bytecode.data(), _bytecode.size());
+        file.read(reinterpret_cast<i8 *>(_bytecode.data()), _bytecode.size());
         file.close();
 
         SpvReflectShaderModule module;
@@ -148,7 +148,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     const std::string &Shader::get_filename() const { return _filename; }
 
-    const std::vector<char> &Shader::get_bytecode() const { return _bytecode; }
+    const std::vector<u8> &Shader::get_bytecode() const { return _bytecode; }
 
     ShaderStage Shader::get_stage() const { return _stage; }
 

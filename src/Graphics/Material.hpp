@@ -27,7 +27,7 @@ namespace Dynamo::Graphics {
          * @param src   Source data
          * @param size  Size of the data
          */
-        virtual void set(const std::string field, char *src, unsigned size) = 0;
+        virtual void set(const std::string field, u8 *src, u32 size) = 0;
 
         /**
          * @brief Set a float uniform
@@ -35,8 +35,8 @@ namespace Dynamo::Graphics {
          * @param field Name of the uniform variable within the shader
          * @param data  Source data
          */
-        inline void set_float(const std::string field, float data) {
-            set(field, reinterpret_cast<char *>(&data), sizeof(data));
+        inline void set_float(const std::string field, f32 data) {
+            set(field, reinterpret_cast<u8 *>(&data), sizeof(data));
         }
 
         /**
@@ -45,8 +45,8 @@ namespace Dynamo::Graphics {
          * @param field Name of the uniform variable within the shader
          * @param data  Source data
          */
-        inline void set_double(const std::string field, double data) {
-            set(field, reinterpret_cast<char *>(&data), sizeof(data));
+        inline void set_double(const std::string field, f64 data) {
+            set(field, reinterpret_cast<u8 *>(&data), sizeof(data));
         }
 
         /**
@@ -55,8 +55,8 @@ namespace Dynamo::Graphics {
          * @param field Name of the uniform variable within the shader
          * @param data  Source data
          */
-        inline void set_int(const std::string field, int data) {
-            set(field, reinterpret_cast<char *>(&data), sizeof(data));
+        inline void set_int(const std::string field, i32 data) {
+            set(field, reinterpret_cast<u8 *>(&data), sizeof(data));
         }
 
         /**
@@ -66,7 +66,7 @@ namespace Dynamo::Graphics {
          * @param data  Source data
          */
         inline void set_vec2(const std::string field, Vec2 &data) {
-            set(field, reinterpret_cast<char *>(&data), sizeof(data));
+            set(field, reinterpret_cast<u8 *>(&data), sizeof(data));
         }
 
         /**
@@ -76,7 +76,7 @@ namespace Dynamo::Graphics {
          * @param data  Source data
          */
         inline void set_vec3(const std::string field, Vec3 &data) {
-            set(field, reinterpret_cast<char *>(&data), sizeof(data));
+            set(field, reinterpret_cast<u8 *>(&data), sizeof(data));
         }
 
         /**
@@ -86,10 +86,10 @@ namespace Dynamo::Graphics {
          * @param field Name of the uniform variable within the shader
          * @param data  Source data
          */
-        template <unsigned N>
+        template <u32 N>
         inline void set_matrix(const std::string field, Matrix<N> &data) {
             set(field,
-                reinterpret_cast<char *>(data.values.data()),
+                reinterpret_cast<u8 *>(data.values.data()),
                 sizeof(data));
         }
 
@@ -100,7 +100,7 @@ namespace Dynamo::Graphics {
          * @param data  Source data
          */
         inline void set_color(const std::string field, Color &data) {
-            set(field, reinterpret_cast<char *>(&data), sizeof(data));
+            set(field, reinterpret_cast<u8 *>(&data), sizeof(data));
         }
     };
 } // namespace Dynamo::Graphics

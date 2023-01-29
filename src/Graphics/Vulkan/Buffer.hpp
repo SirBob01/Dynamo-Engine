@@ -150,7 +150,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the buffer in bytes returned by reserve()
          * @param length Length of the write in bytes
          */
-        void write(i8 *src, u32 offset, u32 length);
+        void write(u8 *src, u32 offset, u32 length);
 
         /**
          * @brief Read from the underlying memory
@@ -159,7 +159,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the buffer in bytes returned by reserve()
          * @param length Length of the read in bytes
          */
-        void read(i8 *dst, u32 offset, u32 length);
+        void read(u8 *dst, u32 offset, u32 length);
 
         /**
          * @brief Copy the contents of a buffer block to another bufffer
@@ -169,9 +169,6 @@ namespace Dynamo::Graphics::Vulkan {
          * @param dst_offset Valid destination offset
          * @param length     Length of the copy <= destination block size
          */
-        void copy(Buffer &dst,
-                  u32 src_offset,
-                  u32 dst_offset,
-                  u32 length);
+        void copy(Buffer &dst, u32 src_offset, u32 dst_offset, u32 length);
     };
 } // namespace Dynamo::Graphics::Vulkan

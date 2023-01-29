@@ -105,9 +105,7 @@ namespace Dynamo::Graphics::Vulkan {
         // Copy the pixel data to the staging buffer
         u32 image_size = _width * _height * 4;
         u32 offset = staging_buffer.reserve(image_size, 1);
-        staging_buffer.write(reinterpret_cast<i8 *>(pixels),
-                             offset,
-                             image_size);
+        staging_buffer.write(pixels, offset, image_size);
         staging_buffer.free(offset);
 
         // Copy from the staging buffer to the image

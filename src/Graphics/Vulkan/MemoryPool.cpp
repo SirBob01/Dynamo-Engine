@@ -30,12 +30,12 @@ namespace Dynamo::Graphics::Vulkan {
         return _size;
     }
 
-    void MemoryBlock::read(i8 *dst, u32 offset, u32 length) {
+    void MemoryBlock::read(u8 *dst, u32 offset, u32 length) {
         DYN_ASSERT(!_moved);
         _memory.get().read(dst, offset + _offset, length);
     }
 
-    void MemoryBlock::write(i8 *src, u32 offset, u32 length) {
+    void MemoryBlock::write(u8 *src, u32 offset, u32 length) {
         DYN_ASSERT(!_moved);
         _memory.get().write(src, offset + _offset, length);
     }

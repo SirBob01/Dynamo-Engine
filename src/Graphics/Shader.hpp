@@ -58,7 +58,7 @@ namespace Dynamo::Graphics {
          *
          * @return const std::vector<u8>&
          */
-        virtual const std::vector<char> &get_bytecode() const = 0;
+        virtual const std::vector<u8> &get_bytecode() const = 0;
 
         /**
          * @brief Get the shader stage

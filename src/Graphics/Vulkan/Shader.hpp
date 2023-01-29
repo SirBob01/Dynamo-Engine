@@ -94,7 +94,7 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class Shader : public Dynamo::Graphics::Shader {
-        std::vector<char> _bytecode;
+        std::vector<u8> _bytecode;
         std::reference_wrapper<Device> _device;
 
         std::string _filename;
@@ -150,9 +150,9 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the bytecode of the shader program
          *
-         * @return const std::vector<char>&
+         * @return const std::vector<u8>&
          */
-        const std::vector<char> &get_bytecode() const override;
+        const std::vector<u8> &get_bytecode() const override;
 
         /**
          * @brief Get the stage of the pipeline the shader represents

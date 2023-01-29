@@ -205,7 +205,7 @@ namespace Dynamo::Graphics::Vulkan {
         color_attachment.format = swapchain.get_format().format;
         color_attachment.samples = physical.get_msaa_samples();
         color_attachment.loadOp = vk::AttachmentLoadOp::eClear;
-        color_attachment.storeOp = vk::AttachmentStoreOp::eStore;
+        color_attachment.storeOp = vk::AttachmentStoreOp::eDontCare;
         color_attachment.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
         color_attachment.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
         color_attachment.initialLayout = vk::ImageLayout::eUndefined;
@@ -227,8 +227,8 @@ namespace Dynamo::Graphics::Vulkan {
         vk::AttachmentDescription resolve_attachment;
         resolve_attachment.format = swapchain.get_format().format;
         resolve_attachment.samples = vk::SampleCountFlagBits::e1;
-        resolve_attachment.loadOp = vk::AttachmentLoadOp::eDontCare;
-        resolve_attachment.storeOp = vk::AttachmentStoreOp::eStore;
+        resolve_attachment.loadOp = vk::AttachmentLoadOp::eClear;
+        resolve_attachment.storeOp = vk::AttachmentStoreOp::eDontCare;
         resolve_attachment.stencilLoadOp = vk::AttachmentLoadOp::eDontCare;
         resolve_attachment.stencilStoreOp = vk::AttachmentStoreOp::eDontCare;
         resolve_attachment.initialLayout = vk::ImageLayout::eUndefined;

@@ -93,14 +93,14 @@ namespace Dynamo::Graphics::Vulkan {
          * @param src   Source data
          * @param size  Size of the data
          */
-        void set(const std::string field, char *src, unsigned size) override;
+        void set(const std::string field, u8 *src, u32 size) override;
 
         /**
          * @brief Hash function to uniquely identify the material
          *
-         * @return unsigned
+         * @return u32
          */
-        unsigned hash() const;
+        u32 hash() const;
 
         /**
          * @brief Equality operator
