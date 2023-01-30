@@ -6,7 +6,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Table of constants for performing fast bit reversal
+     * @brief Table of constants for performing fast bit reversal.
      *
      * Taken from http://graphics.stanford.edu/~seander/bithacks.html
      *
@@ -38,7 +38,7 @@ namespace Dynamo {
 
     /**
      * @brief De Brujin constant multiplication table for calculating the
-     * position of the least significant bit
+     * position of the least significant bit.
      *
      */
     constexpr std::array<i32, 32> DE_BRUJIN_TABLE = {
@@ -47,8 +47,8 @@ namespace Dynamo {
     };
 
     /**
-     * @brief Find the position of the least significant bit in an u32
-     * integer
+     * @brief Find the position of the least significant bit in an unsigned
+     * 32-bit integer.
      *
      * @param x
      * @return constexpr u32
@@ -59,7 +59,7 @@ namespace Dynamo {
     }
 
     /**
-     * @brief Reverse the bits of an u32 integer
+     * @brief Reverse the bits of an unsigned 32-bit integer.
      *
      * @param x
      * @return constexpr u32
@@ -72,7 +72,7 @@ namespace Dynamo {
     }
 
     /**
-     * @brief Round a number to the next power of 2
+     * @brief Round a number to the next power of 2.
      *
      * @param x
      * @return constexpr u32

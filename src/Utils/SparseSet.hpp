@@ -3,39 +3,32 @@
 #include <algorithm>
 #include <vector>
 
-#include "../Types.hpp"
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 #include "./IdTracker.hpp"
 
 namespace Dynamo {
     /**
-     * @brief Sparse set base class for polymorphism
+     * @brief Sparse set base class for polymorphism.
      *
      */
     class SparseSetBase {
       public:
-        /**
-         * Pure virtual destructor implies that the base class
-         * cannot be instantiated directly
-         *
-         */
-        virtual ~SparseSetBase() = 0;
+        virtual ~SparseSetBase() = default;
     };
-    inline SparseSetBase::~SparseSetBase() = default;
 
     /**
      * @brief Sparse sets are an alternative to the hash map that allow
-     * for efficient association of data with unique identifier keys
-     *
-     * Both keys and values are stored in contiguous memory for improved cache
-     * locality, mapping one-to-one
+     * for efficient association of data with unique identifier keys. Both keys
+     * and values are stored in contiguous memory for improved cache locality,
+     * mapping one-to-one.
      *
      * This means that the complexity of hot operations can be reduced to
-     * constant time at the cost of space
+     * constant time at the cost of space.
      *
-     * Insertion: O(1) ammortized
-     * Deletion: O(1)
-     * Search: O(1)
+     * Insertion: O(1) ammortized.
+     * Deletion: O(1).
+     * Search: O(1).
      *
      * @tparam T Type of element
      */
@@ -61,14 +54,14 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Get the number of items
+         * @brief Get the number of items.
          *
          * @return u32
          */
         inline u32 size() const { return _pool.size(); }
 
         /**
-         * @brief Check if the container is empty
+         * @brief Check if the container is empty.
          *
          * @return true
          * @return false
@@ -76,10 +69,10 @@ namespace Dynamo {
         inline b8 empty() const { return size() == 0; }
 
         /**
-         * @brief Find the position of a value within the dense array
+         * @brief Find the position of a value within the dense array.
          *
-         * @param id Unique identifer
-         * @return i32 Index position of the value (-1 on failure)
+         * @param id Unique identifer.
+         * @return i32 Index position of the value (-1 on failure).
          */
         inline i32 find(Id id) {
             u32 key = IdTracker::get_index(id);
@@ -96,7 +89,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if an id exists within the set
+         * @brief Test if an id exists within the set.
          *
          * @param id
          * @return true
@@ -105,13 +98,13 @@ namespace Dynamo {
         inline b8 exists(Id id) { return find(id) >= 0; }
 
         /**
-         * @brief Create a new object in the pool and associate it with an id
+         * @brief Create a new object in the pool and associate it with an id.
          *
-         * If the id's index exists in the set, it is overwritten
+         * If the id's index exists in the set, it is overwritten.
          *
-         * @tparam Params Member types of the composite data type
-         * @param id   Unique identifer of the constructed object
-         * @param args Parameter values used to construct the object
+         * @tparam Params Member types of the composite data type.
+         * @param id   Unique identifer of the constructed object.
+         * @param args Parameter values used to construct the object.
          */
         template <typename... Params>
         inline void insert(Id id, Params... args) {
@@ -137,9 +130,9 @@ namespace Dynamo {
 
         /**
          * @brief Remove an item from the set, doing nothing if it does not
-         * exist
+         * exist.
          *
-         * @param id Unique identifier of the object to be removed
+         * @param id Unique identifier of the object to be removed.
          */
         inline void remove(Id id) {
             u32 key = IdTracker::get_index(id);
@@ -167,7 +160,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Destroy all elements in the pool, emptying the sparse set
+         * @brief Destroy all elements in the pool, emptying the sparse set.
          *
          */
         inline void clear() {
@@ -177,9 +170,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Get the item stored at an index
+         * @brief Get the item stored at an index.
          *
-         * @param index Index position of the object within the pool array
+         * @param index Index position of the object within the pool array.
          * @return T&
          */
         inline T &at(i32 index) {
@@ -189,18 +182,18 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Get the item associated with an id
+         * @brief Get the item associated with an id.
          *
-         * @param id Unique identifier of the object to be queried
+         * @param id Unique identifier of the object to be queried.
          * @return T&
          */
         inline T &get(Id id) { return at(find(id)); }
 
         /**
-         * @brief Apply a function to each member of the set
+         * @brief Apply a function to each member of the set.
          *
          * @tparam Functor
-         * @param function Function that takes a T object and its id
+         * @param function Function that takes a T object and its id.
          */
         template <typename Functor>
         inline void forall(Functor &&function) {
@@ -210,10 +203,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Apply a function to each item in the set
+         * @brief Apply a function to each item in the set.
          *
          * @tparam Functor
-         * @param function Function that takes a T object
+         * @param function Function that takes a T object.
          */
         template <typename Functor>
         inline void forall_items(Functor &&function) {
@@ -223,10 +216,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Apply a function to each id in the set
+         * @brief Apply a function to each id in the set.
          *
          * @tparam Functor
-         * @param function Function that takes an id
+         * @param function Function that takes an id.
          */
         template <typename Functor>
         inline void forall_ids(Functor &&function) {

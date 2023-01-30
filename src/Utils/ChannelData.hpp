@@ -3,54 +3,41 @@
 #include <algorithm>
 #include <vector>
 
-#include "../Types.hpp"
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 
 namespace Dynamo {
     /**
      * @brief Dynamic multi-channel container where data is stored in a
-     * deinterleaved layout
+     * deinterleaved layout.
      *
-     * @tparam T Type of data
+     * @tparam T Type of data.
      */
     template <typename T>
     class ChannelData {
         static_assert(std::is_trivially_copyable<T>::value,
                       "ChannelData members must be trivially copyable");
-        /**
-         * @brief Data container
-         *
-         */
         std::vector<T> _container;
 
-        /**
-         * @brief Number of channels
-         *
-         */
         u32 _channels;
-
-        /**
-         * @brief Number of frames
-         *
-         */
         u32 _frames;
 
       public:
         /**
-         * @brief Construct an empty ChannelData object
+         * @brief Construct an empty ChannelData object.
          *
-         * @param frames   Number of frames
-         * @param channels Number of channels
+         * @param frames   Number of frames.
+         * @param channels Number of channels.
          */
         ChannelData(u32 frames = 0, u32 channels = 0) {
             resize(frames, channels);
         }
 
         /**
-         * @brief Construct a ChannelData object with an existing buffer
+         * @brief Construct a ChannelData object with an existing buffer.
          *
-         * @param data     Data buffer
-         * @param channels Number of channels
+         * @param data     Data buffer.
+         * @param channels Number of channels.
          */
         ChannelData(std::vector<T> data, u32 channels) :
             _container(data), _channels(channels),
@@ -59,28 +46,28 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Get internal data pointer
+         * @brief Get internal data pointer.
          *
          * @return T*
          */
         inline T *data() { return _container.data(); }
 
         /**
-         * @brief Get the number of frames
+         * @brief Get the number of frames.
          *
          * @return u32
          */
         inline u32 frames() const { return _frames; }
 
         /**
-         * @brief Get the number of channels
+         * @brief Get the number of channels.
          *
          * @return u32
          */
         inline u32 channels() const { return _channels; }
 
         /**
-         * @brief Default-initialize all the data
+         * @brief Default-initialize all entries in the container.
          *
          */
         inline void clear() {
@@ -88,11 +75,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Set the number of frames
+         * @brief Set the number of frames and resize the container.
          *
-         * This will resize the container
-         *
-         * @param frames Number of frames
+         * @param frames Number of frames.
          */
         inline void set_frames(const u32 frames) {
             _container.resize(_channels * frames);
@@ -100,11 +85,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Set the number of channels
+         * @brief Set the number of channels and resize the container.
          *
-         * This will resize the container
-         *
-         * @param channels Number of channels
+         * @param channels Number of channels.
          */
         inline void set_channels(const u32 channels) {
             _container.resize(channels * _frames);
@@ -112,10 +95,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Resize the container
+         * @brief Resize the container to fit a number of frames and channels.
          *
-         * @param frames   Number of frames
-         * @param channels Number of channels
+         * @param frames   Number of frames.
+         * @param channels Number of channels.
          */
         inline void resize(const u32 frames, const u32 channels) {
             _container.resize(channels * frames);
@@ -124,10 +107,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Read a frame into a buffer
+         * @brief Read a frame into a buffer.
          *
-         * @param dst   Destination buffer
-         * @param frame Frame index
+         * @param dst   Destination buffer.
+         * @param frame Frame index.
          */
         inline void read_frame(T *dst, const u32 frame) const {
             DYN_ASSERT(frame < _frames);
@@ -137,10 +120,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Read a channel into a buffer
+         * @brief Read a channel into a buffer.
          *
-         * @param dst     Destination buffer
-         * @param channel Channel index
+         * @param dst     Destination buffer.
+         * @param channel Channel index.
          */
         inline void read_channel(T *dst, const u32 channel) const {
             DYN_ASSERT(channel < _channels);
@@ -149,9 +132,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Get the pointer to the start of a channel
+         * @brief Get the pointer to the start of a channel.
          *
-         * @param channel
+         * @param channel Channel index.
          * @return T*
          */
         inline T *operator[](const u32 channel) {
@@ -160,10 +143,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Get a value in the container
+         * @brief Get a value in the container.
          *
-         * @param frame   Frame index
-         * @param channel Channel index
+         * @param frame   Frame index.
+         * @param channel Channel index.
          * @return T
          */
         inline T at(const u32 frame, const u32 channel) const {

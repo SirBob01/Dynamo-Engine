@@ -4,8 +4,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Bespoke method of generating a unique identifier
-     * for a type at runtime
+     * @brief Generate a unique identifier for a type at runtime.
      *
      */
     class TypeId {
@@ -13,9 +12,9 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Get the unique identifier of a type
+         * @brief Get the unique identifier of a type.
          *
-         * @tparam Type
+         * @tparam Type.
          * @return u32
          */
         template <typename Type>
