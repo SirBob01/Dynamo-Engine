@@ -47,6 +47,7 @@
 #include "Utils/Bits.hpp"
 #include "Utils/ChannelData.hpp"
 #include "Utils/IdTracker.hpp"
+#include "Utils/QuadTree.hpp"
 #include "Utils/Random.hpp"
 #include "Utils/RingBuffer.hpp"
 #include "Utils/SparseSet.hpp"
