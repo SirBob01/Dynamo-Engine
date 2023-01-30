@@ -42,7 +42,7 @@ namespace Dynamo {
                 if (_terminate) return;
 
                 // Get the next job
-                std::function<void()> job = _jobs.front();
+                std::function<void()> job = std::move(_jobs.front());
                 _jobs.pop();
 
                 // Run the job out of the lock context
