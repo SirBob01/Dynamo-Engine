@@ -10,6 +10,7 @@
 #include "../Sound/Jukebox.hpp"
 #include "../Types.hpp"
 #include "../Utils/Random.hpp"
+#include "../Utils/ThreadPool.hpp"
 #include "ApplicationFlag.hpp"
 
 namespace Dynamo {
@@ -61,6 +62,8 @@ namespace Dynamo {
 
         std::unique_ptr<Graphics::Renderer> _renderer;
         std::unique_ptr<Sound::Jukebox> _jukebox;
+
+        ThreadPool _threads;
 
       public:
         /**

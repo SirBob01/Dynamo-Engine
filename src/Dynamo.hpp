@@ -42,6 +42,7 @@
 #include "Math/Vec2.hpp"
 #include "Math/Vec3.hpp"
 
+#include "Utils/ThreadPool.hpp"
 #include "Utils/Allocator.hpp"
 #include "Utils/Bits.hpp"
 #include "Utils/ChannelData.hpp"

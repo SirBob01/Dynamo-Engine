@@ -42,8 +42,10 @@ namespace Dynamo {
         _input->poll();
         _clock->tick();
 
-        // TODO: Run audio and graphics processing on separate threads
-        _jukebox->update();
-        _renderer->refresh();
+        // Process audio and graphics in parallel
+        auto sounds_job = _threads.submit([&]() { _jukebox->update(); });
+        auto render_job = _threads.submit([&]() { _renderer->refresh(); });
+        sounds_job.wait();
+        render_job.wait();
     }
 } // namespace Dynamo
