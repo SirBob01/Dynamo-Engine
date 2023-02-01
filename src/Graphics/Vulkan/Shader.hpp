@@ -7,31 +7,98 @@
 #include <spirv_reflect.h>
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
+#include "../../Types.hpp"
+#include "../Shader.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
+    /**
+     * @brief Enumerates the binding types
+     *
+     */
+    enum class BindingType {
+        /**
+         * @brief Raw data binding
+         *
+         */
+        Buffer,
+
+        /**
+         * @brief Texture binding
+         *
+         */
+        Texture
+    };
+
     /**
      * @brief Descriptor set binding information
      *
      */
     struct DescriptorBinding {
-        u32 set;
+        /**
+         * @brief Name of the binding variable
+         *
+         */
+        std::string name;
+
+        /**
+         * @brief Type of binding
+         *
+         */
+        BindingType type;
+
+        /**
+         * @brief API Binding struct
+         *
+         */
         vk::DescriptorSetLayoutBinding binding;
+
+        /**
+         * @brief Set index
+         *
+         */
+        u32 set;
+
+        /**
+         * @brief Size in bytes
+         *
+         */
+        u32 size;
     };
+
+    /**
+     * @brief Convert the API agnostic shader stage enum to a Vulkan shader
+     * stage enum
+     *
+     * @param stage
+     * @return vk::ShaderStageFlagBits
+     */
+    inline vk::ShaderStageFlagBits convert_shader_stage(ShaderStage stage) {
+        switch (stage) {
+        case ShaderStage::Vertex:
+            return vk::ShaderStageFlagBits::eVertex;
+        case ShaderStage::Geometry:
+            return vk::ShaderStageFlagBits::eGeometry;
+        case ShaderStage::Fragment:
+            return vk::ShaderStageFlagBits::eFragment;
+        case ShaderStage::Compute:
+        default:
+            return vk::ShaderStageFlagBits::eCompute;
+        }
+    }
 
     /**
      * @brief Wrapper class for a Vulkan shader module which can be plugged into
      * a Vulkan pipeline
      *
      */
-    class ShaderModule {
-        std::vector<i8> _bytecode;
+    class Shader : public Dynamo::Graphics::Shader {
+        std::vector<u8> _bytecode;
         std::reference_wrapper<Device> _device;
 
         std::string _filename;
-        vk::ShaderStageFlagBits _stage;
+        ShaderStage _stage;
 
         std::vector<DescriptorBinding> _descriptor_bindings;
         std::vector<vk::PushConstantRange> _push_constant_ranges;
@@ -50,15 +117,18 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new ShaderModule object
+         * @brief Construct a new Shader object
          *
          * @param device   Reference to the logical device
          * @param filename Path to the shader source file
-         * @param stage    Stage of the pipeline it represents
          */
-        ShaderModule(Device &device,
-                     const std::string filename,
-                     vk::ShaderStageFlagBits stage);
+        Shader(Device &device, const std::string filename);
+
+        /**
+         * @brief Destroy the Shader object
+         *
+         */
+        virtual ~Shader() = default;
 
         /**
          * @brief Get the handle to vk::UniqueShaderModule
@@ -71,25 +141,25 @@ namespace Dynamo::Graphics::Vulkan {
         vk::UniqueShaderModule get_handle();
 
         /**
-         * @brief Get the stage of the pipeline the shader represents
-         *
-         * @return const vk::ShaderStageFlagBits
-         */
-        vk::ShaderStageFlagBits get_stage() const;
-
-        /**
-         * @brief Get the bytecode of the shader program
-         *
-         * @return const std::vector<i8>&
-         */
-        const std::vector<i8> &get_bytecode();
-
-        /**
          * @brief Get the filename of the shader module
          *
          * @return const std::string&
          */
-        const std::string &get_filename() const;
+        const std::string &get_filename() const override;
+
+        /**
+         * @brief Get the bytecode of the shader program
+         *
+         * @return const std::vector<u8>&
+         */
+        const std::vector<u8> &get_bytecode() const override;
+
+        /**
+         * @brief Get the stage of the pipeline the shader represents
+         *
+         * @return ShaderStage
+         */
+        ShaderStage get_stage() const override;
 
         /**
          * @brief Get the push constant ranges
@@ -111,5 +181,5 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief List of shader stage modules
      *
      */
-    using ShaderList = std::vector<std::reference_wrapper<ShaderModule>>;
+    using ShaderList = std::vector<std::reference_wrapper<Shader>>;
 } // namespace Dynamo::Graphics::Vulkan

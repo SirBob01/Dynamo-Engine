@@ -347,18 +347,18 @@ namespace Dynamo::Sound {
         _volume = std::clamp(volume, 0.0f, 1.0f);
     }
 
-    SoundCache &Jukebox::get_sounds() { return _assets; }
+    SoundCache &Jukebox::get_sound_assets() { return _assets; }
 
     ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
-    void Jukebox::play(Asset<Sound> &sound, StaticMaterial &material) {
+    void Jukebox::play(Sound &sound, StaticMaterial &material) {
         f32 frame = _output_state.sample_rate * material.start_seconds;
-        _static_chunks.push_back({*sound, material, frame});
+        _static_chunks.push_back({sound, material, frame});
     }
 
-    void Jukebox::play(Asset<Sound> &sound, DynamicMaterial &material) {
+    void Jukebox::play(Sound &sound, DynamicMaterial &material) {
         f32 frame = _output_state.sample_rate * material.start_seconds;
-        _dynamic_chunks.push_back({*sound, material, frame});
+        _dynamic_chunks.push_back({sound, material, frame});
     }
 
     void Jukebox::update() {

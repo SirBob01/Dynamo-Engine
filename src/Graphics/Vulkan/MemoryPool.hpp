@@ -82,7 +82,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the memory map in bytes
          * @param length Length of the read in bytes
          */
-        void read(i8 *dst, u32 offset, u32 length);
+        void read(u8 *dst, u32 offset, u32 length);
 
         /**
          * @brief Write to the underlying memory at an offset
@@ -91,7 +91,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param offset Offset within the memory map in bytes
          * @param length Length of the read in bytes
          */
-        void write(i8 *src, u32 offset, u32 length);
+        void write(u8 *src, u32 offset, u32 length);
 
         /**
          * @brief Bind a vk::Image to the block

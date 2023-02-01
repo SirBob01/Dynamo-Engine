@@ -1,8 +1,7 @@
 #include "./DescriptorPool.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    DescriptorPool::DescriptorPool(Device &device) :
-        _device(device) {}
+    DescriptorPool::DescriptorPool(Device &device) : _device(device) {}
 
     DescriptorPool::~DescriptorPool() {
         for (const vk::DescriptorPool &pool : _pools) {
@@ -12,7 +11,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     vk::DescriptorPool
     DescriptorPool::create_pool(const vk::DescriptorSetLayout &layout,
-                                     const LayoutBindings &bindings) {
+                                const LayoutBindings &bindings) {
         // Determine the pool sizes from the bindings associated with the layout
         std::vector<vk::DescriptorPoolSize> pool_sizes;
         for (const vk::DescriptorSetLayoutBinding &binding : bindings) {
@@ -34,13 +33,11 @@ namespace Dynamo::Graphics::Vulkan {
 
     std::vector<vk::DescriptorSet>
     DescriptorPool::allocate_set(const vk::DescriptorSetLayout &layout,
-                                      const LayoutBindings &bindings,
-                                      const vk::DescriptorPool &pool,
-                                      Swapchain &swapchain) {
-        u32 image_count = swapchain.get_images().size();
-
+                                 const LayoutBindings &bindings,
+                                 const vk::DescriptorPool &pool,
+                                 u32 count) {
         // Allocate new descriptor sets within the pool
-        std::vector<vk::DescriptorSetLayout> set_layouts(image_count, layout);
+        std::vector<vk::DescriptorSetLayout> set_layouts(count, layout);
         vk::DescriptorSetAllocateInfo alloc_info;
         alloc_info.descriptorPool = pool;
         alloc_info.descriptorSetCount = set_layouts.size();
@@ -51,13 +48,13 @@ namespace Dynamo::Graphics::Vulkan {
 
     std::vector<vk::DescriptorSet>
     DescriptorPool::try_allocate(const vk::DescriptorSetLayout &layout,
-                                      const LayoutBindings &bindings,
-                                      Swapchain &swapchain) {
-        b8 found_pool = false;
+                                 const LayoutBindings &bindings,
+                                 u32 count) {
+        bool found_pool = false;
         std::vector<vk::DescriptorSet> vksets;
         for (vk::DescriptorPool &pool : _pools) {
             try {
-                vksets = allocate_set(layout, bindings, pool, swapchain);
+                vksets = allocate_set(layout, bindings, pool, count);
                 found_pool = true;
                 break;
             } catch (vk::OutOfPoolMemoryError &err) {
@@ -71,25 +68,26 @@ namespace Dynamo::Graphics::Vulkan {
         if (!found_pool) {
             vk::DescriptorPool pool = create_pool(layout, bindings);
             _pools.push_back(pool);
-            vksets = allocate_set(layout, bindings, pool, swapchain);
+            vksets = allocate_set(layout, bindings, pool, count);
         }
         return vksets;
     }
 
     std::vector<DescriptorSetGroup>
     DescriptorPool::allocate(PipelineLayout &pipeline_layout,
-                                  Swapchain &swapchain) {
+                             Swapchain &swapchain) {
         const std::vector<vk::DescriptorSetLayout> &layouts =
             pipeline_layout.get_descriptor_set_layouts();
         const std::vector<LayoutBindings> &bindings =
             pipeline_layout.get_descriptor_set_bindings();
+        u32 frames = swapchain.get_images().size();
 
-        std::vector<DescriptorSetGroup> groups(layouts.size());
+        std::vector<DescriptorSetGroup> groups(frames);
         for (u32 i = 0; i < layouts.size(); i++) {
-            for (vk::DescriptorSet &vkset :
-                 try_allocate(layouts[i], bindings[i], swapchain)) {
-                groups[i].push_back(
-                    std::make_unique<DescriptorSet>(_device.get(), vkset));
+            std::vector<vk::DescriptorSet> vksets =
+                try_allocate(layouts[i], bindings[i], frames);
+            for (u32 j = 0; j < frames; j++) {
+                groups[j].push_back(vksets[j]);
             }
         }
         return groups;

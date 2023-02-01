@@ -8,9 +8,10 @@
 
 #include "../../Types.hpp"
 #include "./Device.hpp"
+#include "./PipelineCache.hpp"
 #include "./PipelineLayout.hpp"
 #include "./RenderPass.hpp"
-#include "./ShaderModule.hpp"
+#include "./Shader.hpp"
 #include "./VertexDescriptor.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
@@ -18,10 +19,9 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Supported dynamic pipeline states
      *
      */
-    static constexpr std::array<vk::DynamicState, 3> DYNAMIC_PIPELINE_STATES = {
-        vk::DynamicState::eViewport,      // Size of the viewport
-        vk::DynamicState::eScissor,       // Region of the viewport
-        vk::DynamicState::eBlendConstants // Blending function
+    static constexpr std::array<vk::DynamicState, 2> DYNAMIC_PIPELINE_STATES = {
+        vk::DynamicState::eViewport, // Size of the viewport
+        vk::DynamicState::eScissor,  // Region of the viewport
     };
 
     /**
@@ -126,6 +126,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param device             Reference to the logical device
          * @param renderpass         Reference to the render pass
          * @param layout             Pipeline layout
+         * @param cache              Pipeline cache
          * @param primitive_topology Points, lines, or triangles
          * @param polygon_mode       Fill, wireframe, or point cloud
          */
@@ -133,6 +134,7 @@ namespace Dynamo::Graphics::Vulkan {
                  RenderPass &renderpass,
                  Swapchain &swapchain,
                  PipelineLayout &layout,
+                 PipelineCache &cache,
                  vk::PrimitiveTopology primitive_topology,
                  vk::PolygonMode polygon_mode);
 

@@ -113,14 +113,14 @@ namespace Dynamo::Graphics::Vulkan {
 
     void Buffer::free(u32 offset) { return _allocator.free(offset); }
 
-    void Buffer::write(i8 *src, u32 offset, u32 length) {
+    void Buffer::write(u8 *src, u32 offset, u32 length) {
         if (!_allocator.is_reserved(offset)) {
             Log::error("Invalid Vulkan buffer offset write");
         }
         _memory.write(src, offset, length);
     }
 
-    void Buffer::read(i8 *dst, u32 offset, u32 length) {
+    void Buffer::read(u8 *dst, u32 offset, u32 length) {
         if (!_allocator.is_reserved(offset)) {
             Log::error("Invalid Vulkan buffer offset read");
         }
@@ -129,14 +129,9 @@ namespace Dynamo::Graphics::Vulkan {
 
     u32 Buffer::capacity() const { return _allocator.capacity(); }
 
-    u32 Buffer::size(u32 offset) const {
-        return _allocator.size(offset);
-    }
+    u32 Buffer::size(u32 offset) const { return _allocator.size(offset); }
 
-    void Buffer::copy(Buffer &dst,
-                      u32 src_offset,
-                      u32 dst_offset,
-                      u32 length) {
+    void Buffer::copy(Buffer &dst, u32 src_offset, u32 dst_offset, u32 length) {
         // Make sure there is enough space
         if (length > dst.size(dst_offset)) {
             Log::error("Attempted to copy Vulkan buffer contents to "

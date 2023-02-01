@@ -1,29 +1,14 @@
 #include "Renderer.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    Renderer::Renderer(Display &display) : Dynamo::Graphics::Renderer(display) {
+    Renderer::Renderer(Display &display, const std::string asset_directory) :
+        Dynamo::Graphics::Renderer(display, asset_directory) {
         enumerate_extensions();
         create_instance();
         create_surface();
-
         create_device();
-        create_pools();
-
+        create_objects();
         create_swapchain();
-        create_synchronizers();
-
-        create_depth_buffer();
-        create_color_buffer();
-
-        create_framebuffers();
-        create_pipeline();
-        create_command_buffers();
-
-        create_buffers();
-
-        clear(Color(0, 0, 0));
-        _depth_clear.depthStencil.depth = 1;
-        _depth_clear.depthStencil.stencil = 0;
     }
 
     Renderer::~Renderer() {
@@ -72,7 +57,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Setup the application and Vulkan instance
         vk::ApplicationInfo app_info;
-        app_info.pApplicationName = _display.get_title().c_str();
+        app_info.pApplicationName = _display.get().get_title().c_str();
         app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         app_info.pEngineName = "Dynamo Engine";
         app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -108,7 +93,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkSurfaceKHR tmp_surface;
         vk::Result result = static_cast<vk::Result>(
             glfwCreateWindowSurface(_instance.get(),
-                                    _display.get_window(),
+                                    _display.get().get_window(),
                                     nullptr,
                                     &tmp_surface));
         _surface = vk::UniqueSurfaceKHR(tmp_surface, _instance.get());
@@ -138,7 +123,6 @@ namespace Dynamo::Graphics::Vulkan {
             [&](const PhysicalDevice &a, const PhysicalDevice &b) {
                 return a.calculate_score() < b.calculate_score();
             }));
-        _sampler = std::make_unique<Sampler>(*_device, 3);
 
 #ifdef DYN_DEBUG
         Log::info("--- Vulkan Physical Devices ---");
@@ -157,132 +141,36 @@ namespace Dynamo::Graphics::Vulkan {
 #endif
     }
 
-    void Renderer::create_pools() {
+    void Renderer::create_objects() {
+        // Pools
         _memory_pool = std::make_unique<MemoryPool>(*_device);
         _descriptor_pool = std::make_unique<DescriptorPool>(*_device);
         _graphics_command_pool =
             std::make_unique<CommandPool>(*_device, QueueFamily::Graphics);
         _transfer_command_pool =
             std::make_unique<CommandPool>(*_device, QueueFamily::Transfer);
-    }
 
-    void Renderer::create_swapchain() {
-        _swapchain = std::make_unique<Swapchain>(*_device, _display, *_surface);
-    }
+        // Texture sampler
+        _sampler = std::make_unique<Sampler>(*_device, 3);
 
-    void Renderer::create_synchronizers() {
+        // Create synchronizers
         _signal_image_ready.clear();
         _signal_render_done.clear();
         _fences.clear();
 
-        for (i32 i = 0; i < _max_frames_processing; i++) {
+        for (i32 i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             _signal_image_ready.push_back(
                 std::make_unique<Semaphore>(*_device));
             _signal_render_done.push_back(
                 std::make_unique<Semaphore>(*_device));
             _fences.push_back(std::make_unique<Fence>(*_device));
         }
-    }
 
-    void Renderer::create_depth_buffer() {
-        vk::Extent2D extent = _swapchain->get_extent();
-        _depth_image = std::make_unique<UserImage>(
-            *_device,
-            *_memory_pool,
-            extent.width,
-            extent.height,
-            1,
-            1,
-            1,
-            _device->get_physical().get_depth_format(),
-            vk::ImageType::e2D,
-            vk::ImageTiling::eOptimal,
-            vk::ImageUsageFlagBits::eDepthStencilAttachment,
-            _device->get_physical().get_msaa_samples());
-        _depth_view =
-            std::make_unique<ImageView>(*_depth_image,
-                                        vk::ImageViewType::e2D,
-                                        vk::ImageAspectFlagBits::eDepth,
-                                        1);
-    }
-
-    void Renderer::create_color_buffer() {
-        vk::Extent2D extent = _swapchain->get_extent();
-        _color_image = std::make_unique<UserImage>(
-            *_device,
-            *_memory_pool,
-            extent.width,
-            extent.height,
-            1,
-            1,
-            1,
-            _swapchain->get_format().format,
-            vk::ImageType::e2D,
-            vk::ImageTiling::eOptimal,
-            vk::ImageUsageFlagBits::eColorAttachment,
-            _device->get_physical().get_msaa_samples());
-        _color_view =
-            std::make_unique<ImageView>(*_color_image,
-                                        vk::ImageViewType::e2D,
-                                        vk::ImageAspectFlagBits::eColor,
-                                        1);
-    }
-
-    void Renderer::create_framebuffers() {
-        _renderpass = std::make_unique<RenderPass>(*_device, *_swapchain);
-        vk::Extent2D extent = _swapchain->get_extent();
-
-        _framebuffers.clear();
-        for (const std::unique_ptr<ImageView> &view : _swapchain->get_views()) {
-            _framebuffers.push_back(std::make_unique<Framebuffer>(*_device,
-                                                                  extent,
-                                                                  *_renderpass,
-                                                                  *_color_view,
-                                                                  *_depth_view,
-                                                                  *view));
-        }
-    }
-
-    void Renderer::create_pipeline() {
-        // Default shaders
-        _vertex_shader =
-            std::make_unique<ShaderModule>(*_device,
-                                           "vert.spv",
-                                           vk::ShaderStageFlagBits::eVertex);
-        _fragment_shader =
-            std::make_unique<ShaderModule>(*_device,
-                                           "frag.spv",
-                                           vk::ShaderStageFlagBits::eFragment);
-
-        // Create the pipeline and allocate the descriptors
-        ShaderList shaders = {
-            *_vertex_shader,
-            *_fragment_shader,
-        };
-        _pipeline_layout = std::make_unique<PipelineLayout>(*_device, shaders);
-        _pipeline =
-            std::make_unique<Pipeline>(*_device,
-                                       *_renderpass,
-                                       *_swapchain,
-                                       *_pipeline_layout,
-                                       vk::PrimitiveTopology::eTriangleList,
-                                       vk::PolygonMode::eFill);
-        _descriptor_pool->allocate(*_pipeline_layout, *_swapchain);
-    }
-
-    void Renderer::create_command_buffers() {
-        // Define the command queues
+        // Command queues
         _graphics_queue = _device->get_queue(QueueFamily::Graphics);
         _transfer_queue = _device->get_queue(QueueFamily::Transfer);
         _present_queue = _device->get_queue(QueueFamily::Present);
 
-        // Create command buffers for each family
-        _graphics_command_buffers =
-            _graphics_command_pool->allocate(vk::CommandBufferLevel::ePrimary,
-                                             _framebuffers.size());
-    }
-
-    void Renderer::create_buffers() {
         // Staging buffer for memory copies
         vk::MemoryPropertyFlags staging_memory_properties =
             vk::MemoryPropertyFlagBits::eHostVisible |
@@ -325,107 +213,78 @@ namespace Dynamo::Graphics::Vulkan {
                                                    uniform_memory_properties);
     }
 
-    void Renderer::record_commands() {
-        _graphics_queue.waitIdle();
-        _graphics_command_pool->reset(
-            vk::CommandPoolResetFlagBits::eReleaseResources);
-
-        vk::Rect2D render_area;
-        render_area.offset.x = 0;
-        render_area.offset.y = 0;
-        render_area.extent = _swapchain->get_extent();
-
-        std::array<vk::ClearValue, 2> clear_values = {
-            _color_clear,
-            _depth_clear,
-        };
-
-        vk::CommandBufferBeginInfo begin_info;
-        for (u32 i = 0; i < _framebuffers.size(); i++) {
-            // Start recording
-            _graphics_command_buffers[i]->begin(begin_info);
-
-            // Start the render pass
-            vk::RenderPassBeginInfo render_begin_info;
-            render_begin_info.renderPass = _renderpass->get_handle();
-            render_begin_info.framebuffer = _framebuffers[i]->get_handle();
-            render_begin_info.renderArea = render_area;
-            render_begin_info.clearValueCount = clear_values.size();
-            render_begin_info.pClearValues = clear_values.data();
-
-            _graphics_command_buffers[i]->beginRenderPass(
-                render_begin_info,
-                vk::SubpassContents::eInline);
-
-            // Bind the command buffer to the graphics pipeline
-            _graphics_command_buffers[i]->bindPipeline(
-                vk::PipelineBindPoint::eGraphics,
-                _pipeline->get_handle());
-
-            // Stop recording
-            _graphics_command_buffers[i]->endRenderPass();
-            _graphics_command_buffers[i]->end();
-        }
-    }
-
-    void Renderer::reset_swapchain() {
+    void Renderer::create_swapchain() {
         // Wait for all GPU processes to finish
         _device->wait();
 
-        // Reset the views before image to prevent invalid references (segfault)
-        // TODO: Best to use shared_ptr or some custom refcount implementation
-        _depth_view.reset();
-        _color_view.reset();
-
-        // Free the swapchain
+        // Destroy existing swapchain and material system before
+        // initializing
+        _material_system.reset();
+        _draw_set.reset();
         _swapchain.reset();
 
-        // Recreate objects
-        create_swapchain();
-        create_synchronizers();
-
-        create_depth_buffer();
-        create_color_buffer();
-
-        create_framebuffers();
-        create_pipeline();
-        create_command_buffers();
+        _swapchain = std::make_unique<Swapchain>(*_device,
+                                                 *_memory_pool,
+                                                 _display.get(),
+                                                 _surface.get());
+        _material_system = std::make_unique<MaterialSystem>(*_device,
+                                                            *_swapchain,
+                                                            *_descriptor_pool,
+                                                            *_uniform_buffer);
+        _draw_set = std::make_unique<DrawSet>(*_swapchain,
+                                              *_graphics_command_pool,
+                                              *_object_buffer,
+                                              _graphics_queue);
     }
 
-    Texture Renderer::create_texture(std::string filename) {
-        i32 width, height, channels;
-        stbi_uc *raw_data = stbi_load(filename.c_str(),
-                                      &width,
-                                      &height,
-                                      &channels,
-                                      STBI_rgb_alpha);
-        std::vector<u8> pixels(width * height * STBI_rgb_alpha);
-        std::copy(raw_data, raw_data + pixels.size(), pixels.data());
-        stbi_image_free(raw_data);
+    AssetCache<Mesh> &Renderer::get_mesh_assets() { return *_mesh_assets; }
 
-        return Texture(pixels.data(),
-                       width,
-                       height,
-                       *_device,
-                       *_memory_pool,
-                       *_staging_buffer,
-                       *_graphics_command_pool,
-                       _graphics_queue);
+    AssetCache<Dynamo::Graphics::Texture> &Renderer::get_texture_assets() {
+        return *_texture_assets;
     }
 
-    void Renderer::clear(Color color) {
-        _color_clear.color.setFloat32(color.to_array());
+    AssetCache<Dynamo::Graphics::Shader> &Renderer::get_shader_assets() {
+        return *_shader_assets;
     }
+
+    Dynamo::Graphics::MaterialSystem &Renderer::get_material_system() {
+        return *_material_system;
+    }
+
+    std::unique_ptr<Dynamo::Graphics::MeshInstance>
+    Renderer::upload_mesh(Mesh &mesh) {
+        return std::make_unique<MeshInstance>(mesh,
+                                              *_object_buffer,
+                                              *_staging_buffer);
+    }
+
+    void Renderer::set_layers(std::vector<Dynamo::Graphics::Layer> &layers) {
+        // TODO
+    }
+
+    void Renderer::draw(Dynamo::Graphics::MeshInstance &mesh_instance,
+                        Dynamo::Graphics::Material &material,
+                        std::vector<Mat4> &transforms,
+                        u32 layer) {
+        // Downcast API agnostic objects
+        Material &vk_material = *dynamic_cast<Material *>(&material);
+        MeshInstance &vk_mesh_instance =
+            *dynamic_cast<MeshInstance *>(&mesh_instance);
+        _draw_set->add(vk_mesh_instance, vk_material, transforms);
+    }
+
+    void Renderer::clear(Color color) { _draw_set->clear(color); }
 
     void Renderer::refresh() {
         // Record the command buffers
-        record_commands();
+        _draw_set->record();
 
-        // Grab the next available swapchain image presentation target
+        // Grab the next available swapchain image presentation
+        // target
         std::optional<u32> acquired =
             _swapchain->get_presentation_image(*_signal_image_ready[_frame]);
         if (!acquired.has_value()) {
-            reset_swapchain();
+            create_swapchain();
             return;
         }
         u32 image_index = acquired.value();
@@ -434,7 +293,8 @@ namespace Dynamo::Graphics::Vulkan {
         _fences[_frame]->wait();
         _fences[_frame]->reset();
 
-        // Submit commands to the graphics queue for rendering to that image
+        // Submit commands to the graphics queue for rendering to
+        // that image
         vk::PipelineStageFlags wait_stage =
             vk::PipelineStageFlagBits::eColorAttachmentOutput;
         vk::SubmitInfo submit_info;
@@ -442,14 +302,15 @@ namespace Dynamo::Graphics::Vulkan {
         submit_info.waitSemaphoreCount = 1;
         submit_info.pWaitSemaphores =
             &_signal_image_ready[_frame]->get_handle();
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers =
-            &_graphics_command_buffers[image_index].get();
         submit_info.signalSemaphoreCount = 1;
         submit_info.pSignalSemaphores =
             &_signal_render_done[_frame]->get_handle();
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers =
+            &_draw_set->get_command_buffer(image_index);
 
-        // Render to the target attachment and signal the current fence
+        // Render to the target attachment and signal the current
+        // fence
         _graphics_queue.submit(submit_info, _fences[_frame]->get_handle());
 
         // Present rendered image to the display
@@ -466,13 +327,13 @@ namespace Dynamo::Graphics::Vulkan {
 
             // Sometimes, it does not throw an error
             if (result != vk::Result::eSuccess) {
-                reset_swapchain();
+                create_swapchain();
             }
         } catch (vk::OutOfDateKHRError e) {
-            reset_swapchain();
+            create_swapchain();
         }
 
         // Advance the frame
-        _frame = (_frame + 1) % _max_frames_processing;
+        _frame = (_frame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 } // namespace Dynamo::Graphics::Vulkan

@@ -13,58 +13,13 @@ namespace Dynamo::Graphics::Vulkan {
      * buffers), how these attachments are loaded and stored, and their
      * dependencies
      *
-     * TODO: Does it make sense for this to be a class? RenderPass is a very
-     * static object with a default state. It might be better to write
-     * create_*_renderpass() functions instead if we plan to make custom
-     * passes / subpasses
-     *
      */
     class RenderPass {
         vk::RenderPass _handle;
         std::reference_wrapper<Device> _device;
         std::reference_wrapper<Swapchain> _swapchain;
 
-        /**
-         * @brief Create a color attachment
-         *
-         * @return vk::AttachmentDescription
-         */
-        vk::AttachmentDescription create_color_attachment();
-
-        /**
-         * @brief Create a depth attachment
-         *
-         * @return vk::AttachmentDescription
-         */
-        vk::AttachmentDescription create_depth_attachment();
-
-        /**
-         * @brief Create a resolve attachment for the multisampling pass
-         *
-         * @return vk::AttachmentDescription
-         */
-        vk::AttachmentDescription create_resolve_attachment();
-
-        /**
-         * @brief Create the list of all subpasses
-         *
-         * @param color_ref   Color attachment reference
-         * @param depth_ref   Depth attachment reference
-         * @param resolve_ref Resolve attachment reference
-         * @return std::vector<vk::SubpassDescription>
-         */
-        std::vector<vk::SubpassDescription>
-        create_subpasses(vk::AttachmentReference &color_ref,
-                         vk::AttachmentReference &depth_ref,
-                         vk::AttachmentReference &resolve_ref);
-
-        /**
-         * @brief Create a subpass dependencies, which defines the connectivity
-         * of the subpass graph
-         *
-         * @return std::vector<vk::SubpassDependency>
-         */
-        std::vector<vk::SubpassDependency> create_subpass_dependencies();
+        std::vector<vk::Framebuffer> _framebuffers;
 
       public:
         /**
@@ -72,8 +27,11 @@ namespace Dynamo::Graphics::Vulkan {
          *
          * @param device    Reference to the logical device
          * @param swapchain Reference to the swapchain
+         * @param config    Setup configuaration
          */
-        RenderPass(Device &device, Swapchain &swapchain);
+        RenderPass(Device &device,
+                   Swapchain &swapchain,
+                   vk::RenderPassCreateInfo config);
 
         /**
          * @brief Destroy the RenderPass object
@@ -87,5 +45,48 @@ namespace Dynamo::Graphics::Vulkan {
          * @return const vk::RenderPass&
          */
         const vk::RenderPass &get_handle() const;
+
+        /**
+         * @brief Get the framebuffer targets
+         *
+         * @return const std::vector<vk::Framebuffer>&
+         */
+        const std::vector<vk::Framebuffer> &get_framebuffers() const;
     };
+
+    /**
+     * @brief Create a base renderpass for 2D rendering
+     *
+     * @param device    Reference to the logical device
+     * @param swapchain Reference to the swapchain
+     * @return RenderPass
+     */
+    RenderPass create_base_2d_pass(Device &device, Swapchain &swapchain);
+
+    /**
+     * @brief Create a layer renderpass for 2D rendering
+     *
+     * @param device    Reference to the logical device
+     * @param swapchain Reference to the swapchain
+     * @return RenderPass
+     */
+    RenderPass create_layer_2d_pass(Device &device, Swapchain &swapchain);
+
+    /**
+     * @brief Create a base renderpass for 3D rendering
+     *
+     * @param device    Reference to the logical device
+     * @param swapchain Reference to the swapchain
+     * @return RenderPass
+     */
+    RenderPass create_base_3d_pass(Device &device, Swapchain &swapchain);
+
+    /**
+     * @brief Create a layer renderpass for 3D rendering
+     *
+     * @param device    Reference to the logical device
+     * @param swapchain Reference to the swapchain
+     * @return RenderPass
+     */
+    RenderPass create_layer_3d_pass(Device &device, Swapchain &swapchain);
 } // namespace Dynamo::Graphics::Vulkan

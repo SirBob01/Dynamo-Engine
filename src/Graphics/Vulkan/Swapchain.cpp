@@ -2,10 +2,11 @@
 
 namespace Dynamo::Graphics::Vulkan {
     Swapchain::Swapchain(Device &device,
+                         MemoryPool &memory_pool,
                          Display &display,
                          vk::SurfaceKHR surface) :
         _device(device) {
-        PhysicalDevice &physical = device.get_physical();
+        PhysicalDevice &physical = _device.get().get_physical();
         const SwapchainOptions &options = physical.get_swapchain_options();
         calculate_extent(options.capabilities, display);
         select_format(options.formats);
@@ -62,19 +63,8 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Create the swapchain and its images
-        const vk::Device &logical = device.get_handle();
-        _handle = logical.createSwapchainKHR(swapchain_info);
-        for (vk::Image &vkimg : logical.getSwapchainImagesKHR(_handle)) {
-            std::unique_ptr<SwapchainImage> image =
-                std::make_unique<SwapchainImage>(device, vkimg, _format.format);
-            std::unique_ptr<ImageView> view =
-                std::make_unique<ImageView>(*image,
-                                            vk::ImageViewType::e2D,
-                                            vk::ImageAspectFlagBits::eColor,
-                                            1);
-            _images.emplace_back(std::move(image));
-            _views.emplace_back(std::move(view));
-        }
+        _handle = _device.get().get_handle().createSwapchainKHR(swapchain_info);
+        create_images(memory_pool);
     }
 
     Swapchain::~Swapchain() {
@@ -120,6 +110,63 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
+    void Swapchain::create_images(MemoryPool &memory_pool) {
+        vk::Device logical = _device.get().get_handle();
+        PhysicalDevice &physical = _device.get().get_physical();
+
+        for (vk::Image &vkimg : logical.getSwapchainImagesKHR(_handle)) {
+            _images.emplace_back(
+                std::make_unique<SwapchainImage>(_device.get(),
+                                                 vkimg,
+                                                 _format.format));
+            _views.emplace_back(
+                std::make_unique<ImageView>(*_images.back(),
+                                            vk::ImageViewType::e2D,
+                                            vk::ImageAspectFlagBits::eColor,
+                                            1));
+        }
+
+        // Create the color buffer
+        _color_buffer = std::make_unique<UserImage>(
+            _device,
+            memory_pool,
+            _extent.width,
+            _extent.height,
+            1,
+            1,
+            1,
+            _format.format,
+            vk::ImageType::e2D,
+            vk::ImageTiling::eOptimal,
+            vk::ImageUsageFlagBits::eColorAttachment,
+            physical.get_msaa_samples());
+        _color_view =
+            std::make_unique<ImageView>(*_color_buffer,
+                                        vk::ImageViewType::e2D,
+                                        vk::ImageAspectFlagBits::eColor,
+                                        1);
+
+        // Create the depth buffer
+        _depth_buffer = std::make_unique<UserImage>(
+            _device,
+            memory_pool,
+            _extent.width,
+            _extent.height,
+            1,
+            1,
+            1,
+            physical.get_depth_format(),
+            vk::ImageType::e2D,
+            vk::ImageTiling::eOptimal,
+            vk::ImageUsageFlagBits::eDepthStencilAttachment,
+            physical.get_msaa_samples());
+        _depth_view =
+            std::make_unique<ImageView>(*_depth_buffer,
+                                        vk::ImageViewType::e2D,
+                                        vk::ImageAspectFlagBits::eDepth,
+                                        1);
+    }
+
     const vk::SwapchainKHR &Swapchain::get_handle() const { return _handle; }
 
     const std::vector<std::unique_ptr<SwapchainImage>> &
@@ -131,6 +178,10 @@ namespace Dynamo::Graphics::Vulkan {
     Swapchain::get_views() const {
         return _views;
     }
+
+    const ImageView &Swapchain::get_color_view() const { return *_color_view; }
+
+    const ImageView &Swapchain::get_depth_view() const { return *_depth_view; }
 
     const vk::Extent2D &Swapchain::get_extent() const { return _extent; }
 

@@ -6,8 +6,8 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
+#include "../../Types.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -152,7 +152,7 @@ namespace Dynamo::Graphics::Vulkan {
         /**
          * @brief Get the extensions list
          *
-         * @return const std::vector<const *i8>&
+         * @return const std::vector<const i8 *>&
          */
         const std::vector<const i8 *> &get_extensions() const;
 
