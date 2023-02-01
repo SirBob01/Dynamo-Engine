@@ -38,7 +38,7 @@ namespace Dynamo {
          *
          */
         void subdivide() {
-            f32 halfdim = (max - min) * 0.5;
+            Vec2 halfdim = (max - min) * 0.5;
             for (u32 i = 0; i < 4 && _level != MaxDepth; i++) {
                 _children.push_back(std::make_unique<QuadTree>(
                     center() + QUADRANT_DIRECTIONS[i],
@@ -54,7 +54,6 @@ namespace Dynamo {
             if (!_children.empty()) {
                 _items.clear();
             }
-            return true;
         }
 
         /**
@@ -64,7 +63,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        b8 collides_with(T &item) {
+        b8 collides_with(const T &item) {
             if constexpr (std::is_convertible_v<T, Vec2>) {
                 return contains(item);
             } else if constexpr (std::is_convertible_v<T, Box2>) {
@@ -100,7 +99,7 @@ namespace Dynamo {
          *
          * @param item
          */
-        void insert(T &item) {
+        void insert(const T &item) {
             if (_items.size() == Capacity) {
                 subdivide();
             }
@@ -108,7 +107,7 @@ namespace Dynamo {
                 _items.push_back(item);
             } else {
                 for (std::unique_ptr<QuadTree> &child : _children) {
-                    child.insert(item);
+                    child->insert(item);
                 }
             }
         }
@@ -117,9 +116,9 @@ namespace Dynamo {
          * @brief Get the items that occupy the same node as the one queried.
          *
          * @param item
-         * @return std::vector<T>&
+         * @return std::vector<T>
          */
-        std::vector<T> &get_neighbors(T &item) {
+        std::vector<T> get_neighbors(const T &item) {
             std::vector<T> neighbors;
             std::vector<std::reference_wrapper<QuadTree>> stack;
             stack.push_back(*this);
@@ -134,7 +133,7 @@ namespace Dynamo {
                     }
                 } else {
                     for (std::unique_ptr<QuadTree> &child : curr._children) {
-                        if (child.collides_with(item)) {
+                        if (child->collides_with(item)) {
                             stack.push_back(*child);
                         }
                     }

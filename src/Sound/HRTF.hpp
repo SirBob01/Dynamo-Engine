@@ -3,9 +3,9 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
-#include "../Types.hpp"
 #include "../Math/Common.hpp"
 #include "../Math/Complex.hpp"
 #include "../Math/Delaunay.hpp"
@@ -13,7 +13,9 @@
 #include "../Math/Triangle2.hpp"
 #include "../Math/Vec2.hpp"
 #include "../Math/Vec3.hpp"
+#include "../Types.hpp"
 #include "../Utils/ChannelData.hpp"
+#include "../Utils/QuadTree.hpp"
 
 #include "./Convolver.hpp"
 #include "./Data/HRIR.hpp"
@@ -102,6 +104,43 @@ namespace Dynamo::Sound {
      *
      */
     static std::vector<Triangle2> HRIR_TRIANGLES = generate_HRIR_triangles();
+
+    static QuadTree<Vec2, 5, 10> generate_HRIR_quadtree() {
+        Box2 box({}, {});
+        for (const auto &pair : HRIR_MAP) {
+            box.min.x = std::min(pair.first.x, box.min.x);
+            box.min.y = std::min(pair.first.y, box.min.y);
+
+            box.max.x = std::max(pair.first.x, box.max.x);
+            box.max.y = std::max(pair.first.y, box.max.y);
+        }
+
+        QuadTree<Vec2, 5, 10> tree(box.min, box.max);
+        for (const auto &pair : HRIR_MAP) {
+            tree.insert(pair.first);
+        }
+        return tree;
+    }
+
+    static QuadTree HRIR_QUADTREE = generate_HRIR_quadtree();
+
+    static std::unordered_map<Vec2, std::vector<Triangle2>>
+    generate_triangle_map() {
+        std::unordered_map<Vec2, std::vector<Triangle2>> map;
+        for (const auto &pair : HRIR_MAP) {
+            const Vec2 &point = pair.first;
+            for (const Triangle2 &triangle : HRIR_TRIANGLES) {
+                if (triangle.a == point || triangle.b == point ||
+                    triangle.c == point) {
+                    map[point].push_back(triangle);
+                }
+            }
+        }
+        return map;
+    }
+
+    static std::unordered_map<Vec2, std::vector<Triangle2>> HRIR_TRIANGLE_MAP =
+        generate_triangle_map();
 
     /**
      * @brief Calculate the head-related impulse response for a sound source
