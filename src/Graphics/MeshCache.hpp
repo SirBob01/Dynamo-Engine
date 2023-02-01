@@ -8,7 +8,7 @@
 namespace Dynamo::Graphics {
     class MeshCache : public AssetCache<Mesh> {
         /**
-         * @brief Load an obj file
+         * @brief Load an obj file.
          *
          * @param filename
          */
@@ -16,23 +16,23 @@ namespace Dynamo::Graphics {
 
       protected:
         /**
-         * @brief Load a mesh from a file
+         * @brief Load a mesh from a file.
          *
-         * @param filename Path to the mesh file
+         * @param filename Path to the mesh file.
          * @return Mesh*
          */
         Mesh *load(const std::string filename) override;
 
       public:
         /**
-         * @brief Construct a new MeshCache object
+         * @brief Construct a new MeshCache object.
          *
-         * @param asset_directory Root asset directory
+         * @param asset_directory Root asset directory.
          */
         MeshCache(const std::string asset_directory);
 
         /**
-         * @brief Destroy the MeshCache object
+         * @brief Destroy the MeshCache object.
          *
          */
         virtual ~MeshCache() = default;

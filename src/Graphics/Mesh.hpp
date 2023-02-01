@@ -7,27 +7,27 @@
 
 namespace Dynamo::Graphics {
     /**
-     * @brief 3D mesh data
+     * @brief 3D mesh data.
      *
      */
     struct Mesh {
         /**
-         * @brief Vertex array
+         * @brief Vertex array.
          *
          */
         std::vector<Vertex> vertices;
 
         /**
-         * @brief Index array
+         * @brief Index array.
          *
          */
         std::vector<u32> indices;
 
         /**
-         * @brief Construct a new Mesh object
+         * @brief Construct a new Mesh object.
          *
-         * @param vertices Array of vertices
-         * @param indices  Array of indices
+         * @param vertices Array of vertices.
+         * @param indices  Array of indices.
          */
         Mesh(std::vector<Vertex> &vertices, std::vector<u32> &indices);
     };

@@ -6,7 +6,7 @@
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Model texture
+     * @brief Model texture.
      *
      */
     class Texture {
@@ -17,36 +17,36 @@ namespace Dynamo::Graphics {
 
       public:
         /**
-         * @brief Construct a new Texture object
+         * @brief Construct a new Texture object.
          *
-         * @param pixels 4-channel pixel data
-         * @param width  Width of the texture image
-         * @param height Height of the texture image
+         * @param pixels 4-channel pixel data.
+         * @param width  Width of the texture image.
+         * @param height Height of the texture image.
          */
         Texture(std::vector<u8> &pixels, u32 width, u32 height);
 
         /**
-         * @brief Destroy the Texture object
+         * @brief Destroy the Texture object.
          *
          */
         virtual ~Texture() = default;
 
         /**
-         * @brief Get the width of the texture
+         * @brief Get the width of the texture.
          *
          * @return u32
          */
         inline u32 get_width() const { return _width; }
 
         /**
-         * @brief Get the height of the texture
+         * @brief Get the height of the texture.
          *
          * @return u32
          */
         inline u32 get_height() const { return _height; }
 
         /**
-         * @brief Get the pixels object
+         * @brief Get the pixels object.
          *
          * @return const std::vector<u8>&
          */

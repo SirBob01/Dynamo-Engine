@@ -8,14 +8,13 @@
 #include "../Math/Matrix.hpp"
 
 #include "./Layer.hpp"
-#include "./Material.hpp"
+#include "./LayerView.hpp"
 #include "./MaterialSystem.hpp"
-#include "./MeshInstance.hpp"
 #include "./Texture.hpp"
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Abstract graphics rendering engine for drawing 2D and 3D objects
+     * @brief Abstract graphics rendering engine for drawing 2D and 3D objects.
      *
      */
     class Renderer {
@@ -25,50 +24,50 @@ namespace Dynamo::Graphics {
 
       public:
         /**
-         * @brief Construct a new Renderer object
+         * @brief Construct a new Renderer object.
          *
-         * @param display
-         * @param asset_directory
+         * @param display         Reference to the display.
+         * @param asset_directory Root asset folder path.
          */
         Renderer(Display &display, const std::string asset_directory) :
             _display(display), _asset_directory(asset_directory) {}
 
         /**
-         * @brief Destroy the Renderer object
+         * @brief Destroy the Renderer object.
          *
          */
         virtual ~Renderer() = default;
 
         /**
-         * @brief Get the mesh assets
+         * @brief Get the mesh assets.
          *
          * @return AssetCache<Mesh>&
          */
         virtual AssetCache<Mesh> &get_mesh_assets() = 0;
 
         /**
-         * @brief Get the texture assets
+         * @brief Get the texture assets.
          *
          * @return AssetCache<Texture>&
          */
         virtual AssetCache<Texture> &get_texture_assets() = 0;
 
         /**
-         * @brief Get the shader assets
+         * @brief Get the shader assets.
          *
          * @return AssetCache<Shader>&
          */
         virtual AssetCache<Shader> &get_shader_assets() = 0;
 
         /**
-         * @brief Get the material system
+         * @brief Get the material system.
          *
          * @return MaterialSystem&
          */
         virtual MaterialSystem &get_material_system() = 0;
 
         /**
-         * @brief Upload a Mesh to the GPU and get its instance
+         * @brief Upload a Mesh to the GPU and get its instance.
          *
          * @param mesh Raw vertex and index arrays
          * @return std::unique_ptr<MeshInstance>
@@ -76,34 +75,28 @@ namespace Dynamo::Graphics {
         virtual std::unique_ptr<MeshInstance> upload_mesh(Mesh &mesh) = 0;
 
         /**
-         * @brief Set the render layers
+         * @brief Get the rendering layers.
          *
-         * @param layers Ordered list of layers
+         * @return const std::vector<Layer>&
          */
-        virtual void set_layers(std::vector<Layer> &layers) = 0;
+        virtual const std::vector<Layer> &get_layers() const = 0;
 
         /**
-         * @brief Draw instanced models
+         * @brief Set the rendering layers.
          *
-         * @param mesh_instance Mesh instance
-         * @param material      Model material
-         * @param transforms    Transform array
-         * @param layer         Render layer index
+         * @param layers Ordered list of layer configurations
          */
-        virtual void draw(MeshInstance &mesh_instance,
-                          Material &material,
-                          std::vector<Mat4> &transforms,
-                          u32 layer) = 0;
+        virtual void set_layers(std::vector<LayerConfiguration> layers) = 0;
 
         /**
-         * @brief Clear the display with a color
+         * @brief Clear the display with a color.
          *
-         * @param color Clear color
+         * @param color Clear color.
          */
         virtual void clear(Color color) = 0;
 
         /**
-         * @brief Refresh the renderer to update the display
+         * @brief Refresh the renderer to update the display.
          *
          */
         virtual void refresh() = 0;

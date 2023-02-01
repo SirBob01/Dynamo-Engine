@@ -5,63 +5,63 @@
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Enumerates the shader stages
+     * @brief Enumerates the shader stages.
      *
      */
     enum class ShaderStage : u32 {
         /**
-         * @brief Vertex processing shader
+         * @brief Vertex processing shader.
          *
          */
         Vertex,
 
         /**
-         * @brief Primitive processing shader
+         * @brief Primitive processing shader.
          *
          */
         Geometry,
 
         /**
-         * @brief Pixel rasterization shader
+         * @brief Pixel rasterization shader.
          *
          */
         Fragment,
 
         /**
-         * @brief General purpose computation shader
+         * @brief General purpose computation shader.
          *
          */
         Compute,
     };
 
     /**
-     * @brief Rendering shader program
+     * @brief Rendering shader program.
      *
      */
     class Shader {
       public:
         /**
-         * @brief Destroy the Shader object
+         * @brief Destroy the Shader object.
          *
          */
         virtual ~Shader() = default;
 
         /**
-         * @brief Get the source filename
+         * @brief Get the source filename.
          *
          * @return const std::string
          */
         virtual const std::string &get_filename() const = 0;
 
         /**
-         * @brief Get the bytecode
+         * @brief Get the bytecode.
          *
          * @return const std::vector<u8>&
          */
         virtual const std::vector<u8> &get_bytecode() const = 0;
 
         /**
-         * @brief Get the shader stage
+         * @brief Get the shader stage.
          *
          * @return ShaderStage
          */
@@ -69,7 +69,7 @@ namespace Dynamo::Graphics {
     };
 
     /**
-     * @brief Array of shader modules
+     * @brief Array of shader modules.
      *
      */
     using ShaderList = std::vector<std::reference_wrapper<Shader>>;
