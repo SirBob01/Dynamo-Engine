@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "../Types.hpp"
+#include "./Layer.hpp"
+#include "./LayerView.hpp"
 
 namespace Dynamo::Graphics {
     /**
@@ -51,5 +53,19 @@ namespace Dynamo::Graphics {
          * @return const std::vector<u8>&
          */
         inline const std::vector<u8> &get_pixels() const { return _pixels; }
+
+        /**
+         * @brief Get the rendering layers.
+         *
+         * @return const std::vector<Layer>&
+         */
+        virtual const std::vector<Layer> &get_layers() const = 0;
+
+        /**
+         * @brief Set the rendering layers.
+         *
+         * @param layers Ordered list of layer configurations
+         */
+        virtual void set_layers(std::vector<LayerConfiguration> layers) = 0;
     };
 } // namespace Dynamo::Graphics
