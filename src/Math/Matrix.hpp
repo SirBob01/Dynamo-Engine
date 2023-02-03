@@ -6,9 +6,9 @@
 
 namespace Dynamo {
     /**
-     * @brief A square matrix
+     * @brief A square matrix.
      *
-     * @tparam N Number of rows or columns
+     * @tparam N Number of rows or columns.
      */
     template <u32 N>
     struct Matrix {
@@ -16,7 +16,7 @@ namespace Dynamo {
         std::array<f32, N2> values;
 
         /**
-         * @brief Construct a new Matrix object
+         * @brief Construct a new Matrix object.
          *
          */
         constexpr Matrix() {
@@ -28,7 +28,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Construct a new Matrix object
+         * @brief Construct a new Matrix object.
          *
          */
         constexpr Matrix(f32 v) {
@@ -38,7 +38,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Negation
+         * @brief Negation.
          *
          * @return Matrix<N>
          */
@@ -51,7 +51,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Add another matrix
+         * @brief Add another matrix.
          *
          * @param rhs
          * @return Matrix<N>
@@ -65,7 +65,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another matrix
+         * @brief Subtract another matrix.
          *
          * @param rhs
          * @return Matrix<N>
@@ -79,7 +79,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply with another matrix
+         * @brief Multiply with another matrix.
          *
          * @param rhs
          * @return Matrix<N>
@@ -99,7 +99,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar
+         * @brief Multiply by a scalar.
          *
          * @param rhs
          * @return Matrix<N>
@@ -113,7 +113,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar
+         * @brief Divide by a scalar.
          *
          * @param rhs
          * @return Matrix<N>
@@ -124,7 +124,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Add another matrix in-place
+         * @brief Add another matrix in-place.
          *
          * @param rhs
          * @return Matrix<N>
@@ -137,7 +137,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another matrix in-place
+         * @brief Subtract another matrix in-place.
          *
          * @param rhs
          * @return Matrix<N>
@@ -150,7 +150,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply with another matrix in-place
+         * @brief Multiply with another matrix in-place.
          *
          * @param rhs
          * @return Matrix<N>
@@ -171,7 +171,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar in-place
+         * @brief Multiply by a scalar in-place.
          *
          * @param rhs
          * @return Matrix<N>
@@ -184,7 +184,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar in-place
+         * @brief Divide by a scalar in-place.
          *
          * @param rhs
          * @return Matrix<N>
@@ -195,7 +195,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Swap rows and columns
+         * @brief Swap rows and columns.
          *
          * @return Matrix<N>&
          */
@@ -209,7 +209,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -225,7 +225,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -237,13 +237,13 @@ namespace Dynamo {
     };
 
     /**
-     * @brief 3x3 matrix
+     * @brief 3x3 matrix.
      *
      */
     using Mat3 = Matrix<3>;
 
     /**
-     * @brief 4x4 matrix
+     * @brief 4x4 matrix.
      *
      */
     using Mat4 = Matrix<4>;

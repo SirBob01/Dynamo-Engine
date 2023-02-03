@@ -7,7 +7,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Complex number with real and imaginary components
+     * @brief Complex number with real and imaginary components.
      *
      */
     struct Complex {
@@ -15,22 +15,22 @@ namespace Dynamo {
         f32 im;
 
         /**
-         * @brief Construct a new Complex object
+         * @brief Construct a new Complex object.
          *
-         * @param re Real part
-         * @param im Imaginary part
+         * @param re Real part.
+         * @param im Imaginary part.
          */
         constexpr Complex(f32 re = 0, f32 im = 0) : re(re), im(im) {}
 
         /**
-         * @brief Calculate the square length
+         * @brief Calculate the square length.
          *
          * @return f32
          */
         inline f32 length_squared() const { return re * re + im * im; }
 
         /**
-         * @brief Calculate the length
+         * @brief Calculate the length.
          *
          * @return f32
          */
@@ -38,7 +38,7 @@ namespace Dynamo {
 
         /**
          * @brief Calculate the reciprocal of the complex number for use in
-         * divisions
+         * divisions.
          *
          * @return Complex
          */
@@ -48,19 +48,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Calculate the conjugate of the complex number
+         * @brief Calculate the conjugate of the complex number.
          *
          * @return Complex
          */
         inline Complex conjugate() const { return Complex(re, -im); }
 
         /**
-         * @brief Apply Euler's formula
-         *
-         * e^(x + y i)
-         * = e^x * e^yi
-         * = e^x * (cos(y) + sin(y) i)
-         * = e^x * cos(y) + e^x * sin(y) i
+         * @brief Apply Euler's formula.
          *
          * @return Complex
          */
@@ -70,14 +65,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Negation
+         * @brief Negation.
          *
          * @return Complex
          */
         inline Complex operator-() const { return Complex(-re, -im); }
 
         /**
-         * @brief Add another complex number
+         * @brief Add another complex number.
          *
          * @param rhs
          * @return Complex
@@ -87,7 +82,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another complex number
+         * @brief Subtract another complex number.
          *
          * @param rhs
          * @return Complex
@@ -97,7 +92,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by another complex number
+         * @brief Multiply by another complex number.
          *
          * @param rhs
          * @return Complex
@@ -109,7 +104,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar
+         * @brief Multiply by a scalar.
          *
          * @param scalar
          * @return Complex
@@ -119,7 +114,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by another complex number
+         * @brief Divide by another complex number.
          *
          * @param rhs
          * @return Complex
@@ -129,7 +124,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar
+         * @brief Divide by a scalar.
          *
          * @param scalar
          * @return Complex
@@ -140,7 +135,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Add another complex number in-place
+         * @brief Add another complex number in-place.
          *
          * @param rhs
          * @return Complex&
@@ -152,7 +147,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another complex number in-place
+         * @brief Subtract another complex number in-place.
          *
          * @param rhs
          * @return Complex&
@@ -164,7 +159,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by another complex number in-place
+         * @brief Multiply by another complex number in-place.
          *
          * @param rhs
          * @return Complex&
@@ -178,7 +173,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar in-place
+         * @brief Multiply by a scalar in-place.
          *
          * @param scalar
          * @return Complex&
@@ -190,7 +185,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by another complex number in-place
+         * @brief Divide by another complex number in-place.
          *
          * @param rhs
          * @return Complex&
@@ -201,7 +196,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar in-place
+         * @brief Divide by a scalar in-place.
          *
          * @param scalar
          * @return Complex&
@@ -212,7 +207,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -223,7 +218,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -236,7 +231,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Complex
+ * @brief Hash function implementation for Complex.
  *
  * @tparam
  */

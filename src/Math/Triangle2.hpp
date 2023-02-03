@@ -9,23 +9,23 @@
 
 namespace Dynamo {
     /**
-     * @brief 2D triangle
+     * @brief 2D triangle.
      *
      */
     struct Triangle2 {
         Vec2 a, b, c;
 
         /**
-         * @brief Construct a new Triangle object
+         * @brief Construct a new Triangle object.
          *
          * @param a
          * @param b
          * @param c
          */
-        constexpr Triangle2(Vec2 a, Vec2 b, Vec2 c) : a(a), b(b), c(c) {}
+        constexpr Triangle2(Vec2 a = {}, Vec2 b = {}, Vec2 c = {}) : a(a), b(b), c(c) {}
 
         /**
-         * @brief Calculate the circle which minimally contains this triangle
+         * @brief Calculate the circle which minimally contains this triangle.
          *
          * @return Circle
          */
@@ -45,7 +45,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Calculate the barycentric coordinates of a point
+         * @brief Calculate the barycentric coordinates of a point.
          *
          * @param point
          * @return Vec3
@@ -69,11 +69,11 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Calculate the winding order of the triangle
+         * @brief Calculate the winding order of the triangle.
          *
-         * If the result is < 0, the points are clockwise
-         * If the result is = 0, the points are collinear
-         * If the result is > 0, the points are anti-clockwise
+         * If the result is < 0, the points are clockwise.
+         * If the result is = 0, the points are collinear.
+         * If the result is > 0, the points are anti-clockwise.
          *
          * @return i32
          */
@@ -84,7 +84,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Count the number of shared vertices with another triangle
+         * @brief Count the number of shared vertices with another triangle.
          *
          * @param rhs
          * @return i32
@@ -96,7 +96,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if a triangle shares an edge with another triangle
+         * @brief Test if a triangle shares an edge with another triangle.
          *
          * @param rhs
          * @return true
@@ -107,7 +107,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -118,7 +118,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -131,7 +131,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Triangle2
+ * @brief Hash function implementation for Triangle2.
  *
  * @tparam
  */

@@ -7,7 +7,7 @@
 
 namespace Dynamo {
     /**
-     * @brief 2D axis-aligned bounding volume
+     * @brief 2D axis-aligned bounding volume.
      *
      */
     struct Box2 {
@@ -15,56 +15,56 @@ namespace Dynamo {
         Vec2 max;
 
         /**
-         * @brief Construct a new Box2 object
+         * @brief Construct a new Box2 object.
          *
          * @param min
          * @param max
          */
-        constexpr Box2(Vec2 min, Vec2 max) : min(min), max(max) {}
+        constexpr Box2(Vec2 min = {}, Vec2 max = {}) : min(min), max(max) {}
 
         /**
-         * @brief Construct a new Box2 object given its center and dimensions
+         * @brief Construct a new Box2 object given its center and dimensions.
          *
          * @param center
          * @param width
          * @param height
          */
-        Box2(Vec2 center, f32 width, f32 height) {
+        Box2(Vec2 center, f32 width = 0, f32 height = 0) {
             Vec2 halfdim(width * 0.5, height * 0.5);
             min = center - halfdim;
             max = center + halfdim;
         }
 
         /**
-         * @brief Get the center of this box
+         * @brief Get the center of this box.
          *
          * @return Vec2
          */
         inline Vec2 center() const { return (min + max) * 0.5; }
 
         /**
-         * @brief Get the width of this box
+         * @brief Get the width of this box.
          *
          * @return f32
          */
         inline f32 width() const { return max.x - min.x; }
 
         /**
-         * @brief Get the height of this box
+         * @brief Get the height of this box.
          *
          * @return f32
          */
         inline f32 height() const { return max.y - min.y; }
 
         /**
-         * @brief Get the area of this box
+         * @brief Get the area of this box.
          *
          * @return f32
          */
         inline f32 area() const { return width() * height(); }
 
         /**
-         * @brief Translate this box by an offset vector
+         * @brief Translate this box by an offset vector.
          *
          * @param offset
          * @return Box2D&
@@ -76,7 +76,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Clamp a point to be contained within the box
+         * @brief Clamp a point to be contained within the box.
          *
          * @param point
          * @return Vec2
@@ -87,7 +87,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if this box overlaps with another box
+         * @brief Test if this box overlaps with another box.
          *
          * @param box
          * @return true
@@ -100,7 +100,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if a point is contained within this box
+         * @brief Test if a point is contained within this box.
          *
          * @param point
          * @return true
@@ -113,7 +113,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if a box is contained within this box
+         * @brief Test if a box is contained within this box.
          *
          * @param point
          * @return true
@@ -126,7 +126,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -137,7 +137,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -146,7 +146,7 @@ namespace Dynamo {
         inline b8 operator!=(const Box2 &rhs) const { return !(*this == rhs); }
 
         /**
-         * @brief Test if the bounding volume is valid (min is less than max)
+         * @brief Test if the bounding volume is valid (min is less than max).
          *
          * @return true
          * @return false
@@ -156,7 +156,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Box2
+ * @brief Hash function implementation for Box2.
  *
  * @tparam
  */

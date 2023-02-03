@@ -8,7 +8,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Convert an angle in radians to degrees
+     * @brief Convert an angle in radians to degrees.
      *
      * @param rad
      * @return f32
@@ -19,7 +19,7 @@ namespace Dynamo {
     }
 
     /**
-     * @brief Convert an angle in degrees to radians
+     * @brief Convert an angle in degrees to radians.
      *
      * @param deg
      * @return f32
@@ -30,11 +30,11 @@ namespace Dynamo {
     }
 
     /**
-     * @brief Linearly interpolate between a and b
+     * @brief Linearly interpolate between a and b.
      *
-     * @param a Start value
-     * @param b End value
-     * @param t Interpolation factor
+     * @param a Start value.
+     * @param b End value.
+     * @param t Interpolation factor.
      * @return f32
      */
     inline f32 lerp(f32 a, f32 b, f32 t) { return a + (b - a) * t; }
