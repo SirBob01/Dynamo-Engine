@@ -7,36 +7,36 @@
 
 namespace Dynamo {
     /**
-     * @brief 2D bidirectional line segment
+     * @brief 2D bidirectional line segment.
      *
      */
     struct Segment2 {
         Vec2 a, b;
 
         /**
-         * @brief Construct a new Segment2 object
+         * @brief Construct a new Segment2 object.
          *
          * @param a
          * @param b
          */
-        constexpr Segment2(Vec2 a, Vec2 b) : a(a), b(b) {}
+        constexpr Segment2(Vec2 a = {}, Vec2 b = {}) : a(a), b(b) {}
 
         /**
-         * @brief Calculate the squared length
+         * @brief Calculate the squared length.
          *
          * @return f32
          */
         inline f32 length_squared() const { return (a - b).length_squared(); }
 
         /**
-         * @brief Calculate the length
+         * @brief Calculate the length.
          *
          * @return f32
          */
         inline f32 length() const { return (a - b).length(); }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -47,7 +47,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -60,7 +60,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Segment2
+ * @brief Hash function implementation for Segment2.
  *
  * @tparam
  */

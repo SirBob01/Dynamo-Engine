@@ -8,30 +8,28 @@
 
 namespace Dynamo {
     /**
-     * @brief Quaternion expression
-     *
-     * xi + yj + zk + w, such that i^2 = j^2 = k^2 = ijk = -1
+     * @brief Quaternion expression for 3D orientations.
      *
      */
     struct Quaternion {
         f32 x, y, z, w;
 
         /**
-         * @brief Construct a new Quaternion object
+         * @brief Construct a new Quaternion object.
          *
-         * @param x Coefficient of i component
-         * @param y Coefficient of j component
-         * @param z Coefficient of k component
-         * @param w Scalar component
+         * @param x Coefficient of i component.
+         * @param y Coefficient of j component.
+         * @param z Coefficient of k component.
+         * @param w Scalar component.
          */
         constexpr Quaternion(f32 x = 0, f32 y = 0, f32 z = 0, f32 w = 1) :
             x(x), y(y), z(z), w(w) {}
 
         /**
-         * @brief Construct a new Quaternion object from an angle-axis pair
+         * @brief Construct a new Quaternion object from an angle-axis pair.
          *
-         * @param axis  Rotation axis
-         * @param angle Rotation angle in radians
+         * @param axis  Rotation axis.
+         * @param angle Rotation angle in radians.
          */
         Quaternion(Vec3 axis, f32 angle) {
             f32 half_angle = 0.5 * angle;
@@ -43,7 +41,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Calculate the square length
+         * @brief Calculate the square length.
          *
          * @return f32
          */
@@ -52,7 +50,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Calculate the length
+         * @brief Calculate the length.
          *
          * @return f32
          */
@@ -60,7 +58,7 @@ namespace Dynamo {
 
         /**
          * @brief Calculate the reciprocal of the quaternion for use in
-         * divisions
+         * divisions.
          *
          * @return Quaternion
          */
@@ -70,7 +68,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Calculate the conjugate of the quaternion
+         * @brief Calculate the conjugate of the quaternion.
          *
          * @return Quaternion
          */
@@ -79,7 +77,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Negation
+         * @brief Negation.
          *
          * @return Quaternion
          */
@@ -88,7 +86,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Add another quaternion
+         * @brief Add another quaternion.
          *
          * @param rhs
          * @return Quaternion
@@ -98,7 +96,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another quaternion
+         * @brief Subtract another quaternion.
          *
          * @param rhs
          * @return Quaternion
@@ -108,9 +106,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by another quaternion
+         * @brief Multiply by another quaternion.
          *
-         * This operation composes rotations and is non-commutative
+         * This operation composes rotations and is non-commutative.
          *
          * @param rhs
          * @return Quaternion
@@ -124,7 +122,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar
+         * @brief Multiply by a scalar.
          *
          * @param scalar
          * @return Quaternion
@@ -134,7 +132,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar
+         * @brief Divide by a scalar.
          *
          * @param scalar
          * @return Quaternion
@@ -145,7 +143,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Add another quaternion in-place
+         * @brief Add another quaternion in-place.
          *
          * @param rhs
          * @return Quaternion
@@ -159,7 +157,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another quaternion in-place
+         * @brief Subtract another quaternion in-place.
          *
          * @param rhs
          * @return Quaternion
@@ -173,9 +171,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by another quaternion in-place
+         * @brief Multiply by another quaternion in-place.
          *
-         * This operation composes rotations and is non-commutative
+         * This operation composes rotations and is non-commutative.
          *
          * @param rhs
          * @return Quaternion
@@ -193,7 +191,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar in-place
+         * @brief Multiply by a scalar in-place.
          *
          * @param scalar
          * @return Quaternion
@@ -207,7 +205,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar in-place
+         * @brief Divide by a scalar in-place.
          *
          * @param scalar
          * @return Quaternion
@@ -218,14 +216,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Normalize this quaternion in-place
+         * @brief Normalize this quaternion in-place.
          *
          * @return Quaternion&
          */
         inline Quaternion &normalize() { return *this /= length(); }
 
         /**
-         * @brief Apply rotation to a Vec3
+         * @brief Apply rotation to a Vec3.
          *
          * @param v
          * @return Vec3
@@ -237,7 +235,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Extract the forward vector of the rotation basis
+         * @brief Extract the forward vector of the rotation basis.
          *
          * @return Vec3
          */
@@ -249,7 +247,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Extract the up vector of the rotation basis
+         * @brief Extract the up vector of the rotation basis.
          *
          * @return Vec3
          */
@@ -261,7 +259,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Extract the right vector of the rotation basis
+         * @brief Extract the right vector of the rotation basis.
          *
          * @return Vec3
          */
@@ -273,7 +271,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -284,7 +282,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -297,7 +295,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Quaternion
+ * @brief Hash function implementation for Quaternion.
  *
  * @tparam
  */

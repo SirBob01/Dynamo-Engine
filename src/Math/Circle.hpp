@@ -7,7 +7,7 @@
 
 namespace Dynamo {
     /**
-     * @brief 2D circle
+     * @brief 2D circle.
      *
      */
     struct Circle {
@@ -15,37 +15,37 @@ namespace Dynamo {
         f32 radius;
 
         /**
-         * @brief Construct a new Circle object
+         * @brief Construct a new Circle object.
          *
          * @param center
          * @param radius
          */
-        constexpr Circle(Vec2 center, f32 radius = 1) :
+        constexpr Circle(Vec2 center = {}, f32 radius = 1) :
             center(center), radius(radius) {}
 
         /**
-         * @brief Get the circumference of this circle
+         * @brief Get the circumference of this circle.
          *
          * @return f32
          */
         inline f32 circumference() const { return 2 * M_PI * radius; }
 
         /**
-         * @brief Get the diameter of this circle
+         * @brief Get the diameter of this circle.
          *
          * @return f32
          */
         inline f32 diameter() const { return 2 * radius; }
 
         /**
-         * @brief Get the area of this circle
+         * @brief Get the area of this circle.
          *
          * @return f32
          */
         inline f32 area() const { return M_PI * radius * radius; }
 
         /**
-         * @brief Test if this circle intersects with another circle
+         * @brief Test if this circle intersects with another circle.
          *
          * @param circle
          * @return true
@@ -58,7 +58,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if a point is contained within this circle
+         * @brief Test if a point is contained within this circle.
          *
          * @param point
          * @return true
@@ -70,7 +70,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if a circle is contained within this circle
+         * @brief Test if a circle is contained within this circle.
          *
          * @param circle
          * @return true
@@ -83,7 +83,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -94,7 +94,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -105,7 +105,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Test if the circle is valid (radius is non-negative)
+         * @brief Test if the circle is valid (radius is non-negative).
          *
          * @return true
          * @return false
@@ -115,7 +115,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Circle
+ * @brief Hash function implementation for Circle.
  *
  * @tparam
  */

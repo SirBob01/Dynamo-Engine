@@ -7,10 +7,10 @@
 
 namespace Dynamo {
     /**
-     * @brief RGBA color value
+     * @brief RGBA color value.
      *
-     * Each channel accepts a floating point number from [0 - 1], values outside
-     * this range are invalid
+     * Each channel accepts a floating point number from [0 - 1]. Values outside
+     * this range are invalid.
      *
      */
     struct Color {
@@ -20,21 +20,21 @@ namespace Dynamo {
         f32 a;
 
         /**
-         * @brief Construct a new Color object
+         * @brief Construct a new Color object.
          *
-         * @param r Red channel
-         * @param g Green channel
-         * @param b Blue channel
-         * @param a Alpha channel
+         * @param r Red channel.
+         * @param g Green channel.
+         * @param b Blue channel.
+         * @param a Alpha channel.
          */
         constexpr Color(f32 r = 0, f32 g = 0, f32 b = 0, f32 a = 1) :
             r(r), g(g), b(b), a(a) {}
 
         /**
-         * @brief Linearly interpolate between two colors
+         * @brief Linearly interpolate between two colors.
          *
-         * @param rhs Target color
-         * @param t   Interpolation factor
+         * @param rhs Target color.
+         * @param t   Interpolation factor.
          * @return Color
          */
         Color lerp(const Color &rhs, f32 t) const {
@@ -45,15 +45,15 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Invert the RGB channels, maintaining the alpha channel
+         * @brief Invert the RGB channels, maintaining the alpha channel.
          *
          * @return Color
          */
         Color invert() { return Color(1 - r, 1 - g, 1 - b, a); }
 
         /**
-         * @brief Convert the color to a single 32-bit u32 integer which
-         * can be represented as a hex value
+         * @brief Convert the color to a single 32-bit unsigned integer which
+         * can be represented as a hex value.
          *
          * @return constexpr u32
          */
@@ -66,10 +66,26 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Convert the Color into an array of floats
+         * @brief Convert the Color into an array of floats.
          *
          * @return std::array<f32, 4>
          */
         std::array<f32, 4> to_array() const { return {r, g, b, a}; }
     };
 } // namespace Dynamo
+
+/**
+ * @brief Hash function implementation for Color.
+ *
+ * @tparam
+ */
+template <>
+struct std::hash<Dynamo::Color> {
+    inline size_t operator()(const Dynamo::Color &color) const {
+        Dynamo::i64 tr = color.r * 73856093;
+        Dynamo::i64 tg = color.g * 19349663;
+        Dynamo::i64 tb = color.b * 83492791;
+        Dynamo::i64 ta = color.a * 52477425;
+        return tr ^ tg ^ tb ^ ta;
+    }
+};

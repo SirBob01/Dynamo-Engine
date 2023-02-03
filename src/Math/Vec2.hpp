@@ -8,14 +8,14 @@
 
 namespace Dynamo {
     /**
-     * @brief 2D vector
+     * @brief 2D vector.
      *
      */
     struct Vec2 {
         f32 x, y;
 
         /**
-         * @brief Construct a new Vec2 object
+         * @brief Construct a new Vec2 object.
          *
          * @param x
          * @param y
@@ -23,35 +23,35 @@ namespace Dynamo {
         constexpr Vec2(f32 x = 0, f32 y = 0) : x(x), y(y) {}
 
         /**
-         * @brief Calculate the squared length
+         * @brief Calculate the squared length.
          *
          * @return f32
          */
         inline f32 length_squared() const { return x * x + y * y; }
 
         /**
-         * @brief Calculate the length
+         * @brief Calculate the length.
          *
          * @return f32
          */
         inline f32 length() const { return std::sqrt(length_squared()); }
 
         /**
-         * @brief Get the left normal perpendicular to this vector
+         * @brief Get the left normal perpendicular to this vector.
          *
          * @return Vec2
          */
         inline Vec2 left_normal() const { return Vec2(-y, x); }
 
         /**
-         * @brief Get the right normal perpendicular to this vector
+         * @brief Get the right normal perpendicular to this vector.
          *
          * @return Vec2
          */
         inline Vec2 right_normal() const { return Vec2(y, -x); }
 
         /**
-         * @brief Add another vector
+         * @brief Add another vector.
          *
          * @param rhs
          * @return Vec2
@@ -61,7 +61,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another vector
+         * @brief Subtract another vector.
          *
          * @param rhs
          * @return Vec2
@@ -71,7 +71,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar
+         * @brief Multiply by a scalar.
          *
          * @param scalar
          * @return Vec2
@@ -81,7 +81,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar
+         * @brief Divide by a scalar.
          *
          * @param scalar
          * @return Vec2
@@ -92,14 +92,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Negation
+         * @brief Negation.
          *
          * @return Vec2
          */
         inline Vec2 operator-() const { return Vec2(-x, -y); }
 
         /**
-         * @brief Add another vector in-place
+         * @brief Add another vector in-place.
          *
          * @param rhs
          * @return Vec2&
@@ -111,7 +111,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another vector in-place
+         * @brief Subtract another vector in-place.
          *
          * @param rhs
          * @return Vec2&
@@ -123,7 +123,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar in-place
+         * @brief Multiply by a scalar in-place.
          *
          * @param scalar
          * @return Vec2&
@@ -135,7 +135,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar in-place
+         * @brief Divide by a scalar in-place.
          *
          * @param scalar
          * @return Vec2&
@@ -146,14 +146,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Normalize this vector in-place
+         * @brief Normalize this vector in-place.
          *
          * @return Vec2&
          */
         inline Vec2 &normalize() { return *this /= length(); }
 
         /**
-         * @brief Apply a transform with a 3x3 matrix
+         * @brief Apply a transform with a 3x3 matrix.
          *
          * @param mat
          * @return Vec2&
@@ -167,7 +167,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Dot product
+         * @brief Dot product.
          *
          * @param rhs
          * @return f32
@@ -177,7 +177,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief 2D cross product
+         * @brief 2D cross product.
          *
          * @param rhs
          * @return f32
@@ -187,7 +187,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -198,7 +198,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -209,7 +209,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Vec2
+ * @brief Hash function implementation for Vec2.
  *
  * @tparam
  */

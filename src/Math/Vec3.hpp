@@ -8,14 +8,14 @@
 
 namespace Dynamo {
     /**
-     * @brief 3D vector
+     * @brief 3D vector.
      *
      */
     struct Vec3 {
         f32 x, y, z;
 
         /**
-         * @brief Construct a new Vec3 object
+         * @brief Construct a new Vec3 object.
          *
          * @param x
          * @param y
@@ -24,21 +24,21 @@ namespace Dynamo {
         constexpr Vec3(f32 x = 0, f32 y = 0, f32 z = 0) : x(x), y(y), z(z) {}
 
         /**
-         * @brief Calculate the squared length
+         * @brief Calculate the squared length.
          *
          * @return f32
          */
         inline f32 length_squared() const { return x * x + y * y + z * z; }
 
         /**
-         * @brief Calculate the length
+         * @brief Calculate the length.
          *
          * @return f32
          */
         inline f32 length() const { return std::sqrt(length_squared()); }
 
         /**
-         * @brief Add another vector
+         * @brief Add another vector.
          *
          * @param rhs
          * @return Vec3
@@ -48,7 +48,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another vector
+         * @brief Subtract another vector.
          *
          * @param rhs
          * @return Vec3
@@ -58,7 +58,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar
+         * @brief Multiply by a scalar.
          *
          * @param scalar
          * @return Vec3
@@ -68,7 +68,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar
+         * @brief Divide by a scalar.
          *
          * @param scalar
          * @return Vec3
@@ -79,14 +79,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Negation
+         * @brief Negation.
          *
          * @return Vec3
          */
         inline Vec3 operator-() const { return Vec3(-x, -y, -z); }
 
         /**
-         * @brief Add another vector in-place
+         * @brief Add another vector in-place.
          *
          * @param rhs
          * @return Vec3&
@@ -99,7 +99,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Subtract another vector in-place
+         * @brief Subtract another vector in-place.
          *
          * @param rhs
          * @return Vec3&
@@ -112,7 +112,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Multiply by a scalar in-place
+         * @brief Multiply by a scalar in-place.
          *
          * @param scalar
          * @return Vec3&
@@ -125,7 +125,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Divide by a scalar in-place
+         * @brief Divide by a scalar in-place.
          *
          * @param scalar
          * @return Vec3&
@@ -136,14 +136,14 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Normalize this vector in-place
+         * @brief Normalize this vector in-place.
          *
          * @return Vec3&
          */
         inline Vec3 &normalize() { return *this /= length(); }
 
         /**
-         * @brief Apply a transform with a 4x4 matrix
+         * @brief Apply a transform with a 4x4 matrix.
          *
          * @param mat
          * @return Vec3&
@@ -159,7 +159,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Dot product
+         * @brief Dot product.
          *
          * @param rhs
          * @return f32
@@ -169,7 +169,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief 3D cross product
+         * @brief 3D cross product.
          *
          * @param rhs
          * @return Vec3
@@ -182,7 +182,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -193,7 +193,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Inequality operator
+         * @brief Inequality operator.
          *
          * @param rhs
          * @return true
@@ -204,7 +204,7 @@ namespace Dynamo {
 } // namespace Dynamo
 
 /**
- * @brief Hash function implementation for Vec3
+ * @brief Hash function implementation for Vec3.
  *
  * @tparam
  */

@@ -14,16 +14,16 @@
 
 namespace Dynamo::Delaunay {
     /**
-     * @brief Calculate the delaunay triangulation of a point set
+     * @brief Calculate the delaunay triangulation of a point set.
+     * 
+     * This will reorder the points in-place for optimization purposes.
      *
-     * Note: This will reorder the points in-place for optimization purposes
-     *
-     * @param points Input point set
+     * @param points Input point set.
      */
     std::vector<Triangle2> triangulate(std::vector<Vec2> &points);
 
     /**
-     * @brief Calculate the box that contains all points in the set
+     * @brief Calculate the box that contains all points in the set.
      *
      * @param points
      * @return Box2
@@ -31,7 +31,7 @@ namespace Dynamo::Delaunay {
     Box2 calculate_bounding_volume(const std::vector<Vec2> &points);
 
     /**
-     * @brief Calculate the super triangle that contains the box
+     * @brief Calculate the super triangle that contains the box.
      *
      * @param box
      * @return Triangle2

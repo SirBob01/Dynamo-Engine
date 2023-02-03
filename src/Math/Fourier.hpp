@@ -11,9 +11,9 @@
 
 namespace Dynamo::Fourier {
     /**
-     * @brief Pre-compute the twiddle factor tables
+     * @brief Pre-compute the twiddle factor tables.
      *
-     * @param inverse Forward or inverse transform table
+     * @param inverse Forward or inverse transform table.
      * @return std::array<Complex, 32>
      */
     static std::array<Complex, 32> construct_twiddle_table(b8 inverse) {
@@ -26,14 +26,14 @@ namespace Dynamo::Fourier {
     }
 
     /**
-     * @brief Pre-compute twiddle factors for the forward fourier transform
+     * @brief Pre-compute twiddle factors for the forward fourier transform.
      *
      */
     static const std::array<Complex, 32> TWIDDLE_TABLE_FFT =
         construct_twiddle_table(false);
 
     /**
-     * @brief Pre-compute twiddle factors for the inverse fourier transform
+     * @brief Pre-compute twiddle factors for the inverse fourier transform.
      *
      */
     static const std::array<Complex, 32> TWIDDLE_TABLE_IFFT =
@@ -41,19 +41,19 @@ namespace Dynamo::Fourier {
 
     /**
      * @brief Implementation of the fourier transform algorithm to extract
-     * the frequency-domain of a time-domain signal in-place
+     * the frequency-domain of a time-domain signal in-place.
      *
-     * @param signal Signal buffer
-     * @param N      Total number of frames (must be a power of 2)
+     * @param signal Signal buffer.
+     * @param N      Total number of frames (must be a power of 2).
      */
     void transform(Complex *signal, u32 N);
 
     /**
      * @brief Implementation of the inverse fourier transform algorithm to
-     * extract the time-domain of a frequency-domain signal in-place
+     * extract the time-domain of a frequency-domain signal in-place.
      *
-     * @param signal Signal buffer
-     * @param N      Total number of frames (must be a power of 2)
+     * @param signal Signal buffer.
+     * @param N      Total number of frames (must be a power of 2).
      */
     void inverse(Complex *signal, u32 N);
 } // namespace Dynamo::Fourier
