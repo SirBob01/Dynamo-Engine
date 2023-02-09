@@ -1,4 +1,6 @@
+#include "./Common.hpp"
 #include <Dynamo.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Vec2 length squared", "[Vec2]") {
@@ -139,4 +141,56 @@ TEST_CASE("Vec2 inequality", "[Vec2]") {
 
 TEST_CASE("Vec2 hash", "[Vec2]") {
     REQUIRE_NOTHROW(std::unordered_set<Dynamo::Vec2>());
+}
+
+TEST_CASE("Vec2 performance", "[Vec2]") {
+    std::vector<Dynamo::Vec2> binary;
+    for (unsigned i = 0; i < 1000; i++) {
+        float x = Dynamo::Random::range(0, 10);
+        float y = Dynamo::Random::range(0, 10);
+        binary.push_back(Dynamo::Vec2(x, y));
+    }
+    BENCHMARK("Vec2 add benchmark") {
+        Dynamo::Vec2 c;
+        for (unsigned i = 0; i < binary.size(); i++) {
+            for (unsigned j = i + 1; j < binary.size(); j++) {
+                do_not_optimize(c = binary[i] + binary[j]);
+            }
+        }
+    };
+    BENCHMARK("Vec2 subtract benchmark") {
+        Dynamo::Vec2 c;
+        for (unsigned i = 0; i < binary.size(); i++) {
+            for (unsigned j = i + 1; j < binary.size(); j++) {
+                do_not_optimize(c = binary[i] - binary[j]);
+            }
+        }
+    };
+    BENCHMARK("Vec2 dot benchmark") {
+        float dot;
+        for (unsigned i = 0; i < binary.size(); i++) {
+            for (unsigned j = i + 1; j < binary.size(); j++) {
+                do_not_optimize(dot = binary[i] * binary[j]);
+            }
+        }
+    };
+
+    std::vector<Dynamo::Vec2> unary;
+    for (unsigned i = 0; i < 100000; i++) {
+        float x = Dynamo::Random::range(0, 10);
+        float y = Dynamo::Random::range(0, 10);
+        unary.push_back(Dynamo::Vec2(x, y));
+    }
+    BENCHMARK("Vec2 scalar multiply benchmark") {
+        Dynamo::Vec2 c;
+        for (unsigned i = 0; i < unary.size(); i++) {
+            do_not_optimize(c = unary[i] * 69);
+        }
+    };
+    BENCHMARK("Vec2 scalar divide benchmark") {
+        Dynamo::Vec2 c;
+        for (unsigned i = 0; i < unary.size(); i++) {
+            do_not_optimize(c = unary[i] / 69);
+        }
+    };
 }

@@ -1,4 +1,6 @@
+#include "./Common.hpp"
 #include <Dynamo.hpp>
+#include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Vec3 length squared", "[Vec3]") {
@@ -138,4 +140,58 @@ TEST_CASE("Vec3 inequality", "[Vec3]") {
 
 TEST_CASE("Vec3 hash", "[Vec3]") {
     REQUIRE_NOTHROW(std::unordered_set<Dynamo::Vec3>());
+}
+
+TEST_CASE("Vec3 performance", "[Vec3]") {
+    std::vector<Dynamo::Vec3> binary;
+    for (unsigned i = 0; i < 1000; i++) {
+        float x = Dynamo::Random::range(0, 10);
+        float y = Dynamo::Random::range(0, 10);
+        float z = Dynamo::Random::range(0, 10);
+        binary.push_back(Dynamo::Vec3(x, y, z));
+    }
+    BENCHMARK("Vec3 add benchmark") {
+        Dynamo::Vec3 c;
+        for (unsigned i = 0; i < binary.size(); i++) {
+            for (unsigned j = i + 1; j < binary.size(); j++) {
+                do_not_optimize(c = binary[i] + binary[j]);
+            }
+        }
+    };
+    BENCHMARK("Vec3 subtract benchmark") {
+        Dynamo::Vec3 c;
+        for (unsigned i = 0; i < binary.size(); i++) {
+            for (unsigned j = i + 1; j < binary.size(); j++) {
+                do_not_optimize(c = binary[i] - binary[j]);
+            }
+        }
+    };
+    BENCHMARK("Vec3 dot benchmark") {
+        float dot;
+        for (unsigned i = 0; i < binary.size(); i++) {
+            for (unsigned j = i + 1; j < binary.size(); j++) {
+                do_not_optimize(dot = binary[i] * binary[j]);
+            }
+        }
+    };
+
+    std::vector<Dynamo::Vec3> unary;
+    for (unsigned i = 0; i < 100000; i++) {
+        float x = Dynamo::Random::range(0, 10);
+        float y = Dynamo::Random::range(0, 10);
+        float z = Dynamo::Random::range(0, 10);
+        unary.push_back(Dynamo::Vec3(x, y, z));
+    }
+    BENCHMARK("Vec3 scalar multiply benchmark") {
+        Dynamo::Vec3 c;
+        for (unsigned i = 0; i < unary.size(); i++) {
+            do_not_optimize(c = unary[i] * 69);
+        }
+    };
+    BENCHMARK("Vec3 scalar divide benchmark") {
+        Dynamo::Vec3 c;
+        for (unsigned i = 0; i < unary.size(); i++) {
+            do_not_optimize(c = unary[i] / 69);
+        }
+    };
 }
