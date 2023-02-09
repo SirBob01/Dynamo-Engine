@@ -11,24 +11,24 @@ namespace Dynamo::Random {
     static std::uniform_real_distribution<f32> uniform(0, 1);
 
     /**
-     * @brief Seed the random number generator
+     * @brief Seed the random number generator.
      *
-     * @param s Seed value
+     * @param s Seed value.
      */
     inline void seed(i32 s) { rng.seed(s); }
 
     /**
-     * @brief Get a random number in the range [0, 1)
+     * @brief Get a random number in the range [0, 1).
      *
      * @return f32
      */
     inline f32 random() { return uniform(rng); }
 
     /**
-     * @brief Get a random number in the range [min, max)
+     * @brief Get a random number in the range [min, max).
      *
-     * @param min
-     * @param max
+     * @param min Minimum value inclusive.
+     * @param max Maximum value exclusive.
      * @return f32
      */
     inline f32 range(f32 min, f32 max) {

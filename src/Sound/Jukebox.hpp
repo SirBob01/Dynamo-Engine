@@ -69,6 +69,12 @@ namespace Dynamo::Sound {
         ListenerSet _listeners;
 
         /**
+         * @brief Head-related transfer function for binaural effects
+         *
+         */
+        HRTF _hrtf;
+
+        /**
          * @brief Static chunk list
          *
          */
@@ -273,6 +279,13 @@ namespace Dynamo::Sound {
          * @return ListenerSet&
          */
         ListenerSet &get_listeners();
+
+        /**
+         * @brief Get the HRTF object
+         *
+         * @return HRTF&
+         */
+        HRTF &get_hrtf();
 
         /**
          * @brief Play a static sound

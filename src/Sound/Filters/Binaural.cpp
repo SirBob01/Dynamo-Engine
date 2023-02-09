@@ -1,7 +1,7 @@
 #include "./Binaural.hpp"
 
 namespace Dynamo::Sound {
-    Binaural::Binaural() {
+    Binaural::Binaural(HRTF &hrtf) : _hrtf(hrtf) {
         _impulse_response.resize(HRIR_LENGTH, 2);
         _output.set_channels(2);
     }
@@ -12,10 +12,10 @@ namespace Dynamo::Sound {
                            const DynamicMaterial &material,
                            const ListenerProperties &listener) {
         _output.set_frames(length);
-        calculate_HRIR(listener.position,
-                       listener.rotation,
-                       material.position,
-                       _impulse_response);
+        _hrtf.get().calculate_HRIR(listener.position,
+                                   listener.rotation,
+                                   material.position,
+                                   _impulse_response);
         for (i32 c = 0; c < 2; c++) {
             _convolvers[c].initialize(_impulse_response[c],
                                       _impulse_response.frames());

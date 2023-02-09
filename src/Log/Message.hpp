@@ -8,13 +8,13 @@
 
 namespace Dynamo {
     /**
-     * @brief Enumerates the different warning types
+     * @brief Enumerates the different warning types.
      *
      */
     enum class MessageType { Info, Warning, Error };
 
     /**
-     * @brief Message object
+     * @brief Message object.
      *
      */
     struct Message {
@@ -23,7 +23,7 @@ namespace Dynamo {
         MessageType type;
 
         /**
-         * @brief Get the string representation of the message
+         * @brief Get the string representation of the message.
          *
          * @return std::string
          */

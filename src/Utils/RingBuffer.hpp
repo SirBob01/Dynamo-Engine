@@ -7,14 +7,14 @@
 namespace Dynamo {
     /**
      * @brief A circular buffer such that writing will automatically loop back
-     * at the start of the buffer as it overflows, discarding old data
+     * at the start of the buffer as it overflows, discarding old data.
      *
-     * The buffer keeps track of a read and write pointer
-     * The buffer is full if write is just behind read
-     * The buffer is empty if the read and write point to the same index
+     * The buffer keeps track of a read and write pointer.
+     * The buffer is full if write is just behind read.
+     * The buffer is empty if the read and write point to the same index.
      *
-     * @tparam T Type of element, must be trivially copyable
-     * @tparam N Maximum size of the container (power of 2)
+     * @tparam T Type of element, must be trivially copyable.
+     * @tparam N Maximum size of the container (power of 2).
      */
     template <typename T, u32 N>
     class RingBuffer {

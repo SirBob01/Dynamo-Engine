@@ -351,6 +351,8 @@ namespace Dynamo::Sound {
 
     ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
+    HRTF &Jukebox::get_hrtf() { return _hrtf; }
+
     void Jukebox::play(Asset<Sound> &sound, StaticMaterial &material) {
         f32 frame = _output_state.sample_rate * material.start_seconds;
         _static_chunks.push_back({*sound, material, frame});

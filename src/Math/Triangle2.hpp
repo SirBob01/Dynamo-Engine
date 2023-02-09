@@ -22,7 +22,8 @@ namespace Dynamo {
          * @param b
          * @param c
          */
-        constexpr Triangle2(Vec2 a = {}, Vec2 b = {}, Vec2 c = {}) : a(a), b(b), c(c) {}
+        constexpr Triangle2(Vec2 a = {}, Vec2 b = {}, Vec2 c = {}) :
+            a(a), b(b), c(c) {}
 
         /**
          * @brief Calculate the circle which minimally contains this triangle.
