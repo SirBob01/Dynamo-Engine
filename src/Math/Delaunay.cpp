@@ -59,11 +59,10 @@ namespace Dynamo::Delaunay {
             }
 
             // Add triangles formed between the point and the outer edges
-            for (const auto &pair : edges) {
-                if (pair.second > 1) {
+            for (auto [edge, count] : edges) {
+                if (count > 1) {
                     continue;
                 }
-                const Segment2 &edge = pair.first;
                 triangles.push_back(Triangle2(edge.a, edge.b, point));
             }
 

@@ -8,13 +8,13 @@
 
 namespace Dynamo {
     /**
-     * @brief Unique identifier supports up to 2^32 - 1 entities simultaneously
+     * @brief Unique identifier supports up to 2^32 - 1 entities simultaneously.
      *
      */
     using Id = u64;
 
     /**
-     * @brief Generate and discard ids
+     * @brief Generate and discard ids.
      *
      */
     class IdTracker {
@@ -25,13 +25,13 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Construct a new IdTracker object
+         * @brief Construct a new IdTracker object.
          *
          */
         IdTracker() : _index_counter(0) {}
 
         /**
-         * @brief Get the index of an id
+         * @brief Get the index of an id.
          *
          * @param id
          * @return u32
@@ -39,7 +39,7 @@ namespace Dynamo {
         static inline u32 get_index(Id id) { return id >> 32; }
 
         /**
-         * @brief Get the version of an id
+         * @brief Get the version of an id.
          *
          * @param id
          * @return u32
@@ -47,7 +47,7 @@ namespace Dynamo {
         static inline u32 get_version(Id id) { return id & 0xFFFFFFFF; }
 
         /**
-         * @brief Test if an id is active
+         * @brief Test if an id is active.
          *
          * @param id
          * @return true
@@ -61,9 +61,9 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Generate an id
+         * @brief Generate an id.
          *
-         * This will recycle previously discarded ids if available
+         * This will recycle previously discarded ids if available.
          *
          * @return Id
          */
@@ -85,9 +85,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Discard an id
-         *
-         * This will tag the id as inactive and recyclable
+         * @brief Discard an id. This will tag it as inactive and recyclable.
          *
          * @param id
          */
@@ -99,7 +97,7 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Clear the id pool
+         * @brief Clear the id pool.
          *
          */
         inline void clear() {

@@ -13,30 +13,19 @@ namespace Dynamo::Sound {
      *
      */
     class Binaural : public DynamicFilter {
-        /**
-         * @brief Impulse response container
-         *
-         */
-        Sound _impulse_response;
-
-        /**
-         * @brief Signal convolvers
-         *
-         */
+        std::reference_wrapper<HRTF> _hrtf;
         std::array<Convolver, 2> _convolvers;
 
-        /**
-         * @brief Output buffer
-         *
-         */
+        Sound _impulse_response;
         Sound _output;
 
       public:
         /**
          * @brief Construct a new Binaural filter object
          *
+         * @param hrtf HRTF interpolator
          */
-        Binaural();
+        Binaural(HRTF &hrtf);
 
         Sound &apply(Sound &src,
                      const u32 src_offset,

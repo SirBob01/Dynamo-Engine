@@ -29,7 +29,7 @@
 
 namespace Dynamo {
     /**
-     * @brief Logging utility handler
+     * @brief Logging utility handler.
      *
      */
     class Log {
@@ -37,10 +37,10 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Log an informative message to stdout
+         * @brief Log an informative message to stdout.
          *
-         * @param format Formatting template string
-         * @param args   Data arguments (optional)
+         * @param format Formatting template string.
+         * @param args   Data arguments.
          */
         template <typename... Types>
         static void info(std::string format = "", Types... args) {
@@ -52,10 +52,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Log an error to stderr and terminate the process
+         * @brief Log an error to stderr and terminate the process.
          *
-         * @param format Formatting template string
-         * @param args   Data arguments (optional)
+         * @param format Formatting template string.
+         * @param args   Data arguments.
          */
         template <typename... Types>
         static void error(std::string format, Types... args) {
@@ -71,10 +71,10 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Log a warning to stderr
+         * @brief Log a warning to stderr.
          *
-         * @param format Formatting template string
-         * @param args   Data arguments (optional)
+         * @param format Formatting template string.
+         * @param args   Data arguments.
          */
         template <typename... Types>
         static void warn(std::string format, Types... args) {
@@ -86,9 +86,8 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Dump the log history to disk
+         * @brief Dump the log history to disk.
          *
-         * @param filename
          */
         static void dump();
     };
