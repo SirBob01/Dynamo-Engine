@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core/Clock.hpp"
+#include "../Clock/Clock.hpp"
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
 #include "../Core/Input.hpp"
@@ -15,44 +15,43 @@
 
 namespace Dynamo {
     /**
-     * @brief Application startup configuration options
+     * @brief Application startup configuration options.
      *
      */
     struct ApplicationConfiguration {
         /**
-         * @brief Title of the display
+         * @brief Title of the display.
          *
          */
         std::string title;
 
         /**
-         * @brief Width of the display
+         * @brief Width of the display.
          *
          */
         u32 width;
 
         /**
-         * @brief Height of the display
+         * @brief Height of the display.
          *
          */
         u32 height;
 
         /**
-         * @brief Runtime settings
+         * @brief Runtime settings.
          *
          */
         ApplicationFlag flags = ApplicationFlag::None;
 
         /**
-         * @brief Root asset directory
+         * @brief Root asset directory.
          *
          */
         std::string asset_directory;
     };
 
     /**
-     * @brief Main runtime synchronizes the game loop, rendering, sound, and
-     * scenes
+     * @brief Runtime synchronizes the game loop, rendering, sound, and scenes.
      *
      */
     class Application {
@@ -67,36 +66,36 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Construct a new Application object
+         * @brief Construct a new Application object.
          *
-         * @param config Initialization options
+         * @param config Initialization options.
          */
         Application(ApplicationConfiguration config);
 
         /**
-         * @brief Destroy the Application object
+         * @brief Destroy the Application object.
          *
-         * This will clean up the scenes and the GLFW instance
+         * This will clean up the scenes and the GLFW instance.
          *
          */
         ~Application();
 
         /**
-         * @brief Get the core modules
+         * @brief Get the core modules.
          *
-         * @return const Core
+         * @return const Core.
          */
         Core get_core();
 
         /**
-         * @brief Get a reference to the audio engine
+         * @brief Get a reference to the audio engine.
          *
          * @return Sound::Jukebox&
          */
         Sound::Jukebox &get_jukebox();
 
         /**
-         * @brief Get a reference to the rendering engine
+         * @brief Get a reference to the rendering engine.
          *
          * @return Graphics::Renderer&
          */
@@ -111,7 +110,7 @@ namespace Dynamo {
         b8 is_running();
 
         /**
-         * @brief Perform a single frame update
+         * @brief Perform a single frame update.
          *
          */
         void run();
