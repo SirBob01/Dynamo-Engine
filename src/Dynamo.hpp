@@ -2,7 +2,7 @@
 
 #include "Application/Application.hpp"
 
-#include "Core/Clock.hpp"
+#include "Clock/Clock.hpp"
 #include "Core/Core.hpp"
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Clock.hpp"
+#include "../Clock/Clock.hpp"
 #include "Display.hpp"
 #include "Input.hpp"
 
