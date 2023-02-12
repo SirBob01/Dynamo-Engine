@@ -22,8 +22,7 @@ namespace Dynamo {
         _jukebox = std::make_unique<Sound::Jukebox>(config.asset_directory);
 
         // Seed the random number generator
-        i32 seed = std::chrono::system_clock::now().time_since_epoch().count();
-        Random::seed(seed);
+        Random::seed(_clock->epoch().count());
     }
 
     Application::~Application() { glfwTerminate(); }

@@ -44,6 +44,13 @@ namespace Dynamo {
         Seconds delta();
 
         /**
+         * @brief Get the precise time in seconds of initialization.
+         *
+         * @return Seconds
+         */
+        Seconds epoch();
+
+        /**
          * @brief Get the number of frames since initialization.
          *
          * @return i64

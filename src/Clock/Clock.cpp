@@ -16,6 +16,8 @@ namespace Dynamo {
 
     Seconds Clock::delta() { return _delta; }
 
+    Seconds Clock::epoch() { return _epoch; }
+
     i64 Clock::frames() { return _frames; }
 
     void Clock::tick() {
