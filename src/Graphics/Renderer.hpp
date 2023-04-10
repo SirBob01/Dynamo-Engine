@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "../Core/Display.hpp"
 #include "../Math/Color.hpp"
 
@@ -14,7 +16,7 @@ namespace Dynamo::Graphics {
          * @brief Reference to the video display
          *
          */
-        Display &_display;
+        std::reference_wrapper<Display> _display;
 
       public:
         /**

@@ -3,10 +3,10 @@
 namespace Dynamo {
     Input::Input(Display &display) : _display(display) {
         // Register input handling callbacks to update internal state
-        glfwSetWindowUserPointer(_display.get_window(), &_state);
+        glfwSetWindowUserPointer(_display.get().get_window(), &_state);
 
         // On cursor motion
-        glfwSetCursorPosCallback(_display.get_window(),
+        glfwSetCursorPosCallback(_display.get().get_window(),
                                  [](GLFWwindow *window, f64 x, f64 y) {
                                      InputState *state =
                                          static_cast<InputState *>(
@@ -16,7 +16,7 @@ namespace Dynamo {
                                  });
 
         // On scroll
-        glfwSetScrollCallback(_display.get_window(),
+        glfwSetScrollCallback(_display.get().get_window(),
                               [](GLFWwindow *window, f64 x, f64 y) {
                                   InputState *state = static_cast<InputState *>(
                                       glfwGetWindowUserPointer(window));
@@ -26,7 +26,7 @@ namespace Dynamo {
 
         // On key state change
         glfwSetKeyCallback(
-            _display.get_window(),
+            _display.get().get_window(),
             [](GLFWwindow *window,
                i32 key,
                i32 scancode,
@@ -48,7 +48,7 @@ namespace Dynamo {
 
         // On mouse button state change
         glfwSetMouseButtonCallback(
-            _display.get_window(),
+            _display.get().get_window(),
             [](GLFWwindow *window, i32 button, i32 action, i32 mods) {
                 InputState *state =
                     static_cast<InputState *>(glfwGetWindowUserPointer(window));
@@ -91,12 +91,12 @@ namespace Dynamo {
     }
 
     b8 Input::is_down(KeyCode code) {
-        return glfwGetKey(_display.get_window(), static_cast<i32>(code)) ==
-               GLFW_PRESS;
+        return glfwGetKey(_display.get().get_window(),
+                          static_cast<i32>(code)) == GLFW_PRESS;
     }
 
     b8 Input::is_down(MouseCode code) {
-        return glfwGetMouseButton(_display.get_window(),
+        return glfwGetMouseButton(_display.get().get_window(),
                                   static_cast<i32>(code)) == GLFW_PRESS;
     }
 
