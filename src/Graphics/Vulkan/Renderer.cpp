@@ -72,7 +72,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Setup the application and Vulkan instance
         vk::ApplicationInfo app_info;
-        app_info.pApplicationName = _display.get_title().c_str();
+        app_info.pApplicationName = _display.get().get_title().c_str();
         app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         app_info.pEngineName = "Dynamo Engine";
         app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -108,7 +108,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkSurfaceKHR tmp_surface;
         vk::Result result = static_cast<vk::Result>(
             glfwCreateWindowSurface(_instance.get(),
-                                    _display.get_window(),
+                                    _display.get().get_window(),
                                     nullptr,
                                     &tmp_surface));
         _surface = vk::UniqueSurfaceKHR(tmp_surface, _instance.get());

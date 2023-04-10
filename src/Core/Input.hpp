@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <unordered_set>
 
 #include <GLFW/glfw3.h>
@@ -151,7 +152,7 @@ namespace Dynamo {
      *
      */
     class Input {
-        Display &_display;
+        std::reference_wrapper<Display> _display;
 
         struct InputState {
             Vec2 mouse_position;
