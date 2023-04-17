@@ -353,14 +353,14 @@ namespace Dynamo::Sound {
 
     HRTF &Jukebox::get_hrtf() { return _hrtf; }
 
-    void Jukebox::play(Asset<Sound> &sound, StaticMaterial &material) {
+    void Jukebox::play(Sound &sound, StaticMaterial &material) {
         f32 frame = _output_state.sample_rate * material.start_seconds;
-        _static_chunks.push_back({*sound, material, frame});
+        _static_chunks.push_back({sound, material, frame});
     }
 
-    void Jukebox::play(Asset<Sound> &sound, DynamicMaterial &material) {
+    void Jukebox::play(Sound &sound, DynamicMaterial &material) {
         f32 frame = _output_state.sample_rate * material.start_seconds;
-        _dynamic_chunks.push_back({*sound, material, frame});
+        _dynamic_chunks.push_back({sound, material, frame});
     }
 
     void Jukebox::update() {
