@@ -1,34 +1,28 @@
-#include "./Mesh.hpp"
+#include "./GeometryCache.hpp"
 
-namespace Dynamo::Graphics::Vulkan {
-    Mesh::Mesh(const std::string filename, const File3D filetype) {
-        switch (filetype) {
-        case File3D::Obj:
-            load_obj(filename);
-            break;
-        default:
-            Log::error("Invalid file format.");
-            break;
-        }
-    }
+namespace Dynamo::Graphics {
+    GeometryCache::GeometryCache(const std::string asset_directory) :
+        AssetCache<Geometry>(asset_directory) {}
 
-    void Mesh::load_obj(const std::string filename) {
+    Geometry *GeometryCache::load_obj(const std::string filename) {
         tinyobj::attrib_t attrib;
+
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
         std::string warning, error;
 
         b8 result = tinyobj::LoadObj(&attrib,
-                                       &shapes,
-                                       &materials,
-                                       &warning,
-                                       &error,
-                                       filename.c_str());
+                                     &shapes,
+                                     &materials,
+                                     &warning,
+                                     &error,
+                                     filename.c_str());
         if (!result) {
             Log::error("Could not load Obj file: {}, ", error, warning);
         }
 
-        // Calculate the index array
+        // Generate the geometry
+        Geometry *geometry = new Geometry();
         std::unordered_map<Vertex, u32> unique_vertices;
         for (const tinyobj::shape_t &shape : shapes) {
             for (const tinyobj::index_t &index : shape.mesh.indices) {
@@ -55,11 +49,19 @@ namespace Dynamo::Graphics::Vulkan {
                 }
 
                 if (unique_vertices.count(vert) == 0) {
-                    unique_vertices[vert] = vertices.size();
-                    vertices.push_back(vert);
+                    unique_vertices[vert] = geometry->vertices.size();
+                    geometry->vertices.push_back(vert);
                 }
-                indices.push_back(unique_vertices[vert]);
+                geometry->indices.push_back(unique_vertices[vert]);
             }
+            return geometry;
         }
     }
-} // namespace Dynamo::Graphics::Vulkan
+
+    Geometry *GeometryCache::load(const std::string filepath) {
+        if (filepath.find(".obj") == filepath.length() - 4) {
+            return load_obj(filepath);
+        }
+        Log::error("Invalid geometry file format.");
+    }
+} // namespace Dynamo::Graphics
