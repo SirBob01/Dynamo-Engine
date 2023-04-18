@@ -7,6 +7,7 @@
 #include "Core/Display.hpp"
 #include "Core/Input.hpp"
 
+#include "Graphics/Geometry.hpp"
 #include "Graphics/Renderer.hpp"
 #include "Graphics/Vulkan/Renderer.hpp"
 
@@ -23,10 +24,11 @@
 #include "Sound/Material.hpp"
 #include "Sound/Resample.hpp"
 #include "Sound/Sound.hpp"
-#include "Sound/SoundCache.hpp"
 
 #include "Asset/Asset.hpp"
 #include "Asset/AssetCache.hpp"
+#include "Asset/Loader/GeometryLoader.hpp"
+#include "Asset/Loader/SoundLoader.hpp"
 
 #include "Math/Box2.hpp"
 #include "Math/Circle.hpp"
@@ -42,7 +44,6 @@
 #include "Math/Vec2.hpp"
 #include "Math/Vec3.hpp"
 
-#include "Utils/ThreadPool.hpp"
 #include "Utils/Allocator.hpp"
 #include "Utils/Bits.hpp"
 #include "Utils/ChannelData.hpp"
@@ -50,6 +51,7 @@
 #include "Utils/Random.hpp"
 #include "Utils/RingBuffer.hpp"
 #include "Utils/SparseSet.hpp"
+#include "Utils/ThreadPool.hpp"
 #include "Utils/TypeId.hpp"
 
 #include "Log/Log.hpp"

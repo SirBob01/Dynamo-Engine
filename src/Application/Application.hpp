@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Asset/AssetCache.hpp"
 #include "../Clock/Clock.hpp"
 #include "../Core/Core.hpp"
 #include "../Core/Display.hpp"
@@ -11,7 +12,7 @@
 #include "../Types.hpp"
 #include "../Utils/Random.hpp"
 #include "../Utils/ThreadPool.hpp"
-#include "ApplicationFlag.hpp"
+#include "./ApplicationFlag.hpp"
 
 namespace Dynamo {
     /**
@@ -55,6 +56,7 @@ namespace Dynamo {
      *
      */
     class Application {
+        std::unique_ptr<AssetCache> _assets;
         std::unique_ptr<Display> _display;
         std::unique_ptr<Input> _input;
         std::unique_ptr<Clock> _clock;
@@ -79,6 +81,13 @@ namespace Dynamo {
          *
          */
         ~Application();
+
+        /**
+         * @brief Get the assets cache.
+         *
+         * @return AssetCache&
+         */
+        AssetCache &get_assets();
 
         /**
          * @brief Get the core modules.

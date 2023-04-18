@@ -8,6 +8,7 @@ namespace Dynamo {
         }
 
         // Core submodules
+        _assets = std::make_unique<AssetCache>(config.asset_directory);
         _display = std::make_unique<Display>(
             config.width,
             config.height,
@@ -19,13 +20,15 @@ namespace Dynamo {
 
         // Graphics and sound submodules
         _renderer = std::make_unique<Graphics::Vulkan::Renderer>(*_display);
-        _jukebox = std::make_unique<Sound::Jukebox>(config.asset_directory);
+        _jukebox = std::make_unique<Sound::Jukebox>();
 
         // Seed the random number generator
         Random::seed(_clock->epoch().count());
     }
 
     Application::~Application() { glfwTerminate(); }
+
+    AssetCache &Application::get_assets() { return *_assets; }
 
     Core Application::get_core() { return {*_display, *_input, *_clock}; }
 
