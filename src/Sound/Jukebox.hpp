@@ -7,7 +7,6 @@
 
 #include <portaudio.h>
 
-#include "../Asset/Asset.hpp"
 #include "../Log/Log.hpp"
 #include "../Math/Vec3.hpp"
 #include "../Types.hpp"
@@ -22,8 +21,8 @@
 #include "./HRTF.hpp"
 #include "./Listener.hpp"
 #include "./Material.hpp"
+#include "./Resample.hpp"
 #include "./Sound.hpp"
-#include "./SoundCache.hpp"
 
 namespace Dynamo::Sound {
     /**
@@ -46,7 +45,6 @@ namespace Dynamo::Sound {
      *
      */
     class Jukebox {
-        SoundCache _assets;
         PaStream *_input_stream;
         PaStream *_output_stream;
 
@@ -175,9 +173,8 @@ namespace Dynamo::Sound {
         /**
          * @brief Construct a new Jukebox object
          *
-         * @param asset_directory Root asset directory
          */
-        Jukebox(const std::string asset_directory);
+        Jukebox();
 
         /**
          * @brief Destroy the Jukebox object
@@ -265,13 +262,6 @@ namespace Dynamo::Sound {
          * @param volume
          */
         void set_volume(f32 volume);
-
-        /**
-         * @brief Get the sound asset cache
-         *
-         * @return SoundCache&
-         */
-        SoundCache &get_sounds();
 
         /**
          * @brief Get the set of listeners

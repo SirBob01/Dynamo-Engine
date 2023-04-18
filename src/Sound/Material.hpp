@@ -2,9 +2,8 @@
 
 #include <memory>
 
-#include "../Types.hpp"
-#include "../Asset/Asset.hpp"
 #include "../Math/Vec3.hpp"
+#include "../Types.hpp"
 #include "./Sound.hpp"
 
 namespace Dynamo::Sound {

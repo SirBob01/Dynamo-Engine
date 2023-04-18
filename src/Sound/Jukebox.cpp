@@ -1,8 +1,7 @@
 #include "Jukebox.hpp"
 
 namespace Dynamo::Sound {
-    Jukebox::Jukebox(const std::string asset_directory) :
-        _assets(asset_directory) {
+    Jukebox::Jukebox() {
         _volume = 1.0f;
 
         // Initialize state
@@ -346,8 +345,6 @@ namespace Dynamo::Sound {
     void Jukebox::set_volume(f32 volume) {
         _volume = std::clamp(volume, 0.0f, 1.0f);
     }
-
-    SoundCache &Jukebox::get_sounds() { return _assets; }
 
     ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
