@@ -2,27 +2,25 @@
 
 #include <vector>
 
+#include "../Math/Vec2.hpp"
 #include "../Types.hpp"
-#include "./Target.hpp"
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Texture object.
+     * @brief Texture image.
      *
      */
-    class Texture : public Target {
-      public:
+    struct Texture {
         /**
-         * @brief Destroy the Texture object.
+         * @brief 4-channel pixel data.
          *
          */
-        virtual ~Texture() = 0;
+        std::vector<u8> pixels;
 
         /**
-         * @brief Get the raw pixel data.
+         * @brief Dimensions of the image.
          *
-         * @return const std::vector<u8>&
          */
-        virtual const std::vector<u8> &get_pixels() const = 0;
+        Vec2 size;
     };
 } // namespace Dynamo::Graphics

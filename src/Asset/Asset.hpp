@@ -40,6 +40,6 @@ namespace Dynamo {
          *
          * @return T*
          */
-        inline T *operator->() { return _data; }
+        inline T *operator->() { return _data.get(); }
     };
 } // namespace Dynamo

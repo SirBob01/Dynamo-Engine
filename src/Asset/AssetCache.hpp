@@ -10,6 +10,7 @@
 #include "./Asset.hpp"
 #include "./Loader/GeometryLoader.hpp"
 #include "./Loader/SoundLoader.hpp"
+#include "./Loader/TextureLoader.hpp"
 
 namespace Dynamo {
     /**
@@ -57,6 +58,8 @@ namespace Dynamo {
                 return store(filename, GeometryLoader::load(fullpath));
             } else if constexpr (std::is_same_v<T, Sound::Sound>) {
                 return store(filename, SoundLoader::load(fullpath));
+            } else if constexpr (std::is_same_v<T, Graphics::Texture>) {
+                return store(filename, TextureLoader::load(fullpath));
             } else {
                 Log::error("Attempted to load unsupported asset type.");
             }
