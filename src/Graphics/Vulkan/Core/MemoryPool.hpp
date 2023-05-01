@@ -6,8 +6,8 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
-#include "../../Utils/Bits.hpp"
+#include "../../../Types.hpp"
+#include "../../../Utils/Bits.hpp"
 #include "./Device.hpp"
 #include "./Memory.hpp"
 
@@ -139,8 +139,8 @@ namespace Dynamo::Graphics::Vulkan {
          * @return false
          */
         b8 is_compatible(Memory &memory,
-                           vk::MemoryRequirements requirements,
-                           vk::MemoryPropertyFlags properties);
+                         vk::MemoryRequirements requirements,
+                         vk::MemoryPropertyFlags properties);
 
       public:
         /**

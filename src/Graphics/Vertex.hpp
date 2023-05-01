@@ -6,7 +6,7 @@
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Vertex object
+     * @brief Vertex object.
      *
      */
     struct Vertex {
@@ -15,7 +15,7 @@ namespace Dynamo::Graphics {
         Vec2 texture;
 
         /**
-         * @brief Equality operator
+         * @brief Equality operator.
          *
          * @param rhs
          * @return true
@@ -29,7 +29,7 @@ namespace Dynamo::Graphics {
 } // namespace Dynamo::Graphics
 
 /**
- * @brief Hash function implementation for Vertex
+ * @brief Hash function implementation for Vertex.
  *
  * @tparam
  */

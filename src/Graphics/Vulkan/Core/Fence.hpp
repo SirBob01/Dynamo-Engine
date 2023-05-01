@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
+#include "../../../Types.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {

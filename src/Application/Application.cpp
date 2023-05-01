@@ -32,7 +32,9 @@ namespace Dynamo {
 
     Core Application::get_core() { return {*_display, *_input, *_clock}; }
 
-    Graphics::Renderer &Application::get_renderer() { return *_renderer; }
+    Graphics::Vulkan::Renderer &Application::get_renderer() {
+        return *_renderer;
+    }
 
     Sound::Jukebox &Application::get_jukebox() { return *_jukebox; }
 

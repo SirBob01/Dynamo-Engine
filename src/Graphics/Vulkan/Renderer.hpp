@@ -8,34 +8,36 @@
 #include <stb_image.h>
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
 #include "../../Log/Log.hpp"
+#include "../../Types.hpp"
 #include "../Renderer.hpp"
-#include "./Buffer.hpp"
-#include "./CommandPool.hpp"
-#include "./Debugger.hpp"
-#include "./DescriptorPool.hpp"
-#include "./Device.hpp"
-#include "./Fence.hpp"
-#include "./Framebuffer.hpp"
-#include "./Image.hpp"
-#include "./MemoryPool.hpp"
-#include "./PhysicalDevice.hpp"
-#include "./Pipeline.hpp"
-#include "./PipelineLayout.hpp"
-#include "./RenderPass.hpp"
-#include "./Sampler.hpp"
-#include "./Semaphore.hpp"
-#include "./ShaderModule.hpp"
-#include "./Swapchain.hpp"
-#include "./Texture.hpp"
+#include "./Core/Buffer.hpp"
+#include "./Core/CommandPool.hpp"
+#include "./Core/Debugger.hpp"
+#include "./Core/DescriptorPool.hpp"
+#include "./Core/Device.hpp"
+#include "./Core/Fence.hpp"
+#include "./Core/Framebuffer.hpp"
+#include "./Core/Image.hpp"
+#include "./Core/MemoryPool.hpp"
+#include "./Core/PhysicalDevice.hpp"
+#include "./Core/Pipeline.hpp"
+#include "./Core/PipelineLayout.hpp"
+#include "./Core/RenderPass.hpp"
+#include "./Core/Sampler.hpp"
+#include "./Core/Semaphore.hpp"
+#include "./Core/ShaderModule.hpp"
+#include "./Core/Swapchain.hpp"
+#include "./Core/Texture.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Renderer powered by the Vulkan API
      *
      */
-    class Renderer : public Dynamo::Graphics::Renderer {
+    class Renderer {
+        std::reference_wrapper<Display> _display;
+
         vk::UniqueInstance _instance;
         vk::UniqueSurfaceKHR _surface;
 
@@ -243,12 +245,12 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Clear the display with a color
          *
          */
-        void clear(Color color) override;
+        void clear(Color color);
 
         /**
          * @brief Update the renderer and present to the display surface
          *
          */
-        void refresh() override;
+        void refresh();
     };
 } // namespace Dynamo::Graphics::Vulkan

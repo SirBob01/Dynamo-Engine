@@ -4,7 +4,7 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../Vertex.hpp"
+#include "../../Vertex.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**

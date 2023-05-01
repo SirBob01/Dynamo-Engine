@@ -4,8 +4,8 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
-#include "../../Utils/Allocator.hpp"
+#include "../../../Types.hpp"
+#include "../../../Utils/Allocator.hpp"
 #include "./CommandPool.hpp"
 #include "./Device.hpp"
 #include "./MemoryPool.hpp"
@@ -169,9 +169,6 @@ namespace Dynamo::Graphics::Vulkan {
          * @param dst_offset Valid destination offset
          * @param length     Length of the copy <= destination block size
          */
-        void copy(Buffer &dst,
-                  u32 src_offset,
-                  u32 dst_offset,
-                  u32 length);
+        void copy(Buffer &dst, u32 src_offset, u32 dst_offset, u32 length);
     };
 } // namespace Dynamo::Graphics::Vulkan

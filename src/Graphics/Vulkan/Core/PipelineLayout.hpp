@@ -7,8 +7,8 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
-#include "../../Log/Log.hpp"
+#include "../../../Log/Log.hpp"
+#include "../../../Types.hpp"
 #include "./Device.hpp"
 #include "./ShaderModule.hpp"
 
