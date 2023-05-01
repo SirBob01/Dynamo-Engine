@@ -7,8 +7,8 @@
 #include <spirv_reflect.h>
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
-#include "../../Log/Log.hpp"
+#include "../../../Log/Log.hpp"
+#include "../../../Types.hpp"
 #include "./Device.hpp"
 
 namespace Dynamo::Graphics::Vulkan {

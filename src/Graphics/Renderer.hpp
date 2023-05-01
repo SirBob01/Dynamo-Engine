@@ -4,45 +4,73 @@
 
 #include "../Core/Display.hpp"
 #include "../Math/Color.hpp"
+#include "./Geometry.hpp"
+#include "./GeometryInstance.hpp"
+#include "./Target.hpp"
+#include "./Texture.hpp"
 
 namespace Dynamo::Graphics {
     /**
-     * @brief Abstract graphics rendering engine for drawing 2D and 3D objects
+     * @brief Abstract graphics rendering engine for drawing 2D and 3D objects.
      *
      */
     class Renderer {
-      protected:
-        /**
-         * @brief Reference to the video display
-         *
-         */
-        std::reference_wrapper<Display> _display;
-
       public:
         /**
-         * @brief Construct a new Renderer object
-         *
-         * @param display
-         */
-        Renderer(Display &display) : _display(display) {}
-
-        /**
-         * @brief Destroy the Renderer object
+         * @brief Destroy the Renderer object.
          *
          */
         virtual ~Renderer() = 0;
 
         /**
-         * @brief Refresh the renderer to update the display
+         * @brief Upload geometry to the GPU and get a handle to its instance.
+         *
+         * @param geometry
+         * @return std::unique_ptr<GeometryInstance>
+         */
+        virtual std::unique_ptr<GeometryInstance>
+        upload_geometry(Geometry &geometry) = 0;
+
+        /**
+         * @brief Upload a shader program to the GPU and get a handle to its
+         * instance.
+         *
+         * @param shader_code
+         * @param stage
+         * @return std::unique_ptr<Shader>
+         */
+        virtual std::unique_ptr<Shader>
+        upload_shader(const std::string shader_code, ShaderStage stage) = 0;
+
+        /**
+         * @brief Upload a texture to the GPU and get a handle to its instance.
+         *
+         * @param pixels
+         * @param width
+         * @param height
+         * @return std::unique_ptr<Texture>
+         */
+        virtual std::unique_ptr<Texture>
+        upload_texture(std::vector<u8> &pixels, u32 width, u32 height) = 0;
+
+        /**
+         * @brief Add a target to the renderer.
+         *
+         * @return std::unique_ptr<Target>
+         */
+        virtual std::unique_ptr<Target> add_target() = 0;
+
+        /**
+         * @brief Get the list of render targets, excluding textures.
+         *
+         * @return std::vector<std::unique_ptr<Target>>&
+         */
+        virtual std::vector<std::unique_ptr<Target>> &get_targets() = 0;
+
+        /**
+         * @brief Perform the rendering operations.
          *
          */
         virtual void refresh() = 0;
-
-        /**
-         * @brief Clear the display with a color
-         *
-         */
-        virtual void clear(Color color) = 0;
     };
-    inline Renderer::~Renderer() = default;
 } // namespace Dynamo::Graphics

@@ -5,9 +5,9 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include "../../Types.hpp"
-#include "../../Core/Display.hpp"
-#include "../../Log/Log.hpp"
+#include "../../../Core/Display.hpp"
+#include "../../../Log/Log.hpp"
+#include "../../../Types.hpp"
 #include "./Device.hpp"
 #include "./Image.hpp"
 #include "./ImageView.hpp"

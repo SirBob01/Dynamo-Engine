@@ -61,7 +61,7 @@ namespace Dynamo {
         std::unique_ptr<Input> _input;
         std::unique_ptr<Clock> _clock;
 
-        std::unique_ptr<Graphics::Renderer> _renderer;
+        std::unique_ptr<Graphics::Vulkan::Renderer> _renderer;
         std::unique_ptr<Sound::Jukebox> _jukebox;
 
         ThreadPool _threads;
@@ -106,9 +106,11 @@ namespace Dynamo {
         /**
          * @brief Get a reference to the rendering engine.
          *
+         * TODO: Return Graphics::Renderer once Vulkan implementation is ready.
+         *
          * @return Graphics::Renderer&
          */
-        Graphics::Renderer &get_renderer();
+        Graphics::Vulkan::Renderer &get_renderer();
 
         /**
          * @brief Is the application still running?

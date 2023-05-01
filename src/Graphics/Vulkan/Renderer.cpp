@@ -1,7 +1,7 @@
 #include "Renderer.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    Renderer::Renderer(Display &display) : Dynamo::Graphics::Renderer(display) {
+    Renderer::Renderer(Display &display) : _display(display) {
         enumerate_extensions();
         create_instance();
         create_surface();
