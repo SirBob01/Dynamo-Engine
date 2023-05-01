@@ -29,7 +29,7 @@ namespace Dynamo::Graphics {
          * @return std::unique_ptr<GeometryInstance>
          */
         virtual std::unique_ptr<GeometryInstance>
-        upload_geometry(Geometry &geometry) = 0;
+        add_geometry(Geometry &geometry) = 0;
 
         /**
          * @brief Upload a shader program to the GPU and get a handle to its
@@ -40,28 +40,26 @@ namespace Dynamo::Graphics {
          * @return std::unique_ptr<Shader>
          */
         virtual std::unique_ptr<Shader>
-        upload_shader(const std::string shader_code, ShaderStage stage) = 0;
+        add_shader(const std::string shader_code, ShaderStage stage) = 0;
 
         /**
-         * @brief Upload a texture to the GPU and get a handle to its instance.
+         * @brief Upload a texture to the GPU and get a handle to the resulting
+         * render target.
          *
-         * @param pixels
-         * @param width
-         * @param height
-         * @return std::unique_ptr<Texture>
+         * @param texture
+         * @return std::unique_ptr<Target>
          */
-        virtual std::unique_ptr<Texture>
-        upload_texture(std::vector<u8> &pixels, u32 width, u32 height) = 0;
+        virtual std::unique_ptr<Target> add_target(Texture &texture) = 0;
 
         /**
-         * @brief Add a target to the renderer.
+         * @brief Create a blank render target.
          *
          * @return std::unique_ptr<Target>
          */
         virtual std::unique_ptr<Target> add_target() = 0;
 
         /**
-         * @brief Get the list of render targets, excluding textures.
+         * @brief Get the list of render targets.
          *
          * @return std::vector<std::unique_ptr<Target>>&
          */
