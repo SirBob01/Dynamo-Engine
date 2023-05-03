@@ -9,7 +9,8 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Wrapper class for a Vulkan Framebuffer
+     * @brief Wrapper class for a Vulkan Framebuffer. This maps image views to
+     * the attachments they represent.
      *
      */
     class Framebuffer {
@@ -18,7 +19,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new Framebuffer object
+         * @brief Construct a new Framebuffer object.
          *
          * @param device         Reference to the device
          * @param extent         Dimensions of the framebuffer
@@ -35,13 +36,13 @@ namespace Dynamo::Graphics::Vulkan {
                     ImageView &swapchain_view);
 
         /**
-         * @brief Destroy the Framebuffer object
+         * @brief Destroy the Framebuffer object.
          *
          */
         ~Framebuffer();
 
         /**
-         * @brief Get the handle to vk::Framebuffer
+         * @brief Get the handle to vk::Framebuffer.
          *
          * @return const vk::Framebuffer&
          */

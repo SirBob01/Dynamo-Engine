@@ -9,7 +9,9 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Wrapper class for a Vulkan logical device
+     * @brief Wrapper class for a Vulkan logical device. This is the interface
+     * from which most Vulkan operations are performed to interact with the
+     * physical device.
      *
      */
     class Device {
@@ -18,34 +20,34 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new Device object
+         * @brief Construct a new Device object.
          *
          * @param physical Physical device
          */
         Device(PhysicalDevice &physical);
 
         /**
-         * @brief Destroy the Device object
+         * @brief Destroy the Device object.
          *
          */
         ~Device();
 
         /**
-         * @brief Get the handle to vk::Device
+         * @brief Get the handle to vk::Device.
          *
          * @return const vk::Device&
          */
         const vk::Device &get_handle() const;
 
         /**
-         * @brief Get the physical device
+         * @brief Get the physical device.
          *
          * @return PhysicalDevice&
          */
         PhysicalDevice &get_physical();
 
         /**
-         * @brief Get the graphics queue
+         * @brief Get the graphics queue.
          *
          * @param family Class of commands handled by the queue
          * @param index  Queue index
@@ -54,7 +56,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::Queue get_queue(QueueFamily family, u32 index = 0);
 
         /**
-         * @brief Wait for all queue operations to finish
+         * @brief Wait for all queue operations to finish.
          *
          */
         void wait();

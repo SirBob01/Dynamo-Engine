@@ -13,7 +13,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Descriptor set binding information
+     * @brief Descriptor set binding information.
      *
      */
     struct DescriptorBinding {
@@ -23,7 +23,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     /**
      * @brief Wrapper class for a Vulkan shader module which can be plugged into
-     * a Vulkan pipeline
+     * a Vulkan pipeline.
      *
      */
     class ShaderModule {
@@ -37,20 +37,20 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<vk::PushConstantRange> _push_constant_ranges;
 
         /**
-         * @brief Parse the descriptor set layouts
+         * @brief Parse the descriptor set layouts.
          *
          */
         void parse_descriptor_layouts(SpvReflectShaderModule &module);
 
         /**
-         * @brief Parse the push constants from the bytecode
+         * @brief Parse the push constants from the bytecode.
          *
          */
         void parse_push_constants(SpvReflectShaderModule &module);
 
       public:
         /**
-         * @brief Construct a new ShaderModule object
+         * @brief Construct a new ShaderModule object.
          *
          * @param device   Reference to the logical device
          * @param filename Path to the shader source file
@@ -61,38 +61,38 @@ namespace Dynamo::Graphics::Vulkan {
                      vk::ShaderStageFlagBits stage);
 
         /**
-         * @brief Get the handle to vk::UniqueShaderModule
+         * @brief Get the handle to vk::UniqueShaderModule.
          *
          * This is a temporary object that should be destroyed as soon as
-         * pipeline creation ceases
+         * pipeline creation ceases.
          *
          * @return const vk::UniqueShaderModule&
          */
         vk::UniqueShaderModule get_handle();
 
         /**
-         * @brief Get the stage of the pipeline the shader represents
+         * @brief Get the stage of the pipeline the shader represents.
          *
          * @return const vk::ShaderStageFlagBits
          */
         vk::ShaderStageFlagBits get_stage() const;
 
         /**
-         * @brief Get the bytecode of the shader program
+         * @brief Get the bytecode of the shader program.
          *
          * @return const std::vector<i8>&
          */
         const std::vector<i8> &get_bytecode();
 
         /**
-         * @brief Get the filename of the shader module
+         * @brief Get the filename of the shader module.
          *
          * @return const std::string&
          */
         const std::string &get_filename() const;
 
         /**
-         * @brief Get the push constant ranges
+         * @brief Get the push constant ranges.
          *
          * @return const std::vector<vk::PushConstantRange>&
          */
@@ -100,7 +100,7 @@ namespace Dynamo::Graphics::Vulkan {
         get_push_constant_ranges() const;
 
         /**
-         * @brief Get the descriptor bindings accessed from this shader
+         * @brief Get the descriptor bindings accessed from this shader.
          *
          * @return const std::vector<DescriptorBinding>&
          */
@@ -108,7 +108,7 @@ namespace Dynamo::Graphics::Vulkan {
     };
 
     /**
-     * @brief List of shader stage modules
+     * @brief List of shader stage modules.
      *
      */
     using ShaderList = std::vector<std::reference_wrapper<ShaderModule>>;

@@ -32,7 +32,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Renderer powered by the Vulkan API
+     * @brief Renderer powered by the Vulkan API.
      *
      */
     class Renderer {

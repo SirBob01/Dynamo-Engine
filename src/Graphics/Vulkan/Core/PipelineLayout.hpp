@@ -15,14 +15,15 @@
 namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Auxillary datatypes to group descriptor bindings from each
-     * shader stage by set index
+     * shader stage by set index.
      *
      */
     using LayoutBindings = std::vector<vk::DescriptorSetLayoutBinding>;
     using BindingGroups = std::map<u32, LayoutBindings>;
 
     /**
-     * @brief Wrapper class for a Vulkan pipeline layout
+     * @brief Wrapper class for a Vulkan pipeline layout. This describes what
+     * descriptor sets and push constants are used by the pipeline.
      *
      */
     class PipelineLayout {
@@ -37,7 +38,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new PipelineLayout object
+         * @brief Construct a new PipelineLayout object.
          *
          * @param device  Reference to the logical device
          * @param shaders List of shader stage modules
@@ -45,27 +46,27 @@ namespace Dynamo::Graphics::Vulkan {
         PipelineLayout(Device &device, ShaderList &shaders);
 
         /**
-         * @brief Destroy the PipelineLayout object
+         * @brief Destroy the PipelineLayout object.
          *
          */
         ~PipelineLayout();
 
         /**
-         * @brief Get the handle object
+         * @brief Get the handle object.
          *
          * @return const vk::PipelineLayout&
          */
         const vk::PipelineLayout &get_handle() const;
 
         /**
-         * @brief Get the shader list
+         * @brief Get the shader list.
          *
          * @return const ShaderList&
          */
         const ShaderList &get_shaders() const;
 
         /**
-         * @brief Get the descriptor set layout list
+         * @brief Get the descriptor set layout list.
          *
          * @return const std::vector<vk::DescriptorSetLayout>&
          */
@@ -73,7 +74,7 @@ namespace Dynamo::Graphics::Vulkan {
         get_descriptor_set_layouts() const;
 
         /**
-         * @brief Get the descriptor set bindings list
+         * @brief Get the descriptor set bindings list.
          *
          * @return const std::vector<LayoutBindings>&
          */

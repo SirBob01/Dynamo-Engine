@@ -1,8 +1,7 @@
 #include "./DescriptorPool.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
-    DescriptorPool::DescriptorPool(Device &device) :
-        _device(device) {}
+    DescriptorPool::DescriptorPool(Device &device) : _device(device) {}
 
     DescriptorPool::~DescriptorPool() {
         for (const vk::DescriptorPool &pool : _pools) {
@@ -12,7 +11,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     vk::DescriptorPool
     DescriptorPool::create_pool(const vk::DescriptorSetLayout &layout,
-                                     const LayoutBindings &bindings) {
+                                const LayoutBindings &bindings) {
         // Determine the pool sizes from the bindings associated with the layout
         std::vector<vk::DescriptorPoolSize> pool_sizes;
         for (const vk::DescriptorSetLayoutBinding &binding : bindings) {
@@ -32,11 +31,11 @@ namespace Dynamo::Graphics::Vulkan {
         return _device.get().get_handle().createDescriptorPool(pool_info);
     }
 
-    std::vector<vk::DescriptorSet>
+    DescriptorSetGroup
     DescriptorPool::allocate_set(const vk::DescriptorSetLayout &layout,
-                                      const LayoutBindings &bindings,
-                                      const vk::DescriptorPool &pool,
-                                      Swapchain &swapchain) {
+                                 const LayoutBindings &bindings,
+                                 const vk::DescriptorPool &pool,
+                                 Swapchain &swapchain) {
         u32 image_count = swapchain.get_images().size();
 
         // Allocate new descriptor sets within the pool
@@ -46,15 +45,16 @@ namespace Dynamo::Graphics::Vulkan {
         alloc_info.descriptorSetCount = set_layouts.size();
         alloc_info.pSetLayouts = set_layouts.data();
 
-        return _device.get().get_handle().allocateDescriptorSets(alloc_info);
+        return _device.get().get_handle().allocateDescriptorSetsUnique(
+            alloc_info);
     }
 
-    std::vector<vk::DescriptorSet>
+    DescriptorSetGroup
     DescriptorPool::try_allocate(const vk::DescriptorSetLayout &layout,
-                                      const LayoutBindings &bindings,
-                                      Swapchain &swapchain) {
+                                 const LayoutBindings &bindings,
+                                 Swapchain &swapchain) {
         b8 found_pool = false;
-        std::vector<vk::DescriptorSet> vksets;
+        DescriptorSetGroup vksets;
         for (vk::DescriptorPool &pool : _pools) {
             try {
                 vksets = allocate_set(layout, bindings, pool, swapchain);
@@ -78,7 +78,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     std::vector<DescriptorSetGroup>
     DescriptorPool::allocate(PipelineLayout &pipeline_layout,
-                                  Swapchain &swapchain) {
+                             Swapchain &swapchain) {
         const std::vector<vk::DescriptorSetLayout> &layouts =
             pipeline_layout.get_descriptor_set_layouts();
         const std::vector<LayoutBindings> &bindings =
@@ -86,11 +86,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         std::vector<DescriptorSetGroup> groups(layouts.size());
         for (u32 i = 0; i < layouts.size(); i++) {
-            for (vk::DescriptorSet &vkset :
-                 try_allocate(layouts[i], bindings[i], swapchain)) {
-                groups[i].push_back(
-                    std::make_unique<DescriptorSet>(_device.get(), vkset));
-            }
+            groups.push_back(try_allocate(layouts[i], bindings[i], swapchain));
         }
         return groups;
     }

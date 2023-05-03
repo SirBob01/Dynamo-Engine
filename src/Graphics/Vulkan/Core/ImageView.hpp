@@ -10,7 +10,9 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Wrapper class for a Vulkan image view
+     * @brief Wrapper class for a Vulkan image view. This is a portion of the
+     * image that can be accessed (e.g., by the pipeline) and also describes how
+     * it should be accessed.
      *
      */
     class ImageView {
@@ -19,7 +21,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new ImageView object
+         * @brief Construct a new ImageView object.
          *
          * @param image       Reference to the main image
          * @param type        1D, 2D, or 3D
@@ -34,20 +36,20 @@ namespace Dynamo::Graphics::Vulkan {
                   u32 layer_count = 1);
 
         /**
-         * @brief Destroy the ImageView object
+         * @brief Destroy the ImageView object.
          *
          */
         ~ImageView();
 
         /**
-         * @brief Get the handle to vk::ImageView
+         * @brief Get the handle to vk::ImageView.
          *
          * @return const vk::ImageView&
          */
         const vk::ImageView &get_handle() const;
 
         /**
-         * @brief Get a reference to the main image
+         * @brief Get a reference to the main image.
          *
          * @return Image&
          */

@@ -5,26 +5,26 @@
 #include <vulkan/vulkan.hpp>
 
 #include "../../../Types.hpp"
-#include "./DescriptorSet.hpp"
 #include "./Device.hpp"
 #include "./PipelineLayout.hpp"
 #include "./Swapchain.hpp"
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Group of descriptor sets
+     * @brief Group of descriptor sets.
      *
      */
-    using DescriptorSetGroup = std::vector<std::unique_ptr<DescriptorSet>>;
+    using DescriptorSetGroup = std::vector<vk::UniqueDescriptorSet>;
 
     /**
-     * @brief Maximum number of descriptor sets per pool
+     * @brief Maximum number of descriptor sets per pool.
      *
      */
     constexpr u32 MAX_DESCRIPTOR_SETS_PER_POOL = 1000;
 
     /**
-     * @brief Wrapper class abstraction over Vulkan descriptor pool
+     * @brief Wrapper class abstraction over Vulkan descriptor pool. This
+     * allocates descriptor sets from a given pipeline layout.
      *
      */
     class DescriptorPool {
@@ -32,7 +32,7 @@ namespace Dynamo::Graphics::Vulkan {
         std::reference_wrapper<Device> _device;
 
         /**
-         * @brief Create a new descriptor pool
+         * @brief Create a new descriptor pool.
          *
          * @param layout   Descriptor set layout
          * @param bindings List of bindings for the layout
@@ -42,48 +42,46 @@ namespace Dynamo::Graphics::Vulkan {
                                        const LayoutBindings &bindings);
 
         /**
-         * @brief Allocate descriptor sets for a given layout
+         * @brief Allocate descriptor sets for a given layout.
          *
          * @param layout   Descriptor set layout
          * @param bindings List of bindings for the layout
          * @param pool     Descriptor pool
-         * @return std::vector<vk::DescriptorSet>
+         * @return DescriptorSetGroup
          */
-        std::vector<vk::DescriptorSet>
-        allocate_set(const vk::DescriptorSetLayout &layout,
-                     const LayoutBindings &bindings,
-                     const vk::DescriptorPool &pool,
-                     Swapchain &swapchain);
+        DescriptorSetGroup allocate_set(const vk::DescriptorSetLayout &layout,
+                                        const LayoutBindings &bindings,
+                                        const vk::DescriptorPool &pool,
+                                        Swapchain &swapchain);
 
         /**
-         * @brief Select a pool and allocate
+         * @brief Select a pool and allocate.
          *
          * @param layout
          * @param bindings
-         * @return std::vector<vk::DescriptorSet>
+         * @return DescriptorSetGroup
          */
-        std::vector<vk::DescriptorSet>
-        try_allocate(const vk::DescriptorSetLayout &layout,
-                     const LayoutBindings &bindings,
-                     Swapchain &swapchain);
+        DescriptorSetGroup try_allocate(const vk::DescriptorSetLayout &layout,
+                                        const LayoutBindings &bindings,
+                                        Swapchain &swapchain);
 
       public:
         /**
-         * @brief Construct a new DescriptorPool object
+         * @brief Construct a new DescriptorPool object.
          *
          * @param device    Reference to the logical device
          */
         DescriptorPool(Device &device);
 
         /**
-         * @brief Destroy the DescriptorPool object
+         * @brief Destroy the DescriptorPool object.
          *
          */
         ~DescriptorPool();
 
         /**
          * @brief Allocate descriptor sets grouped by layout and ordered by set
-         * index
+         * index.
          *
          * @param pipeline_layout Reference to the pipeline layout
          * @param swapchain       Reference to the swapchain
@@ -93,7 +91,7 @@ namespace Dynamo::Graphics::Vulkan {
         allocate(PipelineLayout &pipeline_layout, Swapchain &swapchain);
 
         /**
-         * @brief Reset all descriptor pools
+         * @brief Reset all descriptor pools.
          *
          */
         void reset();
