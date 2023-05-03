@@ -7,13 +7,13 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Wrapper class of a Vulkan fence for CPU-GPU synchronization
+     * @brief Wrapper class of a Vulkan fence for CPU-GPU synchronization.
      *
      * When a command is sent to a queue, a fence can be signaled to tell the
-     * CPU that the GPU is currently at work
+     * CPU that the GPU is currently at work.
      *
      * The CPU can then wait for that fence to finish before proceeding with
-     * its process
+     * its process.
      *
      */
     class Fence {
@@ -22,34 +22,34 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new Fence object
+         * @brief Construct a new Fence object.
          *
          * @param device
          */
         Fence(Device &device);
 
         /**
-         * @brief Destroy the Fence object
+         * @brief Destroy the Fence object.
          *
          */
         ~Fence();
 
         /**
-         * @brief Get the handle to vk::Fence
+         * @brief Get the handle to vk::Fence.
          *
          * @return const vk::Fence&
          */
         const vk::Fence &get_handle() const;
 
         /**
-         * @brief Block the process until the fence finishes
+         * @brief Block the process until the fence finishes.
          *
          * @param timeout
          */
         void wait(u64 timeout = UINT64_MAX);
 
         /**
-         * @brief Test if the fence is signaled
+         * @brief Test if the fence is signaled.
          *
          * @return true
          * @return false
@@ -57,7 +57,7 @@ namespace Dynamo::Graphics::Vulkan {
         b8 is_signaled();
 
         /**
-         * @brief Reset the fence
+         * @brief Reset the fence.
          *
          */
         void reset();

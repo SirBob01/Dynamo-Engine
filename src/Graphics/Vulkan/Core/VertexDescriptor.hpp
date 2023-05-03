@@ -8,7 +8,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Binding description of a Vertex
+     * @brief Binding description of a Vertex.
      *
      */
     static constexpr vk::VertexInputBindingDescription
@@ -18,7 +18,7 @@ namespace Dynamo::Graphics::Vulkan {
         );
 
     /**
-     * @brief Attribute descriptions of a Vertex
+     * @brief Attribute descriptions of a Vertex.
      *
      */
     static constexpr std::array<vk::VertexInputAttributeDescription, 3>

@@ -9,9 +9,9 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Wrapper class for a Vulkan image sampler that pre-processes images
-     * before they are accessed by the shader stages (e.g. bilinear filtering,
-     * anisotropic filtering)
+     * @brief Wrapper class for a Vulkan image sampler. This pre-processes
+     * images before they are accessed by the shader stages (e.g. bilinear
+     * filtering, anisotropic filtering).
      *
      */
     class Sampler {

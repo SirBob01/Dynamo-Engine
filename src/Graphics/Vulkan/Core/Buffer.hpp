@@ -12,13 +12,13 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Initial size of a Vulkan buffer
+     * @brief Initial size of a Vulkan buffer.
      *
      */
     constexpr u32 DEFAULT_BUFFER_SIZE = (1 << 20);
 
     /**
-     * @brief Wrapper class of Vulkan Buffer
+     * @brief Wrapper class of Vulkan Buffer.
      *
      */
     class Buffer {
@@ -37,7 +37,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::UniqueCommandBuffer _command_buffer;
 
         /**
-         * @brief Create a vk::Buffer handle
+         * @brief Create a vk::Buffer handle.
          *
          * @param device vk::Device handle
          * @param size   Size of the buffer
@@ -49,7 +49,7 @@ namespace Dynamo::Graphics::Vulkan {
                                             vk::BufferUsageFlags usage);
 
         /**
-         * @brief Grow the buffer
+         * @brief Grow the buffer.
          *
          * @param size
          */
@@ -57,7 +57,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new Buffer object
+         * @brief Construct a new Buffer object.
          *
          * @param device         Reference to the logical device
          * @param size           Initial size of the buffer
@@ -76,7 +76,7 @@ namespace Dynamo::Graphics::Vulkan {
                vk::MemoryPropertyFlags properties);
 
         /**
-         * @brief Construct a new Buffer object
+         * @brief Construct a new Buffer object.
          *
          * @param device         Reference to the logical device
          * @param memory_pool    Reference to the memory pool
@@ -93,7 +93,7 @@ namespace Dynamo::Graphics::Vulkan {
                vk::MemoryPropertyFlags properties);
 
         /**
-         * @brief Destroy the Buffer object
+         * @brief Destroy the Buffer object.
          *
          */
         ~Buffer();
@@ -106,7 +106,7 @@ namespace Dynamo::Graphics::Vulkan {
         const vk::Buffer &get_handle() const;
 
         /**
-         * @brief Get the memory requirements for the buffer
+         * @brief Get the memory requirements for the buffer.
          *
          * @return vk::MemoryRequirements
          */
@@ -123,28 +123,28 @@ namespace Dynamo::Graphics::Vulkan {
         u32 reserve(u32 size, u32 alignment);
 
         /**
-         * @brief Free the block of reserved memory at an offset
+         * @brief Free the block of reserved memory at an offset.
          *
          * @param offset Offset within the buffer in bytes returned by reserve()
          */
         void free(u32 offset);
 
         /**
-         * @brief Get the total capacity of the buffer
+         * @brief Get the total capacity of the buffer.
          *
          * @return u32
          */
         u32 capacity() const;
 
         /**
-         * @brief Get the size of a reserved memory block
+         * @brief Get the size of a reserved memory block.
          *
          * @param offset Offset within the buffer in bytes returned by reserve()
          */
         u32 size(u32 offset) const;
 
         /**
-         * @brief Write to the underlying memory
+         * @brief Write to the underlying memory.
          *
          * @param src    Source buffer
          * @param offset Offset within the buffer in bytes returned by reserve()
@@ -153,7 +153,7 @@ namespace Dynamo::Graphics::Vulkan {
         void write(i8 *src, u32 offset, u32 length);
 
         /**
-         * @brief Read from the underlying memory
+         * @brief Read from the underlying memory.
          *
          * @param dst    Destination buffer
          * @param offset Offset within the buffer in bytes returned by reserve()
@@ -162,7 +162,7 @@ namespace Dynamo::Graphics::Vulkan {
         void read(i8 *dst, u32 offset, u32 length);
 
         /**
-         * @brief Copy the contents of a buffer block to another bufffer
+         * @brief Copy the contents of a buffer block to another buffer.
          *
          * @param dst        Destination buffer
          * @param src_offset Valid source offset

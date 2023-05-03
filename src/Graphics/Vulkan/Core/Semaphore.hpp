@@ -6,14 +6,14 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Wrapper class of a Vulkan semaphore for queue synchronization
+     * @brief Wrapper class of a Vulkan semaphore for queue synchronization.
      *
      * Vulkan does not guarantee that commands submitted one after another on
      * different queues will finish in that order, since those commands can
-     * run in parallel
+     * run in parallel.
      *
      * A semaphore is used to ensure that the commands in one queue waits for
-     * the commands in another queue to finish
+     * the commands in another queue to finish.
      *
      */
     class Semaphore {

@@ -13,15 +13,15 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Minimum capacity of a Memory object
+     * @brief Minimum capacity of a Memory object.
      *
      */
     constexpr u32 MINIMUM_MEMORY_CAPACITY = 256 * (1 << 20);
 
     /**
      * @brief MemoryBlock exposes a similar interface to Memory for managing an
-     * underlying block of memory at an offset, but is similar to
-     * std::unique_ptr in that it can only be moved and not copied
+     * underlying block of memory at an offset. However, it is similar to
+     * std::unique_ptr in that it can only be moved and not copied.
      *
      */
     class MemoryBlock {
@@ -33,7 +33,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new MemoryBlock object
+         * @brief Construct a new MemoryBlock object.
          *
          * @param memory Reference to the memory
          * @param offset Reserved block offset in bytes
@@ -42,41 +42,41 @@ namespace Dynamo::Graphics::Vulkan {
         MemoryBlock(Memory &memory, u32 offset, u32 size);
 
         /**
-         * @brief Move constructor
+         * @brief Move constructor.
          *
          * @param rhs
          */
         MemoryBlock(MemoryBlock &&rhs);
 
         /**
-         * @brief Destroy the MemoryBlock object
+         * @brief Destroy the MemoryBlock object.
          *
          */
         ~MemoryBlock();
 
         /**
-         * @brief Get the handle to vk::DeviceMemory
+         * @brief Get the handle to vk::DeviceMemory.
          *
          * @return const vk::DeviceMemory&
          */
         const vk::DeviceMemory &get_handle() const;
 
         /**
-         * @brief Get the offset
+         * @brief Get the offset.
          *
          * @return u32
          */
         u32 offset() const;
 
         /**
-         * @brief Get the size of the allocation
+         * @brief Get the size of the allocation.
          *
          * @return u32
          */
         u32 size() const;
 
         /**
-         * @brief Read from the underlying memory at an offset
+         * @brief Read from the underlying memory at an offset.
          *
          * @param dst    Destination buffer
          * @param offset Offset within the memory map in bytes
@@ -85,7 +85,7 @@ namespace Dynamo::Graphics::Vulkan {
         void read(i8 *dst, u32 offset, u32 length);
 
         /**
-         * @brief Write to the underlying memory at an offset
+         * @brief Write to the underlying memory at an offset.
          *
          * @param dst    Source buffer
          * @param offset Offset within the memory map in bytes
@@ -94,21 +94,21 @@ namespace Dynamo::Graphics::Vulkan {
         void write(i8 *src, u32 offset, u32 length);
 
         /**
-         * @brief Bind a vk::Image to the block
+         * @brief Bind a vk::Image to the block.
          *
          * @param vkimage
          */
         void bind(vk::Image vkimage);
 
         /**
-         * @brief Bind a vk::Buffer to the block
+         * @brief Bind a vk::Buffer to the block.
          *
          * @param vkbuffer
          */
         void bind(vk::Buffer vkbuffer);
 
         /**
-         * @brief Move assignment operator
+         * @brief Move assignment operator.
          *
          * @param rhs
          */
@@ -116,10 +116,10 @@ namespace Dynamo::Graphics::Vulkan {
     };
 
     /**
-     * @brief Dynamic memory pool
+     * @brief Dynamic memory pool.
      *
      * Memory objects are grouped based on their type so allocations with
-     * desired properties can be queried
+     * desired properties can be queried.
      *
      */
     class MemoryPool {
@@ -130,7 +130,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         /**
          * @brief Check if a memory pool is compatible with the given
-         * requirements and properties
+         * requirements and properties.
          *
          * @param memory
          * @param requirements
@@ -144,7 +144,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new MemoryPool object
+         * @brief Construct a new MemoryPool object.
          *
          * @param device Reference to the logical device
          */
@@ -152,7 +152,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         /**
          * @brief Allocate a block of memory with specific requirements and
-         * properties
+         * properties.
          *
          * @param requirements Memory requirements
          * @param properties   Memory properties

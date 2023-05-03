@@ -11,60 +11,60 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Enumerates the different queue families
+     * @brief Enumerates the different queue families.
      *
      */
     enum class QueueFamily : u32 {
         /**
-         * @brief Graphics commands
+         * @brief Graphics commands.
          *
          */
         Graphics,
 
         /**
-         * @brief Buffer transfer commands
+         * @brief Buffer transfer commands.
          *
          */
         Transfer,
 
         /**
-         * @brief Presentation commands
+         * @brief Presentation commands.
          *
          */
         Present
     };
 
     /**
-     * @brief Properties of a command queue
+     * @brief Properties of a command queue.
      *
      */
     struct QueueProperties {
         /**
-         * @brief Family identifier
+         * @brief Family identifier.
          *
          */
         u32 family_id = 0;
 
         /**
-         * @brief Number of available queues
+         * @brief Number of available queues.
          *
          */
         u32 count = 0;
     };
 
     /**
-     * @brief Available options for creating a swapchain
+     * @brief Available options for creating a swapchain.
      *
      */
     struct SwapchainOptions {
         /**
-         * @brief Surface capabilities
+         * @brief Surface capabilities.
          *
          */
         vk::SurfaceCapabilitiesKHR capabilities;
 
         /**
-         * @brief Pixel formats and color spaces
+         * @brief Pixel formats and color spaces.
          *
          */
         std::vector<vk::SurfaceFormatKHR> formats;
@@ -77,7 +77,8 @@ namespace Dynamo::Graphics::Vulkan {
     };
 
     /**
-     * @brief Wrapper class for a Vulkan physical device
+     * @brief Wrapper class for a Vulkan physical device. This allows querying
+     * the different properties of the graphics hardware.
      *
      */
     class PhysicalDevice {
@@ -97,7 +98,7 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<const i8 *> _extensions;
 
         /**
-         * @brief Check if the device contains the required queue families
+         * @brief Check if the device contains the required queue families.
          *
          * @return true
          * @return false
@@ -105,7 +106,7 @@ namespace Dynamo::Graphics::Vulkan {
         b8 is_complete() const;
 
         /**
-         * @brief Check if the device supports the required extensions
+         * @brief Check if the device supports the required extensions.
          *
          * @return true
          * @return false
@@ -113,7 +114,7 @@ namespace Dynamo::Graphics::Vulkan {
         b8 is_supporting_extensions() const;
 
         /**
-         * @brief Check if the device supports swapchaining
+         * @brief Check if the device supports swapchaining.
          *
          * @return true
          * @return false
@@ -121,14 +122,14 @@ namespace Dynamo::Graphics::Vulkan {
         b8 is_supporting_swapchain() const;
 
         /**
-         * @brief Enumerate the available queue familes
+         * @brief Enumerate the available queue familes.
          *
          */
         void enumerate_command_queues();
 
       public:
         /**
-         * @brief Construct a new Physical object
+         * @brief Construct a new Physical object.
          *
          * @param handle  Vulkan PhysicalDevice handle
          * @param surface Vulkan window surface
@@ -136,41 +137,41 @@ namespace Dynamo::Graphics::Vulkan {
         PhysicalDevice(vk::PhysicalDevice handle, vk::SurfaceKHR surface);
 
         /**
-         * @brief Get the handle object to the vk::PhysicalDevice
+         * @brief Get the handle object to the vk::PhysicalDevice.
          *
          * @return const vk::PhysicalDevice&
          */
         const vk::PhysicalDevice &get_handle() const;
 
         /**
-         * @brief Get the name of the device
+         * @brief Get the name of the device.
          *
          * @return std::string
          */
         const std::string get_name() const;
 
         /**
-         * @brief Get the extensions list
+         * @brief Get the extensions list.
          *
          * @return const std::vector<const *i8>&
          */
         const std::vector<const i8 *> &get_extensions() const;
 
         /**
-         * @brief Get the available options for the swapchain
+         * @brief Get the available options for the swapchain.
          *
          * @return const SwapchainOptions&
          */
         const SwapchainOptions &get_swapchain_options();
 
         /**
-         * @brief Get the properties of a queue
+         * @brief Get the properties of a queue.
          *
          * @return const QueueProperties&
          */
 
         /**
-         * @brief Get the properties of a queue
+         * @brief Get the properties of a queue.
          *
          * @param family Class of commands handled by the queue
          * @return const QueueProperties&
@@ -178,7 +179,7 @@ namespace Dynamo::Graphics::Vulkan {
         const QueueProperties &get_queue_properties(QueueFamily family) const;
 
         /**
-         * @brief Get the properties of a pixel format
+         * @brief Get the properties of a pixel format.
          *
          * @param format Pixel format
          * @return vk::FormatProperties
@@ -186,35 +187,35 @@ namespace Dynamo::Graphics::Vulkan {
         vk::FormatProperties get_format_properties(vk::Format format) const;
 
         /**
-         * @brief Get the memory properties of the hardware
+         * @brief Get the memory properties of the hardware.
          *
          * @return const vk::PhysicalDeviceMemoryProperties
          */
         const vk::PhysicalDeviceMemoryProperties &get_memory_properties() const;
 
         /**
-         * @brief Get the limits of the device
+         * @brief Get the limits of the device.
          *
          * @return const vk::PhysicalDeviceLimits&
          */
         const vk::PhysicalDeviceLimits &get_limits() const;
 
         /**
-         * @brief Get the anti-aliasing sample count supported by the device
+         * @brief Get the anti-aliasing sample count supported by the device.
          *
          * @return vk::SampleCountFlagBits
          */
         vk::SampleCountFlagBits get_msaa_samples() const;
 
         /**
-         * @brief Get the supported pixel format for the depth buffer
+         * @brief Get the supported pixel format for the depth buffer.
          *
          * @return vk::Format
          */
         vk::Format get_depth_format() const;
 
         /**
-         * @brief Calculate heuristic for selecting the best device
+         * @brief Calculate heuristic for selecting the best device.
          *
          * @return i32
          */

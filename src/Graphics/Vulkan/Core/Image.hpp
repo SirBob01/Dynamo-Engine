@@ -10,7 +10,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Abstract base wrapper class for a Vulkan image
+     * @brief Abstract base wrapper class for a Vulkan image.
      *
      */
     class Image {
@@ -21,7 +21,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new Image object from an existing handle
+         * @brief Construct a new Image object from an existing handle.
          *
          * @param device Reference to the logical device
          * @param handle Vulkan image handle
@@ -30,7 +30,7 @@ namespace Dynamo::Graphics::Vulkan {
         Image(Device &device, vk::Image handle, vk::Format format);
 
         /**
-         * @brief Construct a new Image object with parameters
+         * @brief Construct a new Image object with parameters.
          *
          * @param device      Reference to the logical device
          * @param width       Width of the image
@@ -58,28 +58,28 @@ namespace Dynamo::Graphics::Vulkan {
         virtual ~Image() = 0;
 
         /**
-         * @brief Get the handle to vk::Image
+         * @brief Get the handle to vk::Image.
          *
          * @return const vk::Image&
          */
         const vk::Image &get_handle() const;
 
         /**
-         * @brief Get the device
+         * @brief Get the device.
          *
          * @return Device&
          */
         Device &get_device();
 
         /**
-         * @brief Get the format object
+         * @brief Get the format object.
          *
          * @return vk::Format
          */
         vk::Format get_format();
 
         /**
-         * @brief Get the memory requirements for the image
+         * @brief Get the memory requirements for the image.
          *
          * @return vk::MemoryRequirements
          */
@@ -88,7 +88,7 @@ namespace Dynamo::Graphics::Vulkan {
     inline Image::~Image() = default;
 
     /**
-     * @brief User-created image
+     * @brief User-created image.
      *
      */
     class UserImage : public Image {
@@ -96,7 +96,7 @@ namespace Dynamo::Graphics::Vulkan {
 
       public:
         /**
-         * @brief Construct a new UserImage object
+         * @brief Construct a new UserImage object.
          *
          * @param device      Reference to the logical device
          * @param memory_pool Reference to the memory pool
@@ -125,7 +125,7 @@ namespace Dynamo::Graphics::Vulkan {
                   vk::SampleCountFlagBits samples);
 
         /**
-         * @brief Destroy the UserImage object
+         * @brief Destroy the UserImage object.
          *
          */
         ~UserImage();
@@ -133,13 +133,13 @@ namespace Dynamo::Graphics::Vulkan {
 
     /**
      * @brief Swapchain images are a special case because they are owned by the
-     * Vulkan instance, and so they cannot be manually destroyed
+     * Vulkan instance, and so they cannot be manually destroyed.
      *
      */
     class SwapchainImage : public Image {
       public:
         /**
-         * @brief Construct a new SwapchainImage object
+         * @brief Construct a new SwapchainImage object.
          *
          * @param device Reference to the logical device
          * @param handle Vulkan image handle
@@ -148,7 +148,7 @@ namespace Dynamo::Graphics::Vulkan {
         SwapchainImage(Device &device, vk::Image handle, vk::Format format);
 
         /**
-         * @brief Destroy the SwapchainImage object (do nothing)
+         * @brief Destroy the SwapchainImage object (do nothing).
          *
          */
         ~SwapchainImage();

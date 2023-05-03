@@ -11,7 +11,7 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Texture image usage flags
+     * @brief Texture image usage flags.
      *
      */
     constexpr vk::ImageUsageFlags TEXTURE_IMAGE_USAGE_FLAGS =
@@ -19,7 +19,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled;
 
     /**
-     * @brief 2D Texture
+     * @brief 2D Texture.
      *
      */
     class Texture {
@@ -37,7 +37,7 @@ namespace Dynamo::Graphics::Vulkan {
         vk::Queue _graphics_queue;
 
         /**
-         * @brief Transition the texture image to a new layout
+         * @brief Transition the texture image to a new layout.
          *
          * @param src
          * @param dst
@@ -45,7 +45,7 @@ namespace Dynamo::Graphics::Vulkan {
         void transition_layout(vk::ImageLayout src, vk::ImageLayout dst);
 
         /**
-         * @brief Copy pixels to the image via a staging buffer
+         * @brief Copy pixels to the image via a staging buffer.
          *
          * @param pixels
          * @param staging_buffer
@@ -53,7 +53,7 @@ namespace Dynamo::Graphics::Vulkan {
         void copy_pixels(u8 pixels[], Buffer &staging_buffer);
 
         /**
-         * @brief Generate the image mip maps
+         * @brief Generate the image mip maps.
          *
          */
         void generate_mipmaps();
@@ -69,14 +69,14 @@ namespace Dynamo::Graphics::Vulkan {
                 vk::Queue graphics_queue);
 
         /**
-         * @brief Get the image
+         * @brief Get the image.
          *
          * @return const Image&
          */
         const Image &get_image() const;
 
         /**
-         * @brief Get the image view
+         * @brief Get the image view.
          *
          * @return const ImageView&
          */
