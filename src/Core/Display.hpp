@@ -10,7 +10,7 @@
 namespace Dynamo {
     /**
      * @brief Display module exposes an interface for manipulating the
-     * application window
+     * application window.
      *
      */
     class Display {
@@ -24,13 +24,13 @@ namespace Dynamo {
 
       public:
         /**
-         * @brief Construct a new Display object
+         * @brief Construct a new Display object.
          *
-         * @param width      Initial width of the window
-         * @param height     Initial height of the window
-         * @param title      Title of the window
-         * @param fullscreen Toggle fullscreen mode
-         * @param vsync      Toggle vsync
+         * @param width      Initial width of the window.
+         * @param height     Initial height of the window.
+         * @param title      Title of the window.
+         * @param fullscreen Toggle fullscreen mode.
+         * @param vsync      Toggle vsync.
          */
         Display(i32 width,
                 i32 height,
@@ -39,40 +39,45 @@ namespace Dynamo {
                 b8 vsync);
 
         /**
-         * @brief Destroy the Display object
-         *
-         * This will clean up the internal GLFW window
+         * @brief Destroy the Display object.
          *
          */
         ~Display();
 
         /**
-         * @brief Get the underlying GLFW window
+         * @brief Get the underlying GLFW window.
          *
          * @return GLFWwindow&
          */
         GLFWwindow *get_window();
 
         /**
-         * @brief Get the size of the display in screen coordinates
+         * @brief Get the size of the display in screen coordinates.
          *
          * @return Vec2
          */
-        Vec2 get_window_size();
+        Vec2 get_window_size() const;
 
         /**
-         * @brief Get the logical size of the display in pixels
+         * @brief Get the size of the framebuffer in pixels.
          *
          * @return Vec2
          */
-        Vec2 get_size();
+        Vec2 get_framebuffer_size() const;
 
         /**
-         * @brief Get the title of the window
+         * @brief Get the logical size of the display.
          *
-         * @return const std::string
+         * @return Vec2
          */
-        const std::string get_title();
+        Vec2 get_size() const;
+
+        /**
+         * @brief Get the title of the window.
+         *
+         * @return std::string
+         */
+        std::string get_title() const;
 
         /**
          * @brief Is the display closed?
@@ -80,7 +85,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        b8 is_closed();
+        b8 is_closed() const;
 
         /**
          * @brief Is the display windowed or in fullscreen?
@@ -88,7 +93,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        b8 is_fullscreen();
+        b8 is_fullscreen() const;
 
         /**
          * @brief Is vsync enabled?
@@ -96,40 +101,40 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        b8 is_vsync();
+        b8 is_vsync() const;
 
         /**
-         * @brief Set the logical size of the display
+         * @brief Set the logical size of the display.
          *
          * @param size
          */
         void set_size(Vec2 size);
 
         /**
-         * @brief Set the title of the display
+         * @brief Set the title of the display.
          *
          * @param title
          */
         void set_title(std::string title);
 
         /**
-         * @brief Toggle fullscreen or windowed
+         * @brief Toggle fullscreen or windowed.
          *
          * @param fullscreen
          */
         void set_fullscreen(b8 fullscreen);
 
         /**
-         * @brief Toggle vsync
+         * @brief Toggle vsync.
          *
          * @param vsync
          */
         void set_vsync(b8 vsync);
 
         /**
-         * @brief Set the icon of the window
+         * @brief Set the icon of the window.
          *
-         * @param filename Path to the image file
+         * @param filename Path to the image file.
          */
         void set_icon(std::string filename);
     };

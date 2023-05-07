@@ -1,3 +1,4 @@
+#include "GLFW/glfw3.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Display.hpp"
 
@@ -35,23 +36,29 @@ namespace Dynamo {
 
     GLFWwindow *Display::get_window() { return _window; }
 
-    Vec2 Display::get_window_size() {
+    Vec2 Display::get_window_size() const {
         i32 width, height;
         glfwGetWindowSize(_window, &width, &height);
         return Vec2(width, height);
     }
 
-    Vec2 Display::get_size() { return _size; }
+    Vec2 Display::get_framebuffer_size() const {
+        i32 width, height;
+        glfwGetFramebufferSize(_window, &width, &height);
+        return Vec2(width, height);
+    }
 
-    const std::string Display::get_title() { return _title; }
+    Vec2 Display::get_size() const { return _size; }
 
-    b8 Display::is_closed() { return glfwWindowShouldClose(_window); }
+    std::string Display::get_title() const { return _title; }
 
-    b8 Display::is_fullscreen() {
+    b8 Display::is_closed() const { return glfwWindowShouldClose(_window); }
+
+    b8 Display::is_fullscreen() const {
         return glfwGetWindowMonitor(_window) != nullptr;
     }
 
-    b8 Display::is_vsync() { return _vsync; }
+    b8 Display::is_vsync() const { return _vsync; }
 
     void Display::set_size(Vec2 size) {
         _size.x = size.x;
