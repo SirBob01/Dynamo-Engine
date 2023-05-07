@@ -34,15 +34,13 @@ namespace Dynamo {
         template <typename T>
         Asset<T> store(const std::string key, T &&object) {
             // Remove item from cache as soon as all handles are destroyed
-            auto deleter = [&](T *data) {
+            auto deleter = [this, key](T *data) {
+                _pool.erase(key);
                 delete data;
-                if (contains(key) && _pool.at(key).expired()) {
-                    _pool.erase(key);
-                }
             };
-            Asset<T> asset(std::shared_ptr<T>(new T(object), deleter));
-            _pool[key] = asset._data;
-            return asset;
+            std::shared_ptr<T> ptr(new T(object), deleter);
+            _pool[key] = ptr;
+            return Asset<T>(ptr);
         }
 
         /**
