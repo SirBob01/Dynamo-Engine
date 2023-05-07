@@ -84,13 +84,11 @@ namespace Dynamo::Graphics::Vulkan {
     void
     Swapchain::calculate_extent(const vk::SurfaceCapabilitiesKHR &capabilities,
                                 Display &display) {
-        i32 width, height;
-        glfwGetFramebufferSize(display.get_window(), &width, &height);
-
-        _extent.width = std::clamp(static_cast<u32>(width),
+        Vec2 size = display.get_framebuffer_size();
+        _extent.width = std::clamp(static_cast<u32>(size.x),
                                    capabilities.minImageExtent.width,
                                    capabilities.maxImageExtent.width);
-        _extent.height = std::clamp(static_cast<u32>(height),
+        _extent.height = std::clamp(static_cast<u32>(size.y),
                                     capabilities.minImageExtent.height,
                                     capabilities.maxImageExtent.height);
     }
