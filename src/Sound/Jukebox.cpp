@@ -1,4 +1,5 @@
 #include "Jukebox.hpp"
+#include "portaudio.h"
 
 namespace Dynamo::Sound {
     Jukebox::Jukebox() {
@@ -225,6 +226,9 @@ namespace Dynamo::Sound {
             device.input_channels = device_info->maxInputChannels;
             device.output_channels = device_info->maxOutputChannels;
             device.sample_rate = device_info->defaultSampleRate;
+            device.input_latency = device_info->defaultLowInputLatency;
+            device.output_latency = device_info->defaultLowOutputLatency;
+
             devices.push_back(device);
         }
 
@@ -250,7 +254,7 @@ namespace Dynamo::Sound {
         params.device = device.id;
         params.hostApiSpecificStreamInfo = nullptr;
         params.sampleFormat = paFloat32;
-        params.suggestedLatency = 0;
+        params.suggestedLatency = device.input_latency;
 
         err = Pa_OpenStream(&_input_stream,
                             &params,
@@ -295,7 +299,7 @@ namespace Dynamo::Sound {
         params.device = device.id;
         params.hostApiSpecificStreamInfo = nullptr;
         params.sampleFormat = paFloat32;
-        params.suggestedLatency = 0;
+        params.suggestedLatency = device.output_latency;
 
         err = Pa_OpenStream(&_output_stream,
                             nullptr,
