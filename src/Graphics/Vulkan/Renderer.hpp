@@ -1,5 +1,4 @@
 #pragma once
-#define GLFW_INCLUDE_VULKAN
 
 #include <memory>
 #include <unordered_set>
@@ -135,7 +134,7 @@ namespace Dynamo::Graphics::Vulkan {
         void create_instance();
 
         /**
-         * @brief Attach the GLFW window to a vk::Surface
+         * @brief Attach the Display to a vk::Surface
          *
          */
         void create_surface();

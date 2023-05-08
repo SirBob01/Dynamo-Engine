@@ -1,7 +1,9 @@
 #pragma once
+#define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <vulkan/vulkan.hpp>
 
 #include "../Log/Log.hpp"
 #include "../Math/Vec2.hpp"
@@ -50,6 +52,21 @@ namespace Dynamo {
          * @return GLFWwindow&
          */
         GLFWwindow *get_window();
+
+        /**
+         * @brief Get the available Vulkan extensions.
+         *
+         * @return std::vector<const i8 *>
+         */
+        std::vector<const i8 *> get_vulkan_extensions() const;
+
+        /**
+         * @brief Get the Vulkan surface.
+         *
+         * @param instance
+         * @return vk::SurfaceKHR
+         */
+        vk::SurfaceKHR get_vulkan_surface(vk::Instance instance) const;
 
         /**
          * @brief Get the size of the display in screen coordinates.
