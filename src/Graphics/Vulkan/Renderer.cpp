@@ -32,12 +32,8 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Renderer::enumerate_extensions() {
-        // Get supported extensions from GLFW
-        u32 count;
-        const i8 **extensions = glfwGetRequiredInstanceExtensions(&count);
-        for (i32 i = 0; i < count; i++) {
-            _extensions.push_back(extensions[i]);
-        }
+        // Get supported extensions
+        _extensions = _display.get().get_vulkan_extensions();
 
 #ifdef DYN_DEBUG
         // Enable validation layers on debug mode
@@ -105,17 +101,9 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Renderer::create_surface() {
-        VkSurfaceKHR tmp_surface;
-        vk::Result result = static_cast<vk::Result>(
-            glfwCreateWindowSurface(_instance.get(),
-                                    _display.get().get_window(),
-                                    nullptr,
-                                    &tmp_surface));
-        _surface = vk::UniqueSurfaceKHR(tmp_surface, _instance.get());
-        if (result != vk::Result::eSuccess) {
-            Log::error("Failed to create a Vulkan surface: {}",
-                       vk::to_string(result));
-        }
+        _surface = vk::UniqueSurfaceKHR(
+            _display.get().get_vulkan_surface(_instance.get()),
+            _instance.get());
     }
 
     void Renderer::create_device() {

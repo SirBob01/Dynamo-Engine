@@ -1,4 +1,3 @@
-#include "GLFW/glfw3.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Display.hpp"
 
@@ -35,6 +34,27 @@ namespace Dynamo {
     Display::~Display() { glfwDestroyWindow(_window); }
 
     GLFWwindow *Display::get_window() { return _window; }
+
+    std::vector<const i8 *> Display::get_vulkan_extensions() const {
+        std::vector<const i8 *> extensions;
+        u32 count;
+        const i8 **arr = glfwGetRequiredInstanceExtensions(&count);
+        for (u32 i = 0; i < count; i++) {
+            extensions.push_back(arr[i]);
+        }
+        return extensions;
+    }
+
+    vk::SurfaceKHR Display::get_vulkan_surface(vk::Instance instance) const {
+        VkSurfaceKHR surface;
+        vk::Result result = static_cast<vk::Result>(
+            glfwCreateWindowSurface(instance, _window, nullptr, &surface));
+        if (result != vk::Result::eSuccess) {
+            Log::error("Failed to create a Vulkan surface: {}",
+                       vk::to_string(result));
+        }
+        return surface;
+    }
 
     Vec2 Display::get_window_size() const {
         i32 width, height;
