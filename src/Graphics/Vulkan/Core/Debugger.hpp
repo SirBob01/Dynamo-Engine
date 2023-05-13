@@ -4,9 +4,6 @@
 
 #include "../../../Log/Log.hpp"
 
-static PFN_vkCreateDebugUtilsMessengerEXT vk_create_debugger_dispatch;
-static PFN_vkDestroyDebugUtilsMessengerEXT vk_destroy_debugger_dispatch;
-
 /**
  * @brief API override for instancing the debug messenger.
  *

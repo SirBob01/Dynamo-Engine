@@ -41,7 +41,7 @@ namespace Dynamo::Sound {
         }
 
         // Shift up the frequency delay-line by one partition
-        for (i32 i = _fdl.size() - 1; i >= PARTITION_LENGTH; i--) {
+        for (u32 i = _fdl.size() - 1; i >= PARTITION_LENGTH; i--) {
             _fdl[i] = _fdl[i - PARTITION_LENGTH];
         }
 

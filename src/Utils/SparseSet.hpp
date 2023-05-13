@@ -82,7 +82,8 @@ namespace Dynamo {
 
             // Verify that the sparse and dense arrays are correlated
             i32 index = _sparse[key];
-            if (index == -1 || index >= _dense.size() || _dense[index] != id) {
+            i32 dense_size = _dense.size();
+            if (index == -1 || index >= dense_size || _dense[index] != id) {
                 return -1;
             }
             return index;
@@ -142,7 +143,8 @@ namespace Dynamo {
 
             // Verify that the sparse and dense arrays are correlated
             i32 index = _sparse[key];
-            if (index == -1 || index >= _dense.size() || _dense[index] != id) {
+            i32 dense_size = _dense.size();
+            if (index == -1 || index >= dense_size || _dense[index] != id) {
                 return;
             }
 
@@ -177,7 +179,7 @@ namespace Dynamo {
          */
         inline T &at(i32 index) {
             DYN_ASSERT(index >= 0);
-            DYN_ASSERT(index < _pool.size());
+            DYN_ASSERT(index < static_cast<i32>(_pool.size()));
             return _pool[index];
         }
 

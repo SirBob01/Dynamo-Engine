@@ -31,10 +31,11 @@ namespace Dynamo::Sound {
             f64 interp = P_frac - l;
 
             // Left wing
-            for (i32 i = 0; i < FILTER_HALF_LENGTH; i++) {
+            for (u32 i = 0; i < FILTER_HALF_LENGTH; i++) {
                 i32 s_i = src_f - i;
                 i32 h_i = l + i * filter_step;
-                if (s_i < 0 || h_i >= FILTER_HALF_LENGTH) break;
+                if (s_i < 0 || h_i >= static_cast<i32>(FILTER_HALF_LENGTH))
+                    break;
                 f64 weight = FILTER_RWING[h_i] + interp * FILTER_DIFFS[h_i];
                 dst_sample += src[s_i] * weight;
             }
@@ -48,10 +49,12 @@ namespace Dynamo::Sound {
             interp = P_frac - l;
 
             // Right wing
-            for (i32 i = 0; i < FILTER_HALF_LENGTH; i++) {
+            for (u32 i = 0; i < FILTER_HALF_LENGTH; i++) {
                 i32 s_i = src_f + i + 1;
                 i32 h_i = l + i * filter_step;
-                if (s_i >= time_end || h_i >= FILTER_HALF_LENGTH) break;
+                if (s_i >= time_end ||
+                    h_i >= static_cast<i32>(FILTER_HALF_LENGTH))
+                    break;
                 f64 weight = FILTER_RWING[h_i] + interp * FILTER_DIFFS[h_i];
                 dst_sample += src[s_i] * weight;
             }

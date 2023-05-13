@@ -1,5 +1,8 @@
 #include "./Debugger.hpp"
 
+static PFN_vkCreateDebugUtilsMessengerEXT vk_create_debugger_dispatch;
+static PFN_vkDestroyDebugUtilsMessengerEXT vk_destroy_debugger_dispatch;
+
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT *create_info,
