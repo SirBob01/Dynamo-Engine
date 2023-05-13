@@ -1,8 +1,7 @@
 #include "Sound.hpp"
 
 namespace Dynamo::Sound {
-    WaveFrame Sound::get_frame(const u32 frame,
-                               const u32 out_channels) {
+    WaveFrame Sound::get_frame(const u32 frame, const u32 out_channels) {
         WaveFrame output;
         output.channels = out_channels;
 
@@ -19,7 +18,7 @@ namespace Dynamo::Sound {
         }
 
         // Write denormalzed samples onto the output frame
-        for (i32 i = 0; i < samples.size(); i++) {
+        for (u32 i = 0; i < samples.size(); i++) {
             output.samples[i] = samples[i];
         }
         return output;

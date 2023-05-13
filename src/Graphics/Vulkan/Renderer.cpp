@@ -163,7 +163,7 @@ namespace Dynamo::Graphics::Vulkan {
         _signal_render_done.clear();
         _fences.clear();
 
-        for (i32 i = 0; i < _max_frames_processing; i++) {
+        for (u32 i = 0; i < _max_frames_processing; i++) {
             _signal_image_ready.push_back(
                 std::make_unique<Semaphore>(*_device));
             _signal_render_done.push_back(
@@ -456,7 +456,7 @@ namespace Dynamo::Graphics::Vulkan {
             if (result != vk::Result::eSuccess) {
                 reset_swapchain();
             }
-        } catch (vk::OutOfDateKHRError e) {
+        } catch (vk::OutOfDateKHRError &e) {
             reset_swapchain();
         }
 

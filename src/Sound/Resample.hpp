@@ -3,8 +3,8 @@
 
 #include <array>
 
-#include "../Types.hpp"
 #include "../Log/Log.hpp"
+#include "../Types.hpp"
 #include "./Sound.hpp"
 
 namespace Dynamo::Sound {
@@ -94,7 +94,7 @@ namespace Dynamo::Sound {
     constexpr std::array<f64, FILTER_HALF_LENGTH> construct_difference_table(
         const std::array<f64, FILTER_HALF_LENGTH> &coeffs) {
         std::array<f64, FILTER_HALF_LENGTH> diffs = {0};
-        for (i32 i = 0; i < FILTER_HALF_LENGTH - 1; i++) {
+        for (u32 i = 0; i < FILTER_HALF_LENGTH - 1; i++) {
             diffs[i] = coeffs[i + 1] - coeffs[i];
         }
         return diffs;

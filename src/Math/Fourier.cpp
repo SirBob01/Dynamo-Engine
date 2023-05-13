@@ -25,7 +25,7 @@ namespace Dynamo::Fourier {
 
             for (u32 k = 0; k < N; k += m) {
                 Complex omega(1);
-                for (i32 j = 0; j < half_m; j++) {
+                for (u32 j = 0; j < half_m; j++) {
                     u32 u_i = k + j;
                     u32 t_i = u_i + half_m;
                     Complex t = omega * signal[t_i];
@@ -62,7 +62,7 @@ namespace Dynamo::Fourier {
 
             for (u32 k = 0; k < N; k += m) {
                 Complex omega(1);
-                for (i32 j = 0; j < half_m; j++) {
+                for (u32 j = 0; j < half_m; j++) {
                     u32 u_i = k + j;
                     u32 t_i = u_i + half_m;
                     Complex t = omega * signal[t_i];
@@ -76,7 +76,7 @@ namespace Dynamo::Fourier {
 
         // Normalize
         f32 inv_N = 1.0 / N;
-        for (i32 f = 0; f < N; f++) {
+        for (u32 f = 0; f < N; f++) {
             signal[f] *= inv_N;
         }
     }
