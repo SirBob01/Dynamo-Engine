@@ -1,10 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <format>
 #include <string>
-
-#include <fmt/chrono.h>
-#include <fmt/format.h>
 
 namespace Dynamo {
     /**

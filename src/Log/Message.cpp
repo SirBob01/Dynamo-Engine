@@ -4,19 +4,16 @@ namespace Dynamo {
     std::string Message::format() {
         switch (type) {
         case MessageType::Error:
-            return fmt::format("[ERROR {:%Y-%m-%d %H:%M:%S}] {}",
-                               timestamp,
-                               content);
+            return std::vformat("[ERROR {:%Y-%m-%d %H:%M:%S}] {}",
+                                std::make_format_args(timestamp, content));
             break;
         case MessageType::Warning:
-            return fmt::format("[WARN {:%Y-%m-%d %H:%M:%S}] {}",
-                               timestamp,
-                               content);
+            return std::vformat("[WARN {:%Y-%m-%d %H:%M:%S}] {}",
+                                std::make_format_args(timestamp, content));
             break;
         default:
-            return fmt::format("[INFO {:%Y-%m-%d %H:%M:%S}] {}",
-                               timestamp,
-                               content);
+            return std::vformat("[INFO {:%Y-%m-%d %H:%M:%S}] {}",
+                                std::make_format_args(timestamp, content));
             break;
         }
     }

@@ -24,7 +24,7 @@ I built this because I've always wanted to understand how game engines worked un
 
 ## Dependencies
 
-To use `Dynamo`, the compiler must support at least C++17.
+To use `Dynamo`, the compiler must support at least C++20.
 
 `Dynamo` uses a number of submodules that can be installed by running `git submodule update --init`
 
@@ -52,7 +52,5 @@ Anyone is welcome to open a pull request! State the issue being solved and expla
 For high-level suggestions on improving the engine, open an issue so we can have a discussion.
 
 ## License
-
-Code and documentation Copyright (c) 2019-2022 Keith Leonardo
 
 Code released under the [MIT License](https://choosealicense.com/licenses/mit/).

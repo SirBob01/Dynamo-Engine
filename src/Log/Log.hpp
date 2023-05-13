@@ -15,15 +15,13 @@
 #endif
 
 #include <chrono>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-#include <fmt/chrono.h>
-#include <fmt/format.h>
 
 #include "Message.hpp"
 
@@ -45,7 +43,8 @@ namespace Dynamo {
         template <typename... Types>
         static void info(std::string format = "", Types... args) {
             const auto timestamp = std::chrono::system_clock::now();
-            std::string content = fmt::format(format, args...);
+            std::string content =
+                std::vformat(format, std::make_format_args(args...));
             Message message = {timestamp, content, MessageType::Info};
             _history.push_back(message);
             std::cout << message.format() << std::endl;
@@ -60,7 +59,8 @@ namespace Dynamo {
         template <typename... Types>
         static void error(std::string format, Types... args) {
             const auto timestamp = std::chrono::system_clock::now();
-            std::string content = fmt::format(format, args...);
+            std::string content =
+                std::vformat(format, std::make_format_args(args...));
             Message message = {timestamp, content, MessageType::Error};
             _history.push_back(message);
             std::cerr << message.format() << std::endl;
@@ -79,7 +79,8 @@ namespace Dynamo {
         template <typename... Types>
         static void warn(std::string format, Types... args) {
             const auto timestamp = std::chrono::system_clock::now();
-            std::string content = fmt::format(format, args...);
+            std::string content =
+                std::vformat(format, std::make_format_args(args...));
             Message message = {timestamp, content, MessageType::Warning};
             _history.push_back(message);
             std::cerr << message.format() << std::endl;

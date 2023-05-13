@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <fstream>
 #include <string>
 #include <unordered_map>
