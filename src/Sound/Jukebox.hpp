@@ -160,15 +160,6 @@ namespace Dynamo::Sound {
          */
         void process_chunk(Chunk<DynamicMaterial> &chunk);
 
-        /**
-         * @brief Find the closest listener to a sound
-         *
-         * @param material
-         * @return ListenerProperties&
-         */
-        ListenerProperties &
-        find_closest_listener(const DynamicMaterial &material);
-
       public:
         /**
          * @brief Construct a new Jukebox object
