@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Types.hpp"
 #include "../Math/Quaternion.hpp"
 #include "../Math/Vec3.hpp"
+#include "../Types.hpp"
 #include "../Utils/IdTracker.hpp"
 #include "../Utils/SparseSet.hpp"
 
@@ -124,6 +124,27 @@ namespace Dynamo::Sound {
          */
         inline ListenerProperties &operator[](u32 index) {
             return _properties.at(index);
+        }
+
+        /**
+         * @brief Find the closest listener to a given position.
+         *
+         * @param position
+         * @return ListenerProperties&
+         */
+        ListenerProperties &find_closest(Vec3 position) {
+            u32 closest_index = 0;
+            for (u32 i = 0; i < _properties.size(); i++) {
+                Vec3 best = _properties.at(i).position;
+                Vec3 curr = _properties.at(closest_index).position;
+
+                f32 a = (best - position).length_squared();
+                f32 b = (curr - position).length_squared();
+                if (b < a) {
+                    closest_index = i;
+                }
+            }
+            return _properties.at(closest_index);
         }
     };
 } // namespace Dynamo::Sound

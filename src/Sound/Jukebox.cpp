@@ -165,7 +165,8 @@ namespace Dynamo::Sound {
         }
 
         // Apply the filters
-        ListenerProperties &listener = find_closest_listener(material);
+        ListenerProperties &listener =
+            _listeners.find_closest(material.position);
         for (const auto &filter : material.filters) {
             transformed = filter->apply(transformed,
                                         0,
@@ -187,22 +188,6 @@ namespace Dynamo::Sound {
 
         // Advance chunk frame
         chunk.frame += length;
-    }
-
-    ListenerProperties &
-    Jukebox::find_closest_listener(const DynamicMaterial &material) {
-        u32 closest_index = 0;
-        for (u32 i = 0; i < _listeners.size(); i++) {
-            Vec3 best = _listeners[i].position;
-            Vec3 curr = _listeners[closest_index].position;
-
-            f32 a = (best - material.position).length_squared();
-            f32 b = (curr - material.position).length_squared();
-            if (b < a) {
-                closest_index = i;
-            }
-        }
-        return _listeners[closest_index];
     }
 
     const std::vector<Device> Jukebox::get_devices() {
