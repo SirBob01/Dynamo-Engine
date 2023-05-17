@@ -4,6 +4,8 @@ namespace Dynamo::Sound {
     b8 EffectNode::has_cycles() {
         std::unordered_set<EffectNode *> visited;
         std::vector<std::reference_wrapper<EffectNode>> stack;
+
+        stack.push_back(*this);
         while (!stack.empty()) {
             EffectNode &node = stack.back();
             stack.pop_back();
@@ -13,6 +15,7 @@ namespace Dynamo::Sound {
             for (EffectNode &child : node._outgoing) {
                 stack.push_back(child);
             }
+            visited.insert(&node);
         }
         return false;
     }
