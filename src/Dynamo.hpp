@@ -14,7 +14,7 @@
 #include "Sound/Chunk.hpp"
 #include "Sound/Convolver.hpp"
 #include "Sound/Device.hpp"
-#include "Sound/EffectNode.hpp"
+#include "Sound/Filter.hpp"
 #include "Sound/Filters/Attenuation.hpp"
 #include "Sound/Filters/Binaural.hpp"
 #include "Sound/Filters/Gain.hpp"
