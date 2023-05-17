@@ -1,31 +1,36 @@
 #pragma once
 
+#include "../../Math/Quaternion.hpp"
+#include "../../Math/Vec3.hpp"
 #include "../../Types.hpp"
-#include "./Filter.hpp"
+#include "../EffectNode.hpp"
 
 namespace Dynamo::Sound {
     /**
-     * @brief Stereo panner filter implementation
+     * @brief Stereo panner filter implementation.
      *
      */
-    class Stereo : public DynamicFilter {
-        /**
-         * @brief Output buffer
-         *
-         */
+    class Stereo : public EffectNode {
         Sound _output;
+
+        /**
+         * @brief Find the closest listener to the sound source.
+         *
+         * @param listeners
+         * @return ListenerProperties&
+         */
+        ListenerProperties &find_listener(const ListenerSet &listeners);
 
       public:
         /**
-         * @brief Construct a new Stereo filter object
+         * @brief Position of the sound source.
          *
          */
-        Stereo();
+        Vec3 position;
 
-        Sound &apply(Sound &src,
-                     const u32 src_offset,
-                     const u32 length,
-                     const DynamicMaterial &material,
-                     const ListenerProperties &listener) override;
+        Sound &process(Sound &src,
+                       u32 offset,
+                       u32 length,
+                       ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

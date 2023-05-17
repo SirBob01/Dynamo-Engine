@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Types.hpp"
-#include "./Material.hpp"
+#include "./EffectNode.hpp"
 #include "./Sound.hpp"
 
 namespace Dynamo::Sound {
@@ -21,12 +21,8 @@ namespace Dynamo::Sound {
      * @brief A chunk contains information to process a sound in small sections
      * every tick.
      *
-     * @tparam Material Playback properties.
      */
-    template <typename Material>
     struct Chunk {
-        static_assert(std::is_convertible<Material, StaticMaterial>::value ||
-                      std::is_convertible<Material, DynamicMaterial>::value);
         /**
          * @brief Reference to the Sound data.
          *
@@ -34,10 +30,10 @@ namespace Dynamo::Sound {
         std::reference_wrapper<Sound> sound;
 
         /**
-         * @brief Reference to the playback material.
+         * @brief Reference to the audio processing effect graph.
          *
          */
-        std::reference_wrapper<Material> material;
+        std::reference_wrapper<EffectNode> effect;
 
         /**
          * @brief Frame offset of the chunk.

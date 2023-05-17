@@ -16,11 +16,9 @@
 
 #include "./Chunk.hpp"
 #include "./Device.hpp"
-#include "./Filters/Binaural.hpp"
-#include "./Filters/Filter.hpp"
+#include "./EffectNode.hpp"
 #include "./HRTF.hpp"
 #include "./Listener.hpp"
-#include "./Material.hpp"
 #include "./Resample.hpp"
 #include "./Sound.hpp"
 
@@ -30,14 +28,6 @@ namespace Dynamo::Sound {
      *
      */
     static constexpr u32 BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
-
-    /**
-     * @brief A playback track on which audio can be enqueued
-     *
-     * TODO: Implement API
-     *
-     */
-    using SoundTrack = Id;
 
     /**
      * @brief In-house audio engine supporting static sounds, spatial sounds,
@@ -73,16 +63,10 @@ namespace Dynamo::Sound {
         HRTF _hrtf;
 
         /**
-         * @brief Static chunk list
+         * @brief Chunk list
          *
          */
-        std::vector<Chunk<StaticMaterial>> _static_chunks;
-
-        /**
-         * @brief Dynamic chunk list
-         *
-         */
-        std::vector<Chunk<DynamicMaterial>> _dynamic_chunks;
+        std::vector<Chunk> _chunks;
 
         /**
          * @brief Internal state shared with the PortAudio callback
@@ -147,18 +131,11 @@ namespace Dynamo::Sound {
                                    void *data);
 
         /**
-         * @brief Process a static chunk
+         * @brief Process a chunk of sound.
          *
-         * @param chunk Static chunk
+         * @param chunk
          */
-        void process_chunk(Chunk<StaticMaterial> &chunk);
-
-        /**
-         * @brief Process a dynamic chunk
-         *
-         * @param chunk Dynamic chunk
-         */
-        void process_chunk(Chunk<DynamicMaterial> &chunk);
+        void process_chunk(Chunk &chunk);
 
       public:
         /**
@@ -271,22 +248,11 @@ namespace Dynamo::Sound {
         /**
          * @brief Play a static sound
          *
-         * @param sound    Sound
-         * @param material Playback properties
+         * @param sound         Sound source
+         * @param effect        Effect processing graph
+         * @param start_seconds Start time offset in seconds
          */
-        void play(Sound &sound, StaticMaterial &material);
-
-        /**
-         * @brief Play a dynamic sound
-         *
-         * These sounds are spatialized and affected by the position of the
-         * sound and the listeners. If there are multiple listeners attached,
-         * the sound will be processed for all of them and mixed.
-         *
-         * @param sound    Sound
-         * @param material Playback properties
-         */
-        void play(Sound &sound, DynamicMaterial &material);
+        void play(Sound &sound, EffectNode &effect, f64 start_seconds = 0.0);
 
         /**
          * @brief Update Jukebox's internal state and process all chunks

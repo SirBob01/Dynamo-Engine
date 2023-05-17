@@ -1,14 +1,12 @@
 #include "./Stereo.hpp"
 
 namespace Dynamo::Sound {
-    Stereo::Stereo() { _output.set_channels(2); }
-
-    Sound &Stereo::apply(Sound &src,
-                         const u32 src_offset,
-                         const u32 length,
-                         const DynamicMaterial &material,
-                         const ListenerProperties &listener) {
-        Vec3 delta = material.position - listener.position;
+    Sound &Stereo::process(Sound &src,
+                           u32 offset,
+                           u32 length,
+                           ListenerSet &listeners) {
+        ListenerProperties &listener = listeners.find_closest(position);
+        Vec3 delta = position - listener.position;
         Vec3 up = listener.rotation.up();
         Vec3 right = listener.rotation.right();
         Vec3 displacement = (delta - up * (delta * up));
@@ -29,7 +27,7 @@ namespace Dynamo::Sound {
         for (u32 c = 0; c < 2; c++) {
             f32 gain = c == 0 ? l_gain : r_gain;
             for (u32 f = 0; f < length; f++) {
-                _output[c][f] = src[c][f + src_offset] * gain;
+                _output[c][f] = src[c][f + offset] * gain;
             }
         }
         return _output;

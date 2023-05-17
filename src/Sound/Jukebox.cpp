@@ -1,5 +1,4 @@
 #include "Jukebox.hpp"
-#include "portaudio.h"
 
 namespace Dynamo::Sound {
     Jukebox::Jukebox() {
@@ -92,9 +91,9 @@ namespace Dynamo::Sound {
         return 0;
     }
 
-    void Jukebox::process_chunk(Chunk<StaticMaterial> &chunk) {
-        Sound &sound = chunk.sound.get();
-        StaticMaterial &material = chunk.material.get();
+    void Jukebox::process_chunk(Chunk &chunk) {
+        Sound &sound = chunk.sound;
+        EffectNode &effect = chunk.effect;
 
         // Calculate the number of frames in the destination
         f64 frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
@@ -117,72 +116,16 @@ namespace Dynamo::Sound {
                             _output_state.sample_rate);
         }
 
-        // Apply the filters
-        for (const auto &filter : material.filters) {
-            transformed = filter->apply(transformed, 0, transformed.frames());
-        }
+        // Apply the effects graph
+        transformed = effect.run(transformed, 0, frames, _listeners);
 
         // Mix the filtered sound onto the composite signal
-        f32 volume = material.volume * _volume;
         for (u32 f = 0; f < transformed.frames(); f++) {
             for (u32 c = 0; c < transformed.channels(); c++) {
                 u32 i = f * transformed.channels() + c;
                 f32 s0 = _composite[i];
                 f32 s1 = transformed[c][f];
-                _composite[i] = (s0 + s1) * volume;
-            }
-        }
-
-        // Advance chunk frame
-        chunk.frame += length;
-    }
-
-    void Jukebox::process_chunk(Chunk<DynamicMaterial> &chunk) {
-        if (_listeners.size() == 0) return;
-
-        Sound &sound = chunk.sound.get();
-        DynamicMaterial &material = chunk.material.get();
-
-        // Calculate the number of frames in the destination
-        f64 frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
-                                  static_cast<f32>(sound.frames()));
-        f64 frames = frame_stop - chunk.frame;
-
-        // Calculate the number of frames required in the original signal to
-        // produce the destination frames
-        f64 factor = sound.sample_rate() / _output_state.sample_rate;
-        f64 length = frames * factor;
-
-        // Resample the audio to the device sample rate
-        Sound transformed(frames, _output_state.channels);
-        for (u32 c = 0; c < transformed.channels(); c++) {
-            resample_signal(sound[c],
-                            transformed[c],
-                            chunk.frame,
-                            length,
-                            sound.sample_rate(),
-                            _output_state.sample_rate);
-        }
-
-        // Apply the filters
-        ListenerProperties &listener =
-            _listeners.find_closest(material.position);
-        for (const auto &filter : material.filters) {
-            transformed = filter->apply(transformed,
-                                        0,
-                                        transformed.frames(),
-                                        material,
-                                        listener);
-        }
-
-        // Mix the filtered sound onto the composite signal
-        f32 volume = material.volume * listener.volume * _volume;
-        for (u32 f = 0; f < transformed.frames(); f++) {
-            for (u32 c = 0; c < transformed.channels(); c++) {
-                u32 i = f * transformed.channels() + c;
-                f32 s0 = _composite[i];
-                f32 s1 = transformed[c][f];
-                _composite[i] = (s0 + s1) * volume;
+                _composite[i] = (s0 + s1) * _volume;
             }
         }
 
@@ -339,14 +282,9 @@ namespace Dynamo::Sound {
 
     HRTF &Jukebox::get_hrtf() { return _hrtf; }
 
-    void Jukebox::play(Sound &sound, StaticMaterial &material) {
-        f32 frame = _output_state.sample_rate * material.start_seconds;
-        _static_chunks.push_back({sound, material, frame});
-    }
-
-    void Jukebox::play(Sound &sound, DynamicMaterial &material) {
-        f32 frame = _output_state.sample_rate * material.start_seconds;
-        _dynamic_chunks.push_back({sound, material, frame});
+    void Jukebox::play(Sound &sound, EffectNode &effect, f64 start_seconds) {
+        f32 frame = _output_state.sample_rate * start_seconds;
+        _chunks.push_back({sound, effect, frame});
     }
 
     void Jukebox::update() {
@@ -359,27 +297,16 @@ namespace Dynamo::Sound {
         // Zero-out the composite waveform
         std::fill(_composite.begin(), _composite.end(), 0);
 
-        // Process static chunks and mix onto the composite
-        auto s_it = _static_chunks.begin();
-        while (s_it != _static_chunks.end()) {
-            Chunk<StaticMaterial> &chunk = *s_it;
-            if (chunk.frame >= chunk.sound.get().frames()) {
-                s_it = _static_chunks.erase(s_it);
+        // Process chunks and mix onto the composite
+        auto s_it = _chunks.begin();
+        while (s_it != _chunks.end()) {
+            Chunk &chunk = *s_it;
+            Sound &sound = chunk.sound;
+            if (chunk.frame >= sound.frames()) {
+                s_it = _chunks.erase(s_it);
             } else {
                 process_chunk(chunk);
                 s_it++;
-            }
-        }
-
-        // Process dynamic chunks and mix onto the composite
-        auto d_it = _dynamic_chunks.begin();
-        while (d_it != _dynamic_chunks.end()) {
-            Chunk<DynamicMaterial> &chunk = *d_it;
-            if (chunk.frame >= chunk.sound.get().frames()) {
-                d_it = _dynamic_chunks.erase(d_it);
-            } else {
-                process_chunk(chunk);
-                d_it++;
             }
         }
 
