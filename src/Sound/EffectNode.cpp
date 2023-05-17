@@ -12,7 +12,7 @@ namespace Dynamo::Sound {
             if (visited.count(&node) > 0) {
                 return true;
             }
-            for (EffectNode &child : node._outgoing) {
+            for (EffectNode &child : node._dependencies) {
                 stack.push_back(child);
             }
             visited.insert(&node);
@@ -21,20 +21,20 @@ namespace Dynamo::Sound {
     }
 
     void EffectNode::connect(EffectNode &destination) {
-        _outgoing.push_back(destination);
+        _dependencies.push_back(destination);
         if (has_cycles()) {
             Log::error("Jukebox EffectNode graph disallows cycles.");
         }
     }
 
-    void EffectNode::disconnect() { _outgoing.clear(); }
+    void EffectNode::disconnect() { _dependencies.clear(); }
 
-    void EffectNode::disconnect(EffectNode &destination) {
-        auto it = _outgoing.begin();
-        while (it != _outgoing.end()) {
-            EffectNode &node = *it;
-            if (&node == &destination) {
-                it = _outgoing.erase(it);
+    void EffectNode::disconnect(EffectNode &node) {
+        auto it = _dependencies.begin();
+        while (it != _dependencies.end()) {
+            EffectNode &curr = *it;
+            if (&curr == &node) {
+                it = _dependencies.erase(it);
                 return;
             } else {
                 it++;

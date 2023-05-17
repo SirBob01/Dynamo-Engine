@@ -14,7 +14,7 @@ namespace Dynamo::Sound {
      *
      */
     class EffectNode {
-        std::vector<std::reference_wrapper<EffectNode>> _outgoing;
+        std::vector<std::reference_wrapper<EffectNode>> _dependencies;
 
       private:
         /**
@@ -32,26 +32,26 @@ namespace Dynamo::Sound {
         virtual ~EffectNode() = default;
 
         /**
-         * @brief Connect an outgoing EffectNode.
+         * @brief Connect a dependency.
          *
          * The resulting graph must not result in a cycle.
          *
-         * @param destination
+         * @param node
          */
-        void connect(EffectNode &destination);
+        void connect(EffectNode &node);
 
         /**
-         * @brief Disconnect all outgoing nodes.
+         * @brief Disconnect all dependencies.
          *
          */
         void disconnect();
 
         /**
-         * @brief Disconnect an outgoing node.
+         * @brief Disconnect a dependency.
          *
-         * @param destination
+         * @param node
          */
-        void disconnect(EffectNode &destination);
+        void disconnect(EffectNode &node);
 
         /**
          * @brief Run the Sound through the graph rooted at this node.
