@@ -38,9 +38,9 @@ namespace Dynamo::Sound {
          */
         Attenuation(f32 inner_radius, f32 cutoff_radius);
 
-        Sound &process(Sound &src,
-                       u32 offset,
-                       u32 length,
-                       ListenerSet &listeners) override;
+        Sound &transform(Sound &src,
+                         u32 offset,
+                         u32 length,
+                         ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

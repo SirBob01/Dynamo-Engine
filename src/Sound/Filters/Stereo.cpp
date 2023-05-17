@@ -1,10 +1,10 @@
 #include "./Stereo.hpp"
 
 namespace Dynamo::Sound {
-    Sound &Stereo::process(Sound &src,
-                           u32 offset,
-                           u32 length,
-                           ListenerSet &listeners) {
+    Sound &Stereo::transform(Sound &src,
+                             u32 offset,
+                             u32 length,
+                             ListenerSet &listeners) {
         ListenerProperties &listener = listeners.find_closest(position);
         Vec3 delta = position - listener.position;
         Vec3 up = listener.rotation.up();

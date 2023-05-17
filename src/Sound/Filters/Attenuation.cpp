@@ -14,10 +14,10 @@ namespace Dynamo::Sound {
         return (_cutoff_radius - distance) / (_cutoff_radius - _inner_radius);
     }
 
-    Sound &Attenuation::process(Sound &src,
-                                u32 offset,
-                                u32 length,
-                                ListenerSet &listeners) {
+    Sound &Attenuation::transform(Sound &src,
+                                  u32 offset,
+                                  u32 length,
+                                  ListenerSet &listeners) {
         ListenerProperties &listener = listeners.find_closest(position);
         f32 distance = (position - listener.position).length();
         f32 gain = linear(distance);

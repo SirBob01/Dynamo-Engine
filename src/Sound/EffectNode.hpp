@@ -65,13 +65,15 @@ namespace Dynamo::Sound {
         Sound &run(Sound &src, u32 offset, u32 length, ListenerSet &listeners);
 
         /**
-         * @brief Process a Sound.
+         * @brief Transform a Sound.
          *
          * @param src
          * @param length
          * @param listeners
          */
-        virtual Sound &
-        process(Sound &src, u32 offset, u32 length, ListenerSet &listeners) = 0;
+        virtual Sound &transform(Sound &src,
+                                 u32 offset,
+                                 u32 length,
+                                 ListenerSet &listeners) = 0;
     };
 } // namespace Dynamo::Sound

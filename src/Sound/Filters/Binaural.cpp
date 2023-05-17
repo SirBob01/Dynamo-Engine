@@ -6,10 +6,10 @@ namespace Dynamo::Sound {
         _output.set_channels(2);
     }
 
-    Sound &Binaural::process(Sound &src,
-                             u32 offset,
-                             u32 length,
-                             ListenerSet &listeners) {
+    Sound &Binaural::transform(Sound &src,
+                               u32 offset,
+                               u32 length,
+                               ListenerSet &listeners) {
         ListenerProperties &listener = listeners.find_closest(position);
         _hrtf.get().calculate_HRIR(listener.position,
                                    listener.rotation,

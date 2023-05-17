@@ -49,6 +49,6 @@ namespace Dynamo::Sound {
                            u32 length,
                            ListenerSet &listeners) {
         // TODO: Implement
-        return process(src, offset, length, listeners);
+        return transform(src, offset, length, listeners);
     }
 } // namespace Dynamo::Sound
