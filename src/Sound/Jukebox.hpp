@@ -16,7 +16,7 @@
 
 #include "./Chunk.hpp"
 #include "./Device.hpp"
-#include "./EffectNode.hpp"
+#include "./Filter.hpp"
 #include "./HRTF.hpp"
 #include "./Listener.hpp"
 #include "./Resample.hpp"
@@ -249,10 +249,10 @@ namespace Dynamo::Sound {
          * @brief Play a static sound
          *
          * @param sound         Sound source
-         * @param effect        Effect processing graph
+         * @param filter        Filter processing graph root node
          * @param start_seconds Start time offset in seconds
          */
-        void play(Sound &sound, EffectNode &effect, f64 start_seconds = 0.0);
+        void play(Sound &sound, Filter &filter, f64 start_seconds = 0.0);
 
         /**
          * @brief Update Jukebox's internal state and process all chunks

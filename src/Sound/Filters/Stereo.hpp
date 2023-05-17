@@ -3,16 +3,14 @@
 #include "../../Math/Quaternion.hpp"
 #include "../../Math/Vec3.hpp"
 #include "../../Types.hpp"
-#include "../EffectNode.hpp"
+#include "../Filter.hpp"
 
 namespace Dynamo::Sound {
     /**
      * @brief Stereo panner filter implementation.
      *
      */
-    class Stereo : public EffectNode {
-        Sound _output;
-
+    class Stereo : public Filter {
         /**
          * @brief Find the closest listener to the sound source.
          *
@@ -28,9 +26,9 @@ namespace Dynamo::Sound {
          */
         Vec3 position;
 
-        Sound &transform(Sound &src,
-                         u32 offset,
-                         u32 length,
-                         ListenerSet &listeners) override;
+        void transform(Sound &src,
+                       u32 offset,
+                       u32 length,
+                       ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

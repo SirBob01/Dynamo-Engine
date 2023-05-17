@@ -4,7 +4,7 @@
 
 #include "../../Types.hpp"
 #include "../Convolver.hpp"
-#include "../EffectNode.hpp"
+#include "../Filter.hpp"
 #include "../HRTF.hpp"
 
 namespace Dynamo::Sound {
@@ -12,12 +12,11 @@ namespace Dynamo::Sound {
      * @brief Binaural surround sound spatial filter implementation using HRTF.
      *
      */
-    class Binaural : public EffectNode {
+    class Binaural : public Filter {
         std::reference_wrapper<HRTF> _hrtf;
         std::array<Convolver, 2> _convolvers;
 
         Sound _impulse_response;
-        Sound _output;
 
         /**
          * @brief Find the closest listener to the sound source.
@@ -41,9 +40,9 @@ namespace Dynamo::Sound {
          */
         Binaural(HRTF &hrtf);
 
-        Sound &transform(Sound &src,
-                         u32 offset,
-                         u32 length,
-                         ListenerSet &listeners) override;
+        void transform(Sound &src,
+                       u32 offset,
+                       u32 length,
+                       ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

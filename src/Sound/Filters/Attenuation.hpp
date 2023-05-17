@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../Types.hpp"
-#include "../EffectNode.hpp"
+#include "../Filter.hpp"
 #include "../Sound.hpp"
 
 namespace Dynamo::Sound {
@@ -10,8 +10,7 @@ namespace Dynamo::Sound {
      * as it moves further away from the listener.
      *
      */
-    class Attenuation : public EffectNode {
-        Sound _output;
+    class Attenuation : public Filter {
         f32 _inner_radius;
         f32 _cutoff_radius;
 
@@ -38,9 +37,9 @@ namespace Dynamo::Sound {
          */
         Attenuation(f32 inner_radius, f32 cutoff_radius);
 
-        Sound &transform(Sound &src,
-                         u32 offset,
-                         u32 length,
-                         ListenerSet &listeners) override;
+        void transform(Sound &src,
+                       u32 offset,
+                       u32 length,
+                       ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

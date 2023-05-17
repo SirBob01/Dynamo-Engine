@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Types.hpp"
-#include "./EffectNode.hpp"
+#include "./Filter.hpp"
 #include "./Sound.hpp"
 
 namespace Dynamo::Sound {
@@ -30,10 +30,10 @@ namespace Dynamo::Sound {
         std::reference_wrapper<Sound> sound;
 
         /**
-         * @brief Reference to the audio processing effect graph.
+         * @brief Reference to the audio processing filter graph.
          *
          */
-        std::reference_wrapper<EffectNode> effect;
+        std::reference_wrapper<Filter> filter;
 
         /**
          * @brief Frame offset of the chunk.

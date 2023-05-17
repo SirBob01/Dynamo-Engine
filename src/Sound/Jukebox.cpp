@@ -93,7 +93,7 @@ namespace Dynamo::Sound {
 
     void Jukebox::process_chunk(Chunk &chunk) {
         Sound &sound = chunk.sound;
-        EffectNode &effect = chunk.effect;
+        Filter &filter = chunk.filter;
 
         // Calculate the number of frames in the destination
         f64 frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
@@ -116,8 +116,8 @@ namespace Dynamo::Sound {
                             _output_state.sample_rate);
         }
 
-        // Apply the effects graph
-        transformed = effect.run(transformed, 0, frames, _listeners);
+        // Apply the filter graph
+        transformed = run_filter(filter, transformed, 0, frames, _listeners);
 
         // Mix the filtered sound onto the composite signal
         for (u32 f = 0; f < transformed.frames(); f++) {
@@ -282,9 +282,9 @@ namespace Dynamo::Sound {
 
     HRTF &Jukebox::get_hrtf() { return _hrtf; }
 
-    void Jukebox::play(Sound &sound, EffectNode &effect, f64 start_seconds) {
+    void Jukebox::play(Sound &sound, Filter &filter, f64 start_seconds) {
         f32 frame = _output_state.sample_rate * start_seconds;
-        _chunks.push_back({sound, effect, frame});
+        _chunks.push_back({sound, filter, frame});
     }
 
     void Jukebox::update() {

@@ -1,16 +1,14 @@
 #pragma once
 
 #include "../../Types.hpp"
-#include "../EffectNode.hpp"
+#include "../Filter.hpp"
 
 namespace Dynamo::Sound {
     /**
      * @brief Gain filter implementation.
      *
      */
-    class Gain : public EffectNode {
-        Sound _output;
-
+    class Gain : public Filter {
       public:
         /**
          * @brief Gain multiplier
@@ -18,9 +16,9 @@ namespace Dynamo::Sound {
          */
         f32 gain = 1.0;
 
-        Sound &transform(Sound &src,
-                         u32 offset,
-                         u32 length,
-                         ListenerSet &listeners) override;
+        void transform(Sound &src,
+                       u32 offset,
+                       u32 length,
+                       ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound
