@@ -14,17 +14,18 @@ namespace Dynamo::Sound {
         return (_cutoff_radius - distance) / (_cutoff_radius - _inner_radius);
     }
 
-    void Distance::transform(ListenerSet &listeners) {
+    void Distance::transform(FilterContext context) {
+        Sound &src = context.input;
+        Sound &dst = context.output;
+        ListenerSet &listeners = context.listeners;
         ListenerProperties &listener = listeners.find_closest(position);
         f32 distance = (position - listener.position).length();
         f32 gain = linear(distance);
 
-        Sound &src = get_input();
-        Sound &dst = get_output();
-        dst.resize(length, src.channels());
+        dst.resize(src.frames(), src.channels());
         for (u32 c = 0; c < dst.channels(); c++) {
             for (u32 f = 0; f < dst.frames(); f++) {
-                dst[c][f] = src[c][f + offset] * gain;
+                dst[c][f] = src[c][f] * gain;
             }
         }
     }

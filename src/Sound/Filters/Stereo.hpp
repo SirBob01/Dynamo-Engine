@@ -26,6 +26,12 @@ namespace Dynamo::Sound {
          */
         Vec3 position;
 
-        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
+        /**
+         * @brief Construct a new Stereo object.
+         *
+         */
+        Stereo();
+
+        void transform(FilterContext context) override;
     };
 } // namespace Dynamo::Sound

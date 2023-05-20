@@ -37,6 +37,6 @@ namespace Dynamo::Sound {
          */
         Distance(f32 inner_radius, f32 cutoff_radius);
 
-        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
+        void transform(FilterContext context) override;
     };
 } // namespace Dynamo::Sound

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <limits>
 #include <unordered_set>
 #include <vector>
 
@@ -14,6 +15,22 @@ namespace Dynamo::Sound {
      *
      */
     struct FilterContext {
+        /**
+         * @brief Input buffer.
+         *
+         */
+        std::reference_wrapper<Sound> input;
+
+        /**
+         * @brief Output buffer.
+         *
+         */
+        std::reference_wrapper<Sound> output;
+
+        /**
+         * @brief Set of all listeners.
+         *
+         */
         std::reference_wrapper<ListenerSet> listeners;
     };
 
@@ -24,6 +41,7 @@ namespace Dynamo::Sound {
     class Filter {
         Sound _input;
         Sound _output;
+        u32 _channels;
 
         std::vector<std::reference_wrapper<Filter>> _dependencies;
 
@@ -36,6 +54,13 @@ namespace Dynamo::Sound {
         b8 has_cycles();
 
       public:
+        /**
+         * @brief Construct a new Filter object.
+         *
+         * @param channels Number of channels to process.
+         */
+        Filter(u32 channels = 0);
+
         /**
          * @brief Destroy the Filter object.
          *
@@ -73,18 +98,27 @@ namespace Dynamo::Sound {
         get_dependencies() const;
 
         /**
-         * @brief Get the input sound buffer.
+         * @brief Get the input buffer.
          *
          * @return Sound&
          */
         Sound &get_input();
 
         /**
-         * @brief Get the output sound buffer.
+         * @brief Get the output buffer.
          *
          * @return Sound&
          */
         Sound &get_output();
+
+        /**
+         * @brief Get the number of channels that can be processed.
+         *
+         * Input buffers will be upmixed or downmixed to match this value.
+         *
+         * @return u32
+         */
+        u32 get_channels();
 
         /**
          * @brief Transform a Sound.

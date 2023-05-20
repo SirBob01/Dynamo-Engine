@@ -1,6 +1,8 @@
 #include "./Filter.hpp"
 
 namespace Dynamo::Sound {
+    Filter::Filter(u32 channels) : _channels(channels) {}
+
     b8 Filter::has_cycles() {
         std::unordered_set<Filter *> visited;
         std::vector<std::reference_wrapper<Filter>> stack;
@@ -98,7 +100,7 @@ namespace Dynamo::Sound {
             // for (Filter &dep : node.get_dependencies()) {
             // }
             // Sound &src = node.get_input();
-            node.transform({listeners});
+            // node.transform({listeners});
         }
         return src;
     }

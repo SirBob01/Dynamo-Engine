@@ -40,6 +40,6 @@ namespace Dynamo::Sound {
          */
         Binaural(HRTF &hrtf);
 
-        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
+        void transform(FilterContext context) override;
     };
 } // namespace Dynamo::Sound

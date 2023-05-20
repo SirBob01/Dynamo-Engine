@@ -16,6 +16,12 @@ namespace Dynamo::Sound {
          */
         f32 gain = 1.0;
 
-        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
+        /**
+         * @brief Construct a new Gain object.
+         *
+         */
+        Gain();
+
+        void transform(FilterContext context) override;
     };
 } // namespace Dynamo::Sound

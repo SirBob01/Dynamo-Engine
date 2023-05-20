@@ -1,8 +1,15 @@
 #include "./Stereo.hpp"
 
 namespace Dynamo::Sound {
-    void Stereo::transform(u32 offset, u32 length, ListenerSet &listeners) {
+    Stereo::Stereo() : Filter(2) {}
+
+    void Stereo::transform(FilterContext context) {
+        Sound &src = context.input;
+        Sound &dst = context.output;
+        ListenerSet &listeners = context.listeners;
         ListenerProperties &listener = listeners.find_closest(position);
+
+        // Compute distance
         Vec3 delta = position - listener.position;
         Vec3 up = listener.rotation.up();
         Vec3 right = listener.rotation.right();
@@ -20,13 +27,11 @@ namespace Dynamo::Sound {
         f32 l_gain = std::sqrt(1 - pan);
         f32 r_gain = std::sqrt(pan);
 
-        Sound &src = get_input();
-        Sound &dst = get_output();
-        dst.set_frames(length);
+        dst.resize(src.frames(), 2);
         for (u32 c = 0; c < 2; c++) {
             f32 gain = c == 0 ? l_gain : r_gain;
-            for (u32 f = 0; f < length; f++) {
-                dst[c][f] = src[c][f + offset] * gain;
+            for (u32 f = 0; f < src.frames(); f++) {
+                dst[c][f] = src[c][f] * gain;
             }
         }
     }
