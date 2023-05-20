@@ -5,9 +5,9 @@
 #include <cmath>
 #include <vector>
 
-#include "../Types.hpp"
 #include "../Log/Log.hpp"
 #include "../Math/Fourier.hpp"
+#include "../Types.hpp"
 #include "../Utils/ChannelData.hpp"
 
 namespace Dynamo::Sound {
@@ -18,9 +18,9 @@ namespace Dynamo::Sound {
     using WaveSample = f32;
 
     /**
-     * @brief An array of samples, a discrete representation of a sound wave
+     * @brief An array of samples, a discrete representation of a sound wave.
      *
-     * Sources with multiple channels may have their values interleaved
+     * Sources with multiple channels are stored in a planar format.
      *
      */
     using WaveForm = std::vector<WaveSample>;
@@ -147,9 +147,7 @@ namespace Dynamo::Sound {
          * @param channels    Number of channels
          * @param sample_rate Sample rate
          */
-        Sound(std::vector<WaveSample> samples,
-              u32 channels,
-              f32 sample_rate) :
+        Sound(std::vector<WaveSample> samples, u32 channels, f32 sample_rate) :
             ChannelData<WaveSample>(samples, channels),
             _sample_rate(sample_rate) {}
 
@@ -159,15 +157,5 @@ namespace Dynamo::Sound {
          * @return f32
          */
         inline f32 sample_rate() const { return _sample_rate; }
-
-        /**
-         * @brief Grab a frame in the waveform and upmix or downmix to the
-         * desired number of channels
-         *
-         * @param frame        Frame index
-         * @param out_channels Target number of channels
-         * @return WaveFrame
-         */
-        WaveFrame get_frame(const u32 frame, const u32 out_channels);
     };
 } // namespace Dynamo::Sound
