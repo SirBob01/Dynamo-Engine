@@ -16,9 +16,6 @@ namespace Dynamo::Sound {
          */
         f32 gain = 1.0;
 
-        void transform(Sound &src,
-                       u32 offset,
-                       u32 length,
-                       ListenerSet &listeners) override;
+        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

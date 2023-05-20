@@ -10,7 +10,7 @@ namespace Dynamo::Sound {
      * as it moves further away from the listener.
      *
      */
-    class Attenuation : public Filter {
+    class Distance : public Filter {
         f32 _inner_radius;
         f32 _cutoff_radius;
 
@@ -30,16 +30,13 @@ namespace Dynamo::Sound {
         Vec3 position;
 
         /**
-         * @brief Construct a new Attenuation object.
+         * @brief Construct a new Distance object.
          *
          * @param inner_radius  Minimum distance to start attenuation.
          * @param cutoff_radius Maximum distance to cutoff the sound.
          */
-        Attenuation(f32 inner_radius, f32 cutoff_radius);
+        Distance(f32 inner_radius, f32 cutoff_radius);
 
-        void transform(Sound &src,
-                       u32 offset,
-                       u32 length,
-                       ListenerSet &listeners) override;
+        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

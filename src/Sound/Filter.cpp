@@ -49,13 +49,57 @@ namespace Dynamo::Sound {
         return _dependencies;
     }
 
+    Sound &Filter::get_input() { return _input; }
+
     Sound &Filter::get_output() { return _output; }
+
+    std::vector<std::reference_wrapper<Filter>> topological_sort(Filter &root) {
+        std::vector<std::reference_wrapper<Filter>> order;
+        std::vector<std::reference_wrapper<Filter>> stack;
+        stack.push_back(root);
+
+        // Implement topological sorting algorithm
+        while (!stack.empty()) {
+            Filter &node = stack.back();
+            stack.pop_back();
+
+            for (Filter &child : node.get_dependencies()) {
+                stack.push_back(child);
+            }
+            order.push_back(node);
+        }
+
+        return order;
+    }
 
     Sound &run_filter(Filter &filter,
                       Sound &src,
                       u32 offset,
                       u32 length,
                       ListenerSet &listeners) {
+        const u32 channels = src.channels();
+        auto ordered = topological_sort(filter);
+
+        // Write input buffers
+        for (u32 i = 0; i < ordered.size(); i++) {
+            Filter &node = ordered[i];
+            if (node.get_dependencies().empty()) {
+                Sound &input = node.get_input();
+                input.resize(length, channels);
+
+                for (u32 c = 0; c < channels; c++) {
+                    for (u32 f = 0; f < length; f++) {
+                        input[c][f] = src[c][f + offset];
+                    }
+                }
+            }
+        }
+        for (Filter &node : ordered) {
+            // for (Filter &dep : node.get_dependencies()) {
+            // }
+            // Sound &src = node.get_input();
+            node.transform({listeners});
+        }
         return src;
     }
 } // namespace Dynamo::Sound

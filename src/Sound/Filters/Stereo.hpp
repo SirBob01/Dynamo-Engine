@@ -26,9 +26,6 @@ namespace Dynamo::Sound {
          */
         Vec3 position;
 
-        void transform(Sound &src,
-                       u32 offset,
-                       u32 length,
-                       ListenerSet &listeners) override;
+        void transform(u32 offset, u32 length, ListenerSet &listeners) override;
     };
 } // namespace Dynamo::Sound

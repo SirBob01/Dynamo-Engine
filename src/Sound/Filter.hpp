@@ -10,11 +10,21 @@
 
 namespace Dynamo::Sound {
     /**
+     * @brief Filter context for performing transformations.
+     *
+     */
+    struct FilterContext {
+        std::reference_wrapper<ListenerSet> listeners;
+    };
+
+    /**
      * @brief Filter node in a signal processing graph.
      *
      */
     class Filter {
+        Sound _input;
         Sound _output;
+
         std::vector<std::reference_wrapper<Filter>> _dependencies;
 
       private:
@@ -63,6 +73,13 @@ namespace Dynamo::Sound {
         get_dependencies() const;
 
         /**
+         * @brief Get the input sound buffer.
+         *
+         * @return Sound&
+         */
+        Sound &get_input();
+
+        /**
          * @brief Get the output sound buffer.
          *
          * @return Sound&
@@ -72,15 +89,18 @@ namespace Dynamo::Sound {
         /**
          * @brief Transform a Sound.
          *
-         * @param src
-         * @param length
-         * @param listeners
+         * @param context Filter context data.
          */
-        virtual void transform(Sound &src,
-                               u32 offset,
-                               u32 length,
-                               ListenerSet &listeners) = 0;
+        virtual void transform(FilterContext context) = 0;
     };
+
+    /**
+     * @brief Topologically sort the filter graph.
+     *
+     * @param root
+     * @return std::vector<std::reference_wrapper<Filter>>
+     */
+    std::vector<std::reference_wrapper<Filter>> topological_sort(Filter &root);
 
     /**
      * @brief Traverse the filter graph and process the sound.
