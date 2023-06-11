@@ -5,7 +5,7 @@ namespace Dynamo {
         auto timestamp = std::chrono::floor<std::chrono::seconds>(
             std::chrono::system_clock::now());
         std::string filename =
-            fmt::format("Dynamo_{:%Y-%m-%d_%H-%M-%S}.log", timestamp);
+            std::format("Dynamo_{:%Y-%m-%d_%H-%M-%S}.log", timestamp);
 
         std::ofstream outfile;
         outfile.open(filename, std::ios::out);
