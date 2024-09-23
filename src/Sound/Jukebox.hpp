@@ -1,27 +1,17 @@
 #pragma once
 
-#include <memory>
-#include <queue>
-#include <string>
 #include <vector>
 
 #include <portaudio.h>
 
-#include "../Log/Log.hpp"
-#include "../Math/Vec3.hpp"
-#include "../Types.hpp"
 #include "../Utils/IdTracker.hpp"
 #include "../Utils/RingBuffer.hpp"
-#include "../Utils/SparseSet.hpp"
 
 #include "./Chunk.hpp"
 #include "./Device.hpp"
-#include "./Filters/Binaural.hpp"
-#include "./Filters/Filter.hpp"
 #include "./HRTF.hpp"
 #include "./Listener.hpp"
 #include "./Material.hpp"
-#include "./Resample.hpp"
 #include "./Sound.hpp"
 
 namespace Dynamo::Sound {
@@ -29,7 +19,7 @@ namespace Dynamo::Sound {
      * @brief Size of the input and output ring buffers
      *
      */
-    static constexpr u32 BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
+    static constexpr unsigned BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
 
     /**
      * @brief A playback track on which audio can be enqueued
@@ -52,7 +42,7 @@ namespace Dynamo::Sound {
          * @brief Global volume control
          *
          */
-        f32 _volume;
+        float _volume;
 
         /**
          * @brief Final waveform on which all active chunks are layered onto
@@ -99,13 +89,13 @@ namespace Dynamo::Sound {
              * @brief Number of channels in the buffer
              *
              */
-            u32 channels;
+            unsigned channels;
 
             /**
              * @brief Sampling rate of the buffer
              *
              */
-            f64 sample_rate;
+            double sample_rate;
         };
         State _input_state;
         State _output_state;
@@ -119,9 +109,9 @@ namespace Dynamo::Sound {
          * @param time_info    Time information in seconds
          * @param status_flags Status flags
          * @param data         User data
-         * @return i32
+         * @return int
          */
-        static i32 input_callback(const void *input,
+        static int input_callback(const void *input,
                                   void *output,
                                   unsigned long frame_count,
                                   const PaStreamCallbackTimeInfo *time_info,
@@ -137,9 +127,9 @@ namespace Dynamo::Sound {
          * @param time_info    Time information in seconds
          * @param status_flags Status flags
          * @param data         User data
-         * @return i32
+         * @return int
          */
-        static i32 output_callback(const void *input,
+        static int output_callback(const void *input,
                                    void *output,
                                    unsigned long frame_count,
                                    const PaStreamCallbackTimeInfo *time_info,
@@ -201,16 +191,16 @@ namespace Dynamo::Sound {
         /**
          * @brief Get the sample rate of the input stream
          *
-         * @return u32
+         * @return unsigned
          */
-        u32 get_input_sample_rate();
+        unsigned get_input_sample_rate();
 
         /**
          * @brief Get the sample rate of the output stream
          *
-         * @return u32
+         * @return unsigned
          */
-        u32 get_output_sample_rate();
+        unsigned get_output_sample_rate();
 
         /**
          * @brief Is the output device playing?
@@ -218,7 +208,7 @@ namespace Dynamo::Sound {
          * @return true
          * @return false
          */
-        b8 is_playing();
+        bool is_playing();
 
         /**
          * @brief Is the input device listening
@@ -226,14 +216,14 @@ namespace Dynamo::Sound {
          * @return true
          * @return false
          */
-        b8 is_recording();
+        bool is_recording();
 
         /**
          * @brief Get the master volume
          *
-         * @return f32
+         * @return float
          */
-        f32 get_volume();
+        float get_volume();
 
         /**
          * @brief Pause audio playback
@@ -252,7 +242,7 @@ namespace Dynamo::Sound {
          *
          * @param volume
          */
-        void set_volume(f32 volume);
+        void set_volume(float volume);
 
         /**
          * @brief Get the set of listeners

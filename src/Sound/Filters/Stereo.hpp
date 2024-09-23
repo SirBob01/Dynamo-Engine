@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../Types.hpp"
 #include "./Filter.hpp"
 
 namespace Dynamo::Sound {
@@ -23,8 +22,8 @@ namespace Dynamo::Sound {
         Stereo();
 
         Sound &apply(Sound &src,
-                     const u32 src_offset,
-                     const u32 length,
+                     const unsigned src_offset,
+                     const unsigned length,
                      const DynamicMaterial &material,
                      const ListenerProperties &listener) override;
     };

@@ -3,9 +3,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "../Log/Log.hpp"
-#include "../Types.hpp"
 #include "./IdTracker.hpp"
+#include "./Log.hpp"
 
 namespace Dynamo {
     /**
@@ -50,15 +49,15 @@ namespace Dynamo {
          * @brief Contains indices to _dense and _pool
          *
          */
-        std::vector<i32> _sparse;
+        std::vector<int> _sparse;
 
       public:
         /**
          * @brief Get the number of items.
          *
-         * @return u32
+         * @return unsigned
          */
-        inline u32 size() const { return _pool.size(); }
+        inline unsigned size() const { return _pool.size(); }
 
         /**
          * @brief Check if the container is empty.
@@ -66,23 +65,23 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 empty() const { return size() == 0; }
+        inline bool empty() const { return size() == 0; }
 
         /**
          * @brief Find the position of a value within the dense array.
          *
          * @param id Unique identifer.
-         * @return i32 Index position of the value (-1 on failure).
+         * @return int Index position of the value (-1 on failure).
          */
-        inline i32 find(Id id) {
-            u32 key = IdTracker::get_index(id);
+        inline int find(Id id) {
+            unsigned key = IdTracker::get_index(id);
             if (key >= _sparse.size()) {
                 return -1;
             }
 
             // Verify that the sparse and dense arrays are correlated
-            i32 index = _sparse[key];
-            i32 dense_size = _dense.size();
+            int index = _sparse[key];
+            int dense_size = _dense.size();
             if (index == -1 || index >= dense_size || _dense[index] != id) {
                 return -1;
             }
@@ -96,7 +95,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 exists(Id id) { return find(id) >= 0; }
+        inline bool exists(Id id) { return find(id) >= 0; }
 
         /**
          * @brief Create a new object in the pool and associate it with an id.
@@ -110,7 +109,7 @@ namespace Dynamo {
         template <typename... Params>
         inline void insert(Id id, Params... args) {
             // Resize the sparse array or remove the existing item
-            u32 key = IdTracker::get_index(id);
+            unsigned key = IdTracker::get_index(id);
             if (key >= _sparse.size()) {
                 _sparse.resize((key + 1) * 2, -1);
             } else if (_sparse[key] != -1) {
@@ -136,20 +135,20 @@ namespace Dynamo {
          * @param id Unique identifier of the object to be removed.
          */
         inline void remove(Id id) {
-            u32 key = IdTracker::get_index(id);
+            unsigned key = IdTracker::get_index(id);
             if (key >= _sparse.size()) {
                 return;
             }
 
             // Verify that the sparse and dense arrays are correlated
-            i32 index = _sparse[key];
-            i32 dense_size = _dense.size();
+            int index = _sparse[key];
+            int dense_size = _dense.size();
             if (index == -1 || index >= dense_size || _dense[index] != id) {
                 return;
             }
 
             // Swap last element of dense and pool array to maintain contiguity
-            u32 new_key = IdTracker::get_index(_dense.back());
+            unsigned new_key = IdTracker::get_index(_dense.back());
             std::swap(_pool.back(), _pool[index]);
             _pool.pop_back();
 
@@ -177,9 +176,9 @@ namespace Dynamo {
          * @param index Index position of the object within the pool array.
          * @return T&
          */
-        inline T &at(i32 index) {
+        inline T &at(int index) {
             DYN_ASSERT(index >= 0);
-            DYN_ASSERT(index < static_cast<i32>(_pool.size()));
+            DYN_ASSERT(index < static_cast<int>(_pool.size()));
             return _pool[index];
         }
 
@@ -199,7 +198,7 @@ namespace Dynamo {
          */
         template <typename Functor>
         inline void forall(Functor &&function) {
-            for (i32 i = 0; i < size(); i++) {
+            for (unsigned i = 0; i < size(); i++) {
                 function(_pool[i], _dense[i]);
             }
         }
@@ -212,7 +211,7 @@ namespace Dynamo {
          */
         template <typename Functor>
         inline void forall_items(Functor &&function) {
-            for (i32 i = 0; i < size(); i++) {
+            for (int i = 0; i < size(); i++) {
                 function(_pool[i]);
             }
         }
@@ -225,7 +224,7 @@ namespace Dynamo {
          */
         template <typename Functor>
         inline void forall_ids(Functor &&function) {
-            for (i32 i = 0; i < size(); i++) {
+            for (int i = 0; i < size(); i++) {
                 function(_dense[i]);
             }
         }

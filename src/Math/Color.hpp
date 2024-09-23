@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include "../Types.hpp"
 #include "./Common.hpp"
 
 namespace Dynamo {
@@ -14,10 +13,10 @@ namespace Dynamo {
      *
      */
     struct Color {
-        f32 r;
-        f32 g;
-        f32 b;
-        f32 a;
+        float r;
+        float g;
+        float b;
+        float a;
 
         /**
          * @brief Construct a new Color object.
@@ -27,7 +26,7 @@ namespace Dynamo {
          * @param b Blue channel.
          * @param a Alpha channel.
          */
-        constexpr Color(f32 r = 0, f32 g = 0, f32 b = 0, f32 a = 1) :
+        constexpr Color(float r = 0, float g = 0, float b = 0, float a = 1) :
             r(r), g(g), b(b), a(a) {}
 
         /**
@@ -37,7 +36,7 @@ namespace Dynamo {
          * @param t   Interpolation factor.
          * @return Color
          */
-        Color lerp(const Color &rhs, f32 t) const {
+        Color lerp(const Color &rhs, float t) const {
             return Color(Dynamo::lerp(r, rhs.r, t),
                          Dynamo::lerp(g, rhs.g, t),
                          Dynamo::lerp(b, rhs.b, t),
@@ -55,22 +54,22 @@ namespace Dynamo {
          * @brief Convert the color to a single 32-bit unsigned integer which
          * can be represented as a hex value.
          *
-         * @return constexpr u32
+         * @return constexpr unsigned
          */
-        constexpr u32 to_hex() const {
-            u32 r_v = UINT8_MAX * r;
-            u32 g_v = UINT8_MAX * g;
-            u32 b_v = UINT8_MAX * b;
-            u32 a_v = UINT8_MAX * a;
+        constexpr unsigned to_hex() const {
+            unsigned r_v = UINT8_MAX * r;
+            unsigned g_v = UINT8_MAX * g;
+            unsigned b_v = UINT8_MAX * b;
+            unsigned a_v = UINT8_MAX * a;
             return (r_v << 24) | (g_v << 16) | (b_v << 8) | (a_v);
         }
 
         /**
          * @brief Convert the Color into an array of floats.
          *
-         * @return std::array<f32, 4>
+         * @return std::array<float, 4>
          */
-        std::array<f32, 4> to_array() const { return {r, g, b, a}; }
+        std::array<float, 4> to_array() const { return {r, g, b, a}; }
     };
 } // namespace Dynamo
 
@@ -82,10 +81,10 @@ namespace Dynamo {
 template <>
 struct std::hash<Dynamo::Color> {
     inline size_t operator()(const Dynamo::Color &color) const {
-        Dynamo::i64 tr = color.r * 73856093;
-        Dynamo::i64 tg = color.g * 19349663;
-        Dynamo::i64 tb = color.b * 83492791;
-        Dynamo::i64 ta = color.a * 52477425;
+        long long tr = color.r * 73856093;
+        long long tg = color.g * 19349663;
+        long long tb = color.b * 83492791;
+        long long ta = color.a * 52477425;
         return tr ^ tg ^ tb ^ ta;
     }
 };

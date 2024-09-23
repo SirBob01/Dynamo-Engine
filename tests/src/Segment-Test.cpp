@@ -1,5 +1,6 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_set>
 
 TEST_CASE("Segment2 length squared", "[Segment2]") {
     Dynamo::Segment2 a({0, 0}, {2, 0});

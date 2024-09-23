@@ -1,5 +1,6 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_set>
 
 TEST_CASE("Vec2 length squared", "[Vec2]") {
     Dynamo::Vec2 a(3, 4);

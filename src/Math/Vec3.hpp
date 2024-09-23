@@ -3,7 +3,6 @@
 #include <cmath>
 #include <functional>
 
-#include "../Types.hpp"
 #include "Matrix.hpp"
 
 namespace Dynamo {
@@ -12,7 +11,7 @@ namespace Dynamo {
      *
      */
     struct Vec3 {
-        f32 x, y, z;
+        float x, y, z;
 
         /**
          * @brief Construct a new Vec3 object.
@@ -21,21 +20,22 @@ namespace Dynamo {
          * @param y
          * @param z
          */
-        constexpr Vec3(f32 x = 0, f32 y = 0, f32 z = 0) : x(x), y(y), z(z) {}
+        constexpr Vec3(float x = 0, float y = 0, float z = 0) :
+            x(x), y(y), z(z) {}
 
         /**
          * @brief Calculate the squared length.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 length_squared() const { return x * x + y * y + z * z; }
+        inline float length_squared() const { return x * x + y * y + z * z; }
 
         /**
          * @brief Calculate the length.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 length() const { return std::sqrt(length_squared()); }
+        inline float length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Add another vector.
@@ -63,7 +63,7 @@ namespace Dynamo {
          * @param scalar
          * @return Vec3
          */
-        inline Vec3 operator*(f32 scalar) const {
+        inline Vec3 operator*(float scalar) const {
             return Vec3(x * scalar, y * scalar, z * scalar);
         }
 
@@ -73,8 +73,8 @@ namespace Dynamo {
          * @param scalar
          * @return Vec3
          */
-        inline Vec3 operator/(f32 scalar) const {
-            f32 inv = 1.0f / scalar;
+        inline Vec3 operator/(float scalar) const {
+            float inv = 1.0f / scalar;
             return *this * inv;
         }
 
@@ -117,7 +117,7 @@ namespace Dynamo {
          * @param scalar
          * @return Vec3&
          */
-        inline Vec3 &operator*=(f32 scalar) {
+        inline Vec3 &operator*=(float scalar) {
             x *= scalar;
             y *= scalar;
             z *= scalar;
@@ -130,8 +130,8 @@ namespace Dynamo {
          * @param scalar
          * @return Vec3&
          */
-        inline Vec3 &operator/=(f32 scalar) {
-            f32 inv = 1.0f / scalar;
+        inline Vec3 &operator/=(float scalar) {
+            float inv = 1.0f / scalar;
             return *this *= inv;
         }
 
@@ -150,7 +150,7 @@ namespace Dynamo {
          */
         inline Vec3 &transform(const Mat4 &mat) {
             const auto &vals = mat.values;
-            f32 w =
+            float w =
                 1.0 / (vals[12] * x + vals[13] * y + vals[14] * z + vals[15]);
             x = (vals[0] * x + vals[1] * y + vals[2] * z + vals[3]) * w;
             y = (vals[4] * x + vals[5] * y + vals[6] * z + vals[7]) * w;
@@ -162,9 +162,9 @@ namespace Dynamo {
          * @brief Dot product.
          *
          * @param rhs
-         * @return f32
+         * @return float
          */
-        inline f32 operator*(const Vec3 &rhs) const {
+        inline float operator*(const Vec3 &rhs) const {
             return x * rhs.x + y * rhs.y + z * rhs.z;
         }
 
@@ -175,9 +175,9 @@ namespace Dynamo {
          * @return Vec3
          */
         inline Vec3 cross(const Vec3 &rhs) const {
-            f32 n_x = y * rhs.z - z * rhs.y;
-            f32 n_y = z * rhs.x - x * rhs.z;
-            f32 n_z = x * rhs.y - y * rhs.x;
+            float n_x = y * rhs.z - z * rhs.y;
+            float n_y = z * rhs.x - x * rhs.z;
+            float n_z = x * rhs.y - y * rhs.x;
             return Vec3(n_x, n_y, n_z);
         }
 
@@ -188,7 +188,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator==(const Vec3 &rhs) const {
+        inline bool operator==(const Vec3 &rhs) const {
             return x == rhs.x && y == rhs.y && z == rhs.z;
         }
 
@@ -199,7 +199,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator!=(const Vec3 &rhs) const { return !(*this == rhs); }
+        inline bool operator!=(const Vec3 &rhs) const {
+            return !(*this == rhs);
+        }
     };
 } // namespace Dynamo
 
@@ -211,9 +213,9 @@ namespace Dynamo {
 template <>
 struct std::hash<Dynamo::Vec3> {
     inline size_t operator()(const Dynamo::Vec3 &point) const {
-        Dynamo::i64 tx = point.x * 73856093;
-        Dynamo::i64 ty = point.y * 19349663;
-        Dynamo::i64 tz = point.z * 83492791;
+        long long tx = point.x * 73856093;
+        long long ty = point.y * 19349663;
+        long long tz = point.z * 83492791;
         return tx ^ ty ^ tz;
     }
 };

@@ -1,5 +1,6 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_set>
 
 TEST_CASE("Box2 construct center and dimensions", "[Box2]") {
     Dynamo::Box2 a({0, 0}, 5, 5);

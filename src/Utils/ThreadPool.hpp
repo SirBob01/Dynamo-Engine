@@ -10,9 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "../Log/Log.hpp"
-#include "../Types.hpp"
-
 namespace Dynamo {
     /**
      * @brief A pool of threads to assign jobs that run concurrently.
@@ -21,14 +18,14 @@ namespace Dynamo {
     class ThreadPool {
         std::vector<std::thread> _threads;
         std::queue<std::function<void()>> _jobs;
-        u32 _job_count = 0;
+        unsigned _job_count = 0;
 
         mutable std::mutex _mutex;
         std::condition_variable _conditional_start;
         std::condition_variable _conditional_finish;
 
-        b8 _terminate = false;
-        b8 _waiting = false;
+        bool _terminate = false;
+        bool _waiting = false;
 
         /**
          * @brief Main thread loop that waits for new jobs to execute.
@@ -66,9 +63,9 @@ namespace Dynamo {
          *
          * @param pool_size Number of threads in the pool.
          */
-        ThreadPool(u32 pool_size) {
+        ThreadPool(unsigned pool_size) {
             _threads.resize(pool_size);
-            for (u32 i = 0; i < pool_size; i++) {
+            for (unsigned i = 0; i < pool_size; i++) {
                 _threads[i] = std::thread([this]() { thread_main(); });
             }
         }

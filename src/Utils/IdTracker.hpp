@@ -1,27 +1,24 @@
 #pragma once
 
-#include <cstdint>
 #include <queue>
 #include <vector>
-
-#include "../Types.hpp"
 
 namespace Dynamo {
     /**
      * @brief Unique identifier supports up to 2^32 - 1 entities simultaneously.
      *
      */
-    using Id = u64;
+    using Id = unsigned long long;
 
     /**
      * @brief Generate and discard ids.
      *
      */
     class IdTracker {
-        u32 _index_counter;
+        unsigned _index_counter;
 
-        std::vector<u32> _version_map;
-        std::queue<u32> _free_indices;
+        std::vector<unsigned> _version_map;
+        std::queue<unsigned> _free_indices;
 
       public:
         /**
@@ -34,17 +31,17 @@ namespace Dynamo {
          * @brief Get the index of an id.
          *
          * @param id
-         * @return u32
+         * @return unsigned
          */
-        static inline u32 get_index(Id id) { return id >> 32; }
+        static inline unsigned get_index(Id id) { return id >> 32; }
 
         /**
          * @brief Get the version of an id.
          *
          * @param id
-         * @return u32
+         * @return unsigned
          */
-        static inline u32 get_version(Id id) { return id & 0xFFFFFFFF; }
+        static inline unsigned get_version(Id id) { return id & 0xFFFFFFFF; }
 
         /**
          * @brief Test if an id is active.
@@ -53,9 +50,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 is_active(Id id) {
-            u32 index = IdTracker::get_index(id);
-            u32 version = IdTracker::get_version(id);
+        inline bool is_active(Id id) {
+            unsigned index = IdTracker::get_index(id);
+            unsigned version = IdTracker::get_version(id);
 
             return index < _index_counter && _version_map[index] == version;
         }
@@ -68,7 +65,7 @@ namespace Dynamo {
          * @return Id
          */
         inline Id generate() {
-            u32 index, version;
+            unsigned index, version;
             if (_free_indices.size() > 0) {
                 index = _free_indices.front();
                 version = _version_map[index];
@@ -91,7 +88,7 @@ namespace Dynamo {
          */
         inline void discard(Id id) {
             if (!is_active(id)) return;
-            u32 index = IdTracker::get_index(id);
+            unsigned index = IdTracker::get_index(id);
             _version_map[index]++;
             _free_indices.push(index);
         }

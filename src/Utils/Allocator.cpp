@@ -1,7 +1,8 @@
 #include "./Allocator.hpp"
+#include "./Log.hpp"
 
 namespace Dynamo {
-    Allocator::Allocator(u32 capacity) : _capacity(capacity) {
+    Allocator::Allocator(unsigned capacity) : _capacity(capacity) {
         // Create the initial free block that encompasses the heap
         Block heap_block;
         heap_block.offset = 0;
@@ -17,8 +18,8 @@ namespace Dynamo {
         Log::info("Before defragmentation: {}", print());
 #endif
         Block block = *it;
-        u32 new_offset = block.offset;
-        u32 new_size = block.size;
+        unsigned new_offset = block.offset;
+        unsigned new_size = block.size;
 
         // Join left node
         if (it != _free.begin()) {
@@ -45,14 +46,14 @@ namespace Dynamo {
 #endif
     }
 
-    std::optional<u32> Allocator::reserve(u32 size,
-                                               u32 alignment) {
+    std::optional<unsigned> Allocator::reserve(unsigned size,
+                                               unsigned alignment) {
         for (auto it = _free.begin(); it != _free.end(); it++) {
             Block &block = *it;
 
-            u32 offset = align_size(block.offset, alignment);
-            u32 block_r = block.offset + block.size;
-            u32 alloc_r = offset + size;
+            unsigned offset = align_size(block.offset, alignment);
+            unsigned block_r = block.offset + block.size;
+            unsigned alloc_r = offset + size;
 
             if (block_r >= alloc_r) {
                 // Handle allocation in the middle of the block due to alignment
@@ -83,7 +84,7 @@ namespace Dynamo {
         return {};
     }
 
-    void Allocator::free(u32 offset) {
+    void Allocator::free(unsigned offset) {
         if (_used.count(offset) == 0) {
             Log::error("Allocator::free() failed, invalid offset {}: {}",
                        offset,
@@ -103,7 +104,7 @@ namespace Dynamo {
         }
 
         // Start of the list
-        u32 alloc_r = freed.offset + freed.size;
+        unsigned alloc_r = freed.offset + freed.size;
         if (_free.begin()->offset >= alloc_r) {
             _free.push_front(freed);
             defragment(_free.begin());
@@ -111,7 +112,7 @@ namespace Dynamo {
         }
 
         for (auto it = _free.begin(); it != _free.end(); it++) {
-            u32 block_r = it->offset + it->size;
+            unsigned block_r = it->offset + it->size;
 
             // End of the list
             auto next = std::next(it);
@@ -133,7 +134,7 @@ namespace Dynamo {
         DYN_ASSERT(false);
     }
 
-    void Allocator::grow(u32 capacity) {
+    void Allocator::grow(unsigned capacity) {
 #ifdef DYN_DEBUG
         Log::info("Before grow: {}", print());
 #endif
@@ -155,13 +156,13 @@ namespace Dynamo {
 #endif
     }
 
-    b8 Allocator::is_reserved(u32 offset) const {
+    bool Allocator::is_reserved(unsigned offset) const {
         return _used.count(offset) > 0;
     }
 
-    u32 Allocator::capacity() const { return _capacity; }
+    unsigned Allocator::capacity() const { return _capacity; }
 
-    u32 Allocator::size(u32 offset) const { return _used.at(offset); }
+    unsigned Allocator::size(unsigned offset) const { return _used.at(offset); }
 
     std::string Allocator::print() const {
         std::string str;
@@ -176,7 +177,7 @@ namespace Dynamo {
         }
 
         while (it != _free.end()) {
-            u32 right = it->offset + it->size;
+            unsigned right = it->offset + it->size;
             str += " | " + std::to_string(it->offset) + ", " +
                    std::to_string(right);
 

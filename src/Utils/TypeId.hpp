@@ -1,25 +1,23 @@
 #pragma once
 
-#include "../Types.hpp"
-
 namespace Dynamo {
     /**
      * @brief Generate a unique identifier for a type at runtime.
      *
      */
     class TypeId {
-        inline static u32 _id_counter = 0;
+        inline static unsigned _id_counter = 0;
 
       public:
         /**
          * @brief Get the unique identifier of a type.
          *
          * @tparam Type.
-         * @return u32
+         * @return unsigned
          */
         template <typename Type>
-        inline static u32 get() {
-            static const u32 id = _id_counter++;
+        inline static unsigned get() {
+            static const unsigned id = _id_counter++;
             return id;
         }
     };

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Types.hpp"
 #include "./Material.hpp"
 #include "./Sound.hpp"
 
@@ -15,7 +14,7 @@ namespace Dynamo::Sound {
      * to receive enough data when requested, causing glitches.
      *
      */
-    static constexpr u32 MAX_CHUNK_LENGTH = 1 << 9;
+    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 9;
 
     /**
      * @brief A chunk contains information to process a sound in small sections
@@ -43,6 +42,6 @@ namespace Dynamo::Sound {
          * @brief Frame offset of the chunk.
          *
          */
-        f32 frame;
+        float frame;
     };
 } // namespace Dynamo::Sound

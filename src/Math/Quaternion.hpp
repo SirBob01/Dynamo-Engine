@@ -3,7 +3,6 @@
 #include <cmath>
 #include <functional>
 
-#include "../Types.hpp"
 #include "./Vec3.hpp"
 
 namespace Dynamo {
@@ -12,7 +11,7 @@ namespace Dynamo {
      *
      */
     struct Quaternion {
-        f32 x, y, z, w;
+        float x, y, z, w;
 
         /**
          * @brief Construct a new Quaternion object.
@@ -22,8 +21,12 @@ namespace Dynamo {
          * @param z Coefficient of k component.
          * @param w Scalar component.
          */
-        constexpr Quaternion(f32 x = 0, f32 y = 0, f32 z = 0, f32 w = 1) :
-            x(x), y(y), z(z), w(w) {}
+        constexpr Quaternion(float x = 0,
+                             float y = 0,
+                             float z = 0,
+                             float w = 1) :
+            x(x),
+            y(y), z(z), w(w) {}
 
         /**
          * @brief Construct a new Quaternion object from an angle-axis pair.
@@ -31,9 +34,9 @@ namespace Dynamo {
          * @param axis  Rotation axis.
          * @param angle Rotation angle in radians.
          */
-        Quaternion(Vec3 axis, f32 angle) {
-            f32 half_angle = 0.5 * angle;
-            f32 sine = std::sin(half_angle);
+        Quaternion(Vec3 axis, float angle) {
+            float half_angle = 0.5 * angle;
+            float sine = std::sin(half_angle);
             x = axis.x * sine;
             y = axis.y * sine;
             z = axis.z * sine;
@@ -43,18 +46,18 @@ namespace Dynamo {
         /**
          * @brief Calculate the square length.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 length_squared() const {
+        inline float length_squared() const {
             return x * x + y * y + z * z + w * w;
         }
 
         /**
          * @brief Calculate the length.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 length() const { return std::sqrt(length_squared()); }
+        inline float length() const { return std::sqrt(length_squared()); }
 
         /**
          * @brief Calculate the reciprocal of the quaternion for use in
@@ -63,7 +66,7 @@ namespace Dynamo {
          * @return Quaternion
          */
         inline Quaternion reciprocal() const {
-            f32 scale = 1.0 / length_squared();
+            float scale = 1.0 / length_squared();
             return Quaternion(-x * scale, -y * scale, -z * scale, w * scale);
         }
 
@@ -114,10 +117,10 @@ namespace Dynamo {
          * @return Quaternion
          */
         inline Quaternion operator*(const Quaternion &rhs) const {
-            f32 n_x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
-            f32 n_y = w * rhs.y - x * rhs.z + y * rhs.w + z * rhs.x;
-            f32 n_z = w * rhs.z + x * rhs.y - y * rhs.x + z * rhs.w;
-            f32 n_w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
+            float n_x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
+            float n_y = w * rhs.y - x * rhs.z + y * rhs.w + z * rhs.x;
+            float n_z = w * rhs.z + x * rhs.y - y * rhs.x + z * rhs.w;
+            float n_w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
             return Quaternion(n_x, n_y, n_z, n_w);
         }
 
@@ -127,7 +130,7 @@ namespace Dynamo {
          * @param scalar
          * @return Quaternion
          */
-        inline Quaternion operator*(f32 scalar) const {
+        inline Quaternion operator*(float scalar) const {
             return Quaternion(scalar * x, scalar * y, scalar * z, scalar * w);
         }
 
@@ -137,8 +140,8 @@ namespace Dynamo {
          * @param scalar
          * @return Quaternion
          */
-        inline Quaternion operator/(f32 scalar) const {
-            f32 inv = 1.0 / scalar;
+        inline Quaternion operator/(float scalar) const {
+            float inv = 1.0 / scalar;
             return Quaternion(inv * x, inv * y, inv * z, inv * w);
         }
 
@@ -179,10 +182,10 @@ namespace Dynamo {
          * @return Quaternion
          */
         inline Quaternion &operator*=(const Quaternion &rhs) {
-            f32 n_x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
-            f32 n_y = w * rhs.y - x * rhs.z + y * rhs.w + z * rhs.x;
-            f32 n_z = w * rhs.z + x * rhs.y - y * rhs.x + z * rhs.w;
-            f32 n_w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
+            float n_x = w * rhs.x + x * rhs.w + y * rhs.z - z * rhs.y;
+            float n_y = w * rhs.y - x * rhs.z + y * rhs.w + z * rhs.x;
+            float n_z = w * rhs.z + x * rhs.y - y * rhs.x + z * rhs.w;
+            float n_w = w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z;
             x = n_x;
             y = n_y;
             z = n_z;
@@ -196,7 +199,7 @@ namespace Dynamo {
          * @param scalar
          * @return Quaternion
          */
-        inline Quaternion &operator*=(f32 scalar) {
+        inline Quaternion &operator*=(float scalar) {
             x *= scalar;
             y *= scalar;
             z *= scalar;
@@ -210,8 +213,8 @@ namespace Dynamo {
          * @param scalar
          * @return Quaternion
          */
-        inline Quaternion &operator/=(f32 scalar) {
-            f32 inv = 1.0 / scalar;
+        inline Quaternion &operator/=(float scalar) {
+            float inv = 1.0 / scalar;
             return *this *= inv;
         }
 
@@ -240,9 +243,9 @@ namespace Dynamo {
          * @return Vec3
          */
         inline Vec3 forward() const {
-            f32 n_x = 2 * (x * z + w * y);
-            f32 n_y = 2 * (y * z - w * x);
-            f32 n_z = 1 - 2 * (x * x + y * y);
+            float n_x = 2 * (x * z + w * y);
+            float n_y = 2 * (y * z - w * x);
+            float n_z = 1 - 2 * (x * x + y * y);
             return Vec3(n_x, n_y, n_z);
         }
 
@@ -252,9 +255,9 @@ namespace Dynamo {
          * @return Vec3
          */
         inline Vec3 up() const {
-            f32 n_x = 2 * (x * y - w * z);
-            f32 n_y = 1 - 2 * (x * x + z * z);
-            f32 n_z = 2 * (y * z + w * x);
+            float n_x = 2 * (x * y - w * z);
+            float n_y = 1 - 2 * (x * x + z * z);
+            float n_z = 2 * (y * z + w * x);
             return Vec3(n_x, n_y, n_z);
         }
 
@@ -264,9 +267,9 @@ namespace Dynamo {
          * @return Vec3
          */
         inline Vec3 right() const {
-            f32 n_x = 1 - 2 * (y * y + z * z);
-            f32 n_y = 2 * (x * y + w * z);
-            f32 n_z = 2 * (x * z - w * y);
+            float n_x = 1 - 2 * (y * y + z * z);
+            float n_y = 2 * (x * y + w * z);
+            float n_z = 2 * (x * z - w * y);
             return Vec3(n_x, n_y, n_z);
         }
 
@@ -277,7 +280,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator==(const Quaternion &rhs) const {
+        inline bool operator==(const Quaternion &rhs) const {
             return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w;
         }
 
@@ -288,7 +291,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator!=(const Quaternion &rhs) const {
+        inline bool operator!=(const Quaternion &rhs) const {
             return !(*this == rhs);
         }
     };
@@ -302,10 +305,10 @@ namespace Dynamo {
 template <>
 struct std::hash<Dynamo::Quaternion> {
     inline size_t operator()(const Dynamo::Quaternion &quaternion) const {
-        Dynamo::i64 tx = quaternion.x * 73856093;
-        Dynamo::i64 ty = quaternion.y * 19349663;
-        Dynamo::i64 tz = quaternion.z * 83492791;
-        Dynamo::i64 tw = quaternion.w * 52477425;
+        long long tx = quaternion.x * 73856093;
+        long long ty = quaternion.y * 19349663;
+        long long tz = quaternion.z * 83492791;
+        long long tw = quaternion.w * 52477425;
         return tx ^ ty ^ tz ^ tw;
     }
 };

@@ -1,5 +1,6 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <unordered_set>
 
 TEST_CASE("Circle circumference", "[Circle]") {
     Dynamo::Circle a({0, 0}, 5);

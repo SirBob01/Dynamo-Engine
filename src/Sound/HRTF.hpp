@@ -1,22 +1,12 @@
 #pragma once
 
-#include <fstream>
-#include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
-#include "../Math/Common.hpp"
-#include "../Math/Complex.hpp"
-#include "../Math/Delaunay.hpp"
 #include "../Math/Quaternion.hpp"
-#include "../Math/Triangle2.hpp"
 #include "../Math/Vec2.hpp"
 #include "../Math/Vec3.hpp"
-#include "../Types.hpp"
-#include "../Utils/ChannelData.hpp"
 
-#include "./Convolver.hpp"
 #include "./Data/HRIR.hpp"
 #include "./Sound.hpp"
 
@@ -27,7 +17,7 @@ namespace Dynamo::Sound {
      * @return WaveForm
      */
     static WaveForm read_HRIR_coefficients() {
-        WaveForm buffer(HRIR_bin_len / sizeof(f32));
+        WaveForm buffer(HRIR_bin_len / sizeof(float));
         std::memcpy(buffer.data(), HRIR_bin, HRIR_bin_len);
         return buffer;
     }
@@ -42,13 +32,13 @@ namespace Dynamo::Sound {
      * @brief Length of an HRIR
      *
      */
-    static constexpr u32 HRIR_LENGTH = 200;
+    static constexpr unsigned HRIR_LENGTH = 200;
 
     /**
      * @brief HRTF point space x-coordinates
      *
      */
-    static constexpr std::array<f32, 27> HRTF_AZIMUTHS = {
+    static constexpr std::array<float, 27> HRTF_AZIMUTHS = {
         -90, -80, -65, -55, -45, -40, -35, -30, -25, -20, -15, -10, -5, 0,
         5,   10,  15,  20,  25,  30,  35,  40,  45,  55,  65,  80,  90,
     };
@@ -60,9 +50,9 @@ namespace Dynamo::Sound {
      */
     class HRTF {
         std::vector<Vec2> _points;
-        std::vector<u32> _indices;
+        std::vector<unsigned> _indices;
 
-        std::unordered_map<u32, Sound> _coeff_map;
+        std::unordered_map<unsigned, Sound> _coeff_map;
 
         /**
          * @brief Compute the azimuth and elevation angles

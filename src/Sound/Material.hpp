@@ -3,8 +3,6 @@
 #include <memory>
 
 #include "../Math/Vec3.hpp"
-#include "../Types.hpp"
-#include "./Sound.hpp"
 
 namespace Dynamo::Sound {
     /**
@@ -24,13 +22,13 @@ namespace Dynamo::Sound {
          * @brief Volume to be played relative to overall gain
          *
          */
-        f32 volume = 1.0;
+        float volume = 1.0;
 
         /**
          * @brief Start time in seconds
          *
          */
-        f32 start_seconds = 0.0;
+        float start_seconds = 0.0;
 
         /**
          * @brief Filter pipeline
@@ -48,13 +46,13 @@ namespace Dynamo::Sound {
          * @brief Volume to be played relative to overall gain
          *
          */
-        f32 volume = 1.0;
+        float volume = 1.0;
 
         /**
          * @brief Start time in seconds
          *
          */
-        f32 start_seconds = 0.0;
+        float start_seconds = 0.0;
 
         /**
          * @brief Position of the sound in 3D space
