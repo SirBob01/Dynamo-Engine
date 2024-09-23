@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#include "../Types.hpp"
 #include "./Vec2.hpp"
 
 namespace Dynamo {
@@ -12,7 +11,7 @@ namespace Dynamo {
      */
     struct Circle {
         Vec2 center;
-        f32 radius;
+        float radius;
 
         /**
          * @brief Construct a new Circle object.
@@ -20,29 +19,29 @@ namespace Dynamo {
          * @param center
          * @param radius
          */
-        constexpr Circle(Vec2 center = {}, f32 radius = 1) :
+        constexpr Circle(Vec2 center = {}, float radius = 1) :
             center(center), radius(radius) {}
 
         /**
          * @brief Get the circumference of this circle.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 circumference() const { return 2 * M_PI * radius; }
+        inline float circumference() const { return 2 * M_PI * radius; }
 
         /**
          * @brief Get the diameter of this circle.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 diameter() const { return 2 * radius; }
+        inline float diameter() const { return 2 * radius; }
 
         /**
          * @brief Get the area of this circle.
          *
-         * @return f32
+         * @return float
          */
-        inline f32 area() const { return M_PI * radius * radius; }
+        inline float area() const { return M_PI * radius * radius; }
 
         /**
          * @brief Test if this circle intersects with another circle.
@@ -51,9 +50,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 intersects(const Circle &circle) const {
-            f32 r_sum = circle.radius + radius;
-            f32 d_sq = (circle.center - center).length_squared();
+        inline bool intersects(const Circle &circle) const {
+            float r_sum = circle.radius + radius;
+            float d_sq = (circle.center - center).length_squared();
             return d_sq <= r_sum * r_sum;
         }
 
@@ -64,8 +63,8 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 contains(const Vec2 &point) const {
-            f32 d_sq = (point - center).length_squared();
+        inline bool contains(const Vec2 &point) const {
+            float d_sq = (point - center).length_squared();
             return d_sq <= radius * radius;
         }
 
@@ -76,9 +75,9 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 contains(const Circle &circle) const {
-            f32 d_sq = (circle.center - center).length_squared();
-            f32 r_diff = (circle.radius - radius);
+        inline bool contains(const Circle &circle) const {
+            float d_sq = (circle.center - center).length_squared();
+            float r_diff = (circle.radius - radius);
             return d_sq <= r_diff * r_diff;
         }
 
@@ -89,7 +88,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator==(const Circle &rhs) const {
+        inline bool operator==(const Circle &rhs) const {
             return radius == rhs.radius && center == rhs.center;
         }
 
@@ -100,7 +99,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator!=(const Circle &rhs) const {
+        inline bool operator!=(const Circle &rhs) const {
             return !(*this == rhs);
         }
 
@@ -110,7 +109,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 valid() const { return radius >= 0; }
+        inline bool valid() const { return radius >= 0; }
     };
 } // namespace Dynamo
 
@@ -123,7 +122,7 @@ template <>
 struct std::hash<Dynamo::Circle> {
     inline size_t operator()(const Dynamo::Circle &circle) const {
         size_t tcenter = std::hash<Dynamo::Vec2>{}(circle.center);
-        size_t tradius = std::hash<Dynamo::f32>{}(circle.radius);
+        size_t tradius = std::hash<float>{}(circle.radius);
         return tcenter ^ (tradius << 1);
     }
 };

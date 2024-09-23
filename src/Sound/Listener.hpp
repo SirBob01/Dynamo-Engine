@@ -2,7 +2,6 @@
 
 #include "../Math/Quaternion.hpp"
 #include "../Math/Vec3.hpp"
-#include "../Types.hpp"
 #include "../Utils/IdTracker.hpp"
 #include "../Utils/SparseSet.hpp"
 
@@ -22,7 +21,7 @@ namespace Dynamo::Sound {
          * @brief Listener volume
          *
          */
-        f32 volume = 1.0;
+        float volume = 1.0;
 
         /**
          * @brief Position of the listener in 3D space
@@ -64,9 +63,9 @@ namespace Dynamo::Sound {
         /**
          * @brief Get the number of listeners
          *
-         * @return u32
+         * @return unsigned
          */
-        inline u32 size() { return _properties.size(); }
+        inline unsigned size() { return _properties.size(); }
 
         /**
          * @brief Create a new listener
@@ -122,7 +121,7 @@ namespace Dynamo::Sound {
          * @param index
          * @return ListenerProperties&
          */
-        inline ListenerProperties &operator[](u32 index) {
+        inline ListenerProperties &operator[](unsigned index) {
             return _properties.at(index);
         }
 
@@ -133,13 +132,13 @@ namespace Dynamo::Sound {
          * @return ListenerProperties&
          */
         ListenerProperties &find_closest(Vec3 position) {
-            u32 closest_index = 0;
-            for (u32 i = 0; i < _properties.size(); i++) {
+            unsigned closest_index = 0;
+            for (unsigned i = 0; i < _properties.size(); i++) {
                 Vec3 best = _properties.at(i).position;
                 Vec3 curr = _properties.at(closest_index).position;
 
-                f32 a = (best - position).length_squared();
-                f32 b = (curr - position).length_squared();
+                float a = (best - position).length_squared();
+                float b = (curr - position).length_squared();
                 if (b < a) {
                     closest_index = i;
                 }

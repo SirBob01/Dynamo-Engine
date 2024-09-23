@@ -2,7 +2,6 @@
 
 #include <functional>
 
-#include "../Types.hpp"
 #include "./Circle.hpp"
 #include "./Vec2.hpp"
 #include "./Vec3.hpp"
@@ -34,12 +33,12 @@ namespace Dynamo {
             Vec2 ab = b - a;
             Vec2 ac = c - a;
 
-            f32 inv_d = 1.0 / (ab.cross(ac) * 2.0);
-            f32 ab_sq = ab.length_squared();
-            f32 ac_sq = ac.length_squared();
+            float inv_d = 1.0 / (ab.cross(ac) * 2.0);
+            float ab_sq = ab.length_squared();
+            float ac_sq = ac.length_squared();
 
-            f32 ux = inv_d * (ac.y * ab_sq - ab.y * ac_sq);
-            f32 uy = inv_d * (ab.x * ac_sq - ac.x * ab_sq);
+            float ux = inv_d * (ac.y * ab_sq - ab.y * ac_sq);
+            float uy = inv_d * (ab.x * ac_sq - ac.x * ab_sq);
             Vec2 u(ux, uy);
 
             return Circle(a + u, u.length());
@@ -56,16 +55,16 @@ namespace Dynamo {
             Vec2 ac = c - a;
             Vec2 ap = point - a;
 
-            f32 d00 = ab * ab;
-            f32 d01 = ab * ac;
-            f32 d11 = ac * ac;
-            f32 d20 = ap * ab;
-            f32 d21 = ap * ac;
-            f32 inv = 1.0 / (d00 * d11 - d01 * d01);
+            float d00 = ab * ab;
+            float d01 = ab * ac;
+            float d11 = ac * ac;
+            float d20 = ap * ab;
+            float d21 = ap * ac;
+            float inv = 1.0 / (d00 * d11 - d01 * d01);
 
-            f32 v = (d11 * d20 - d01 * d21) * inv;
-            f32 w = (d00 * d21 - d01 * d20) * inv;
-            f32 u = 1.0 - (v + w);
+            float v = (d11 * d20 - d01 * d21) * inv;
+            float w = (d00 * d21 - d01 * d20) * inv;
+            float u = 1.0 - (v + w);
             return Vec3(u, v, w);
         }
 
@@ -76,9 +75,9 @@ namespace Dynamo {
          * If the result is = 0, the points are collinear.
          * If the result is > 0, the points are anti-clockwise.
          *
-         * @return i32
+         * @return int
          */
-        inline i32 winding() const {
+        inline int winding() const {
             Vec2 ab = b - a;
             Vec2 ac = c - a;
             return ab.cross(ac);
@@ -88,9 +87,9 @@ namespace Dynamo {
          * @brief Count the number of shared vertices with another triangle.
          *
          * @param rhs
-         * @return i32
+         * @return unsigned
          */
-        inline i32 shared_vertices(const Triangle2 &rhs) const {
+        inline unsigned shared_vertices(const Triangle2 &rhs) const {
             return (a == rhs.a) + (a == rhs.b) + (a == rhs.c) + (b == rhs.a) +
                    (b == rhs.b) + (b == rhs.c) + (c == rhs.a) + (c == rhs.b) +
                    (c == rhs.c);
@@ -103,7 +102,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 adjacent(const Triangle2 &rhs) const {
+        inline bool adjacent(const Triangle2 &rhs) const {
             return shared_vertices(rhs) > 1;
         }
 
@@ -114,7 +113,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator==(const Triangle2 &rhs) const {
+        inline bool operator==(const Triangle2 &rhs) const {
             return a == rhs.a && b == rhs.b && c == rhs.c;
         }
 
@@ -125,7 +124,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline b8 operator!=(const Triangle2 &rhs) const {
+        inline bool operator!=(const Triangle2 &rhs) const {
             return !(*this == rhs);
         }
     };

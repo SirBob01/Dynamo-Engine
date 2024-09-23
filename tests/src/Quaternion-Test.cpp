@@ -1,6 +1,7 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cmath>
+#include <unordered_set>
 
 #include "Common.hpp"
 

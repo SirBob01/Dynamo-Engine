@@ -1,4 +1,6 @@
-#include "Delaunay.hpp"
+#include "./Delaunay.hpp"
+#include "../Utils/Log.hpp"
+#include "./Segment2.hpp"
 
 namespace Dynamo::Delaunay {
     std::vector<Triangle2> triangulate(std::vector<Vec2> &points) {
@@ -25,7 +27,7 @@ namespace Dynamo::Delaunay {
         triangles.push_back(super_triangle);
 
         // Edge buffer
-        std::unordered_map<Segment2, i32> edges;
+        std::unordered_map<Segment2, int> edges;
 
         for (const Vec2 &point : points) {
             // Find triangles whose circumcircle contains the query point

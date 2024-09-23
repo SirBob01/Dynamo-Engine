@@ -3,11 +3,9 @@ project(.)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
-
-set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED on)
 
-add_compile_options(-Wall -g -O3)
+add_compile_options(-Wall -g -O3 -fPIC)
 
 add_subdirectory("../" "./Dynamo")
 

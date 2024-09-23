@@ -7,8 +7,8 @@ namespace Dynamo::Sound {
     }
 
     Sound &Binaural::apply(Sound &src,
-                           const u32 src_offset,
-                           const u32 length,
+                           const unsigned src_offset,
+                           const unsigned length,
                            const DynamicMaterial &material,
                            const ListenerProperties &listener) {
         _output.set_frames(length);
@@ -16,7 +16,7 @@ namespace Dynamo::Sound {
                                    listener.rotation,
                                    material.position,
                                    _impulse_response);
-        for (i32 c = 0; c < 2; c++) {
+        for (unsigned c = 0; c < 2; c++) {
             _convolvers[c].initialize(_impulse_response[c],
                                       _impulse_response.frames());
             _convolvers[c].compute(src[c] + src_offset, _output[c], length);

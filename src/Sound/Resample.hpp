@@ -3,8 +3,6 @@
 
 #include <array>
 
-#include "../Log/Log.hpp"
-#include "../Types.hpp"
 #include "./Sound.hpp"
 
 namespace Dynamo::Sound {
@@ -12,30 +10,30 @@ namespace Dynamo::Sound {
      * @brief Number of zero-crossings in the filter
      *
      */
-    static constexpr u32 FILTER_ZERO_CROSSINGS = 32;
+    static constexpr unsigned FILTER_ZERO_CROSSINGS = 32;
 
     /**
      * @brief Number of coefficients per zero crossing
      *
      */
-    static constexpr u32 FILTER_PRECISION = 4;
+    static constexpr unsigned FILTER_PRECISION = 4;
 
     /**
      * @brief Length of one wing in the filter
      *
      */
-    static constexpr u32 FILTER_HALF_LENGTH =
+    static constexpr unsigned FILTER_HALF_LENGTH =
         FILTER_ZERO_CROSSINGS * FILTER_PRECISION + 1;
 
     /**
      * @brief Normalized sinc function
      *
      * @param x
-     * @return constexpr f64
+     * @return constexpr double
      */
-    constexpr f64 sinc(f64 x) {
+    constexpr double sinc(double x) {
         if (x == 0) return 1;
-        f64 f = M_PI * x;
+        double f = M_PI * x;
         return std::sin(f) / f;
     }
 
@@ -43,13 +41,13 @@ namespace Dynamo::Sound {
      * @brief Compute the zeroth-order modified Bessel function
      *
      * @param x
-     * @return constexpr f64
+     * @return constexpr double
      */
-    constexpr f64 i0(f64 x) {
-        constexpr f64 epsilon = 0.00000001;
-        f64 sum = 1;
-        f64 term = 1;
-        f64 m = 0;
+    constexpr double i0(double x) {
+        constexpr double epsilon = 0.00000001;
+        double sum = 1;
+        double term = 1;
+        double m = 0;
         while (term > epsilon * sum) {
             sum += term;
             m++;
@@ -62,24 +60,24 @@ namespace Dynamo::Sound {
      * @brief Compute the Kaiser window
      *
      * @param x
-     * @return constexpr f64
+     * @return constexpr double
      */
-    constexpr f64 filter_window(f64 n, u32 N = 35, f64 beta = 6) {
-        f64 m = 2.0 * n / N;
-        f64 num = i0(beta * std::sqrt(1 - m * m));
-        f64 den = i0(beta);
+    constexpr double filter_window(double n, unsigned N = 35, double beta = 6) {
+        double m = 2.0 * n / N;
+        double num = i0(beta * std::sqrt(1 - m * m));
+        double den = i0(beta);
         return num / den;
     }
 
     /**
      * @brief Compulte the right-wing of the filter coefficients
      *
-     * @return constexpr std::array<f64, FILTER_HALF_LENGTH>
+     * @return constexpr std::array<double, FILTER_HALF_LENGTH>
      */
-    constexpr std::array<f64, FILTER_HALF_LENGTH> construct_filter_table() {
-        std::array<f64, FILTER_HALF_LENGTH> coeffs = {0};
-        for (f64 l = 0; l < FILTER_HALF_LENGTH; l++) {
-            f64 f = l / FILTER_PRECISION;
+    constexpr std::array<double, FILTER_HALF_LENGTH> construct_filter_table() {
+        std::array<double, FILTER_HALF_LENGTH> coeffs = {0};
+        for (double l = 0; l < FILTER_HALF_LENGTH; l++) {
+            double f = l / FILTER_PRECISION;
             coeffs[l] = sinc(f) * filter_window(l);
         }
         return coeffs;
@@ -89,12 +87,12 @@ namespace Dynamo::Sound {
      * @brief Compute the filter coefficient difference table
      *
      * @param coeffs
-     * @return constexpr std::array<f64, FILTER_HALF_LENGTH>
+     * @return constexpr std::array<double, FILTER_HALF_LENGTH>
      */
-    constexpr std::array<f64, FILTER_HALF_LENGTH> construct_difference_table(
-        const std::array<f64, FILTER_HALF_LENGTH> &coeffs) {
-        std::array<f64, FILTER_HALF_LENGTH> diffs = {0};
-        for (u32 i = 0; i < FILTER_HALF_LENGTH - 1; i++) {
+    constexpr std::array<double, FILTER_HALF_LENGTH> construct_difference_table(
+        const std::array<double, FILTER_HALF_LENGTH> &coeffs) {
+        std::array<double, FILTER_HALF_LENGTH> diffs = {0};
+        for (unsigned i = 0; i < FILTER_HALF_LENGTH - 1; i++) {
             diffs[i] = coeffs[i + 1] - coeffs[i];
         }
         return diffs;
@@ -105,7 +103,7 @@ namespace Dynamo::Sound {
      * initialization
      *
      */
-    static const std::array<f64, FILTER_HALF_LENGTH> FILTER_RWING =
+    static const std::array<double, FILTER_HALF_LENGTH> FILTER_RWING =
         construct_filter_table();
 
     /**
@@ -113,7 +111,7 @@ namespace Dynamo::Sound {
      * initialization
      *
      */
-    static const std::array<f64, FILTER_HALF_LENGTH> FILTER_DIFFS =
+    static const std::array<double, FILTER_HALF_LENGTH> FILTER_DIFFS =
         construct_difference_table(FILTER_RWING);
 
     /**
@@ -131,8 +129,8 @@ namespace Dynamo::Sound {
      */
     void resample_signal(WaveSample *src,
                          WaveSample *dst,
-                         f64 time_offset,
-                         f64 src_length,
-                         f64 src_rate,
-                         f64 dst_rate);
+                         double time_offset,
+                         double src_length,
+                         double src_rate,
+                         double dst_rate);
 } // namespace Dynamo::Sound

@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "../Log/Log.hpp"
-#include "../Types.hpp"
+#include "./Log.hpp"
 
 namespace Dynamo {
     /**
@@ -19,8 +18,8 @@ namespace Dynamo {
                       "ChannelData members must be trivially copyable");
         std::vector<T> _container;
 
-        u32 _channels;
-        u32 _frames;
+        unsigned _channels;
+        unsigned _frames;
 
       public:
         /**
@@ -29,7 +28,7 @@ namespace Dynamo {
          * @param frames   Number of frames.
          * @param channels Number of channels.
          */
-        ChannelData(u32 frames = 0, u32 channels = 0) {
+        ChannelData(unsigned frames = 0, unsigned channels = 0) {
             resize(frames, channels);
         }
 
@@ -39,7 +38,7 @@ namespace Dynamo {
          * @param data     Data buffer.
          * @param channels Number of channels.
          */
-        ChannelData(std::vector<T> data, u32 channels) :
+        ChannelData(std::vector<T> data, unsigned channels) :
             _container(data), _channels(channels),
             _frames(data.size() / channels) {
             DYN_ASSERT(data.size() % channels == 0);
@@ -55,16 +54,16 @@ namespace Dynamo {
         /**
          * @brief Get the number of frames.
          *
-         * @return u32
+         * @return unsigned
          */
-        inline u32 frames() const { return _frames; }
+        inline unsigned frames() const { return _frames; }
 
         /**
          * @brief Get the number of channels.
          *
-         * @return u32
+         * @return unsigned
          */
-        inline u32 channels() const { return _channels; }
+        inline unsigned channels() const { return _channels; }
 
         /**
          * @brief Default-initialize all entries in the container.
@@ -79,7 +78,7 @@ namespace Dynamo {
          *
          * @param frames Number of frames.
          */
-        inline void set_frames(const u32 frames) {
+        inline void set_frames(const unsigned frames) {
             _container.resize(_channels * frames);
             _frames = frames;
         }
@@ -89,7 +88,7 @@ namespace Dynamo {
          *
          * @param channels Number of channels.
          */
-        inline void set_channels(const u32 channels) {
+        inline void set_channels(const unsigned channels) {
             _container.resize(channels * _frames);
             _channels = channels;
         }
@@ -100,7 +99,7 @@ namespace Dynamo {
          * @param frames   Number of frames.
          * @param channels Number of channels.
          */
-        inline void resize(const u32 frames, const u32 channels) {
+        inline void resize(const unsigned frames, const unsigned channels) {
             _container.resize(channels * frames);
             _channels = channels;
             _frames = frames;
@@ -112,9 +111,9 @@ namespace Dynamo {
          * @param dst   Destination buffer.
          * @param frame Frame index.
          */
-        inline void read_frame(T *dst, const u32 frame) const {
+        inline void read_frame(T *dst, const unsigned frame) const {
             DYN_ASSERT(frame < _frames);
-            for (u32 c = 0; c < _channels; c++) {
+            for (unsigned c = 0; c < _channels; c++) {
                 dst[c] = _container[(c * _frames) + frame];
             }
         }
@@ -125,7 +124,7 @@ namespace Dynamo {
          * @param dst     Destination buffer.
          * @param channel Channel index.
          */
-        inline void read_channel(T *dst, const u32 channel) const {
+        inline void read_channel(T *dst, const unsigned channel) const {
             DYN_ASSERT(channel < _channels);
             const T *ptr = _container.data() + (channel * _frames);
             std::copy(ptr, ptr + _frames, dst);
@@ -137,7 +136,7 @@ namespace Dynamo {
          * @param channel Channel index.
          * @return T*
          */
-        inline T *operator[](const u32 channel) {
+        inline T *operator[](const unsigned channel) {
             DYN_ASSERT(channel < _channels);
             return _container.data() + (channel * _frames);
         }
@@ -149,7 +148,7 @@ namespace Dynamo {
          * @param channel Channel index.
          * @return T
          */
-        inline T at(const u32 frame, const u32 channel) const {
+        inline T at(const unsigned frame, const unsigned channel) const {
             DYN_ASSERT(frame < _frames);
             DYN_ASSERT(channel < _channels);
             return _container[(channel * _frames) + frame];

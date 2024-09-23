@@ -1,21 +1,15 @@
 #pragma once
 
-#include <algorithm>
-#include <unordered_map>
 #include <vector>
 
-#include "../Log/Log.hpp"
-#include "../Types.hpp"
 #include "./Box2.hpp"
-#include "./Circle.hpp"
-#include "./Segment2.hpp"
 #include "./Triangle2.hpp"
 #include "./Vec2.hpp"
 
 namespace Dynamo::Delaunay {
     /**
      * @brief Calculate the delaunay triangulation of a point set.
-     * 
+     *
      * This will reorder the points in-place for optimization purposes.
      *
      * @param points Input point set.

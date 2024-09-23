@@ -1,20 +1,16 @@
 #pragma once
 
-#include <cmath>
-
-#include "../Math/Vec2.hpp"
-#include "../Math/Vec3.hpp"
-#include "../Types.hpp"
+constexpr double PI = 3.14159265358979323846264338327950288;
 
 namespace Dynamo {
     /**
      * @brief Convert an angle in radians to degrees.
      *
      * @param rad
-     * @return f32
+     * @return float
      */
-    inline f32 to_degrees(f32 rad) {
-        static const f32 factor = 180.0 / M_PI;
+    inline float to_degrees(float rad) {
+        static const float factor = 180.0 / PI;
         return rad * factor;
     }
 
@@ -22,10 +18,10 @@ namespace Dynamo {
      * @brief Convert an angle in degrees to radians.
      *
      * @param deg
-     * @return f32
+     * @return float
      */
-    inline f32 to_radians(f32 deg) {
-        static const f32 factor = M_PI / 180.0;
+    inline float to_radians(float deg) {
+        static const float factor = PI / 180.0;
         return deg * factor;
     }
 
@@ -35,7 +31,7 @@ namespace Dynamo {
      * @param a Start value.
      * @param b End value.
      * @param t Interpolation factor.
-     * @return f32
+     * @return float
      */
-    inline f32 lerp(f32 a, f32 b, f32 t) { return a + (b - a) * t; }
+    inline float lerp(float a, float b, float t) { return a + (b - a) * t; }
 } // namespace Dynamo

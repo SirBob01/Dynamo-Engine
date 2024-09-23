@@ -1,12 +1,14 @@
 #include "Fourier.hpp"
+#include "../Utils/Bits.hpp"
+#include "../Utils/Log.hpp"
 
 namespace Dynamo::Fourier {
-    void transform(Complex *signal, u32 N) {
+    void transform(Complex *signal, unsigned N) {
         DYN_ASSERT((N & (N - 1)) == 0);
 
         // Bit reversal element reordering
-        for (u32 i = 1, j = 0; i < N; i++) {
-            u32 bit = N >> 1;
+        for (unsigned i = 1, j = 0; i < N; i++) {
+            unsigned bit = N >> 1;
             while (bit & j) {
                 j ^= bit;
                 bit >>= 1;
@@ -18,16 +20,16 @@ namespace Dynamo::Fourier {
         }
 
         // Radix-2 FFT
-        for (u32 s = 1; s <= find_lsb(N); s++) {
-            u32 m = 1 << s;
-            u32 half_m = m >> 1;
+        for (unsigned s = 1; s <= find_lsb(N); s++) {
+            unsigned m = 1 << s;
+            unsigned half_m = m >> 1;
             Complex omega_m = TWIDDLE_TABLE_FFT[s];
 
-            for (u32 k = 0; k < N; k += m) {
+            for (unsigned k = 0; k < N; k += m) {
                 Complex omega(1);
-                for (u32 j = 0; j < half_m; j++) {
-                    u32 u_i = k + j;
-                    u32 t_i = u_i + half_m;
+                for (unsigned j = 0; j < half_m; j++) {
+                    unsigned u_i = k + j;
+                    unsigned t_i = u_i + half_m;
                     Complex t = omega * signal[t_i];
                     Complex u = signal[u_i];
                     signal[u_i] = u + t;
@@ -38,12 +40,12 @@ namespace Dynamo::Fourier {
         }
     }
 
-    void inverse(Complex *signal, u32 N) {
+    void inverse(Complex *signal, unsigned N) {
         DYN_ASSERT((N & (N - 1)) == 0);
 
         // Bit reversal element reordering
-        for (u32 i = 1, j = 0; i < N; i++) {
-            u32 bit = N >> 1;
+        for (unsigned i = 1, j = 0; i < N; i++) {
+            unsigned bit = N >> 1;
             while (bit & j) {
                 j ^= bit;
                 bit >>= 1;
@@ -55,16 +57,16 @@ namespace Dynamo::Fourier {
         }
 
         // Radix-2 IFFT
-        for (u32 s = 1; s <= find_lsb(N); s++) {
-            u32 m = 1 << s;
-            u32 half_m = m >> 1;
+        for (unsigned s = 1; s <= find_lsb(N); s++) {
+            unsigned m = 1 << s;
+            unsigned half_m = m >> 1;
             Complex omega_m = TWIDDLE_TABLE_IFFT[s];
 
-            for (u32 k = 0; k < N; k += m) {
+            for (unsigned k = 0; k < N; k += m) {
                 Complex omega(1);
-                for (u32 j = 0; j < half_m; j++) {
-                    u32 u_i = k + j;
-                    u32 t_i = u_i + half_m;
+                for (unsigned j = 0; j < half_m; j++) {
+                    unsigned u_i = k + j;
+                    unsigned t_i = u_i + half_m;
                     Complex t = omega * signal[t_i];
                     Complex u = signal[u_i];
                     signal[u_i] = u + t;
@@ -75,8 +77,8 @@ namespace Dynamo::Fourier {
         }
 
         // Normalize
-        f32 inv_N = 1.0 / N;
-        for (u32 f = 0; f < N; f++) {
+        float inv_N = 1.0 / N;
+        for (unsigned f = 0; f < N; f++) {
             signal[f] *= inv_N;
         }
     }

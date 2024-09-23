@@ -1,15 +1,15 @@
 #include <Dynamo.hpp>
 
 int main() {
-    Dynamo::ApplicationConfiguration config;
-    config.title = "Hello, world!";
-    config.width = 640;
-    config.height = 480;
-    config.asset_directory = "../assets/";
+    Dynamo::ApplicationSettings settings;
+    settings.title = "Hello, world!";
+    settings.window_width = 640;
+    settings.window_height = 480;
+    settings.root_asset_directory = "../assets/";
 
-    Dynamo::Application app(config);
+    Dynamo::Application app(settings);
     while (app.is_running()) {
-        app.run();
+        app.update();
     }
     return 0;
 }
