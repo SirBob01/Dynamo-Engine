@@ -1,9 +1,8 @@
 #include <Dynamo.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_test_macros.hpp>
-#include <cmath>
 
-#include "Common.hpp"
+#include "../Common.hpp"
 
 template <unsigned N>
 using ComplexChannel = std::array<Dynamo::Complex, N>;
