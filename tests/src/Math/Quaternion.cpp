@@ -3,7 +3,7 @@
 #include <cmath>
 #include <unordered_set>
 
-#include "Common.hpp"
+#include "../Common.hpp"
 
 TEST_CASE("Quaternion axis-angle", "[Quaternion]") {
     Dynamo::Quaternion z({1, 0, 0}, M_PI_4);

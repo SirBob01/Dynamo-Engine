@@ -1,7 +1,7 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "Common.hpp"
+#include "../Common.hpp"
 
 TEST_CASE("Color Construction", "[Color]") {
     Dynamo::Color a(0, 0.5, 1);

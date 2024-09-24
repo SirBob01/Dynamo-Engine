@@ -2,7 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <unordered_set>
 
-#include "Common.hpp"
+#include "../Common.hpp"
 
 TEST_CASE("Complex number length squared", "[Complex]") {
     Dynamo::Complex z(3, 4);
