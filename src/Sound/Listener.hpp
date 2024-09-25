@@ -65,18 +65,14 @@ namespace Dynamo::Sound {
          *
          * @return unsigned
          */
-        inline unsigned size() { return _properties.size(); }
+        unsigned size();
 
         /**
          * @brief Create a new listener
          *
          * @return Listener
          */
-        inline Listener create() {
-            Listener listener = _id_tracker.generate();
-            _properties.insert(listener);
-            return listener;
-        }
+        Listener create();
 
         /**
          * @brief Destroy a listener, if it exists
@@ -86,10 +82,7 @@ namespace Dynamo::Sound {
          *
          * @param listener
          */
-        inline void destroy(Listener listener) {
-            _properties.remove(listener);
-            _id_tracker.discard(listener);
-        }
+        void destroy(Listener listener);
 
         /**
          * @brief Get the properties of a listener
@@ -99,9 +92,7 @@ namespace Dynamo::Sound {
          * @param listener
          * @return ListenerProperties&
          */
-        inline ListenerProperties &get_properties(Listener listener) {
-            return _properties.get(listener);
-        }
+        ListenerProperties &get_properties(Listener listener);
 
         /**
          * @brief Clear all listeners
@@ -110,10 +101,7 @@ namespace Dynamo::Sound {
          * `get_properties()`
          *
          */
-        inline void clear() {
-            _properties.clear();
-            _id_tracker.clear();
-        }
+        void clear();
 
         /**
          * @brief Random access operator to the listener pool
@@ -121,9 +109,7 @@ namespace Dynamo::Sound {
          * @param index
          * @return ListenerProperties&
          */
-        inline ListenerProperties &operator[](unsigned index) {
-            return _properties.at(index);
-        }
+        ListenerProperties &operator[](unsigned index);
 
         /**
          * @brief Find the closest listener to a given position.
@@ -131,19 +117,6 @@ namespace Dynamo::Sound {
          * @param position
          * @return ListenerProperties&
          */
-        ListenerProperties &find_closest(Vec3 position) {
-            unsigned closest_index = 0;
-            for (unsigned i = 0; i < _properties.size(); i++) {
-                Vec3 best = _properties.at(i).position;
-                Vec3 curr = _properties.at(closest_index).position;
-
-                float a = (best - position).length_squared();
-                float b = (curr - position).length_squared();
-                if (b < a) {
-                    closest_index = i;
-                }
-            }
-            return _properties.at(closest_index);
-        }
+        ListenerProperties &find_closest(Vec3 position);
     };
 } // namespace Dynamo::Sound

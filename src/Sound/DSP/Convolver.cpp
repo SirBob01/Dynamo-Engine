@@ -1,5 +1,5 @@
 #include "./Convolver.hpp"
-#include "../Math/Fourier.hpp"
+#include "../../Math/Fourier.hpp"
 
 namespace Dynamo::Sound {
     void Convolver::initialize(WaveSample *ir, unsigned M) {

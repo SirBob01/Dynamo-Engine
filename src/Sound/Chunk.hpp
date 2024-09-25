@@ -1,5 +1,8 @@
 #pragma once
 
+#include <optional>
+
+#include "./Filter.hpp"
 #include "./Material.hpp"
 #include "./Sound.hpp"
 
@@ -14,29 +17,30 @@ namespace Dynamo::Sound {
      * to receive enough data when requested, causing glitches.
      *
      */
-    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 9;
+    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 12;
 
     /**
-     * @brief A chunk contains information to process a sound in small sections
-     * every tick.
+     * @brief A unit of Sound with associated processing data.
      *
-     * @tparam Material Playback properties.
      */
-    template <typename Material>
     struct Chunk {
-        static_assert(std::is_convertible<Material, StaticMaterial>::value ||
-                      std::is_convertible<Material, DynamicMaterial>::value);
         /**
          * @brief Reference to the Sound data.
          *
          */
-        std::reference_wrapper<Sound> sound;
+        SoundRef sound;
 
         /**
-         * @brief Reference to the playback material.
+         * @brief Material properties.
          *
          */
-        std::reference_wrapper<Material> material;
+        MaterialRef material;
+
+        /**
+         * @brief Optional filter.
+         *
+         */
+        std::optional<FilterRef> filter;
 
         /**
          * @brief Frame offset of the chunk.

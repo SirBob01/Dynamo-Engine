@@ -4,23 +4,25 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief Stereo panner filter implementation
+     * @brief Sequence of filters to be applied in order.
      *
      */
-    class Stereo : public Filter {
+    class FilterSequence : public Filter {
+        std::vector<FilterRef> _sequence;
         Sound _output;
 
       public:
-        /**
-         * @brief Construct a new Stereo filter object
-         *
-         */
-        Stereo();
-
         Sound &apply(Sound &src,
                      const unsigned offset,
                      const unsigned length,
                      const Material &material,
                      const ListenerProperties &listener) override;
+
+        /**
+         * @brief Add a filter.
+         *
+         * @param filter
+         */
+        void push(Filter &filter);
     };
 } // namespace Dynamo::Sound

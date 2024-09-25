@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <string>
+#include <thread>
 
 #include "./Sound/Jukebox.hpp"
 #include "Clock.hpp"
@@ -46,6 +47,8 @@ namespace Dynamo {
         std::unique_ptr<Display> _display;
         std::unique_ptr<Sound::Jukebox> _jukebox;
 
+        std::thread _audio_thread;
+
         Clock _clock;
 
       public:
@@ -55,6 +58,7 @@ namespace Dynamo {
          * @param settings
          */
         Application(const ApplicationSettings &settings);
+        ~Application();
 
         /**
          * @brief Check if the application is running.

@@ -6,6 +6,19 @@ namespace Dynamo {
                                              settings.window_width,
                                              settings.window_height);
         _jukebox = std::make_unique<Sound::Jukebox>();
+
+        // Run audio on a separate thread
+        _audio_thread = std::thread([&]() {
+            while (is_running()) {
+                _jukebox->update();
+            }
+        });
+    }
+
+    Application::~Application() {
+        if (_audio_thread.joinable()) {
+            _audio_thread.join();
+        }
     }
 
     bool Application::is_running() const { return _display->is_open(); }
@@ -19,7 +32,7 @@ namespace Dynamo {
     Sound::Jukebox &Application::get_jukebox() { return *_jukebox; }
 
     void Application::update() {
-        // Update subsystems
+        // Poll for input
         _display->get_input().poll();
 
         // Tick

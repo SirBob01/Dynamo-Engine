@@ -9,7 +9,6 @@
 
 #include "./Chunk.hpp"
 #include "./Device.hpp"
-#include "./HRTF.hpp"
 #include "./Listener.hpp"
 #include "./Material.hpp"
 #include "./Sound.hpp"
@@ -57,48 +56,22 @@ namespace Dynamo::Sound {
         ListenerSet _listeners;
 
         /**
-         * @brief Head-related transfer function for binaural effects
+         * @brief Chunks to be processed.
          *
          */
-        HRTF _hrtf;
-
-        /**
-         * @brief Static chunk list
-         *
-         */
-        std::vector<Chunk<StaticMaterial>> _static_chunks;
-
-        /**
-         * @brief Dynamic chunk list
-         *
-         */
-        std::vector<Chunk<DynamicMaterial>> _dynamic_chunks;
+        std::vector<Chunk> _chunks;
 
         /**
          * @brief Internal state shared with the PortAudio callback
          *
          */
-        struct State {
-            /**
-             * @brief Buffer to read and write samples from asynchronously
-             *
-             */
+        struct PAState {
             RingBuffer<WaveSample, BUFFER_SIZE> buffer;
-
-            /**
-             * @brief Number of channels in the buffer
-             *
-             */
             unsigned channels;
-
-            /**
-             * @brief Sampling rate of the buffer
-             *
-             */
             double sample_rate;
         };
-        State _input_state;
-        State _output_state;
+        PAState _input_state;
+        PAState _output_state;
 
         /**
          * @brief Callback for reading recorded audio from the input device
@@ -137,18 +110,11 @@ namespace Dynamo::Sound {
                                    void *data);
 
         /**
-         * @brief Process a static chunk
+         * @brief Process a chunk
          *
-         * @param chunk Static chunk
+         * @param chunk chunk
          */
-        void process_chunk(Chunk<StaticMaterial> &chunk);
-
-        /**
-         * @brief Process a dynamic chunk
-         *
-         * @param chunk Dynamic chunk
-         */
-        void process_chunk(Chunk<DynamicMaterial> &chunk);
+        void process_chunk(Chunk &chunk);
 
       public:
         /**
@@ -252,22 +218,7 @@ namespace Dynamo::Sound {
         ListenerSet &get_listeners();
 
         /**
-         * @brief Get the HRTF object
-         *
-         * @return HRTF&
-         */
-        HRTF &get_hrtf();
-
-        /**
-         * @brief Play a static sound
-         *
-         * @param sound    Sound
-         * @param material Playback properties
-         */
-        void play(Sound &sound, StaticMaterial &material);
-
-        /**
-         * @brief Play a dynamic sound
+         * @brief Play a sound
          *
          * These sounds are spatialized and affected by the position of the
          * sound and the listeners. If there are multiple listeners attached,
@@ -275,8 +226,11 @@ namespace Dynamo::Sound {
          *
          * @param sound    Sound
          * @param material Playback properties
+         * @param filters  Filter
          */
-        void play(Sound &sound, DynamicMaterial &material);
+        void play(Sound &sound,
+                  Material &material,
+                  std::optional<FilterRef> filter = {});
 
         /**
          * @brief Update Jukebox's internal state and process all chunks

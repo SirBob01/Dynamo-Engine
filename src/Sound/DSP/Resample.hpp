@@ -3,7 +3,7 @@
 
 #include <array>
 
-#include "./Sound.hpp"
+#include "../Sound.hpp"
 
 namespace Dynamo::Sound {
     /**
