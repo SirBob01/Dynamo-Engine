@@ -26,7 +26,7 @@ namespace Dynamo::Sound {
     }
 
     ListenerProperties &ListenerSet::operator[](unsigned index) {
-        return _properties.at(index);
+        return _properties[index];
     }
 
     ListenerProperties &ListenerSet::find_closest(Vec3 position) {
@@ -34,13 +34,13 @@ namespace Dynamo::Sound {
 
         float closest_distance = std::numeric_limits<float>::max();
         for (unsigned i = 0; i < _properties.size(); i++) {
-            ListenerProperties &listener = _properties.at(i);
+            const ListenerProperties &listener = _properties[i];
             float distance = (listener.position - position).length_squared();
             if (distance < closest_distance) {
                 closest_index = i;
                 closest_distance = distance;
             }
         }
-        return _properties.at(closest_index);
+        return _properties[closest_index];
     }
 } // namespace Dynamo::Sound

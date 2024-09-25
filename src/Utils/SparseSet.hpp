@@ -73,7 +73,7 @@ namespace Dynamo {
          * @param id Unique identifer.
          * @return int Index position of the value (-1 on failure).
          */
-        inline int find(Id id) {
+        inline int find(Id id) const {
             unsigned key = IdTracker::get_index(id);
             if (key >= _sparse.size()) {
                 return -1;
@@ -95,7 +95,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool exists(Id id) { return find(id) >= 0; }
+        inline bool exists(Id id) const { return find(id) >= 0; }
 
         /**
          * @brief Create a new object in the pool and associate it with an id.
@@ -176,9 +176,21 @@ namespace Dynamo {
          * @param index Index position of the object within the pool array.
          * @return T&
          */
-        inline T &at(int index) {
+        inline T &operator[](unsigned index) {
             DYN_ASSERT(index >= 0);
-            DYN_ASSERT(index < static_cast<int>(_pool.size()));
+            DYN_ASSERT(index < _pool.size());
+            return _pool[index];
+        }
+
+        /**
+         * @brief Get the item stored at an index.
+         *
+         * @param index Index position of the object within the pool array.
+         * @return const T&
+         */
+        inline const T &operator[](unsigned index) const {
+            DYN_ASSERT(index >= 0);
+            DYN_ASSERT(index < _pool.size());
             return _pool[index];
         }
 
@@ -188,7 +200,15 @@ namespace Dynamo {
          * @param id Unique identifier of the object to be queried.
          * @return T&
          */
-        inline T &get(Id id) { return at(find(id)); }
+        inline T &get(Id id) { return (*this)[find(id)]; }
+
+        /**
+         * @brief Get the item associated with an id.
+         *
+         * @param id Unique identifier of the object to be queried.
+         * @return const T&
+         */
+        inline const T &get(Id id) const { return (*this)[find(id)]; }
 
         /**
          * @brief Apply a function to each member of the set.

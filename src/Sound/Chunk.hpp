@@ -17,7 +17,7 @@ namespace Dynamo::Sound {
      * to receive enough data when requested, causing glitches.
      *
      */
-    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 12;
+    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 8;
 
     /**
      * @brief A unit of Sound with associated processing data.

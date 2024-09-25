@@ -3,6 +3,70 @@
 
 using CharSet = Dynamo::SparseSet<char>;
 
+TEST_CASE("SparseSet []", "[SparseSet]") {
+    CharSet set;
+    Dynamo::IdTracker tracker;
+
+    set.insert(tracker.generate(), 'a');
+    set.insert(tracker.generate(), 'b');
+    set.insert(tracker.generate(), 'c');
+
+    REQUIRE(set[0] == 'a');
+    REQUIRE(set[1] == 'b');
+    REQUIRE(set[2] == 'c');
+}
+
+TEST_CASE("SparseSet const []", "[SparseSet]") {
+    CharSet set;
+    Dynamo::IdTracker tracker;
+
+    set.insert(tracker.generate(), 'a');
+    set.insert(tracker.generate(), 'b');
+    set.insert(tracker.generate(), 'c');
+
+    const CharSet &const_set = set;
+
+    REQUIRE(const_set[0] == 'a');
+    REQUIRE(const_set[1] == 'b');
+    REQUIRE(const_set[2] == 'c');
+}
+
+TEST_CASE("SparseSet get", "[SparseSet]") {
+    CharSet set;
+    Dynamo::IdTracker tracker;
+
+    Dynamo::Id a = tracker.generate();
+    Dynamo::Id b = tracker.generate();
+    Dynamo::Id c = tracker.generate();
+
+    set.insert(a, 'a');
+    set.insert(b, 'b');
+    set.insert(c, 'c');
+
+    REQUIRE(set.get(a) == 'a');
+    REQUIRE(set.get(b) == 'b');
+    REQUIRE(set.get(c) == 'c');
+}
+
+TEST_CASE("SparseSet const get", "[SparseSet]") {
+    CharSet set;
+    Dynamo::IdTracker tracker;
+
+    Dynamo::Id a = tracker.generate();
+    Dynamo::Id b = tracker.generate();
+    Dynamo::Id c = tracker.generate();
+
+    set.insert(a, 'a');
+    set.insert(b, 'b');
+    set.insert(c, 'c');
+
+    const CharSet &const_set = set;
+
+    REQUIRE(const_set.get(a) == 'a');
+    REQUIRE(const_set.get(b) == 'b');
+    REQUIRE(const_set.get(c) == 'c');
+}
+
 TEST_CASE("SparseSet insert", "[SparseSet]") {
     CharSet set;
     Dynamo::IdTracker tracker;
