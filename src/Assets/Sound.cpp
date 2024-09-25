@@ -15,11 +15,11 @@ namespace Dynamo {
         unsigned sample_rate = file.samplerate();
 
         // Read the PCM data
-        Sound::WaveForm interleaved(frames * channels);
+        std::vector<Sound::WaveSample> interleaved(frames * channels);
         file.readf(interleaved.data(), interleaved.size());
 
         // De-interleave the data into the final waveform buffer
-        Sound::WaveForm waveform(frames * channels);
+        std::vector<Sound::WaveSample> waveform(frames * channels);
         for (unsigned f = 0; f < frames; f++) {
             for (unsigned c = 0; c < channels; c++) {
                 waveform[c * frames + f] = interleaved[f * channels + c];

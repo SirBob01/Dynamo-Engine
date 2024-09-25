@@ -38,7 +38,7 @@ namespace Dynamo {
          * @param data     Data buffer.
          * @param channels Number of channels.
          */
-        ChannelData(std::vector<T> data, unsigned channels) :
+        ChannelData(const std::vector<T> &data, unsigned channels) :
             _container(data), _channels(channels),
             _frames(data.size() / channels) {
             DYN_ASSERT(data.size() % channels == 0);
@@ -50,6 +50,13 @@ namespace Dynamo {
          * @return T*
          */
         inline T *data() { return _container.data(); }
+
+        /**
+         * @brief Get internal data pointer.
+         *
+         * @return T*
+         */
+        inline const T *data() const { return data(); }
 
         /**
          * @brief Get the number of frames.
@@ -137,6 +144,17 @@ namespace Dynamo {
          * @return T*
          */
         inline T *operator[](const unsigned channel) {
+            DYN_ASSERT(channel < _channels);
+            return _container.data() + (channel * _frames);
+        }
+
+        /**
+         * @brief Get the const pointer to the start of a channel.
+         *
+         * @param channel Channel index.
+         * @return T*
+         */
+        inline const T *operator[](const unsigned channel) const {
             DYN_ASSERT(channel < _channels);
             return _container.data() + (channel * _frames);
         }
