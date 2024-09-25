@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "Display.hpp"
-#include "Utils/Log.hpp"
+#include <Display.hpp>
+#include <Utils/Log.hpp>
 
 namespace Dynamo {
     Display::Display(const std::string &title,

@@ -4,9 +4,9 @@
 #include <string>
 #include <thread>
 
-#include "./Sound/Jukebox.hpp"
-#include "Clock.hpp"
-#include "Display.hpp"
+#include <Clock.hpp>
+#include <Display.hpp>
+#include <Sound/Jukebox.hpp>
 
 namespace Dynamo {
     /**

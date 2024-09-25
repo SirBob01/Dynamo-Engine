@@ -3,12 +3,12 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../Math/Quaternion.hpp"
-#include "../../Math/Vec2.hpp"
-#include "../../Math/Vec3.hpp"
+#include <Math/Quaternion.hpp>
+#include <Math/Vec2.hpp>
+#include <Math/Vec3.hpp>
 
-#include "../Data/HRIR.hpp"
-#include "../Sound.hpp"
+#include <Sound/Data/HRIR.hpp>
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**

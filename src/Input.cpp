@@ -1,4 +1,4 @@
-#include "Input.hpp"
+#include <Input.hpp>
 
 namespace Dynamo {
     Input::Input(GLFWwindow *window) : _window(window) {

@@ -1,5 +1,5 @@
-#include "./Allocator.hpp"
-#include "./Log.hpp"
+#include <Utils/Allocator.hpp>
+#include <Utils/Log.hpp>
 
 namespace Dynamo {
     Allocator::Allocator(unsigned capacity) : _capacity(capacity) {

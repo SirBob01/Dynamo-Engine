@@ -4,7 +4,7 @@
 #include <functional>
 #include <vector>
 
-#include "../Utils/ChannelData.hpp"
+#include <Utils/ChannelData.hpp>
 
 namespace Dynamo::Sound {
     /**

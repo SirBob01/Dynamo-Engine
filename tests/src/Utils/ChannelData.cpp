@@ -21,8 +21,8 @@ TEST_CASE("ChannelData construction", "[ChannelData]") {
     REQUIRE(buffer.channels() == 2);
 
     IntegerBuffer copy = buffer;
-    for (int c = 0; c < buffer.channels(); c++) {
-        for (int f = 0; f < buffer.frames(); f++) {
+    for (unsigned c = 0; c < buffer.channels(); c++) {
+        for (unsigned f = 0; f < buffer.frames(); f++) {
             REQUIRE(buffer.at(f, c) == copy.at(f, c));
         }
     }
@@ -34,8 +34,8 @@ TEST_CASE("ChannelData clear", "[ChannelData]") {
     IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
     buffer.clear();
 
-    for (int c = 0; c < buffer.channels(); c++) {
-        for (int f = 0; f < buffer.frames(); f++) {
+    for (unsigned c = 0; c < buffer.channels(); c++) {
+        for (unsigned f = 0; f < buffer.frames(); f++) {
             REQUIRE(buffer[c][f] == 0);
         }
     }
@@ -96,7 +96,7 @@ TEST_CASE("ChannelData read channel", "[ChannelData]") {
     REQUIRE(c[1] == -1);
     REQUIRE(c[2] == 4);
 
-    for (int f = 0; f < 3; f++) {
+    for (unsigned f = 0; f < 3; f++) {
         REQUIRE(buffer[1][f] == buffer.at(f, 1));
     }
 

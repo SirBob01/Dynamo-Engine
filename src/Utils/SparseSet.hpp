@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "./IdTracker.hpp"
-#include "./Log.hpp"
+#include <Utils/IdTracker.hpp>
+#include <Utils/Log.hpp>
 
 namespace Dynamo {
     /**
@@ -211,7 +211,7 @@ namespace Dynamo {
          */
         template <typename Functor>
         inline void forall_items(Functor &&function) {
-            for (int i = 0; i < size(); i++) {
+            for (unsigned i = 0; i < size(); i++) {
                 function(_pool[i]);
             }
         }
@@ -224,7 +224,7 @@ namespace Dynamo {
          */
         template <typename Functor>
         inline void forall_ids(Functor &&function) {
-            for (int i = 0; i < size(); i++) {
+            for (unsigned i = 0; i < size(); i++) {
                 function(_dense[i]);
             }
         }

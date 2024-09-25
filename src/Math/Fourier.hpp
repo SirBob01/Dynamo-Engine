@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "./Complex.hpp"
+#include <Math/Complex.hpp>
 
 namespace Dynamo::Fourier {
     /**

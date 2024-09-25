@@ -1,8 +1,8 @@
 #pragma once
 
-#include "./Listener.hpp"
-#include "./Material.hpp"
-#include "./Sound.hpp"
+#include <Sound/Listener.hpp>
+#include <Sound/Material.hpp>
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**

@@ -3,11 +3,11 @@
 #include <array>
 #include <vector>
 
-#include "../../Math/Complex.hpp"
-#include "../../Utils/Bits.hpp"
+#include <Math/Complex.hpp>
+#include <Utils/Bits.hpp>
 
-#include "../Chunk.hpp"
-#include "../Sound.hpp"
+#include <Sound/Chunk.hpp>
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Filter.hpp"
+#include <Sound/Filter.hpp>
 
 namespace Dynamo::Sound {
     /**

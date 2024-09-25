@@ -1,4 +1,4 @@
-#include "./Attenuation.hpp"
+#include <Sound/Filters/Attenuation.hpp>
 
 namespace Dynamo::Sound {
     Attenuation::Attenuation(float inner_radius, float cutoff_radius) :

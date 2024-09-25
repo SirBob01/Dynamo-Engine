@@ -1,4 +1,4 @@
-#include "Sound.hpp"
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     Sound::Sound(unsigned frames, unsigned channels, float sample_rate) :

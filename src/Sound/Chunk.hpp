@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include "./Filter.hpp"
-#include "./Material.hpp"
-#include "./Sound.hpp"
+#include <Sound/Filter.hpp>
+#include <Sound/Material.hpp>
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**

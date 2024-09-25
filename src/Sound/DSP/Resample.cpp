@@ -1,4 +1,4 @@
-#include "Resample.hpp"
+#include <Sound/DSP/Resample.hpp>
 
 namespace Dynamo::Sound {
     void resample_signal(WaveSample *src,

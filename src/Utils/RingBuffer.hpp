@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "./Log.hpp"
+#include <Utils/Log.hpp>
 
 namespace Dynamo {
     /**

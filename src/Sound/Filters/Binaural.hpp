@@ -2,9 +2,9 @@
 
 #include <array>
 
-#include "../DSP/Convolver.hpp"
-#include "../DSP/HRTF.hpp"
-#include "../Filter.hpp"
+#include <Sound/DSP/Convolver.hpp>
+#include <Sound/DSP/HRTF.hpp>
+#include <Sound/Filter.hpp>
 
 namespace Dynamo::Sound {
     /**

@@ -1,4 +1,4 @@
-#include "Application.hpp"
+#include <Application.hpp>
 
 namespace Dynamo {
     Application::Application(const ApplicationSettings &settings) {

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "./Log.hpp"
+#include <Utils/Log.hpp>
 
 namespace Dynamo {
     /**

@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "./Vec2.hpp"
+#include <Math/Vec2.hpp>
 
 namespace Dynamo {
     /**

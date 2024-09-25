@@ -1,4 +1,4 @@
-#include "Clock.hpp"
+#include <Clock.hpp>
 
 namespace Dynamo {
     Clock::Clock() {
