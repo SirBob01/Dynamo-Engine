@@ -14,10 +14,10 @@ namespace Dynamo::Sound {
     /**
      * @brief Read the raw HRIR binary data
      *
-     * @return WaveForm
+     * @return std::vector<WaveSample>
      */
-    static WaveForm read_HRIR_coefficients() {
-        WaveForm buffer(HRIR_bin_len / sizeof(float));
+    static std::vector<WaveSample> read_HRIR_coefficients() {
+        std::vector<WaveSample> buffer(HRIR_bin_len / sizeof(float));
         std::memcpy(buffer.data(), HRIR_bin, HRIR_bin_len);
         return buffer;
     }
@@ -26,7 +26,8 @@ namespace Dynamo::Sound {
      * @brief HRIR coefficients array
      *
      */
-    static const WaveForm HRIR_COEFFICIENTS = read_HRIR_coefficients();
+    static const std::vector<WaveSample> HRIR_COEFFICIENTS =
+        read_HRIR_coefficients();
 
     /**
      * @brief Length of an HRIR
