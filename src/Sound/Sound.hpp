@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <vector>
 
 #include "../Utils/ChannelData.hpp"
@@ -113,6 +114,9 @@ namespace Dynamo::Sound {
      */
     static constexpr float DEFAULT_SAMPLE_RATE = 44100;
 
+    // TODO: Implement upmix and downmix
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API#up-mixing_and_down-mixing
+
     /**
      * @brief Sound asset represented as a signal holding multiple channels of
      * WaveSample data
@@ -161,4 +165,10 @@ namespace Dynamo::Sound {
          */
         WaveFrame get_frame(const unsigned frame, const unsigned out_channels);
     };
+
+    /**
+     * @brief Sound reference.
+     *
+     */
+    using SoundRef = std::reference_wrapper<Sound>;
 } // namespace Dynamo::Sound

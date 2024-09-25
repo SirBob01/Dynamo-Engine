@@ -17,7 +17,6 @@
 #include "./Math/Vec3.hpp"
 #include "./Utils/Allocator.hpp"
 #include "./Utils/Bits.hpp"
-#include "./Utils/ChannelData.hpp"
 #include "./Utils/IdTracker.hpp"
 #include "./Utils/Log.hpp"
 #include "./Utils/Random.hpp"
