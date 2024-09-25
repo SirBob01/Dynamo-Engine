@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 #include <Math/Common.hpp>
 #include <Math/Delaunay.hpp>
 #include <Math/Triangle2.hpp>
@@ -6,14 +8,15 @@
 namespace Dynamo::Sound {
     HRTF::HRTF() {
         // Generate point space
-        for (const float &a : HRTF_AZIMUTHS) {
-            _points.push_back({a, -90});
+        for (float az : HRTF_AZIMUTHS) {
+            _points.push_back({az, -90});
             for (unsigned i = 0; i < 50; i++) {
-                float e = -45 + 5.625 * i;
-                _points.push_back({a, e});
+                float el = -45 + 5.625 * i;
+                _points.push_back({az, el});
             }
-            _points.push_back({a, 270});
+            _points.push_back({az, 270});
         }
+        _coeff_map.resize(_points.size());
 
         // Map each point to its index
         std::unordered_map<Vec2, unsigned> index_map;
@@ -42,7 +45,7 @@ namespace Dynamo::Sound {
     }
 
     Vec2 HRTF::compute_point(const Vec3 &listener_position,
-                             const Vec3 &source_position) {
+                             const Vec3 &source_position) const {
         Vec3 disp = source_position - listener_position;
 
         float azimuth = std::asin(disp.x / disp.length());
@@ -57,20 +60,20 @@ namespace Dynamo::Sound {
     void HRTF::calculate_HRIR(const Vec3 &listener_position,
                               const Quaternion &listener_rotation,
                               const Vec3 &source_position,
-                              Sound &dst_buffer) {
+                              Sound &dst_buffer) const {
         dst_buffer.clear();
         Vec2 point = compute_point(listener_position, source_position);
-        for (unsigned t = 0; t < _indices.size() / 3; t++) {
-            unsigned a = _indices[t * 3];
-            unsigned b = _indices[t * 3 + 1];
-            unsigned c = _indices[t * 3 + 2];
-            Triangle2 triangle(_points[a], _points[b], _points[c]);
+        for (unsigned t = 0; t < _indices.size(); t += 3) {
+            unsigned a = _indices[t];
+            unsigned b = _indices[t + 1];
+            unsigned c = _indices[t + 2];
 
+            Triangle2 triangle(_points[a], _points[b], _points[c]);
             Vec3 coords = triangle.barycentric(point);
             if (coords.x >= 0 && coords.y >= 0 && coords.z >= 0) {
-                Sound &ir0 = _coeff_map[a];
-                Sound &ir1 = _coeff_map[b];
-                Sound &ir2 = _coeff_map[c];
+                const Sound &ir0 = _coeff_map[a];
+                const Sound &ir1 = _coeff_map[b];
+                const Sound &ir2 = _coeff_map[c];
 
                 // Use barycentric coordinates to interpolate samples
                 for (unsigned c = 0; c < dst_buffer.channels(); c++) {

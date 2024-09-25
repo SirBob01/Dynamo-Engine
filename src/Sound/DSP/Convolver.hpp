@@ -21,7 +21,7 @@ namespace Dynamo::Sound {
      * convolutional processing
      *
      */
-    static constexpr unsigned PARTITION_LENGTH = BLOCK_LENGTH * 2;
+    static constexpr unsigned BLOCK_LENGTH_2 = BLOCK_LENGTH << 1;
 
     /**
      * @brief Signal convolution engine
@@ -35,13 +35,13 @@ namespace Dynamo::Sound {
          * @brief Input sample buffer
          *
          */
-        std::array<WaveSample, BLOCK_LENGTH * 2> _input = {0};
+        std::array<WaveSample, BLOCK_LENGTH_2> _input = {0};
 
         /**
          * @brief Output sample buffer
          *
          */
-        std::array<Complex, BLOCK_LENGTH * 2> _output = {0};
+        std::array<Complex, BLOCK_LENGTH_2> _output = {0};
 
         /**
          * @brief Frequency delay line
