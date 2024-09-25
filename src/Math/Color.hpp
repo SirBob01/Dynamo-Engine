@@ -2,7 +2,7 @@
 
 #include <array>
 
-#include "./Common.hpp"
+#include <Math/Common.hpp>
 
 namespace Dynamo {
     /**

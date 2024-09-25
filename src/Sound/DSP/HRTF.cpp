@@ -1,7 +1,7 @@
-#include "Sound/DSP/HRTF.hpp"
-#include "../../Math/Common.hpp"
-#include "../../Math/Delaunay.hpp"
-#include "../../Math/Triangle2.hpp"
+#include <Math/Common.hpp>
+#include <Math/Delaunay.hpp>
+#include <Math/Triangle2.hpp>
+#include <Sound/DSP/HRTF.hpp>
 
 namespace Dynamo::Sound {
     HRTF::HRTF() {

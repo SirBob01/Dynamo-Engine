@@ -3,7 +3,7 @@
 #include <cmath>
 #include <functional>
 
-#include "./Vec3.hpp"
+#include <Math/Vec3.hpp>
 
 namespace Dynamo {
     /**

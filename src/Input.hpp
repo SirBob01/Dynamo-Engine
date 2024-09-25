@@ -4,7 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "./Math/Vec2.hpp"
+#include <Math/Vec2.hpp>
 
 namespace Dynamo {
     /**

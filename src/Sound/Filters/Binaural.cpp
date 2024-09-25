@@ -1,4 +1,4 @@
-#include "./Binaural.hpp"
+#include <Sound/Filters/Binaural.hpp>
 
 namespace Dynamo::Sound {
     Binaural::Binaural(HRTF &hrtf) :

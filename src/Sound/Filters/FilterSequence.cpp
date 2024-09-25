@@ -1,4 +1,4 @@
-#include "./FilterSequence.hpp"
+#include <Sound/Filters/FilterSequence.hpp>
 
 namespace Dynamo::Sound {
     Sound &FilterSequence::apply(Sound &src,

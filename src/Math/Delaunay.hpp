@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "./Box2.hpp"
-#include "./Triangle2.hpp"
-#include "./Vec2.hpp"
+#include <Math/Box2.hpp>
+#include <Math/Triangle2.hpp>
+#include <Math/Vec2.hpp>
 
 namespace Dynamo::Delaunay {
     /**

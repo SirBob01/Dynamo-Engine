@@ -4,14 +4,14 @@
 
 #include <portaudio.h>
 
-#include "../Utils/IdTracker.hpp"
-#include "../Utils/RingBuffer.hpp"
+#include <Utils/IdTracker.hpp>
+#include <Utils/RingBuffer.hpp>
 
-#include "./Chunk.hpp"
-#include "./Device.hpp"
-#include "./Listener.hpp"
-#include "./Material.hpp"
-#include "./Sound.hpp"
+#include <Sound/Chunk.hpp>
+#include <Sound/Device.hpp>
+#include <Sound/Listener.hpp>
+#include <Sound/Material.hpp>
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**

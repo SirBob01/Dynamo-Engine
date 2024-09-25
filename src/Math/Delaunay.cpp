@@ -1,6 +1,6 @@
-#include "./Delaunay.hpp"
-#include "../Utils/Log.hpp"
-#include "./Segment2.hpp"
+#include <Math/Delaunay.hpp>
+#include <Math/Segment2.hpp>
+#include <Utils/Log.hpp>
 
 namespace Dynamo::Delaunay {
     std::vector<Triangle2> triangulate(std::vector<Vec2> &points) {

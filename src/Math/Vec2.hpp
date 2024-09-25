@@ -3,7 +3,7 @@
 #include <cmath>
 #include <functional>
 
-#include "Matrix.hpp"
+#include <Math/Matrix.hpp>
 
 namespace Dynamo {
     /**

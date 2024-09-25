@@ -2,7 +2,7 @@
 
 #include <sndfile.hh>
 
-#include "../Sound/Sound.hpp"
+#include <Sound/Sound.hpp>
 
 namespace Dynamo {
     /**

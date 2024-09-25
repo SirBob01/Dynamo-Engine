@@ -7,8 +7,8 @@
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
 
-#include "./Input.hpp"
-#include "./Math/Vec2.hpp"
+#include <Input.hpp>
+#include <Math/Vec2.hpp>
 
 namespace Dynamo {
     /**

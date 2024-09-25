@@ -1,4 +1,4 @@
-#include "./Stereo.hpp"
+#include <Sound/Filters/Stereo.hpp>
 
 namespace Dynamo::Sound {
     Stereo::Stereo() : _output(0, 2) {}

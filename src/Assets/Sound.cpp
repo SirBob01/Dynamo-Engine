@@ -1,5 +1,5 @@
-#include "./Sound.hpp"
-#include "../Utils/Log.hpp"
+#include <Assets/Sound.hpp>
+#include <Utils/Log.hpp>
 
 namespace Dynamo {
     Sound::Sound load(const std::string filepath) {

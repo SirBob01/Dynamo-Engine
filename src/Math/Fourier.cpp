@@ -1,6 +1,6 @@
-#include "Fourier.hpp"
-#include "../Utils/Bits.hpp"
-#include "../Utils/Log.hpp"
+#include <Math/Fourier.hpp>
+#include <Utils/Bits.hpp>
+#include <Utils/Log.hpp>
 
 namespace Dynamo::Fourier {
     void transform(Complex *signal, unsigned N) {

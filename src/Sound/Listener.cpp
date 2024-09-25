@@ -1,6 +1,6 @@
 #include <limits>
 
-#include "./Listener.hpp"
+#include <Sound/Listener.hpp>
 
 namespace Dynamo::Sound {
     unsigned ListenerSet::size() { return _properties.size(); }

@@ -1,5 +1,5 @@
-#include "./Jukebox.hpp"
-#include "./DSP/Resample.hpp"
+#include <Sound/DSP/Resample.hpp>
+#include <Sound/Jukebox.hpp>
 
 namespace Dynamo::Sound {
     Jukebox::Jukebox() {
