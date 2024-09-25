@@ -1,6 +1,5 @@
 #pragma once
 
-#include <unordered_map>
 #include <vector>
 
 #include <Math/Quaternion.hpp>
@@ -53,7 +52,7 @@ namespace Dynamo::Sound {
         std::vector<Vec2> _points;
         std::vector<unsigned> _indices;
 
-        std::unordered_map<unsigned, Sound> _coeff_map;
+        std::vector<Sound> _coeff_map;
 
         /**
          * @brief Compute the azimuth and elevation angles
@@ -63,7 +62,7 @@ namespace Dynamo::Sound {
          * @return Vec2
          */
         Vec2 compute_point(const Vec3 &listener_position,
-                           const Vec3 &source_position);
+                           const Vec3 &source_position) const;
 
       public:
         /**
@@ -84,6 +83,6 @@ namespace Dynamo::Sound {
         void calculate_HRIR(const Vec3 &listener_position,
                             const Quaternion &listener_rotation,
                             const Vec3 &source_position,
-                            Sound &dst_buffer);
+                            Sound &dst_buffer) const;
     };
 } // namespace Dynamo::Sound
