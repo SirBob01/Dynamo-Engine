@@ -16,6 +16,7 @@ namespace Dynamo::Sound {
         std::array<Convolver, 2> _convolvers;
 
         Sound _impulse_response;
+        Sound _remixed;
         Sound _output;
 
       public:

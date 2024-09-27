@@ -41,20 +41,6 @@ TEST_CASE("ChannelData clear", "[ChannelData]") {
     }
 }
 
-TEST_CASE("ChannelData set frames", "[ChannelData]") {
-    IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
-
-    buffer.set_frames(2);
-    REQUIRE(buffer.frames() == 2);
-}
-
-TEST_CASE("ChannelData set channels", "[ChannelData]") {
-    IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
-
-    buffer.set_channels(4);
-    REQUIRE(buffer.channels() == 4);
-}
-
 TEST_CASE("ChannelData resize", "[ChannelData]") {
     IntegerBuffer buffer({3, 2, 1, 0, -1, 4}, 2);
 

@@ -37,41 +37,26 @@ namespace Dynamo::Sound {
         PaStream *_input_stream;
         PaStream *_output_stream;
 
-        /**
-         * @brief Global volume control
-         *
-         */
         float _volume;
 
-        /**
-         * @brief Final waveform on which all active chunks are layered onto
-         *
-         */
-        WaveForm _composite;
+        Sound _scratch;
+        Sound _remixed;
+        Sound _composite;
 
-        /**
-         * @brief Set of all listeners
-         *
-         */
         ListenerSet _listeners;
-
-        /**
-         * @brief Chunks to be processed.
-         *
-         */
         std::vector<Chunk> _chunks;
 
         /**
          * @brief Internal state shared with the PortAudio callback
          *
          */
-        struct PAState {
+        struct PaState {
             RingBuffer<WaveSample, BUFFER_SIZE> buffer;
             unsigned channels;
             double sample_rate;
         };
-        PAState _input_state;
-        PAState _output_state;
+        PaState _input_state;
+        PaState _output_state;
 
         /**
          * @brief Callback for reading recorded audio from the input device

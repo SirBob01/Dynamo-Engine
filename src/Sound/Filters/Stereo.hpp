@@ -8,15 +8,10 @@ namespace Dynamo::Sound {
      *
      */
     class Stereo : public Filter {
+        Sound _remixed;
         Sound _output;
 
       public:
-        /**
-         * @brief Construct a new Stereo filter object
-         *
-         */
-        Stereo();
-
         Sound &apply(Sound &src,
                      const unsigned offset,
                      const unsigned length,

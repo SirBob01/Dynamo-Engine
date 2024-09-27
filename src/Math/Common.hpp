@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr double PI = 3.14159265358979323846264338327950288;
+#include <cmath>
 
 namespace Dynamo {
     /**
@@ -10,7 +10,7 @@ namespace Dynamo {
      * @return float
      */
     inline float to_degrees(float rad) {
-        static const float factor = 180.0 / PI;
+        static const float factor = 180.0 / M_PI;
         return rad * factor;
     }
 
@@ -21,7 +21,7 @@ namespace Dynamo {
      * @return float
      */
     inline float to_radians(float deg) {
-        static const float factor = PI / 180.0;
+        static const float factor = M_PI / 180.0;
         return deg * factor;
     }
 
