@@ -1,11 +1,28 @@
 #pragma once
 
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON)
+#define DYNAMO_ARCH_NEON
 #include <Math/Arch/Neon.hpp>
+
 namespace arch = Dynamo::Vectorize::Neon;
+
+#elif (defined(__i386__) || defined(__x86_64__)) && defined(__AVX__)
+#define DYNAMO_ARCH_AVX
+#include <Math/Arch/AVX.hpp>
+
+namespace arch = Dynamo::Vectorize::AVX;
+
+#elif (defined(__i386__) || defined(__x86_64__)) && defined(__SSE__)
+#define DYNAMO_ARCH_SSE
+#include <Math/Arch/SSE.hpp>
+
+namespace arch = Dynamo::Vectorize::SSE;
+
 #else
 #include <Math/Arch/Scalar.hpp>
+
 namespace arch = Dynamo::Vectorize::Scalar;
+
 #endif
 
 namespace Dynamo::Vectorize {

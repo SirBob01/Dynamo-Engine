@@ -1,0 +1,48 @@
+#pragma once
+#include <immintrin.h>
+
+namespace Dynamo::Vectorize::SSE {
+    inline void
+    smul(const float *src, const float scalar, float *dst, unsigned length) {
+        unsigned i = 0;
+        unsigned mul4 = length - (length % 4);
+        __m128 scalar_v = _mm_set1_ps(scalar);
+        for (; i < mul4; i += 4) {
+            __m128 a_v = _mm_loadu_ps(src + i);
+            _mm_storeu_ps(dst + i, _mm_mul_ps(a_v, scalar_v));
+        }
+        for (; i < length; i++) {
+            dst[i] = src[i] * scalar;
+        }
+    }
+
+    inline void
+    vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
+        unsigned i = 0;
+        unsigned mul4 = length - (length % 4);
+        for (; i < mul4; i += 4) {
+            __m128 a_v = _mm_loadu_ps(src_a + i);
+            __m128 b_v = _mm_loadu_ps(src_b + i);
+            _mm_storeu_ps(dst + i, _mm_add_ps(a_v, b_v));
+        }
+        for (; i < length; i++) {
+            dst[i] = src_a[i] + src_b[i];
+        }
+    }
+
+    inline void
+    vsma(const float *src, const float scalar, float *dst, unsigned length) {
+        unsigned i = 0;
+        unsigned mul4 = length - (length % 4);
+        __m128 scalar_v = _mm_set1_ps(scalar);
+        for (; i < mul4; i += 4) {
+            __m128 a_v = _mm_loadu_ps(src + i);
+            __m128 b_v = _mm_loadu_ps(dst + i);
+            __m128 c_v = _mm_add_ps(_mm_mul_ps(a_v, scalar_v), b_v);
+            _mm_storeu_ps(dst + i, c_v);
+        }
+        for (; i < length; i++) {
+            dst[i] += src[i] * scalar;
+        }
+    }
+} // namespace Dynamo::Vectorize::SSE
