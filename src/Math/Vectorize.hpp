@@ -1,6 +1,12 @@
 #pragma once
 
-// TODO: Implement utilies using intrinsics or std::experimental::simd
+#ifdef __ARM_NEON
+#include <Math/Arch/Neon.hpp>
+namespace arch = Dynamo::Vectorize::Neon;
+#else
+#include <Math/Arch/Scalar.hpp>
+namespace arch = Dynamo::Vectorize::Scalar;
+#endif
 
 namespace Dynamo::Vectorize {
     /**
@@ -13,9 +19,7 @@ namespace Dynamo::Vectorize {
      */
     inline void
     smul(const float *src_a, const float scalar, float *dst, unsigned length) {
-        for (unsigned i = 0; i < length; i++) {
-            dst[i] = src_a[i] * scalar;
-        }
+        arch::smul(src_a, scalar, dst, length);
     }
 
     /**
@@ -28,9 +32,7 @@ namespace Dynamo::Vectorize {
      */
     inline void
     vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
-        for (unsigned i = 0; i < length; i++) {
-            dst[i] = src_a[i] + src_b[i];
-        }
+        arch::vadd(src_a, src_b, dst, length);
     }
 
     /**
@@ -44,8 +46,6 @@ namespace Dynamo::Vectorize {
      */
     inline void
     vsma(const float *src, const float scalar, float *dst, unsigned length) {
-        for (unsigned i = 0; i < length; i++) {
-            dst[i] += src[i] * scalar;
-        }
+        arch::vsma(src, scalar, dst, length);
     }
 } // namespace Dynamo::Vectorize
