@@ -81,26 +81,6 @@ namespace Dynamo {
         }
 
         /**
-         * @brief Set the number of frames and resize the container.
-         *
-         * @param frames Number of frames.
-         */
-        inline void set_frames(const unsigned frames) {
-            _container.resize(_channels * frames);
-            _frames = frames;
-        }
-
-        /**
-         * @brief Set the number of channels and resize the container.
-         *
-         * @param channels Number of channels.
-         */
-        inline void set_channels(const unsigned channels) {
-            _container.resize(channels * _frames);
-            _channels = channels;
-        }
-
-        /**
          * @brief Resize the container to fit a number of frames and channels.
          *
          * @param frames   Number of frames.

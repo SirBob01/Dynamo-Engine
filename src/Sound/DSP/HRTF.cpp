@@ -3,6 +3,7 @@
 #include <Math/Common.hpp>
 #include <Math/Delaunay.hpp>
 #include <Math/Triangle2.hpp>
+#include <Math/Vectorize.hpp>
 #include <Sound/DSP/HRTF.hpp>
 
 namespace Dynamo::Sound {
@@ -77,11 +78,11 @@ namespace Dynamo::Sound {
 
                 // Use barycentric coordinates to interpolate samples
                 for (unsigned c = 0; c < dst_buffer.channels(); c++) {
-                    for (unsigned f = 0; f < dst_buffer.frames(); f++) {
-                        dst_buffer[c][f] = ir0[c][f] * coords.x +
-                                           ir1[c][f] * coords.y +
-                                           ir2[c][f] * coords.z;
-                    }
+                    WaveSample *dst = dst_buffer[c];
+                    unsigned frames = dst_buffer.frames();
+                    Vectorize::vsma(ir0[c], coords.x, dst, frames);
+                    Vectorize::vsma(ir1[c], coords.y, dst, frames);
+                    Vectorize::vsma(ir2[c], coords.z, dst, frames);
                 }
                 break;
             }

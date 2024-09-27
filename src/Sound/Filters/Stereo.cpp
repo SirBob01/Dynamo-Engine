@@ -1,8 +1,7 @@
+#include <Math/Vectorize.hpp>
 #include <Sound/Filters/Stereo.hpp>
 
 namespace Dynamo::Sound {
-    Stereo::Stereo() : _output(0, 2) {}
-
     Sound &Stereo::apply(Sound &src,
                          const unsigned offset,
                          const unsigned length,
@@ -22,15 +21,23 @@ namespace Dynamo::Sound {
         }
 
         // Square-law panning
-        float l_gain = std::sqrt(1 - pan);
-        float r_gain = std::sqrt(pan);
+        std::array<float, 2> channel_gains = {std::sqrt(1 - pan),
+                                              std::sqrt(pan)};
 
-        _output.set_frames(length);
+        // Resize the scratch buffers
+        _output.resize(length, 2);
+        _remixed.resize(length, 2);
+
+        // Remix to the desired number of channels
+        _remixed.clear();
+        src.remix(_remixed, offset, 0, length);
+
+        // Apply per-channel gain
         for (unsigned c = 0; c < 2; c++) {
-            float gain = c == 0 ? l_gain : r_gain;
-            for (unsigned f = 0; f < length; f++) {
-                _output[c][f] = src[c][f + offset] * gain;
-            }
+            Vectorize::smul(_remixed[c] + offset,
+                            channel_gains[c],
+                            _output[c],
+                            length);
         }
         return _output;
     }

@@ -1,3 +1,4 @@
+#include <Math/Vectorize.hpp>
 #include <Sound/Filters/Attenuation.hpp>
 
 namespace Dynamo::Sound {
@@ -20,14 +21,15 @@ namespace Dynamo::Sound {
                               const unsigned length,
                               const Material &material,
                               const ListenerProperties &listener) {
-        _output.resize(length, src.channels());
         float distance = (material.position - listener.position).length();
         float gain = linear(distance);
 
+        // Resize the output buffer
+        _output.resize(length, src.channels());
+
+        // Apply gain
         for (unsigned c = 0; c < _output.channels(); c++) {
-            for (unsigned f = 0; f < _output.frames(); f++) {
-                _output[c][f] = src[c][f + offset] * gain;
-            }
+            Vectorize::smul(src[c] + offset, gain, _output[c], length);
         }
         return _output;
     }

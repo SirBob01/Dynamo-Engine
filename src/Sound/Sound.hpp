@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <functional>
 #include <vector>
 
@@ -8,122 +7,57 @@
 
 namespace Dynamo::Sound {
     /**
+     * @brief The default sample rate is defined to be 44.1KHz
+     *
+     */
+    static constexpr float DEFAULT_SAMPLE_RATE = 44100;
+
+    /**
      * @brief Indiviual sample ranges between [−1.0, +1.0]
      *
      */
     using WaveSample = float;
 
     /**
-     * @brief An array of samples, a discrete representation of a sound wave
-     *
-     * Sources with multiple channels may have their values interleaved
+     * @brief Supported channel remix combinations
      *
      */
-    using WaveForm = std::vector<WaveSample>;
-
-    /**
-     * @brief Frame in the audio waveform containing mono or stereo samples
-     *
-     */
-    struct WaveFrame {
-        std::array<WaveSample, 2> samples;
-        unsigned channels;
+    enum class ChannelRemixMode : unsigned {
+        C_1_2 = ((1 << (1 + 7)) | (1 << (2 - 1))),
+        C_1_4 = ((1 << (1 + 7)) | (1 << (4 - 1))),
+        C_1_6 = ((1 << (1 + 7)) | (1 << (6 - 1))),
+        C_2_1 = ((1 << (2 + 7)) | (1 << (1 - 1))),
+        C_2_4 = ((1 << (2 + 7)) | (1 << (4 - 1))),
+        C_2_6 = ((1 << (2 + 7)) | (1 << (6 - 1))),
+        C_4_1 = ((1 << (4 + 7)) | (1 << (1 - 1))),
+        C_4_2 = ((1 << (4 + 7)) | (1 << (2 - 1))),
+        C_4_6 = ((1 << (4 + 7)) | (1 << (6 - 1))),
+        C_6_1 = ((1 << (6 + 7)) | (1 << (1 - 1))),
+        C_6_2 = ((1 << (6 + 7)) | (1 << (2 - 1))),
+        C_6_4 = ((1 << (6 + 7)) | (1 << (4 - 1))),
     };
 
     /**
-     * @brief Channels in a waveform
-     *
-     */
-    enum class Channel {
-        FL = 0,
-        FC = 1,
-        FR = 2,
-        SL = 3,
-        SR = 4,
-        BL = 5,
-        BC = 6,
-        BR = 7,
-        LFE = 8
-    };
-
-    /**
-     * @brief Order of the channels depending on number of channels
-     *
-     */
-    static const std::vector<Channel> CHANNEL_ORDERS[8] = {
-        {Channel::FC},
-        {Channel::FL, Channel::FR},
-        {Channel::FL, Channel::FC, Channel::FR},
-        {Channel::FL, Channel::FR, Channel::BL, Channel::BR},
-        {Channel::FL, Channel::FC, Channel::FR, Channel::BL, Channel::BR},
-        {Channel::FL,
-         Channel::FC,
-         Channel::FR,
-         Channel::BL,
-         Channel::BR,
-         Channel::LFE},
-        {Channel::FL,
-         Channel::FC,
-         Channel::FR,
-         Channel::BL,
-         Channel::BR,
-         Channel::BC,
-         Channel::LFE},
-        {Channel::FL,
-         Channel::FC,
-         Channel::FR,
-         Channel::SL,
-         Channel::SR,
-         Channel::BL,
-         Channel::BR,
-         Channel::LFE},
-    };
-
-    /**
-     * @brief Gain coefficients for downmixing a waveform to mono or stereo
-     *
-     */
-    static const double DOWNMIX_COEFFS[2][9][2] = {
-        {
-            {M_SQRT1_2},
-            {1},
-            {M_SQRT1_2},
-            {0.5},
-            {0.5},
-            {0.5},
-            {0.25},
-            {0.5},
-            {0.25},
-        },
-        {
-            {1, 0},
-            {M_SQRT1_2, M_SQRT1_2},
-            {0, 1},
-            {M_SQRT1_2, 0},
-            {0, M_SQRT1_2},
-            {M_SQRT1_2, 0},
-            {0.5, 0.5},
-            {0, M_SQRT1_2},
-            {0.5, 0.5},
-        },
-    };
-
-    /**
-     * @brief The default sample rate is defined to be 44.1KHz
-     *
-     */
-    static constexpr float DEFAULT_SAMPLE_RATE = 44100;
-
-    // TODO: Implement upmix and downmix
-    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API#up-mixing_and_down-mixing
-
-    /**
-     * @brief Sound asset represented as a signal holding multiple channels of
-     * WaveSample data
+     * @brief A signal holding multiple channels of WaveSample data
      *
      */
     class Sound : public ChannelData<WaveSample> {
         float _sample_rate;
+
+        void vadd_channel(Sound &dst,
+                          unsigned src_channel,
+                          unsigned dst_channel,
+                          unsigned src_offset,
+                          unsigned dst_offset,
+                          unsigned length) const;
+
+        void vsma_channel(Sound &dst,
+                          float scalar,
+                          unsigned src_channel,
+                          unsigned dst_channel,
+                          unsigned src_offset,
+                          unsigned dst_offset,
+                          unsigned length) const;
 
       public:
         /**
@@ -144,7 +78,7 @@ namespace Dynamo::Sound {
          * @param channels    Number of channels
          * @param sample_rate Sample rate
          */
-        Sound(std::vector<WaveSample> samples,
+        Sound(const std::vector<WaveSample> &samples,
               unsigned channels,
               float sample_rate);
 
@@ -156,14 +90,17 @@ namespace Dynamo::Sound {
         float sample_rate() const;
 
         /**
-         * @brief Grab a frame in the waveform and upmix or downmix to the
-         * desired number of channels
+         * @brief Remix to the desired channel count in the destination buffer
          *
-         * @param frame        Frame index
-         * @param out_channels Target number of channels
-         * @return WaveFrame
+         * @param dst
+         * @param src_offset
+         * @param dst_offset
+         * @param length
          */
-        WaveFrame get_frame(const unsigned frame, const unsigned out_channels);
+        void remix(Sound &dst,
+                   unsigned src_offset,
+                   unsigned dst_offset,
+                   unsigned length) const;
     };
 
     /**
