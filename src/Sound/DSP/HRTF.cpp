@@ -10,12 +10,12 @@ namespace Dynamo::Sound {
     HRTF::HRTF() {
         // Generate point space
         for (float az : HRTF_AZIMUTHS) {
-            _points.push_back({az, -90});
+            _points.emplace_back(az, -90);
             for (unsigned i = 0; i < 50; i++) {
                 float el = -45 + 5.625 * i;
-                _points.push_back({az, el});
+                _points.emplace_back(az, el);
             }
-            _points.push_back({az, 270});
+            _points.emplace_back(az, 270);
         }
         _coeff_map.resize(_points.size());
 
@@ -36,11 +36,12 @@ namespace Dynamo::Sound {
         // Read the HRIR samples for each point
         unsigned offset = 0;
         for (unsigned i = 0; i < _points.size(); i++) {
-            _coeff_map[i].resize(HRIR_LENGTH, 2);
+            Sound &coeff = _coeff_map[i];
+            coeff.resize(HRIR_LENGTH, 2);
             for (unsigned c = 0; c < 2; c++) {
-                for (unsigned f = 0; f < HRIR_LENGTH; f++) {
-                    _coeff_map[i][c][f] = HRIR_COEFFICIENTS[offset++];
-                }
+                const WaveSample *samples = HRIR_COEFFICIENTS.data() + offset;
+                std::copy(samples, samples + HRIR_LENGTH, coeff[c]);
+                offset += HRIR_LENGTH;
             }
         }
     }
@@ -52,7 +53,7 @@ namespace Dynamo::Sound {
         float azimuth = std::asin(disp.x / disp.length());
         float elevation = std::atan2(-disp.z, disp.y);
         if (disp.y < 0 && disp.z < 0) {
-            elevation += 2 * M_PI;
+            elevation += M_2_PI;
         }
 
         return Vec2(to_degrees(azimuth), to_degrees(elevation));
@@ -71,7 +72,9 @@ namespace Dynamo::Sound {
 
             Triangle2 triangle(_points[a], _points[b], _points[c]);
             Vec3 coords = triangle.barycentric(point);
-            if (coords.x >= 0 && coords.y >= 0 && coords.z >= 0) {
+
+            float eps = 1e-6;
+            if (coords.x >= -eps && coords.y >= -eps && coords.z >= -eps) {
                 const Sound &ir0 = _coeff_map[a];
                 const Sound &ir1 = _coeff_map[b];
                 const Sound &ir2 = _coeff_map[c];
@@ -84,8 +87,11 @@ namespace Dynamo::Sound {
                     Vectorize::vsma(ir1[c], coords.y, dst, frames);
                     Vectorize::vsma(ir2[c], coords.z, dst, frames);
                 }
-                break;
+                return;
             }
         }
+        Dynamo::Log::error("HRTF could not triagulate ({} {})",
+                           point.x,
+                           point.y);
     }
 } // namespace Dynamo::Sound

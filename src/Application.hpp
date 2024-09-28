@@ -73,28 +73,28 @@ namespace Dynamo {
          *
          * @return Display&
          */
-        Display &get_display();
+        Display &display();
 
         /**
          * @brief Get the input handler.
          *
          * @return Input&
          */
-        Input &get_input();
+        Input &input();
 
         /**
          * @brief Get the clock.
          *
          * @return Clock&
          */
-        Clock &get_clock();
+        Clock &clock();
 
         /**
          * @brief Get the audio engine.
          *
          * @return Sound::Jukebox&
          */
-        Sound::Jukebox &get_jukebox();
+        Sound::Jukebox &jukebox();
 
         /**
          * @brief Update the application state.
