@@ -1,4 +1,6 @@
 #pragma once
+
+#include <algorithm>
 #include <arm_neon.h>
 
 namespace Dynamo::Vectorize::Neon {
@@ -42,6 +44,24 @@ namespace Dynamo::Vectorize::Neon {
         }
         for (; i < length; i++) {
             dst[i] += src[i] * scalar;
+        }
+    }
+
+    inline void vclip(const float *src,
+                      const float lo,
+                      const float hi,
+                      float *dst,
+                      unsigned length) {
+        unsigned i = 0;
+        unsigned mul4 = length - (length % 4);
+        float32x4_t lo_v = vdupq_n_f32(lo);
+        float32x4_t hi_v = vdupq_n_f32(hi);
+        for (; i < mul4; i += 4) {
+            float32x4_t a_v = vld1q_f32(src + i);
+            vst1q_f32(dst + i, vmaxq_f32(lo_v, vminq_f32(hi_v, a_v)));
+        }
+        for (; i < length; i++) {
+            dst[i] = std::max(lo, std::min(hi, src[i]));
         }
     }
 } // namespace Dynamo::Vectorize::Neon

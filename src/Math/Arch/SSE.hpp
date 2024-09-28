@@ -1,4 +1,6 @@
 #pragma once
+
+#include <algorithm>
 #include <immintrin.h>
 
 namespace Dynamo::Vectorize::SSE {
@@ -43,6 +45,24 @@ namespace Dynamo::Vectorize::SSE {
         }
         for (; i < length; i++) {
             dst[i] += src[i] * scalar;
+        }
+    }
+
+    inline void vclip(const float *src,
+                      const float lo,
+                      const float hi,
+                      float *dst,
+                      unsigned length) {
+        unsigned i = 0;
+        unsigned mul4 = length - (length % 4);
+        __m128 lo_v = _mm_set1_ps(lo);
+        __m128 hi_v = _mm_set1_ps(hi);
+        for (; i < mul4; i += 4) {
+            __m128 a_v = _mm_loadu_ps(src + i);
+            _mm_storeu_ps(dst + i, _mm_max_ps(lo_v, _mm_min_ps(hi_v, a_v)));
+        }
+        for (; i < length; i++) {
+            dst[i] = std::max(lo, std::min(hi, src[i]));
         }
     }
 } // namespace Dynamo::Vectorize::SSE

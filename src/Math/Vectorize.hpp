@@ -65,4 +65,21 @@ namespace Dynamo::Vectorize {
     vsma(const float *src, const float scalar, float *dst, unsigned length) {
         arch::vsma(src, scalar, dst, length);
     }
+
+    /**
+     * @brief dst[i] = min(hi, max(lo, src[i]))
+     *
+     * @param src
+     * @param min
+     * @param max
+     * @param dst
+     * @param length
+     */
+    inline void vclip(const float *src,
+                      const float lo,
+                      const float hi,
+                      float *dst,
+                      unsigned length) {
+        arch::vclip(src, lo, hi, dst, length);
+    }
 } // namespace Dynamo::Vectorize
