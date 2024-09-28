@@ -23,13 +23,13 @@ namespace Dynamo {
 
     bool Application::is_running() const { return _display->is_open(); }
 
-    Display &Application::get_display() { return *_display; }
+    Display &Application::display() { return *_display; }
 
-    Input &Application::get_input() { return _display->get_input(); }
+    Input &Application::input() { return _display->get_input(); }
 
-    Clock &Application::get_clock() { return _clock; }
+    Clock &Application::clock() { return _clock; }
 
-    Sound::Jukebox &Application::get_jukebox() { return *_jukebox; }
+    Sound::Jukebox &Application::jukebox() { return *_jukebox; }
 
     void Application::update() {
         // Poll for input
