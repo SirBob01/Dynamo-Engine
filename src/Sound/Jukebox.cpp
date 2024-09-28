@@ -93,8 +93,23 @@ namespace Dynamo::Sound {
         return 0;
     }
 
+    Listener &Jukebox::find_closest_listener(Vec3 position) {
+        unsigned closest_index = 0;
+        float closest_distance = std::numeric_limits<float>::max();
+        for (unsigned i = 0; i < _listeners.size(); i++) {
+            const Listener &listener = _listeners[i];
+            float distance = (listener.position - position).length_squared();
+            if (distance < closest_distance) {
+                closest_index = i;
+                closest_distance = distance;
+            }
+        }
+        return _listeners[closest_index];
+    }
+
     void Jukebox::process_chunk(Chunk &chunk) {
-        if (_listeners.size() == 0) return;
+        // Jukebox requires at least 1 listener for playback
+        if (_listeners.empty()) return;
 
         Sound &sound = chunk.sound;
         Material &material = chunk.material;
@@ -124,7 +139,7 @@ namespace Dynamo::Sound {
         }
 
         // Apply the filters, if any
-        auto &listener = _listeners.find_closest(material.position);
+        Listener &listener = find_closest_listener(material.position);
         if (chunk.filter.has_value()) {
             // TODO: Rethink the Filter interface, minimize memcopies
             _scratch = chunk.filter->get().apply(_scratch,
@@ -181,6 +196,24 @@ namespace Dynamo::Sound {
 
         return devices;
     }
+
+    void Jukebox::add_listener(Listener &listener) {
+        _listeners.push_back(listener);
+    }
+
+    bool Jukebox::remove_listener(Listener &listener) {
+        auto it = _listeners.begin();
+        while (it != _listeners.end()) {
+            if (&(*it).get() == &listener) {
+                _listeners.erase(it);
+                return true;
+            }
+            it++;
+        }
+        return false;
+    }
+
+    void Jukebox::clear_listeners() { _listeners.clear(); }
 
     void Jukebox::set_input_device(const Device &device) {
         PaError err;
@@ -289,15 +322,9 @@ namespace Dynamo::Sound {
 
     float Jukebox::get_volume() { return _volume; }
 
-    void Jukebox::pause() { Pa_StopStream(_output_stream); }
-
-    void Jukebox::resume() { Pa_StartStream(_output_stream); }
-
     void Jukebox::set_volume(float volume) {
         _volume = std::clamp(volume, 0.0f, 1.0f);
     }
-
-    ListenerSet &Jukebox::get_listeners() { return _listeners; }
 
     void Jukebox::play(Sound &sound,
                        Material &material,
@@ -305,6 +332,10 @@ namespace Dynamo::Sound {
         float frame = _output_state.sample_rate * material.start_seconds;
         _chunks.push_back({sound, material, filter, frame});
     }
+
+    void Jukebox::pause() { Pa_StopStream(_output_stream); }
+
+    void Jukebox::resume() { Pa_StartStream(_output_stream); }
 
     void Jukebox::update() {
         // Wait for there to be available space in the buffer

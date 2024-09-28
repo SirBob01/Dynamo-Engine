@@ -8,7 +8,7 @@ namespace Dynamo::Sound {
                            const unsigned offset,
                            const unsigned length,
                            const Material &material,
-                           const ListenerProperties &listener) {
+                           const Listener &listener) {
         _hrtf.get().calculate_HRIR(listener.position,
                                    listener.rotation,
                                    material.position,
