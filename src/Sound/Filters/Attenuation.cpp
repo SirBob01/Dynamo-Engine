@@ -20,7 +20,7 @@ namespace Dynamo::Sound {
                               const unsigned offset,
                               const unsigned length,
                               const Material &material,
-                              const ListenerProperties &listener) {
+                              const Listener &listener) {
         float distance = (material.position - listener.position).length();
         float gain = linear(distance);
 

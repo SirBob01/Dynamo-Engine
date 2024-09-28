@@ -6,7 +6,7 @@ namespace Dynamo::Sound {
                          const unsigned offset,
                          const unsigned length,
                          const Material &material,
-                         const ListenerProperties &listener) {
+                         const Listener &listener) {
         Vec3 delta = material.position - listener.position;
         Vec3 up = listener.rotation.up();
         Vec3 right = listener.rotation.right();

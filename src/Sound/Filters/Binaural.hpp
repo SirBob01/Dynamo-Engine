@@ -31,6 +31,6 @@ namespace Dynamo::Sound {
                      const unsigned offset,
                      const unsigned length,
                      const Material &material,
-                     const ListenerProperties &listener) override;
+                     const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

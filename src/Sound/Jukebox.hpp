@@ -21,14 +21,6 @@ namespace Dynamo::Sound {
     static constexpr unsigned BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
 
     /**
-     * @brief A playback track on which audio can be enqueued
-     *
-     * TODO: Implement API
-     *
-     */
-    using SoundTrack = Id;
-
-    /**
      * @brief In-house audio engine supporting static sounds, spatial sounds,
      * and multiple listeners
      *
@@ -43,7 +35,7 @@ namespace Dynamo::Sound {
         Sound _remixed;
         Sound _composite;
 
-        ListenerSet _listeners;
+        std::vector<ListenerRef> _listeners;
         std::vector<Chunk> _chunks;
 
         /**
@@ -95,6 +87,14 @@ namespace Dynamo::Sound {
                                    void *data);
 
         /**
+         * @brief Find the closest listener to a position
+         *
+         * @param position
+         * @return Listener&
+         */
+        Listener &find_closest_listener(Vec3 position);
+
+        /**
          * @brief Process a chunk
          *
          * @param chunk chunk
@@ -117,18 +117,44 @@ namespace Dynamo::Sound {
         const std::vector<Device> get_devices();
 
         /**
-         * @brief Set the input device
+         * @brief Add a listener.
          *
-         * This will close the input stream and instance a new one
+         * Jukebox requires at least 1 listener for playback.
+         *
+         * @param listener
+         */
+        void add_listener(Listener &listener);
+
+        /**
+         * @brief Remove a listener.
+         *
+         * Returns true if the listener was found.
+         *
+         * @param listener
+         * @return true
+         * @return false
+         */
+        bool remove_listener(Listener &listener);
+
+        /**
+         * @brief Remove all listeners.
+         *
+         */
+        void clear_listeners();
+
+        /**
+         * @brief Set the input device.
+         *
+         * This will close the input stream and instance a new one.
          *
          * @param device
          */
         void set_input_device(const Device &device);
 
         /**
-         * @brief Set the output device
+         * @brief Set the output device.
          *
-         * This will close the output stream and instance a new one
+         * This will close the output stream and instance a new one.
          *
          * @param device
          */
@@ -143,7 +169,7 @@ namespace Dynamo::Sound {
         bool is_playing();
 
         /**
-         * @brief Is the input device listening
+         * @brief Is the input device listening?
          *
          * @return true
          * @return false
@@ -151,40 +177,21 @@ namespace Dynamo::Sound {
         bool is_recording();
 
         /**
-         * @brief Get the master volume
+         * @brief Get the master volume.
          *
          * @return float
          */
         float get_volume();
 
         /**
-         * @brief Pause audio playback
-         *
-         */
-        void pause();
-
-        /**
-         * @brief Resume audio playback
-         *
-         */
-        void resume();
-
-        /**
-         * @brief Set the master volume
+         * @brief Set the master volume.
          *
          * @param volume
          */
         void set_volume(float volume);
 
         /**
-         * @brief Get the set of listeners
-         *
-         * @return ListenerSet&
-         */
-        ListenerSet &get_listeners();
-
-        /**
-         * @brief Play a sound
+         * @brief Play a sound.
          *
          * These sounds are spatialized and affected by the position of the
          * sound and the listeners. If there are multiple listeners attached,
@@ -199,8 +206,20 @@ namespace Dynamo::Sound {
                   std::optional<FilterRef> filter = {});
 
         /**
+         * @brief Pause audio playback.
+         *
+         */
+        void pause();
+
+        /**
+         * @brief Resume audio playback.
+         *
+         */
+        void resume();
+
+        /**
          * @brief Update Jukebox's internal state and process all chunks
-         * to be written into the output buffer
+         * to be written into the output buffer.
          *
          */
         void update();
