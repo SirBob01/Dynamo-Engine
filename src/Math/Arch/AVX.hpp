@@ -1,4 +1,6 @@
 #pragma once
+
+#include <algorithm>
 #include <immintrin.h>
 
 namespace Dynamo::Vectorize::AVX {
@@ -43,6 +45,25 @@ namespace Dynamo::Vectorize::AVX {
         }
         for (; i < length; i++) {
             dst[i] += src[i] * scalar;
+        }
+    }
+
+    inline void vclip(const float *src,
+                      const float lo,
+                      const float hi,
+                      float *dst,
+                      unsigned length) {
+        unsigned i = 0;
+        unsigned mul4 = length - (length % 8);
+        __m256 lo_v = _mm256_set1_ps(lo);
+        __m256 hi_v = _mm256_set1_ps(hi);
+        for (; i < mul4; i += 8) {
+            __m256 a_v = _mm256_loadu_ps(src + i);
+            _mm256_storeu_ps(dst + i,
+                             _mm256_max_ps(lo_v, _mm256_min_ps(hi_v, a_v)));
+        }
+        for (; i < length; i++) {
+            dst[i] = std::max(lo, std::min(hi, src[i]));
         }
     }
 } // namespace Dynamo::Vectorize::AVX

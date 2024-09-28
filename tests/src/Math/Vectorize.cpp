@@ -54,3 +54,18 @@ TEST_CASE("Vectorize vsma", "[Vectorize]") {
     REQUIRE(c[3] == 15);
     REQUIRE(c[4] == 8);
 }
+
+TEST_CASE("Vectorize vclip", "[Vectorize]") {
+    float a[] = {-2, 0, 1, 4, 0.5};
+    float lo = -1;
+    float hi = 1;
+    float c[] = {0, 0, 0, 0, 0};
+
+    Dynamo::Vectorize::vclip(a, lo, hi, c, 5);
+
+    REQUIRE(c[0] == -1);
+    REQUIRE(c[1] == 0);
+    REQUIRE(c[2] == 1);
+    REQUIRE(c[3] == 1);
+    REQUIRE(c[4] == 0.5);
+}
