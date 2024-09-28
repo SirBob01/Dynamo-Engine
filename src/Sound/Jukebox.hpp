@@ -107,11 +107,6 @@ namespace Dynamo::Sound {
          *
          */
         Jukebox();
-
-        /**
-         * @brief Destroy the Jukebox object
-         *
-         */
         ~Jukebox();
 
         /**
@@ -138,20 +133,6 @@ namespace Dynamo::Sound {
          * @param device
          */
         void set_output_device(const Device &device);
-
-        /**
-         * @brief Get the sample rate of the input stream
-         *
-         * @return unsigned
-         */
-        unsigned get_input_sample_rate();
-
-        /**
-         * @brief Get the sample rate of the output stream
-         *
-         * @return unsigned
-         */
-        unsigned get_output_sample_rate();
 
         /**
          * @brief Is the output device playing?
