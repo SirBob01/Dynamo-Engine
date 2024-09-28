@@ -11,5 +11,5 @@ namespace Dynamo {
      * @param filepath
      * @return Sound::Sound
      */
-    Sound::Sound load(const std::string filepath);
+    Sound::Sound load_sound(const std::string filepath);
 } // namespace Dynamo

@@ -3,10 +3,11 @@
 #include <functional>
 
 #include <Math/Vec3.hpp>
+#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**
-     * @brief Parameters that describe spatial information about the sound
+     * @brief Parameters that describe playback information for the Sound
      *
      */
     struct Material {
@@ -20,7 +21,7 @@ namespace Dynamo::Sound {
          * @brief Start time in seconds.
          *
          */
-        float start_seconds = 0.0;
+        Seconds start = 0s;
 
         /**
          * @brief Position of the sound in 3D space.
@@ -33,6 +34,12 @@ namespace Dynamo::Sound {
          *
          */
         Vec3 velocity;
+
+        /**
+         * @brief Callback for when the sound is finished playing.
+         *
+         */
+        std::function<void(Sound &)> on_finish = [](auto) {};
     };
 
     /**
