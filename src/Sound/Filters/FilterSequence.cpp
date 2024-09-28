@@ -5,7 +5,7 @@ namespace Dynamo::Sound {
                                  const unsigned offset,
                                  const unsigned length,
                                  const Material &material,
-                                 const ListenerProperties &listener) {
+                                 const Listener &listener) {
         _output = src;
         for (Filter &filter : _sequence) {
             _output = filter.apply(_output, offset, length, material, listener);

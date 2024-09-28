@@ -27,7 +27,7 @@ namespace Dynamo::Sound {
                                    const unsigned offset,
                                    const unsigned length,
                                    const Material &material,
-                                   const ListenerProperties &listener) = 0;
+                                   const Listener &listener) = 0;
     };
 
     /**
