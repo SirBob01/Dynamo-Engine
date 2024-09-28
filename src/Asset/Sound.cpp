@@ -1,8 +1,8 @@
-#include <Assets/Sound.hpp>
+#include <Asset/Sound.hpp>
 #include <Utils/Log.hpp>
 
 namespace Dynamo {
-    Sound::Sound load(const std::string filepath) {
+    Sound::Sound load_sound(const std::string filepath) {
         SndfileHandle file(filepath.c_str(), SFM_READ, 0, 1, 0);
         if (file.error()) {
             Log::error("Could not load sound file `{}`: {}",

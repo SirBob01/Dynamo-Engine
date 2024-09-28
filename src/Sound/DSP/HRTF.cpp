@@ -26,6 +26,7 @@ namespace Dynamo::Sound {
         }
 
         // Triangulate points
+        // TODO: Register triangles into a quadtree for faster querying
         std::vector<Vec2> tmp_points = _points;
         for (const Triangle2 &triangle : Delaunay::triangulate(tmp_points)) {
             _indices.push_back(index_map[triangle.a]);

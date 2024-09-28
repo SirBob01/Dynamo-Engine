@@ -1,4 +1,5 @@
 #include <Application.hpp>
+#include <Asset/Sound.hpp>
 #include <Clock.hpp>
 #include <Display.hpp>
 #include <Input.hpp>
@@ -16,6 +17,19 @@
 #include <Math/Vec2.hpp>
 #include <Math/Vec3.hpp>
 #include <Math/Vectorize.hpp>
+#include <Sound/DSP/Convolver.hpp>
+#include <Sound/DSP/HRTF.hpp>
+#include <Sound/DSP/Resample.hpp>
+#include <Sound/Device.hpp>
+#include <Sound/Filter.hpp>
+#include <Sound/Filters/Attenuation.hpp>
+#include <Sound/Filters/Binaural.hpp>
+#include <Sound/Filters/FilterSequence.hpp>
+#include <Sound/Filters/Stereo.hpp>
+#include <Sound/Jukebox.hpp>
+#include <Sound/Listener.hpp>
+#include <Sound/Material.hpp>
+#include <Sound/Sound.hpp>
 #include <Utils/Allocator.hpp>
 #include <Utils/Bits.hpp>
 #include <Utils/IdTracker.hpp>

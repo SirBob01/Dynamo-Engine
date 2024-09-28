@@ -1,18 +1,17 @@
 #include <Sound/Filters/Binaural.hpp>
 
 namespace Dynamo::Sound {
-    Binaural::Binaural(HRTF &hrtf) :
-        _hrtf(hrtf), _impulse_response(HRIR_LENGTH, 2) {}
+    Binaural::Binaural() : _impulse_response(HRIR_LENGTH, 2) {}
 
     Sound &Binaural::apply(Sound &src,
                            const unsigned offset,
                            const unsigned length,
                            const Material &material,
                            const Listener &listener) {
-        _hrtf.get().calculate_HRIR(listener.position,
-                                   listener.rotation,
-                                   material.position,
-                                   _impulse_response);
+        _hrtf.calculate_HRIR(listener.position,
+                             listener.rotation,
+                             material.position,
+                             _impulse_response);
 
         // Resize the scratch buffers
         _output.resize(length, 2);

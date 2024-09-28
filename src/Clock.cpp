@@ -3,7 +3,7 @@
 namespace Dynamo {
     Clock::Clock() {
         _start = std::chrono::steady_clock::now().time_since_epoch();
-        _delta = Seconds(0);
+        _delta = 0s;
         _prev = _start;
 
         _frames = 0;

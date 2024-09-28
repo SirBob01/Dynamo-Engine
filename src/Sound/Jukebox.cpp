@@ -329,7 +329,7 @@ namespace Dynamo::Sound {
     void Jukebox::play(Sound &sound,
                        Material &material,
                        std::optional<FilterRef> filter) {
-        float frame = _output_state.sample_rate * material.start_seconds;
+        float frame = _output_state.sample_rate * material.start.count();
         _chunks.push_back({sound, material, filter, frame});
     }
 
@@ -353,6 +353,7 @@ namespace Dynamo::Sound {
             Chunk &chunk = *d_it;
             if (chunk.frame >= chunk.sound.get().frames()) {
                 d_it = _chunks.erase(d_it);
+                chunk.material.get().on_finish(chunk.sound);
             } else {
                 process_chunk(chunk);
                 d_it++;
