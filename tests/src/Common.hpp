@@ -6,8 +6,9 @@
  * @brief Approximator for comparing doubles
  *
  * @param x
+ * @param eps
  * @return Catch::Matchers::WithinAbsMatcher
  */
-Catch::Matchers::WithinAbsMatcher Approx(double x) {
-    return Catch::Matchers::WithinAbs(x, 1e-6);
+inline Catch::Matchers::WithinAbsMatcher Approx(double x, double eps = 1e-6) {
+    return Catch::Matchers::WithinAbs(x, eps);
 }
