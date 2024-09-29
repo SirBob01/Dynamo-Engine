@@ -37,6 +37,22 @@ namespace Dynamo::Vectorize::AVX {
     }
 
     inline void
+    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+        unsigned rem = length % 8;
+        float *dst_end = dst + length - rem;
+        while (dst < dst_end) {
+            __m256 src_a_v = _mm256_loadu_ps(src_a);
+            __m256 src_b_v = _mm256_loadu_ps(src_b);
+            __m256 dst_v = _mm256_sub_ps(src_a_v, src_b_v);
+            _mm256_storeu_ps(dst, dst_v);
+            src_a += 8;
+            src_b += 8;
+            dst += 8;
+        }
+        SSE::vsub(src_a, src_b, dst, rem);
+    }
+
+    inline void
     vsma(const float *src, const float scalar, float *dst, unsigned length) {
         __m256 scalar_v = _mm256_set1_ps(scalar);
         unsigned rem = length % 8;

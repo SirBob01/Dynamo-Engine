@@ -52,6 +52,19 @@ namespace Dynamo::Vectorize {
     }
 
     /**
+     * @brief dst[i] = src_a[i] - src_b[i]
+     *
+     * @param src_a
+     * @param src_b
+     * @param dst
+     * @param length
+     */
+    inline void
+    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+        arch::vsub(src_a, src_b, dst, length);
+    }
+
+    /**
      * @brief dst[i] += src_a[i] * scalar
      *
      * @param src_a
