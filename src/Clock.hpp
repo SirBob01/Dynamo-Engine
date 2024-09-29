@@ -2,8 +2,9 @@
 
 #include <chrono>
 
+using namespace std::chrono_literals;
+
 namespace Dynamo {
-    using namespace std::chrono_literals;
 
     /**
      * @brief Standard unit of time.

@@ -6,28 +6,28 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief Abstract audio filter node.
+     * @brief Abstract sound filter node.
      *
      */
-    class Filter {
+    struct Filter {
       public:
         virtual ~Filter() = default;
 
         /**
-         * @brief Apply the filter to a sound
+         * @brief Apply the filter to a sound.
          *
-         * @param src        Source sound buffer
-         * @param offset     Source frame start index
-         * @param length     Length of the chunk to be processed
-         * @param material   Material properties of the sound
-         * @param listener   Listener
+         * Implementations must support the case where src == dst.
+         *
+         * @param src      Source sound buffer
+         * @param dst      Destination sound buffer
+         * @param material Playback properties
+         * @param listener Listener
          * @return Sound&
          */
-        virtual const Sound &apply(Sound &src,
-                                   const unsigned offset,
-                                   const unsigned length,
-                                   const Material &material,
-                                   const Listener &listener) = 0;
+        virtual void apply(const Sound &src,
+                           Sound &dst,
+                           const Material &material,
+                           const Listener &listener) = 0;
     };
 
     /**

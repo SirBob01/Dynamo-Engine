@@ -9,16 +9,10 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief Unique Listener.
+     * @brief Unique person listening to the sound scene.
      *
      */
     struct Listener {
-        /**
-         * @brief Listener volume
-         *
-         */
-        float volume = 1.0;
-
         /**
          * @brief Position of the listener in 3D space
          *

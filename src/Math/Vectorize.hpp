@@ -27,7 +27,7 @@ namespace arch = Dynamo::Vectorize::Scalar;
 
 namespace Dynamo::Vectorize {
     /**
-     * @brief dst[i] = src_a[i] + scalar
+     * @brief dst[i] = src_a[i] * scalar
      *
      * @param src_a
      * @param scalar

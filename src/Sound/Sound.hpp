@@ -7,19 +7,19 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief The default sample rate is defined to be 44.1KHz
+     * @brief The default sample rate is defined to be 44.1KHz.
      *
      */
     static constexpr float DEFAULT_SAMPLE_RATE = 44100;
 
     /**
-     * @brief Indiviual sample ranges between [−1.0, +1.0]
+     * @brief Indiviual sample ranges between [−1.0, +1.0].
      *
      */
     using WaveSample = float;
 
     /**
-     * @brief Supported channel remix combinations
+     * @brief Supported channel remix combinations.
      *
      */
     enum class ChannelRemixMode : unsigned {
@@ -38,7 +38,7 @@ namespace Dynamo::Sound {
     };
 
     /**
-     * @brief A signal holding multiple channels of WaveSample data
+     * @brief A signal holding multiple channels of WaveSample data.
      *
      */
     class Sound : public ChannelData<WaveSample> {
@@ -61,7 +61,7 @@ namespace Dynamo::Sound {
 
       public:
         /**
-         * @brief Construct a new Sound object
+         * @brief Construct a new Sound object.
          *
          * @param frames      Number of frames
          * @param channels    Number of channels
@@ -72,7 +72,7 @@ namespace Dynamo::Sound {
               float sample_rate = DEFAULT_SAMPLE_RATE);
 
         /**
-         * @brief Construct a new Sound object from an existing buffer
+         * @brief Construct a new Sound object from an existing buffer.
          *
          * @param samples     Sample buffer
          * @param channels    Number of channels
@@ -83,14 +83,14 @@ namespace Dynamo::Sound {
               float sample_rate);
 
         /**
-         * @brief Get the sample rate of the signal
+         * @brief Get the sample rate of the signal.
          *
          * @return float
          */
         float sample_rate() const;
 
         /**
-         * @brief Remix to the desired channel count in the destination buffer
+         * @brief Remix to the desired channel count in the destination buffer.
          *
          * @param dst
          * @param src_offset

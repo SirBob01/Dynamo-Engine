@@ -9,14 +9,12 @@ namespace Dynamo::Sound {
      */
     class FilterSequence : public Filter {
         std::vector<FilterRef> _sequence;
-        Sound _output;
 
       public:
-        Sound &apply(Sound &src,
-                     const unsigned offset,
-                     const unsigned length,
-                     const Material &material,
-                     const Listener &listener) override;
+        void apply(const Sound &src,
+                   Sound &dst,
+                   const Material &material,
+                   const Listener &listener) override;
 
         /**
          * @brief Add a filter.

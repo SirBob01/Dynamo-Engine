@@ -1,6 +1,7 @@
 #include <Math/Vectorize.hpp>
 #include <Sound/DSP/Resample.hpp>
 #include <Sound/Jukebox.hpp>
+#include <Sound/Listener.hpp>
 
 namespace Dynamo::Sound {
     Jukebox::Jukebox() {
@@ -25,14 +26,14 @@ namespace Dynamo::Sound {
         const std::vector<Device> devices = get_devices();
         for (const Device &device : devices) {
             if (device.id == Pa_GetDefaultOutputDevice()) {
-                set_output_device(device);
+                set_output(device);
                 break;
             }
         }
         for (const Device &device : devices) {
             if (device.id != Pa_GetDefaultInputDevice() &&
                 device.input_channels > 0) {
-                set_input_device(device);
+                set_input(device);
                 break;
             }
         }
@@ -93,24 +94,7 @@ namespace Dynamo::Sound {
         return 0;
     }
 
-    Listener &Jukebox::find_closest_listener(Vec3 position) {
-        unsigned closest_index = 0;
-        float closest_distance = std::numeric_limits<float>::max();
-        for (unsigned i = 0; i < _listeners.size(); i++) {
-            const Listener &listener = _listeners[i];
-            float distance = (listener.position - position).length_squared();
-            if (distance < closest_distance) {
-                closest_index = i;
-                closest_distance = distance;
-            }
-        }
-        return _listeners[closest_index];
-    }
-
     void Jukebox::process_chunk(Chunk &chunk) {
-        // Jukebox requires at least 1 listener for playback
-        if (_listeners.empty()) return;
-
         Sound &sound = chunk.sound;
         Material &material = chunk.material;
 
@@ -127,7 +111,7 @@ namespace Dynamo::Sound {
         double factor = sound.sample_rate() / _output_state.sample_rate;
         double length = frames * factor;
 
-        // Resample the audio to the device sample rate
+        // Resample the signal to the device sample rate
         _scratch.resize(frames, src_channels);
         for (unsigned c = 0; c < src_channels; c++) {
             resample_signal(sound[c],
@@ -139,14 +123,8 @@ namespace Dynamo::Sound {
         }
 
         // Apply the filters, if any
-        Listener &listener = find_closest_listener(material.position);
         if (chunk.filter.has_value()) {
-            // TODO: Rethink the Filter interface, minimize memcopies
-            _scratch = chunk.filter->get().apply(_scratch,
-                                                 0,
-                                                 _scratch.frames(),
-                                                 material,
-                                                 listener);
+            chunk.filter->get().apply(_scratch, _scratch, material, _listener);
         }
 
         // Remix to the output device channels
@@ -155,10 +133,9 @@ namespace Dynamo::Sound {
         _scratch.remix(_remixed, 0, 0, _scratch.frames());
 
         // Mix the processed sound onto the composite signal
-        float volume = material.volume * listener.volume * _volume;
         for (unsigned c = 0; c < _composite.channels(); c++) {
             Vectorize::vsma(_remixed[c],
-                            volume,
+                            _volume,
                             _composite[c],
                             _composite.frames());
         }
@@ -166,6 +143,8 @@ namespace Dynamo::Sound {
         // Advance chunk frame
         chunk.frame += length;
     }
+
+    Listener &Jukebox::listener() { return _listener; }
 
     const std::vector<Device> Jukebox::get_devices() {
         std::vector<Device> devices;
@@ -197,25 +176,7 @@ namespace Dynamo::Sound {
         return devices;
     }
 
-    void Jukebox::add_listener(Listener &listener) {
-        _listeners.push_back(listener);
-    }
-
-    bool Jukebox::remove_listener(Listener &listener) {
-        auto it = _listeners.begin();
-        while (it != _listeners.end()) {
-            if (&(*it).get() == &listener) {
-                _listeners.erase(it);
-                return true;
-            }
-            it++;
-        }
-        return false;
-    }
-
-    void Jukebox::clear_listeners() { _listeners.clear(); }
-
-    void Jukebox::set_input_device(const Device &device) {
+    void Jukebox::set_input(const Device &device) {
         PaError err;
         if (_input_stream) {
             err = Pa_CloseStream(_input_stream);
@@ -263,7 +224,7 @@ namespace Dynamo::Sound {
         _input_state.sample_rate = info->sampleRate;
     }
 
-    void Jukebox::set_output_device(const Device &device) {
+    void Jukebox::set_output(const Device &device) {
         PaError err;
         if (_output_stream) {
             err = Pa_CloseStream(_output_stream);
@@ -312,6 +273,12 @@ namespace Dynamo::Sound {
         _composite.resize(MAX_CHUNK_LENGTH, device.output_channels);
     }
 
+    void Jukebox::set_volume(float volume) {
+        _volume = std::clamp(volume, 0.0f, 1.0f);
+    }
+
+    float Jukebox::get_volume() const { return _volume; }
+
     bool Jukebox::is_playing() {
         return _output_stream != nullptr && Pa_IsStreamActive(_output_stream);
     }
@@ -320,17 +287,15 @@ namespace Dynamo::Sound {
         return _input_stream != nullptr && Pa_IsStreamActive(_input_stream);
     }
 
-    float Jukebox::get_volume() { return _volume; }
-
-    void Jukebox::set_volume(float volume) {
-        _volume = std::clamp(volume, 0.0f, 1.0f);
-    }
-
     void Jukebox::play(Sound &sound,
                        Material &material,
                        std::optional<FilterRef> filter) {
         float frame = _output_state.sample_rate * material.start.count();
-        _chunks.push_back({sound, material, filter, frame});
+        float frame_stop =
+            material.duration.count() < 0.0f
+                ? sound.frames()
+                : _output_state.sample_rate * material.duration.count() + frame;
+        _chunks.push_back({sound, material, filter, frame, frame_stop});
     }
 
     void Jukebox::pause() { Pa_StopStream(_output_stream); }
@@ -351,7 +316,7 @@ namespace Dynamo::Sound {
         auto d_it = _chunks.begin();
         while (d_it != _chunks.end()) {
             Chunk &chunk = *d_it;
-            if (chunk.frame >= chunk.sound.get().frames()) {
+            if (chunk.frame >= chunk.frame_stop) {
                 d_it = _chunks.erase(d_it);
                 chunk.material.get().on_finish(chunk.sound);
             } else {

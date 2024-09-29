@@ -22,8 +22,9 @@
 #include <Sound/DSP/Resample.hpp>
 #include <Sound/Device.hpp>
 #include <Sound/Filter.hpp>
-#include <Sound/Filters/Attenuation.hpp>
+#include <Sound/Filters/Amplify.hpp>
 #include <Sound/Filters/Binaural.hpp>
+#include <Sound/Filters/Distance.hpp>
 #include <Sound/Filters/FilterSequence.hpp>
 #include <Sound/Filters/Stereo.hpp>
 #include <Sound/Jukebox.hpp>
