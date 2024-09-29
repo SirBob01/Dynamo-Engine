@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_C_STANDARD_REQUIRED on)
 set(BUILD_TESTING off)
 
-add_compile_options(-Wall -g -O3 -fPIC)
+add_compile_options(-Wall -g -O3 -fPIC -march=native)
 
 add_subdirectory("../" "./Dynamo")
 add_subdirectory("../submodules/Catch2" "./Catch2")

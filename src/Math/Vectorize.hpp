@@ -2,27 +2,26 @@
 
 #if defined(__ARM_NEON)
 #define DYNAMO_ARCH_NEON
-#include <Math/Arch/Neon.hpp>
-
-namespace arch = Dynamo::Vectorize::Neon;
-
-#elif (defined(__i386__) || defined(__x86_64__)) && defined(__AVX__)
+#endif
+#if (defined(__i386__) || defined(__x86_64__)) && defined(__AVX__)
 #define DYNAMO_ARCH_AVX
-#include <Math/Arch/AVX.hpp>
-
-namespace arch = Dynamo::Vectorize::AVX;
-
-#elif (defined(__i386__) || defined(__x86_64__)) && defined(__SSE__)
+#endif
+#if (defined(__i386__) || defined(__x86_64__)) && defined(__SSE__)
 #define DYNAMO_ARCH_SSE
+#endif
+
+#if defined(DYNAMO_ARCH_NEON)
+#include <Math/Arch/Neon.hpp>
+namespace arch = Dynamo::Vectorize::Neon;
+#elif defined(DYNAMO_ARCH_AVX)
+#include <Math/Arch/AVX.hpp>
+namespace arch = Dynamo::Vectorize::AVX;
+#elif defined(DYNAMO_ARCH_SSE)
 #include <Math/Arch/SSE.hpp>
-
 namespace arch = Dynamo::Vectorize::SSE;
-
 #else
 #include <Math/Arch/Scalar.hpp>
-
 namespace arch = Dynamo::Vectorize::Scalar;
-
 #endif
 
 namespace Dynamo::Vectorize {
@@ -75,11 +74,11 @@ namespace Dynamo::Vectorize {
      * @param dst
      * @param length
      */
-    inline void vclip(const float *src,
-                      const float lo,
-                      const float hi,
-                      float *dst,
-                      unsigned length) {
-        arch::vclip(src, lo, hi, dst, length);
+    inline void vclamp(const float *src,
+                       const float lo,
+                       const float hi,
+                       float *dst,
+                       unsigned length) {
+        arch::vclamp(src, lo, hi, dst, length);
     }
 } // namespace Dynamo::Vectorize

@@ -1,12 +1,15 @@
-#include <Math/Arch/Scalar.hpp>
+#include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Vectorize Scalar smul", "[Vectorize]") {
+#if defined(DYNAMO_ARCH_SSE)
+#include <Math/Arch/SSE.hpp>
+
+TEST_CASE("Vectorize SSE smul", "[Vectorize]") {
     float a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     float b = 2;
     float c[] = {1, 4, 7, 9, 0, 3, 2, 5, 2, 4};
 
-    Dynamo::Vectorize::Scalar::smul(a, b, c, 10);
+    Dynamo::Vectorize::SSE::smul(a, b, c, 10);
 
     REQUIRE(c[0] == 0);
     REQUIRE(c[1] == 2);
@@ -20,12 +23,12 @@ TEST_CASE("Vectorize Scalar smul", "[Vectorize]") {
     REQUIRE(c[9] == 18);
 }
 
-TEST_CASE("Vectorize Scalar vadd", "[Vectorize]") {
+TEST_CASE("Vectorize SSE vadd", "[Vectorize]") {
     float a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     float b[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     float c[] = {1, 4, 7, 9, 0, 3, 2, 5, 2, 4};
 
-    Dynamo::Vectorize::Scalar::vadd(a, b, c, 10);
+    Dynamo::Vectorize::SSE::vadd(a, b, c, 10);
 
     REQUIRE(c[0] == 1);
     REQUIRE(c[1] == 3);
@@ -39,12 +42,12 @@ TEST_CASE("Vectorize Scalar vadd", "[Vectorize]") {
     REQUIRE(c[9] == 19);
 }
 
-TEST_CASE("Vectorize Scalar vsma", "[Vectorize]") {
+TEST_CASE("Vectorize SSE vsma", "[Vectorize]") {
     float a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     float b = 2;
     float c[] = {1, 4, 7, 9, 0, 3, 2, 5, 2, 4};
 
-    Dynamo::Vectorize::Scalar::vsma(a, b, c, 10);
+    Dynamo::Vectorize::SSE::vsma(a, b, c, 10);
 
     REQUIRE(c[0] == 1);
     REQUIRE(c[1] == 6);
@@ -58,13 +61,13 @@ TEST_CASE("Vectorize Scalar vsma", "[Vectorize]") {
     REQUIRE(c[9] == 22);
 }
 
-TEST_CASE("Vectorize Scalar vclamp", "[Vectorize]") {
+TEST_CASE("Vectorize SSE vclamp", "[Vectorize]") {
     float a[] = {-2, 0, 1, 4, 0.5, 1, 5, -0.5, -3, -0.25};
     float lo = -1;
     float hi = 1;
     float c[] = {1, 4, 7, 9, 0, 3, 2, 5, 2, 4};
 
-    Dynamo::Vectorize::Scalar::vclamp(a, lo, hi, c, 10);
+    Dynamo::Vectorize::SSE::vclamp(a, lo, hi, c, 10);
 
     REQUIRE(c[0] == -1);
     REQUIRE(c[1] == 0);
@@ -77,3 +80,8 @@ TEST_CASE("Vectorize Scalar vclamp", "[Vectorize]") {
     REQUIRE(c[8] == -1);
     REQUIRE(c[9] == -0.25);
 }
+#else
+TEST_CASE("Vectorize SSE null", "[Vectorize]") {
+    Dynamo::Log::info("SSE instruction set not supported.");
+}
+#endif

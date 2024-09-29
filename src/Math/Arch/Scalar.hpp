@@ -24,13 +24,13 @@ namespace Dynamo::Vectorize::Scalar {
         }
     }
 
-    inline void vclip(const float *src,
-                      const float lo,
-                      const float hi,
-                      float *dst,
-                      unsigned length) {
+    inline void vclamp(const float *src,
+                       const float lo,
+                       const float hi,
+                       float *dst,
+                       unsigned length) {
         for (unsigned i = 0; i < length; i++) {
-            dst[i] = std::max(lo, std::min(hi, src[i]));
+            dst[i] = std::clamp(src[i], lo, hi);
         }
     }
 } // namespace Dynamo::Vectorize::Scalar
