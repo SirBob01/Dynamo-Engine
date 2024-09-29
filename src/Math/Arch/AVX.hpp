@@ -2,7 +2,7 @@
 
 #include <immintrin.h>
 
-#include <Math/Arch/Scalar.hpp>
+#include <Math/Arch/SSE.hpp>
 
 namespace Dynamo::Vectorize::AVX {
     inline void
@@ -17,7 +17,7 @@ namespace Dynamo::Vectorize::AVX {
             src += 8;
             dst += 8;
         }
-        Scalar::smul(src, scalar, dst, rem);
+        SSE::smul(src, scalar, dst, rem);
     }
 
     inline void
@@ -33,7 +33,7 @@ namespace Dynamo::Vectorize::AVX {
             src_b += 8;
             dst += 8;
         }
-        Scalar::vadd(src_a, src_b, dst, rem);
+        SSE::vadd(src_a, src_b, dst, rem);
     }
 
     inline void
@@ -49,7 +49,7 @@ namespace Dynamo::Vectorize::AVX {
             src += 8;
             dst += 8;
         }
-        Scalar::vsma(src, scalar, dst, rem);
+        SSE::vsma(src, scalar, dst, rem);
     }
 
     inline void vclamp(const float *src,
@@ -68,6 +68,6 @@ namespace Dynamo::Vectorize::AVX {
             src += 8;
             dst += 8;
         }
-        Scalar::vclamp(src, lo, hi, dst, rem);
+        SSE::vclamp(src, lo, hi, dst, rem);
     }
 } // namespace Dynamo::Vectorize::AVX
