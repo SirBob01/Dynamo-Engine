@@ -40,6 +40,26 @@ TEST_CASE("Vectorize Scalar vadd", "[Vectorize]") {
     }
 }
 
+TEST_CASE("Vectorize Scalar vsub", "[Vectorize]") {
+    FloatArray src_a;
+    FloatArray src_b;
+    FloatArray dst;
+    fill_array(src_a);
+    fill_array(src_b);
+    fill_array(dst);
+
+    BENCHMARK("Vectorize Scalar vsub benchmark") {
+        Dynamo::Vectorize::Scalar::vsub(src_a.data(),
+                                        src_b.data(),
+                                        dst.data(),
+                                        LENGTH);
+    };
+
+    for (unsigned i = 0; i < LENGTH; i++) {
+        REQUIRE(dst[i] == src_a[i] - src_b[i]);
+    }
+}
+
 TEST_CASE("Vectorize Scalar vsma", "[Vectorize]") {
     FloatArray src;
     FloatArray dst;

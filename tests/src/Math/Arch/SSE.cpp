@@ -43,6 +43,26 @@ TEST_CASE("Vectorize SSE vadd", "[Vectorize]") {
     }
 }
 
+TEST_CASE("Vectorize SSE vsub", "[Vectorize]") {
+    FloatArray src_a;
+    FloatArray src_b;
+    FloatArray dst;
+    fill_array(src_a);
+    fill_array(src_b);
+    fill_array(dst);
+
+    BENCHMARK("Vectorize SSE vsub benchmark") {
+        Dynamo::Vectorize::SSE::vsub(src_a.data(),
+                                     src_b.data(),
+                                     dst.data(),
+                                     LENGTH);
+    };
+
+    for (unsigned i = 0; i < LENGTH; i++) {
+        REQUIRE(dst[i] == src_a[i] - src_b[i]);
+    }
+}
+
 TEST_CASE("Vectorize SSE vsma", "[Vectorize]") {
     FloatArray src;
     FloatArray dst;

@@ -43,6 +43,26 @@ TEST_CASE("Vectorize AVX vadd", "[Vectorize]") {
     }
 }
 
+TEST_CASE("Vectorize AVX vsub", "[Vectorize]") {
+    FloatArray src_a;
+    FloatArray src_b;
+    FloatArray dst;
+    fill_array(src_a);
+    fill_array(src_b);
+    fill_array(dst);
+
+    BENCHMARK("Vectorize AVX vsub benchmark") {
+        Dynamo::Vectorize::AVX::vsub(src_a.data(),
+                                     src_b.data(),
+                                     dst.data(),
+                                     LENGTH);
+    };
+
+    for (unsigned i = 0; i < LENGTH; i++) {
+        REQUIRE(dst[i] == src_a[i] - src_b[i]);
+    }
+}
+
 TEST_CASE("Vectorize AVX vsma", "[Vectorize]") {
     FloatArray src;
     FloatArray dst;

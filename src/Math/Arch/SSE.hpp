@@ -37,6 +37,22 @@ namespace Dynamo::Vectorize::SSE {
     }
 
     inline void
+    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+        unsigned rem = length % 4;
+        float *dst_end = dst + length - rem;
+        while (dst < dst_end) {
+            __m128 src_a_v = _mm_loadu_ps(src_a);
+            __m128 src_b_v = _mm_loadu_ps(src_b);
+            __m128 dst_v = _mm_sub_ps(src_a_v, src_b_v);
+            _mm_storeu_ps(dst, dst_v);
+            src_a += 4;
+            src_b += 4;
+            dst += 4;
+        }
+        Scalar::vsub(src_a, src_b, dst, rem);
+    }
+
+    inline void
     vsma(const float *src, const float scalar, float *dst, unsigned length) {
         __m128 scalar_v = _mm_set1_ps(scalar);
         unsigned rem = length % 4;
