@@ -47,5 +47,11 @@ namespace Dynamo::Sound {
          *
          */
         float frame;
+
+        /**
+         * @brief End-of-chunk frame.
+         *
+         */
+        float frame_stop;
     };
 } // namespace Dynamo::Sound

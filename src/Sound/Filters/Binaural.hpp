@@ -17,7 +17,6 @@ namespace Dynamo::Sound {
 
         Sound _impulse_response;
         Sound _remixed;
-        Sound _output;
 
       public:
         /**
@@ -26,10 +25,9 @@ namespace Dynamo::Sound {
          */
         Binaural();
 
-        Sound &apply(Sound &src,
-                     const unsigned offset,
-                     const unsigned length,
-                     const Material &material,
-                     const Listener &listener) override;
+        void apply(const Sound &src,
+                   Sound &dst,
+                   const Material &material,
+                   const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

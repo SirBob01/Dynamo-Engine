@@ -4,13 +4,20 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief Simple stereo panner filter implementation
+     * @brief Change the volume of a sound signal.
      *
      */
-    class Stereo : public Filter {
-        Sound _remixed;
+    class Amplify : public Filter {
+        float _gain = 1;
 
       public:
+        /**
+         * @brief Set the gain multiplier.
+         *
+         * @param gain
+         */
+        void set_gain(float gain);
+
         void apply(const Sound &src,
                    Sound &dst,
                    const Material &material,

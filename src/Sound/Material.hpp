@@ -7,21 +7,21 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief Parameters that describe playback information for the Sound
+     * @brief Parameters that describe playback information for the Sound.
      *
      */
     struct Material {
         /**
-         * @brief Volume to be played relative to overall gain.
-         *
-         */
-        float volume = 1.0;
-
-        /**
-         * @brief Start time in seconds.
+         * @brief Start time offset in seconds.
          *
          */
         Seconds start = 0s;
+
+        /**
+         * @brief Duration time (from the start time offset) in seconds.
+         *
+         */
+        Seconds duration = -1s;
 
         /**
          * @brief Position of the sound in 3D space.

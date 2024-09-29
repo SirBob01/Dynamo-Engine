@@ -10,19 +10,17 @@
 #include <Sound/Chunk.hpp>
 #include <Sound/Device.hpp>
 #include <Sound/Listener.hpp>
-#include <Sound/Material.hpp>
 #include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**
-     * @brief Size of the input and output ring buffers
+     * @brief Size of the input and output ring buffers.
      *
      */
     static constexpr unsigned BUFFER_SIZE = MAX_CHUNK_LENGTH * 64;
 
     /**
-     * @brief In-house audio engine supporting static sounds, spatial sounds,
-     * and multiple listeners
+     * @brief Audio engine supporting sound spatialization.
      *
      */
     class Jukebox {
@@ -35,11 +33,11 @@ namespace Dynamo::Sound {
         Sound _remixed;
         Sound _composite;
 
-        std::vector<ListenerRef> _listeners;
+        Listener _listener;
         std::vector<Chunk> _chunks;
 
         /**
-         * @brief Internal state shared with the PortAudio callback
+         * @brief Internal state shared with the PortAudio callback.
          *
          */
         struct PaState {
@@ -51,7 +49,7 @@ namespace Dynamo::Sound {
         PaState _output_state;
 
         /**
-         * @brief Callback for reading recorded audio from the input device
+         * @brief Callback for pulling data from the input device.
          *
          * @param input        Input buffer
          * @param output       Output buffer
@@ -69,7 +67,7 @@ namespace Dynamo::Sound {
                                   void *data);
 
         /**
-         * @brief Callback for pushing audio data to the output device
+         * @brief Callback for pushing data to the output device.
          *
          * @param input        Input buffer
          * @param output       Output buffer
@@ -87,14 +85,6 @@ namespace Dynamo::Sound {
                                    void *data);
 
         /**
-         * @brief Find the closest listener to a position
-         *
-         * @param position
-         * @return Listener&
-         */
-        Listener &find_closest_listener(Vec3 position);
-
-        /**
          * @brief Process a chunk
          *
          * @param chunk chunk
@@ -103,44 +93,25 @@ namespace Dynamo::Sound {
 
       public:
         /**
-         * @brief Construct a new Jukebox object
+         * @brief Construct a new Jukebox object.
          *
          */
         Jukebox();
         ~Jukebox();
 
         /**
-         * @brief Get all available sound devices
+         * @brief Get the listener.
+         *
+         * @return Listener&
+         */
+        Listener &listener();
+
+        /**
+         * @brief Get all available sound devices.
          *
          * @return const std::vector<Device>
          */
         const std::vector<Device> get_devices();
-
-        /**
-         * @brief Add a listener.
-         *
-         * Jukebox requires at least 1 listener for playback.
-         *
-         * @param listener
-         */
-        void add_listener(Listener &listener);
-
-        /**
-         * @brief Remove a listener.
-         *
-         * Returns true if the listener was found.
-         *
-         * @param listener
-         * @return true
-         * @return false
-         */
-        bool remove_listener(Listener &listener);
-
-        /**
-         * @brief Remove all listeners.
-         *
-         */
-        void clear_listeners();
 
         /**
          * @brief Set the input device.
@@ -149,7 +120,7 @@ namespace Dynamo::Sound {
          *
          * @param device
          */
-        void set_input_device(const Device &device);
+        void set_input(const Device &device);
 
         /**
          * @brief Set the output device.
@@ -158,7 +129,21 @@ namespace Dynamo::Sound {
          *
          * @param device
          */
-        void set_output_device(const Device &device);
+        void set_output(const Device &device);
+
+        /**
+         * @brief Set the master volume.
+         *
+         * @param volume
+         */
+        void set_volume(float volume);
+
+        /**
+         * @brief Get the master volume.
+         *
+         * @return float
+         */
+        float get_volume() const;
 
         /**
          * @brief Is the output device playing?
@@ -177,25 +162,7 @@ namespace Dynamo::Sound {
         bool is_recording();
 
         /**
-         * @brief Get the master volume.
-         *
-         * @return float
-         */
-        float get_volume();
-
-        /**
-         * @brief Set the master volume.
-         *
-         * @param volume
-         */
-        void set_volume(float volume);
-
-        /**
          * @brief Play a sound.
-         *
-         * These sounds are spatialized and affected by the position of the
-         * sound and the listeners. If there are multiple listeners attached,
-         * the sound will be processed for all of them and mixed.
          *
          * @param sound    Sound
          * @param material Playback properties
@@ -206,13 +173,13 @@ namespace Dynamo::Sound {
                   std::optional<FilterRef> filter = {});
 
         /**
-         * @brief Pause audio playback.
+         * @brief Pause playback.
          *
          */
         void pause();
 
         /**
-         * @brief Resume audio playback.
+         * @brief Resume playback.
          *
          */
         void resume();
