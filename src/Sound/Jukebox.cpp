@@ -327,11 +327,11 @@ namespace Dynamo::Sound {
 
         // Clamp channels
         for (unsigned c = 0; c < _composite.channels(); c++) {
-            Vectorize::vclip(_composite[c],
-                             -1,
-                             1,
-                             _composite[c],
-                             _composite.frames());
+            Vectorize::vclamp(_composite[c],
+                              -1,
+                              1,
+                              _composite[c],
+                              _composite.frames());
         }
 
         // Interleave the composite and write to the ring buffer
