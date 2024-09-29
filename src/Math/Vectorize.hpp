@@ -3,6 +3,9 @@
 #if defined(__ARM_NEON)
 #define DYNAMO_ARCH_NEON
 #endif
+#if (defined(__i386__) || defined(__x86_64__)) && defined(__AVX512F__)
+#define DYNAMO_ARCH_AVX512
+#endif
 #if (defined(__i386__) || defined(__x86_64__)) && defined(__AVX__)
 #define DYNAMO_ARCH_AVX
 #endif
@@ -13,6 +16,9 @@
 #if defined(DYNAMO_ARCH_NEON)
 #include <Math/Arch/Neon.hpp>
 namespace arch = Dynamo::Vectorize::Neon;
+#elif defined(DYNAMO_ARCH_AVX512)
+#include <Math/Arch/AVX512.hpp>
+namespace arch = Dynamo::Vectorize::AVX512;
 #elif defined(DYNAMO_ARCH_AVX)
 #include <Math/Arch/AVX.hpp>
 namespace arch = Dynamo::Vectorize::AVX;
