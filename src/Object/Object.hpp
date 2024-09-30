@@ -29,5 +29,47 @@ namespace Dynamo {
 
       public:
         virtual ~Object() = default;
+
+        /**
+         * @brief Default constructor.
+         *
+         */
+        Object() : _ref_count(1) {}
+
+        /**
+         * @brief Copy constructor.
+         *
+         * @param object
+         */
+        Object(Object &object) : _ref_count(1) {}
+
+        /**
+         * @brief Move constructor.
+         *
+         * @param object
+         */
+        Object(Object &&object) : _ref_count(1) {}
+
+        /**
+         * @brief Copy assignment operator.
+         *
+         * @param object
+         * @return Object&
+         */
+        Object &operator=(const Object &object) {
+            _ref_count = 1;
+            return *this;
+        }
+
+        /**
+         * @brief Move assignment operator.
+         *
+         * @param object
+         * @return Object&
+         */
+        Object &operator=(const Object &&object) {
+            _ref_count = 1;
+            return *this;
+        }
     };
 } // namespace Dynamo
