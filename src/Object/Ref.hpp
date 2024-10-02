@@ -13,7 +13,11 @@ namespace Dynamo {
      */
     template <typename T>
     class Ref {
+        static_assert(std::is_base_of<class Object, T>::value);
         T *_ptr;
+
+        template <typename V>
+        friend class Ref;
 
         friend std::hash<Dynamo::Ref<T>>;
 
@@ -48,14 +52,20 @@ namespace Dynamo {
          *
          * @param rhs
          */
-        Ref(Ref<T> &rhs) : _ptr(rhs._ptr) { _ptr->ref(); }
+        template <typename V>
+        Ref(Ref<V> &rhs) : _ptr(rhs._ptr) {
+            _ptr->ref();
+        }
 
         /**
          * @brief Construct a new Ref from an r-value reference.
          *
          * @param ref
          */
-        Ref(Ref<T> &&rhs) : _ptr(rhs._ptr) { rhs._ptr = nullptr; }
+        template <typename V>
+        Ref(Ref<V> &&rhs) : _ptr(rhs._ptr) {
+            rhs._ptr = nullptr;
+        }
 
         /**
          * @brief Destroy the Ref object if its reference count is 0.
