@@ -2,17 +2,15 @@
 
 #include <atomic>
 
-#include <Object/Ref.hpp>
-
 namespace Dynamo {
     /**
      * @brief Base Dynamo object.
      *
      */
     class Object {
-        mutable std::atomic_uint _ref_count = 1;
+        mutable std::atomic_uint _ref_count;
 
-        template <class T>
+        template <typename T>
         friend class Ref;
 
         /**
