@@ -116,10 +116,4 @@ namespace Dynamo {
          */
         void set_icon(const std::string &filepath);
     };
-
-    /**
-     * @brief Display reference.
-     *
-     */
-    using DisplayRef = std::reference_wrapper<Display>;
 } // namespace Dynamo

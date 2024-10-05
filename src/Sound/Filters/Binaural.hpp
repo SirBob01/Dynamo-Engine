@@ -15,19 +15,13 @@ namespace Dynamo::Sound {
         HRTF _hrtf;
         std::array<Convolver, 2> _convolvers;
 
-        Sound _impulse_response;
-        Sound _remixed;
+        Buffer _impulse_response;
+        Buffer _mono;
 
       public:
-        /**
-         * @brief Construct a new Binaural filter object.
-         *
-         */
-        Binaural();
-
-        void apply(const Sound &src,
-                   Sound &dst,
-                   const Material &material,
+        void apply(const Buffer &src,
+                   Buffer &dst,
+                   const Source &source,
                    const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

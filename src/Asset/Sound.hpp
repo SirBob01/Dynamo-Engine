@@ -2,14 +2,14 @@
 
 #include <sndfile.hh>
 
-#include <Sound/Sound.hpp>
+#include <Sound/Buffer.hpp>
 
 namespace Dynamo {
     /**
      * @brief Load a sound file.
      *
      * @param filepath
-     * @return Sound::Sound
+     * @return Sound::Buffer
      */
-    Sound::Sound load_sound(const std::string filepath);
+    Sound::Buffer load_sound(const std::string filepath);
 } // namespace Dynamo

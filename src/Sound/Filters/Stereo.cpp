@@ -1,12 +1,13 @@
 #include <Math/Vectorize.hpp>
 #include <Sound/Filters/Stereo.hpp>
+#include <Sound/Source.hpp>
 
 namespace Dynamo::Sound {
-    void Stereo::apply(const Sound &src,
-                       Sound &dst,
-                       const Material &material,
+    void Stereo::apply(const Buffer &src,
+                       Buffer &dst,
+                       const Source &source,
                        const Listener &listener) {
-        Vec3 delta = material.position - listener.position;
+        Vec3 delta = source.position - listener.position;
         Vec3 up = listener.rotation.up();
         Vec3 right = listener.rotation.right();
         Vec3 displacement = (delta - up * (delta * up));
@@ -19,20 +20,16 @@ namespace Dynamo::Sound {
             pan = ((direction * right) + 1) * 0.5;
         }
 
-        // Square-law panning
-        std::array<float, 2> gains = {std::sqrt(1.0f - pan), std::sqrt(pan)};
-
-        // Remix the source buffer to the desired number of channels
-        _remixed.clear();
-        _remixed.resize(src.frames(), 2);
-        src.remix(_remixed, 0, 0, src.frames());
+        // Downmix the source buffer to mono
+        _mono.resize(src.frames(), 1);
+        _mono.silence();
+        src.remix(_mono);
 
         // Resize the destination buffer
         dst.resize(src.frames(), 2);
 
-        // Apply per-channel gain
-        for (unsigned c = 0; c < 2; c++) {
-            Vectorize::smul(_remixed[c], gains[c], dst[c], src.frames());
-        }
+        // Square-law panning
+        Vectorize::smul(_mono[0], std::sqrt(1.0f - pan), dst[0], src.frames());
+        Vectorize::smul(_mono[0], std::sqrt(pan), dst[1], src.frames());
     }
 } // namespace Dynamo::Sound

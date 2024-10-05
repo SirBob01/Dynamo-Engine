@@ -1,30 +1,33 @@
 #include <Sound/Filters/Binaural.hpp>
+#include <Sound/Source.hpp>
 
 namespace Dynamo::Sound {
-    Binaural::Binaural() : _impulse_response(HRIR_LENGTH, 2) {}
-
-    void Binaural::apply(const Sound &src,
-                         Sound &dst,
-                         const Material &material,
+    void Binaural::apply(const Buffer &src,
+                         Buffer &dst,
+                         const Source &source,
                          const Listener &listener) {
+        _impulse_response.resize(HRIR_LENGTH, 2);
         _hrtf.calculate_HRIR(listener.position,
                              listener.rotation,
-                             material.position,
+                             source.position,
                              _impulse_response);
 
-        // Remix the source buffer to the desired number of channels
-        _remixed.clear();
-        _remixed.resize(src.frames(), 2);
-        src.remix(_remixed, 0, 0, src.frames());
+        // Downmix the source buffer to mono
+        _mono.resize(src.frames(), 1);
+        _mono.silence();
+        src.remix(_mono);
 
         // Resize the destination buffer
         dst.resize(src.frames(), 2);
 
+        // Initialize channel convolvers
+        _convolvers[0].initialize(_impulse_response[0],
+                                  _impulse_response.frames());
+        _convolvers[1].initialize(_impulse_response[1],
+                                  _impulse_response.frames());
+
         // Apply convolution
-        for (unsigned c = 0; c < 2; c++) {
-            _convolvers[c].initialize(_impulse_response[c],
-                                      _impulse_response.frames());
-            _convolvers[c].compute(_remixed[c], dst[c], src.frames());
-        }
+        _convolvers[0].compute(_mono[0], dst[0], src.frames());
+        _convolvers[1].compute(_mono[0], dst[1], src.frames());
     }
 } // namespace Dynamo::Sound

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 #include <string>
 #include <thread>
 
@@ -102,10 +101,4 @@ namespace Dynamo {
          */
         void update();
     };
-
-    /**
-     * @brief Application reference.
-     *
-     */
-    using ApplicationRef = std::reference_wrapper<Application>;
 } // namespace Dynamo

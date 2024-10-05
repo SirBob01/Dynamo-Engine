@@ -1,10 +1,11 @@
 #pragma once
 
+#include <Sound/Buffer.hpp>
 #include <Sound/Listener.hpp>
-#include <Sound/Material.hpp>
-#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
+    class Source;
+
     /**
      * @brief Abstract sound filter node.
      *
@@ -18,15 +19,15 @@ namespace Dynamo::Sound {
          *
          * Implementations must support the case where src == dst.
          *
-         * @param src      Source sound buffer
-         * @param dst      Destination sound buffer
-         * @param material Playback properties
-         * @param listener Listener
+         * @param src
+         * @param dst
+         * @param source
+         * @param listener
          * @return Sound&
          */
-        virtual void apply(const Sound &src,
-                           Sound &dst,
-                           const Material &material,
+        virtual void apply(const Buffer &src,
+                           Buffer &dst,
+                           const Source &source,
                            const Listener &listener) = 0;
     };
 

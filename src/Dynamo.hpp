@@ -19,6 +19,7 @@
 #include <Math/Vectorize.hpp>
 #include <Object/Object.hpp>
 #include <Object/Ref.hpp>
+#include <Sound/Buffer.hpp>
 #include <Sound/DSP/Convolver.hpp>
 #include <Sound/DSP/HRTF.hpp>
 #include <Sound/DSP/Resample.hpp>
@@ -31,8 +32,7 @@
 #include <Sound/Filters/Stereo.hpp>
 #include <Sound/Jukebox.hpp>
 #include <Sound/Listener.hpp>
-#include <Sound/Material.hpp>
-#include <Sound/Sound.hpp>
+#include <Sound/Source.hpp>
 #include <Utils/Allocator.hpp>
 #include <Utils/Bits.hpp>
 #include <Utils/IdTracker.hpp>

@@ -37,7 +37,7 @@ namespace Dynamo::Sound {
         // Read the HRIR samples for each point
         unsigned offset = 0;
         for (unsigned i = 0; i < _points.size(); i++) {
-            Sound &coeff = _coeff_map[i];
+            Buffer &coeff = _coeff_map[i];
             coeff.resize(HRIR_LENGTH, 2);
             for (unsigned c = 0; c < 2; c++) {
                 const WaveSample *samples = HRIR_COEFFICIENTS.data() + offset;
@@ -63,8 +63,8 @@ namespace Dynamo::Sound {
     void HRTF::calculate_HRIR(const Vec3 &listener_position,
                               const Quaternion &listener_rotation,
                               const Vec3 &source_position,
-                              Sound &dst_buffer) const {
-        dst_buffer.clear();
+                              Buffer &dst) const {
+        dst.silence();
         Vec2 point = compute_point(listener_position, source_position);
         for (unsigned t = 0; t < _indices.size(); t += 3) {
             unsigned a = _indices[t];
@@ -76,17 +76,17 @@ namespace Dynamo::Sound {
 
             float eps = 1e-6;
             if (coords.x >= -eps && coords.y >= -eps && coords.z >= -eps) {
-                const Sound &ir0 = _coeff_map[a];
-                const Sound &ir1 = _coeff_map[b];
-                const Sound &ir2 = _coeff_map[c];
+                const Buffer &ir0 = _coeff_map[a];
+                const Buffer &ir1 = _coeff_map[b];
+                const Buffer &ir2 = _coeff_map[c];
 
                 // Use barycentric coordinates to interpolate samples
-                for (unsigned c = 0; c < dst_buffer.channels(); c++) {
-                    WaveSample *dst = dst_buffer[c];
-                    unsigned frames = dst_buffer.frames();
-                    Vectorize::vsma(ir0[c], coords.x, dst, frames);
-                    Vectorize::vsma(ir1[c], coords.y, dst, frames);
-                    Vectorize::vsma(ir2[c], coords.z, dst, frames);
+                for (unsigned c = 0; c < dst.channels(); c++) {
+                    WaveSample *ptr = dst[c];
+                    unsigned frames = dst.frames();
+                    Vectorize::vsma(ir0[c], coords.x, ptr, frames);
+                    Vectorize::vsma(ir1[c], coords.y, ptr, frames);
+                    Vectorize::vsma(ir2[c], coords.z, ptr, frames);
                 }
                 return;
             }

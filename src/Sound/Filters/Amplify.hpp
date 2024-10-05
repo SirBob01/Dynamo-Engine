@@ -4,23 +4,19 @@
 
 namespace Dynamo::Sound {
     /**
-     * @brief Change the volume of a sound signal.
+     * @brief Change the volume of a signal.
      *
      */
-    class Amplify : public Filter {
-        float _gain = 1;
-
-      public:
+    struct Amplify : public Filter {
         /**
-         * @brief Set the gain multiplier.
+         * @brief Signal multiplier.
          *
-         * @param gain
          */
-        void set_gain(float gain);
+        float gain = 1;
 
-        void apply(const Sound &src,
-                   Sound &dst,
-                   const Material &material,
+        void apply(const Buffer &src,
+                   Buffer &dst,
+                   const Source &source,
                    const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

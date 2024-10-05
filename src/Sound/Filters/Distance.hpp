@@ -7,9 +7,18 @@ namespace Dynamo::Sound {
      * @brief Attenuate volume as a sound moves away from the listener.
      *
      */
-    class Distance : public Filter {
-        float _inner_radius = 0;
-        float _outer_radius = 1000;
+    struct Distance : public Filter {
+        /**
+         * @brief Inner radius of the attenuation sphere.
+         *
+         */
+        float inner_radius = 0;
+
+        /**
+         * @brief Outer radius of the attenuation sphere.
+         *
+         */
+        float outer_radius = 1000;
 
         /**
          * @brief Linear attenuation function
@@ -19,24 +28,9 @@ namespace Dynamo::Sound {
          */
         float linear(float distance);
 
-      public:
-        /**
-         * @brief Set the inner radius.
-         *
-         * @param radius
-         */
-        void set_inner_radius(float radius);
-
-        /**
-         * @brief Set the outer radius.
-         *
-         * @param radius
-         */
-        void set_outer_radius(float radius);
-
-        void apply(const Sound &src,
-                   Sound &dst,
-                   const Material &material,
+        void apply(const Buffer &src,
+                   Buffer &dst,
+                   const Source &source,
                    const Listener &listener) override;
     };
 } // namespace Dynamo::Sound
