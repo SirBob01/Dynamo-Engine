@@ -22,6 +22,6 @@ namespace Dynamo::Graphics::Vulkan {
         Instance(const Display &display);
         ~Instance();
 
-        const VkInstance &handle();
+        VkInstance handle() const;
     };
 } // namespace Dynamo::Graphics::Vulkan

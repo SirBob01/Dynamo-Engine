@@ -1,5 +1,4 @@
 #include <Graphics/Vulkan/Debugger.hpp>
-#include <vulkan/vulkan_core.h>
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugUtilsMessengerEXT(
     VkInstance instance,

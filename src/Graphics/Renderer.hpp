@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <Display.hpp>
 #include <Graphics/Vulkan/Debugger.hpp>
 #include <Graphics/Vulkan/Instance.hpp>

@@ -69,5 +69,5 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
-    const VkInstance &Instance::handle() { return _handle; }
+    VkInstance Instance::handle() const { return _handle; }
 } // namespace Dynamo::Graphics::Vulkan
