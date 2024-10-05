@@ -71,10 +71,4 @@ namespace Dynamo {
          */
         void tick();
     };
-
-    /**
-     * @brief Clock reference.
-     *
-     */
-    using ClockRef = std::reference_wrapper<Clock>;
 } // namespace Dynamo

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Sound/Buffer.hpp>
 #include <Sound/Filter.hpp>
 
 namespace Dynamo::Sound {
@@ -8,12 +9,12 @@ namespace Dynamo::Sound {
      *
      */
     class Stereo : public Filter {
-        Sound _remixed;
+        Buffer _mono;
 
       public:
-        void apply(const Sound &src,
-                   Sound &dst,
-                   const Material &material,
+        void apply(const Buffer &src,
+                   Buffer &dst,
+                   const Source &source,
                    const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

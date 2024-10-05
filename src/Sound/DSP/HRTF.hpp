@@ -6,8 +6,8 @@
 #include <Math/Vec2.hpp>
 #include <Math/Vec3.hpp>
 
+#include <Sound/Buffer.hpp>
 #include <Sound/Data/HRIR.hpp>
-#include <Sound/Sound.hpp>
 
 namespace Dynamo::Sound {
     /**
@@ -52,7 +52,7 @@ namespace Dynamo::Sound {
         std::vector<Vec2> _points;
         std::vector<unsigned> _indices;
 
-        std::vector<Sound> _coeff_map;
+        std::vector<Buffer> _coeff_map;
 
         /**
          * @brief Compute the azimuth and elevation angles
@@ -83,6 +83,6 @@ namespace Dynamo::Sound {
         void calculate_HRIR(const Vec3 &listener_position,
                             const Quaternion &listener_rotation,
                             const Vec3 &source_position,
-                            Sound &dst_buffer) const;
+                            Buffer &dst) const;
     };
 } // namespace Dynamo::Sound

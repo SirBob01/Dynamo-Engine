@@ -23,14 +23,14 @@ namespace Dynamo::Sound {
         }
 
         // Set the default input and output devices
-        const std::vector<Device> devices = get_devices();
-        for (const Device &device : devices) {
+        devices();
+        for (const Device &device : _devices) {
             if (device.id == Pa_GetDefaultOutputDevice()) {
                 set_output(device);
                 break;
             }
         }
-        for (const Device &device : devices) {
+        for (const Device &device : _devices) {
             if (device.id != Pa_GetDefaultInputDevice() &&
                 device.input_channels > 0) {
                 set_input(device);
@@ -94,60 +94,54 @@ namespace Dynamo::Sound {
         return 0;
     }
 
-    void Jukebox::process_chunk(Chunk &chunk) {
-        Sound &sound = chunk.sound;
-        Material &material = chunk.material;
+    void Jukebox::process_source(Source &source) {
+        // Calculate the number of frames in the destination buffer
+        Buffer &buffer = source._buffer;
+        double frame_stop = std::min(source._frame + MAX_CHUNK_LENGTH,
+                                     static_cast<double>(buffer.frames()));
+        double frames = frame_stop - source._frame;
 
-        unsigned src_frames = sound.frames();
-        unsigned src_channels = sound.channels();
-
-        // Calculate the number of frames in the destination
-        double frame_stop = std::min(chunk.frame + MAX_CHUNK_LENGTH,
-                                     static_cast<float>(src_frames));
-        double frames = frame_stop - chunk.frame;
-
-        // Calculate the number of frames required in the original signal to
-        // produce the destination frames
-        double factor = sound.sample_rate() / _output_state.sample_rate;
+        // Calculate the number of frames required to process
+        double factor = STANDARD_SAMPLE_RATE / _output_state.sample_rate;
         double length = frames * factor;
 
-        // Resample the signal to the device sample rate
-        _scratch.resize(frames, src_channels);
-        for (unsigned c = 0; c < src_channels; c++) {
-            resample_signal(sound[c],
+        // Resample to the device sample rate
+        _scratch.resize(frames, buffer.channels());
+        for (unsigned c = 0; c < buffer.channels(); c++) {
+            resample_signal(buffer[c],
                             _scratch[c],
-                            chunk.frame,
+                            source._frame,
                             length,
-                            sound.sample_rate(),
+                            STANDARD_SAMPLE_RATE,
                             _output_state.sample_rate);
         }
 
-        // Apply the filters, if any
-        if (chunk.filter.has_value()) {
-            chunk.filter->get().apply(_scratch, _scratch, material, _listener);
+        // Apply the filters
+        if (source._filter.has_value()) {
+            Filter &filter = source._filter.value();
+            filter.apply(_scratch, _scratch, source, _listener);
         }
 
         // Remix to the output device channels
         _remixed.resize(_scratch.frames(), _output_state.channels);
-        _remixed.clear();
-        _scratch.remix(_remixed, 0, 0, _scratch.frames());
+        _remixed.silence();
+        _scratch.remix(_remixed);
 
         // Mix the processed sound onto the composite signal
         for (unsigned c = 0; c < _composite.channels(); c++) {
             Vectorize::vsma(_remixed[c],
                             _volume,
                             _composite[c],
-                            _composite.frames());
+                            _remixed.frames());
         }
 
         // Advance chunk frame
-        chunk.frame += length;
+        source._frame += length;
     }
 
     Listener &Jukebox::listener() { return _listener; }
 
-    const std::vector<Device> Jukebox::get_devices() {
-        std::vector<Device> devices;
+    const std::vector<Device> &Jukebox::devices() {
         PaError err;
 
         // Count the devices
@@ -159,6 +153,7 @@ namespace Dynamo::Sound {
         }
 
         // List all devices
+        _devices.clear();
         for (int index = 0; index < device_count; index++) {
             const PaDeviceInfo *device_info = Pa_GetDeviceInfo(index);
             Device device;
@@ -170,10 +165,10 @@ namespace Dynamo::Sound {
             device.input_latency = device_info->defaultLowInputLatency;
             device.output_latency = device_info->defaultLowOutputLatency;
 
-            devices.push_back(device);
+            _devices.emplace_back(device);
         }
 
-        return devices;
+        return _devices;
     }
 
     void Jukebox::set_input(const Device &device) {
@@ -287,20 +282,31 @@ namespace Dynamo::Sound {
         return _input_stream != nullptr && Pa_IsStreamActive(_input_stream);
     }
 
-    void Jukebox::play(Sound &sound,
-                       Material &material,
-                       std::optional<FilterRef> filter) {
-        float frame = _output_state.sample_rate * material.start.count();
-        float frame_stop =
-            material.duration.count() < 0.0f
-                ? sound.frames()
-                : _output_state.sample_rate * material.duration.count() + frame;
-        _chunks.push_back({sound, material, filter, frame, frame_stop});
+    void Jukebox::play(Source &source) {
+        if (source._playing) return;
+
+        source._playing = true;
+        _sources.emplace_back(source);
     }
 
-    void Jukebox::pause() { Pa_StopStream(_output_stream); }
+    void Jukebox::pause(Source &source) {
+        if (!source._playing) return;
+
+        auto d_it = _sources.begin();
+        while (d_it != _sources.end()) {
+            if (&d_it->get() == &source) {
+                _sources.erase(d_it);
+                source._playing = false;
+                break;
+            } else {
+                d_it++;
+            }
+        }
+    }
 
     void Jukebox::resume() { Pa_StartStream(_output_stream); }
+
+    void Jukebox::pause() { Pa_StopStream(_output_stream); }
 
     void Jukebox::update() {
         // Wait for there to be available space in the buffer
@@ -310,17 +316,18 @@ namespace Dynamo::Sound {
         }
 
         // Zero-out the composite waveform
-        _composite.clear();
+        _composite.silence();
 
         // Process chunks and mix onto the composite
-        auto d_it = _chunks.begin();
-        while (d_it != _chunks.end()) {
-            Chunk &chunk = *d_it;
-            if (chunk.frame >= chunk.frame_stop) {
-                d_it = _chunks.erase(d_it);
-                chunk.material.get().on_finish(chunk.sound);
+        auto d_it = _sources.begin();
+        while (d_it != _sources.end()) {
+            Source &source = *d_it;
+            if (source._frame >= source._frame_stop) {
+                d_it = _sources.erase(d_it);
+                source._playing = false;
+                source._on_finish();
             } else {
-                process_chunk(chunk);
+                process_source(source);
                 d_it++;
             }
         }

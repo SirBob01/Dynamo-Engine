@@ -3,48 +3,119 @@
 
 #include "../Common.hpp"
 
-using WaveForm = std::vector<Dynamo::Sound::WaveSample>;
-
 struct Samples {
-    Dynamo::Sound::Sound mono;
-    Dynamo::Sound::Sound stereo;
-    Dynamo::Sound::Sound quad;
-    Dynamo::Sound::Sound s_51;
+    Dynamo::Sound::Buffer mono;
+    Dynamo::Sound::Buffer stereo;
+    Dynamo::Sound::Buffer quad;
+    Dynamo::Sound::Buffer s_51;
 
     Samples() {
-        WaveForm mono_buf;
+        mono = Dynamo::Sound::Buffer(3, 1);
         for (unsigned i = 0; i < 3 * 1; i++) {
-            mono_buf.push_back(i);
+            mono.data()[i] = i;
         }
-        mono = Dynamo::Sound::Sound(mono_buf, 1, 44100);
 
-        WaveForm stereo_buf;
+        stereo = Dynamo::Sound::Buffer(3, 2);
         for (unsigned i = 0; i < 3 * 2; i++) {
-            stereo_buf.push_back(i);
+            stereo.data()[i] = i;
         }
-        stereo = Dynamo::Sound::Sound(stereo_buf, 2, 44100);
 
-        WaveForm quad_buf;
+        quad = Dynamo::Sound::Buffer(3, 4);
         for (unsigned i = 0; i < 3 * 4; i++) {
-            quad_buf.push_back(i);
+            quad.data()[i] = i;
         }
-        quad = Dynamo::Sound::Sound(quad_buf, 4, 44100);
 
-        WaveForm s_51_buf;
+        s_51 = Dynamo::Sound::Buffer(3, 6);
         for (unsigned i = 0; i < 3 * 6; i++) {
-            s_51_buf.push_back(i);
+            s_51.data()[i] = i;
         }
-        s_51 = Dynamo::Sound::Sound(s_51_buf, 6, 44100);
     }
 };
 
 Samples dataset;
 
-TEST_CASE("Sound remix 1 - 2", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.mono;
-    Dynamo::Sound::Sound dst(src.frames(), 2);
+TEST_CASE("Buffer construction", "[Buffer]") {
+    Dynamo::Sound::Buffer buffer;
+    REQUIRE(buffer.frames() == 0);
+    REQUIRE(buffer.channels() == 0);
 
-    src.remix(dst, 0, 0, src.frames());
+    buffer = Dynamo::Sound::Buffer(3, 1);
+    REQUIRE(buffer.frames() == 3);
+    REQUIRE(buffer.channels() == 1);
+
+    std::array<float, 6> arr = {3, 2, 1, 0, -1, 4};
+    buffer = Dynamo::Sound::Buffer(arr.data(), 3, 2);
+    REQUIRE(buffer.frames() == 3);
+    REQUIRE(buffer.channels() == 2);
+
+    buffer = Dynamo::Sound::Buffer(arr.data(), 2, 3);
+    REQUIRE(buffer.frames() == 2);
+    REQUIRE(buffer.channels() == 3);
+
+    // Verify samples
+    REQUIRE(buffer[0][0] == 3);
+    REQUIRE(buffer[0][1] == 2);
+
+    REQUIRE(buffer[1][0] == 1);
+    REQUIRE(buffer[1][1] == 0);
+
+    REQUIRE(buffer[2][0] == -1);
+    REQUIRE(buffer[2][1] == 4);
+
+    Dynamo::Sound::Buffer copy = buffer;
+    for (unsigned c = 0; c < buffer.channels(); c++) {
+        for (unsigned f = 0; f < buffer.frames(); f++) {
+            REQUIRE(buffer[c][f] == copy[c][f]);
+        }
+    }
+}
+
+TEST_CASE("Buffer silence", "[Buffer]") {
+    std::array<float, 6> arr = {3, 2, 1, 0, -1, 4};
+    Dynamo::Sound::Buffer buffer(arr.data(), 3, 2);
+    buffer.silence();
+
+    for (unsigned c = 0; c < buffer.channels(); c++) {
+        for (unsigned f = 0; f < buffer.frames(); f++) {
+            REQUIRE(buffer[c][f] == 0);
+        }
+    }
+}
+
+TEST_CASE("Buffer resize", "[Buffer]") {
+    std::array<float, 6> arr = {3, 2, 1, 0, -1, 4};
+    Dynamo::Sound::Buffer buffer(arr.data(), 3, 2);
+
+    // Size up
+    buffer.resize(5, 3);
+    REQUIRE(buffer.frames() == 5);
+    REQUIRE(buffer.channels() == 3);
+
+    // Size down
+    buffer.resize(4, 2);
+    REQUIRE(buffer.frames() == 4);
+    REQUIRE(buffer.channels() == 2);
+}
+
+TEST_CASE("Buffer channel index", "[Buffer]") {
+    std::array<float, 6> arr = {3, 2, 1, 0, -1, 4};
+    Dynamo::Sound::Buffer buffer(arr.data(), 3, 2);
+
+    REQUIRE(buffer[0][0] == 3);
+    REQUIRE(buffer[0][1] == 2);
+    REQUIRE(buffer[0][2] == 1);
+
+    REQUIRE(buffer[1][0] == 0);
+    REQUIRE(buffer[1][1] == -1);
+    REQUIRE(buffer[1][2] == 4);
+}
+
+TEST_CASE("Buffer remix 1 - 2", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.mono;
+    Dynamo::Sound::Buffer dst(src.frames(), 2);
+
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -55,11 +126,12 @@ TEST_CASE("Sound remix 1 - 2", "[Sound]") {
     REQUIRE(dst[1][2] == src[0][2]);
 }
 
-TEST_CASE("Sound remix 1 - 4", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.mono;
-    Dynamo::Sound::Sound dst(src.frames(), 4);
+TEST_CASE("Buffer remix 1 - 4", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.mono;
+    Dynamo::Sound::Buffer dst(src.frames(), 4);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -78,11 +150,12 @@ TEST_CASE("Sound remix 1 - 4", "[Sound]") {
     REQUIRE(dst[3][2] == 0);
 }
 
-TEST_CASE("Sound remix 1 - 6", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.mono;
-    Dynamo::Sound::Sound dst(src.frames(), 6);
+TEST_CASE("Buffer remix 1 - 6", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.mono;
+    Dynamo::Sound::Buffer dst(src.frames(), 6);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == 0);
     REQUIRE(dst[0][1] == 0);
@@ -109,22 +182,24 @@ TEST_CASE("Sound remix 1 - 6", "[Sound]") {
     REQUIRE(dst[5][2] == 0);
 }
 
-TEST_CASE("Sound remix 2 - 1", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.stereo;
-    Dynamo::Sound::Sound dst(src.frames(), 1);
+TEST_CASE("Buffer remix 2 - 1", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.stereo;
+    Dynamo::Sound::Buffer dst(src.frames(), 1);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == 0.5 * (src[0][0] + src[1][0]));
     REQUIRE(dst[0][1] == 0.5 * (src[0][1] + src[1][1]));
     REQUIRE(dst[0][2] == 0.5 * (src[0][2] + src[1][2]));
 }
 
-TEST_CASE("Sound remix 2 - 4", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.stereo;
-    Dynamo::Sound::Sound dst(src.frames(), 4);
+TEST_CASE("Buffer remix 2 - 4", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.stereo;
+    Dynamo::Sound::Buffer dst(src.frames(), 4);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -143,11 +218,12 @@ TEST_CASE("Sound remix 2 - 4", "[Sound]") {
     REQUIRE(dst[3][2] == 0);
 }
 
-TEST_CASE("Sound remix 2 - 6", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.stereo;
-    Dynamo::Sound::Sound dst(src.frames(), 6);
+TEST_CASE("Buffer remix 2 - 6", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.stereo;
+    Dynamo::Sound::Buffer dst(src.frames(), 6);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -174,11 +250,12 @@ TEST_CASE("Sound remix 2 - 6", "[Sound]") {
     REQUIRE(dst[5][2] == 0);
 }
 
-TEST_CASE("Sound remix 4 - 1", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.quad;
-    Dynamo::Sound::Sound dst(src.frames(), 1);
+TEST_CASE("Buffer remix 4 - 1", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.quad;
+    Dynamo::Sound::Buffer dst(src.frames(), 1);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] ==
             0.25 * (src[0][0] + src[1][0] + src[2][0] + src[3][0]));
@@ -188,11 +265,12 @@ TEST_CASE("Sound remix 4 - 1", "[Sound]") {
             0.25 * (src[0][2] + src[1][2] + src[2][2] + src[3][2]));
 }
 
-TEST_CASE("Sound remix 4 - 2", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.quad;
-    Dynamo::Sound::Sound dst(src.frames(), 2);
+TEST_CASE("Buffer remix 4 - 2", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.quad;
+    Dynamo::Sound::Buffer dst(src.frames(), 2);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == 0.5 * (src[0][0] + src[2][0]));
     REQUIRE(dst[0][1] == 0.5 * (src[0][1] + src[2][1]));
@@ -203,11 +281,12 @@ TEST_CASE("Sound remix 4 - 2", "[Sound]") {
     REQUIRE(dst[1][2] == 0.5 * (src[1][2] + src[3][2]));
 }
 
-TEST_CASE("Sound remix 4 - 6", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.quad;
-    Dynamo::Sound::Sound dst(src.frames(), 6);
+TEST_CASE("Buffer remix 4 - 6", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.quad;
+    Dynamo::Sound::Buffer dst(src.frames(), 6);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -234,11 +313,12 @@ TEST_CASE("Sound remix 4 - 6", "[Sound]") {
     REQUIRE(dst[5][2] == src[3][2]);
 }
 
-TEST_CASE("Sound remix 6 - 1", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.s_51;
-    Dynamo::Sound::Sound dst(src.frames(), 1);
+TEST_CASE("Buffer remix 6 - 1", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.s_51;
+    Dynamo::Sound::Buffer dst(src.frames(), 1);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE_THAT(dst[0][0],
                  Approx(M_SQRT1_2 * (src[0][0] + src[1][0]) + src[2][0] +
@@ -251,11 +331,12 @@ TEST_CASE("Sound remix 6 - 1", "[Sound]") {
                         0.5 * (src[4][2] + src[5][2])));
 }
 
-TEST_CASE("Sound remix 6 - 2", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.s_51;
-    Dynamo::Sound::Sound dst(src.frames(), 2);
+TEST_CASE("Buffer remix 6 - 2", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.s_51;
+    Dynamo::Sound::Buffer dst(src.frames(), 2);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE_THAT(dst[0][0],
                  Approx(src[0][0] + M_SQRT1_2 * (src[2][0] + src[4][0]), 1e-5));
@@ -272,11 +353,12 @@ TEST_CASE("Sound remix 6 - 2", "[Sound]") {
                  Approx(src[1][2] + M_SQRT1_2 * (src[2][2] + src[5][2]), 1e-5));
 }
 
-TEST_CASE("Sound remix 6 - 4", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.s_51;
-    Dynamo::Sound::Sound dst(src.frames(), 4);
+TEST_CASE("Buffer remix 6 - 4", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.s_51;
+    Dynamo::Sound::Buffer dst(src.frames(), 4);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE_THAT(dst[0][0], Approx(src[0][0] + M_SQRT1_2 * src[2][0], 1e-5));
     REQUIRE_THAT(dst[0][1], Approx(src[0][1] + M_SQRT1_2 * src[2][1], 1e-5));
@@ -295,11 +377,12 @@ TEST_CASE("Sound remix 6 - 4", "[Sound]") {
     REQUIRE(dst[3][2] == src[5][2]);
 }
 
-TEST_CASE("Sound remix discrete upmix", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.stereo;
-    Dynamo::Sound::Sound dst(src.frames(), 3);
+TEST_CASE("Buffer remix discrete upmix", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.stereo;
+    Dynamo::Sound::Buffer dst(src.frames(), 3);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -314,11 +397,12 @@ TEST_CASE("Sound remix discrete upmix", "[Sound]") {
     REQUIRE(dst[2][2] == 0);
 }
 
-TEST_CASE("Sound remix discrete downmix", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.s_51;
-    Dynamo::Sound::Sound dst(src.frames(), 3);
+TEST_CASE("Buffer remix discrete downmix", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.s_51;
+    Dynamo::Sound::Buffer dst(src.frames(), 3);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);
@@ -333,11 +417,12 @@ TEST_CASE("Sound remix discrete downmix", "[Sound]") {
     REQUIRE(dst[2][2] == src[2][2]);
 }
 
-TEST_CASE("Sound remix discrete equal", "[Sound]") {
-    Dynamo::Sound::Sound src = dataset.s_51;
-    Dynamo::Sound::Sound dst(src.frames(), 6);
+TEST_CASE("Buffer remix discrete equal", "[Buffer]") {
+    Dynamo::Sound::Buffer src = dataset.s_51;
+    Dynamo::Sound::Buffer dst(src.frames(), 6);
 
-    src.remix(dst, 0, 0, src.frames());
+    dst.silence();
+    src.remix(dst);
 
     REQUIRE(dst[0][0] == src[0][0]);
     REQUIRE(dst[0][1] == src[0][1]);

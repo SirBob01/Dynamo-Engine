@@ -7,12 +7,24 @@
 #include <Utils/IdTracker.hpp>
 #include <Utils/RingBuffer.hpp>
 
-#include <Sound/Chunk.hpp>
+#include <Sound/Buffer.hpp>
 #include <Sound/Device.hpp>
 #include <Sound/Listener.hpp>
-#include <Sound/Sound.hpp>
+#include <Sound/Source.hpp>
 
 namespace Dynamo::Sound {
+    /**
+     * @brief Maximum number of frames in a processing chunk.
+     *
+     * A larger chunk will demand more compute time, especially when
+     * processing multiple simultneously, causing latency.
+     *
+     * However, a smaller chunk may not allow the output device
+     * to receive enough data when requested, causing glitches.
+     *
+     */
+    static constexpr unsigned MAX_CHUNK_LENGTH = 1 << 8;
+
     /**
      * @brief Size of the input and output ring buffers.
      *
@@ -29,12 +41,13 @@ namespace Dynamo::Sound {
 
         float _volume;
 
-        Sound _scratch;
-        Sound _remixed;
-        Sound _composite;
+        Buffer _scratch;
+        Buffer _remixed;
+        Buffer _composite;
 
         Listener _listener;
-        std::vector<Chunk> _chunks;
+        std::vector<SourceRef> _sources;
+        std::vector<Device> _devices;
 
         /**
          * @brief Internal state shared with the PortAudio callback.
@@ -85,11 +98,11 @@ namespace Dynamo::Sound {
                                    void *data);
 
         /**
-         * @brief Process a chunk
+         * @brief Process a sound source.
          *
-         * @param chunk chunk
+         * @param source
          */
-        void process_chunk(Chunk &chunk);
+        void process_source(Source &source);
 
       public:
         /**
@@ -111,7 +124,7 @@ namespace Dynamo::Sound {
          *
          * @return const std::vector<Device>
          */
-        const std::vector<Device> get_devices();
+        const std::vector<Device> &devices();
 
         /**
          * @brief Set the input device.
@@ -162,21 +175,20 @@ namespace Dynamo::Sound {
         bool is_recording();
 
         /**
-         * @brief Play a sound.
+         * @brief Play a sound source.
          *
          * @param sound    Sound
          * @param material Playback properties
          * @param filters  Filter
          */
-        void play(Sound &sound,
-                  Material &material,
-                  std::optional<FilterRef> filter = {});
+        void play(Source &source);
 
         /**
-         * @brief Pause playback.
+         * @brief Pause a sound source.
          *
+         * @param source
          */
-        void pause();
+        void pause(Source &source);
 
         /**
          * @brief Resume playback.
@@ -185,7 +197,13 @@ namespace Dynamo::Sound {
         void resume();
 
         /**
-         * @brief Update Jukebox's internal state and process all chunks
+         * @brief Pause playback.
+         *
+         */
+        void pause();
+
+        /**
+         * @brief Update Jukebox's internal state and process all sources
          * to be written into the output buffer.
          *
          */

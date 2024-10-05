@@ -6,8 +6,8 @@
 #include <Math/Complex.hpp>
 #include <Utils/Bits.hpp>
 
-#include <Sound/Chunk.hpp>
-#include <Sound/Sound.hpp>
+#include <Sound/Buffer.hpp>
+#include <Sound/Jukebox.hpp>
 
 namespace Dynamo::Sound {
     /**
