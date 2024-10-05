@@ -1,5 +1,4 @@
 #include <Graphics/Vulkan/Surface.hpp>
-#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
     Surface::Surface(Instance &instance, const Display &display) :
@@ -10,4 +9,6 @@ namespace Dynamo::Graphics::Vulkan {
     Surface::~Surface() {
         vkDestroySurfaceKHR(_instance.handle(), _handle, nullptr);
     }
+
+    VkSurfaceKHR Surface::handle() const { return _handle; }
 } // namespace Dynamo::Graphics::Vulkan

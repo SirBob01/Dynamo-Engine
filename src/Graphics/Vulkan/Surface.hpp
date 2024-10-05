@@ -13,6 +13,6 @@ namespace Dynamo::Graphics::Vulkan {
         Surface(Instance &instance, const Display &display);
         ~Surface();
 
-        const VkSurfaceKHR &handle() const;
+        VkSurfaceKHR handle() const;
     };
 } // namespace Dynamo::Graphics::Vulkan
