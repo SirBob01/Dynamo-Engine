@@ -29,6 +29,7 @@ namespace Dynamo {
         glfwMakeContextCurrent(_window);
 
         _vsync = true;
+        _title = title;
         _input = std::make_unique<Input>(_window);
     }
 
@@ -37,7 +38,20 @@ namespace Dynamo {
         glfwTerminate();
     }
 
-    Input &Display::get_input() { return *_input; }
+    std::vector<const char *> Display::get_vulkan_extensions() const {
+        unsigned count = 0;
+        const char **ptr = glfwGetRequiredInstanceExtensions(&count);
+
+        std::vector<const char *> extensions;
+        for (unsigned i = 0; i < count; i++) {
+            extensions.emplace_back(ptr[i]);
+        }
+        return extensions;
+    }
+
+    const std::string &Display::get_title() const { return _title; }
+
+    Input &Display::input() { return *_input; }
 
     Vec2 Display::get_window_size() const {
         int width, height;
@@ -95,7 +109,8 @@ namespace Dynamo {
     }
 
     void Display::set_title(const std::string &title) {
-        glfwSetWindowTitle(_window, title.c_str());
+        _title = title;
+        glfwSetWindowTitle(_window, _title.c_str());
     }
 
     void Display::set_icon(const std::string &filepath) {

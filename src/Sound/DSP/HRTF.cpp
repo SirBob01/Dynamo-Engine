@@ -91,8 +91,6 @@ namespace Dynamo::Sound {
                 return;
             }
         }
-        Dynamo::Log::error("HRTF could not triagulate ({} {})",
-                           point.x,
-                           point.y);
+        Log::error("HRTF could not triagulate ({} {})", point.x, point.y);
     }
 } // namespace Dynamo::Sound
