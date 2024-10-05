@@ -44,6 +44,14 @@ namespace Dynamo {
         std::vector<const char *> get_vulkan_extensions() const;
 
         /**
+         * @brief Create a Vulkan surface.
+         *
+         * @param instance
+         * @return VkSurfaceKHR
+         */
+        VkSurfaceKHR create_vulkan_surface(const VkInstance &instance) const;
+
+        /**
          * @brief Get the display title.
          *
          * @return const std::string&

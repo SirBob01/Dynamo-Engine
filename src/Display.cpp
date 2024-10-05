@@ -49,6 +49,17 @@ namespace Dynamo {
         return extensions;
     }
 
+    VkSurfaceKHR
+    Display::create_vulkan_surface(const VkInstance &instance) const {
+        VkSurfaceKHR surface;
+        VkResult result =
+            glfwCreateWindowSurface(instance, _window, nullptr, &surface);
+        if (result != VK_SUCCESS) {
+            Log::error("Unable to create Vulkan surface from Display.");
+        }
+        return surface;
+    }
+
     const std::string &Display::get_title() const { return _title; }
 
     Input &Display::input() { return *_input; }
