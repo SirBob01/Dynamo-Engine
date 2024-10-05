@@ -5,6 +5,7 @@
 
 #include <Clock.hpp>
 #include <Display.hpp>
+#include <Graphics/Renderer.hpp>
 #include <Sound/Jukebox.hpp>
 
 namespace Dynamo {
@@ -44,6 +45,7 @@ namespace Dynamo {
      */
     class Application {
         std::unique_ptr<Display> _display;
+        std::unique_ptr<Graphics::Vulkan::Renderer> _renderer;
         std::unique_ptr<Sound::Jukebox> _jukebox;
 
         std::thread _audio_thread;
@@ -87,6 +89,13 @@ namespace Dynamo {
          * @return Clock&
          */
         Clock &clock();
+
+        /**
+         * @brief Get the renderer.
+         *
+         * @return Graphics::Vulkan::Renderer&
+         */
+        Graphics::Vulkan::Renderer &renderer();
 
         /**
          * @brief Get the audio engine.

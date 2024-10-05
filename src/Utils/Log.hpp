@@ -76,7 +76,7 @@ namespace Dynamo {
                                            Clock::time(),
                                            message);
             std::cout << line << "\n";
-            throw std::runtime_error(message);
+            throw std::runtime_error("Dynamo fatal.");
         }
     };
 } // namespace Dynamo

@@ -18,7 +18,7 @@ namespace Dynamo {
     class Display {
         GLFWmonitor *_monitor;
         GLFWwindow *_window;
-
+        std::string _title;
         bool _vsync;
 
         std::unique_ptr<Input> _input;
@@ -37,11 +37,25 @@ namespace Dynamo {
         ~Display();
 
         /**
+         * @brief Get the supported Vulkan extensions.
+         *
+         * @return std::vector<const char *>
+         */
+        std::vector<const char *> get_vulkan_extensions() const;
+
+        /**
+         * @brief Get the display title.
+         *
+         * @return const std::string&
+         */
+        const std::string &get_title() const;
+
+        /**
          * @brief Get the Input subsystem.
          *
          * @return Input&
          */
-        Input &get_input();
+        Input &input();
 
         /**
          * @brief Get the window size.
