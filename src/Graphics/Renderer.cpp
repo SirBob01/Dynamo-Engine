@@ -6,5 +6,6 @@ namespace Dynamo::Graphics::Vulkan {
 #ifdef DYN_DEBUG
         _debugger = std::make_unique<Debugger>(*_instance);
 #endif
+        _surface = std::make_unique<Surface>(*_instance, display);
     }
 } // namespace Dynamo::Graphics::Vulkan
