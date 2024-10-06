@@ -8,6 +8,7 @@
 #include <Graphics/Vulkan/Instance.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
 #include <Graphics/Vulkan/Surface.hpp>
+#include <Graphics/Vulkan/Swapchain.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -22,6 +23,7 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<PhysicalDevice> _physical_devices;
 
         std::unique_ptr<Device> _device;
+        std::unique_ptr<Swapchain> _swapchain;
 
         /**
          * @brief Enumerate available GPUs and return the most suitable one.

@@ -9,6 +9,7 @@ namespace Dynamo::Graphics::Vulkan {
 #endif
         _surface = std::make_unique<Surface>(*_instance, display);
         _device = std::make_unique<Device>(find_physical_device());
+        _swapchain = std::make_unique<Swapchain>(*_device, *_surface, display);
     }
 
     PhysicalDevice &Renderer::find_physical_device() {
