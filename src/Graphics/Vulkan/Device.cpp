@@ -93,11 +93,7 @@ namespace Dynamo::Graphics::Vulkan {
             family = _physical.compute_queues();
             break;
         }
-
-        if (family.index >= family.count) {
-            Log::error("Vulkan::Device requested unavailable {} queues.",
-                       (int)type);
-        }
+        DYN_ASSERT(index < family.count);
 
         VkQueue queue;
         vkGetDeviceQueue(_handle, family.index, index, &queue);

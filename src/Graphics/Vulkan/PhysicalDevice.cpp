@@ -65,6 +65,39 @@ namespace Dynamo::Graphics::Vulkan {
             }
         }
 
+        // Query for device surface capabilities
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+            _handle,
+            surface.handle(),
+            &_swapchain_options.capabilities);
+
+        // Query for surface formats
+        unsigned formats_count = 0;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(_handle,
+                                             surface.handle(),
+                                             &formats_count,
+                                             nullptr);
+
+        _swapchain_options.formats.resize(formats_count);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(_handle,
+                                             surface.handle(),
+                                             &formats_count,
+                                             _swapchain_options.formats.data());
+
+        // Query for surface present modes
+        unsigned present_modes_count = 0;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(_handle,
+                                                  surface.handle(),
+                                                  &present_modes_count,
+                                                  nullptr);
+
+        _swapchain_options.present_modes.resize(present_modes_count);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(
+            _handle,
+            surface.handle(),
+            &present_modes_count,
+            _swapchain_options.present_modes.data());
+
         // Enumerate device extensions
         unsigned ext_count = 0;
         vkEnumerateDeviceExtensionProperties(_handle,
@@ -150,12 +183,25 @@ namespace Dynamo::Graphics::Vulkan {
         return _compute_queues;
     }
 
+    const SwapchainOptions &PhysicalDevice::swapchain_options() const {
+        return _swapchain_options;
+    }
+
     int PhysicalDevice::score() const {
-        // Minimum requirements
-        if (!_features.fillModeNonSolid || !_features.sampleRateShading ||
+        if (
+            // Required device features
+            !_features.fillModeNonSolid || !_features.sampleRateShading ||
             !_features.samplerAnisotropy || !_features.multiViewport ||
+
+            // Required device queues
             !_graphics_queues.count || !_transfer_queues.count ||
             !_present_queues.count || !_compute_queues.count ||
+
+            // Required swapchain support
+            _swapchain_options.present_modes.empty() ||
+            _swapchain_options.formats.empty() ||
+
+            // Extensions
             !supports_required_extensions()) {
             return 0;
         }

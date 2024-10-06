@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
-#include <vulkan/vulkan_core.h>
 
 #include <Graphics/Vulkan/Instance.hpp>
 #include <Graphics/Vulkan/Surface.hpp>
@@ -11,6 +10,12 @@ namespace Dynamo::Graphics::Vulkan {
         unsigned index = 0;
         unsigned count = 0;
         float priority = 0;
+    };
+
+    struct SwapchainOptions {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> present_modes;
     };
 
     class PhysicalDevice {
@@ -25,6 +30,8 @@ namespace Dynamo::Graphics::Vulkan {
         QueueFamily _present_queues;
         QueueFamily _compute_queues;
         QueueFamily _transfer_queues;
+
+        SwapchainOptions _swapchain_options;
 
         std::vector<VkExtensionProperties> _extensions;
         std::vector<const char *> _required_extensions;
@@ -61,6 +68,8 @@ namespace Dynamo::Graphics::Vulkan {
         const QueueFamily &transfer_queues() const;
 
         const QueueFamily &compute_queues() const;
+
+        const SwapchainOptions &swapchain_options() const;
 
         /**
          * @brief Compute score for default device selection.
