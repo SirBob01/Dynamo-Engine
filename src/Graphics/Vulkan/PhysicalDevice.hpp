@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <vector>
 
-#include <Graphics/Vulkan/Instance.hpp>
-#include <Graphics/Vulkan/Surface.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
     struct QueueFamily {
@@ -18,64 +17,54 @@ namespace Dynamo::Graphics::Vulkan {
         std::vector<VkPresentModeKHR> present_modes;
     };
 
-    class PhysicalDevice {
-        VkPhysicalDevice _handle;
+    /**
+     * @brief Wrapper object for a Vulkan physical device and its properties.
+     *
+     */
+    struct PhysicalDevice {
+        VkPhysicalDevice handle;
+        VkSurfaceKHR surface;
 
-        VkPhysicalDeviceProperties _properties;
-        VkPhysicalDeviceMemoryProperties _memory_properties;
-        VkPhysicalDeviceFeatures _features;
+        VkPhysicalDeviceProperties properties;
+        VkPhysicalDeviceMemoryProperties memory;
+        VkPhysicalDeviceFeatures features;
 
-        std::vector<VkQueueFamilyProperties> _queue_families;
-        QueueFamily _graphics_queues;
-        QueueFamily _present_queues;
-        QueueFamily _compute_queues;
-        QueueFamily _transfer_queues;
-
-        SwapchainOptions _swapchain_options;
-
-        std::vector<VkExtensionProperties> _extensions;
-        std::vector<const char *> _required_extensions;
-
-        /**
-         * @brief Check if the device supports all required extensions.
-         *
-         * @return true
-         * @return false
-         */
-        bool supports_required_extensions() const;
-
-      public:
-        PhysicalDevice(VkPhysicalDevice handle, Surface &surface);
-
-        VkPhysicalDevice handle() const;
-
-        const VkPhysicalDeviceProperties &properties() const;
-
-        const VkPhysicalDeviceMemoryProperties &memory_properties() const;
-
-        const VkPhysicalDeviceFeatures &features() const;
-
-        const std::vector<VkQueueFamilyProperties> &queue_families() const;
-
-        const std::vector<VkExtensionProperties> &extensions() const;
-
-        const std::vector<const char *> &required_extensions() const;
-
-        const QueueFamily &graphics_queues() const;
-
-        const QueueFamily &present_queues() const;
-
-        const QueueFamily &transfer_queues() const;
-
-        const QueueFamily &compute_queues() const;
-
-        const SwapchainOptions &swapchain_options() const;
+        QueueFamily graphics_queues;
+        QueueFamily present_queues;
+        QueueFamily compute_queues;
+        QueueFamily transfer_queues;
 
         /**
-         * @brief Compute score for default device selection.
+         * @brief Build a Vulkan physical device.
          *
-         * @return int
+         * @param handle
+         * @param surface
+         * @return PhysicalDevice
          */
-        int score() const;
+        static PhysicalDevice build(VkPhysicalDevice handle,
+                                    VkSurfaceKHR surface);
+
+        /**
+         * @brief Select a suitable physical device based on its score.
+         *
+         * @param instance
+         * @param surface
+         * @return PhysicalDevice
+         */
+        static PhysicalDevice select(VkInstance instance, VkSurfaceKHR surface);
+
+        /**
+         * @brief Get the available swapchain configuration options.
+         *
+         * @return SwapchainOptions
+         */
+        SwapchainOptions get_swapchain_options() const;
+
+        /**
+         * @brief Compute the desirability "score".
+         *
+         * @return unsigned
+         */
+        unsigned score() const;
     };
 } // namespace Dynamo::Graphics::Vulkan

@@ -49,8 +49,7 @@ namespace Dynamo {
         return extensions;
     }
 
-    VkSurfaceKHR
-    Display::create_vulkan_surface(const VkInstance &instance) const {
+    VkSurfaceKHR Display::create_vulkan_surface(VkInstance instance) const {
         VkSurfaceKHR surface;
         VkResult result =
             glfwCreateWindowSurface(instance, _window, nullptr, &surface);

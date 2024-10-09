@@ -1,65 +1,64 @@
 #include <Graphics/Vulkan/Debugger.hpp>
+#include <Graphics/Vulkan/Utils.hpp>
 
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT *create_info,
     const VkAllocationCallbacks *allocator,
     VkDebugUtilsMessengerEXT *messenger) {
-    return vk_create_debugger_dispatch(instance,
-                                       create_info,
-                                       allocator,
-                                       messenger);
+    return vkCreateDebuggerDispatch(instance,
+                                    create_info,
+                                    allocator,
+                                    messenger);
 }
 
 VKAPI_ATTR void VKAPI_CALL
 vkDestroyDebugUtilsMessengerEXT(VkInstance instance,
                                 VkDebugUtilsMessengerEXT messenger,
                                 VkAllocationCallbacks const *allocator) {
-    vk_destroy_debugger_dispatch(instance, messenger, allocator);
+    vkDestroyDebuggerDispatch(instance, messenger, allocator);
 }
 
 namespace Dynamo::Graphics::Vulkan {
-    Debugger::Debugger(Instance &instance) : _instance(instance) {
-        vk_create_debugger_dispatch =
+    VkDebugUtilsMessengerEXT
+    VkDebugUtilsMessengerEXT_build(VkInstance instance) {
+        vkCreateDebuggerDispatch =
             reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
-                vkGetInstanceProcAddr(_instance.handle(),
+                vkGetInstanceProcAddr(instance,
                                       "vkCreateDebugUtilsMessengerEXT"));
-        vk_destroy_debugger_dispatch =
+        vkDestroyDebuggerDispatch =
             reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
-                vkGetInstanceProcAddr(_instance.handle(),
+                vkGetInstanceProcAddr(instance,
                                       "vkDestroyDebugUtilsMessengerEXT"));
 
         // Create the debug messenger
-        VkDebugUtilsMessengerCreateInfoEXT debug_utils_info = {};
-        debug_utils_info.sType =
+        VkDebugUtilsMessengerCreateInfoEXT debugger_info = {};
+        debugger_info.sType =
             VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        debug_utils_info.messageSeverity =
+        debugger_info.messageSeverity =
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT;
-        debug_utils_info.messageType =
+        debugger_info.messageType =
             VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        debug_utils_info.pfnUserCallback = &message_callback;
+        debugger_info.pfnUserCallback =
+            &VkDebugUtilsMessengerEXT_message_callback;
 
-        VkResult result = vkCreateDebugUtilsMessengerEXT(_instance.handle(),
-                                                         &debug_utils_info,
-                                                         nullptr,
-                                                         &_handle);
-        if (result != VK_SUCCESS) {
-            Log::error("Could not create Vulkan::Debugger.");
-        }
+        VkDebugUtilsMessengerEXT debugger;
+        VkResult_log("Create Debugger",
+                     vkCreateDebugUtilsMessengerEXT(instance,
+                                                    &debugger_info,
+                                                    nullptr,
+                                                    &debugger));
+        return debugger;
     }
 
-    Debugger::~Debugger() {
-        vk_destroy_debugger_dispatch(_instance.handle(), _handle, nullptr);
-    }
-
-    VKAPI_ATTR VkBool32 VKAPI_CALL
-    Debugger::message_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-                               VkDebugUtilsMessageTypeFlagsEXT type,
-                               VkDebugUtilsMessengerCallbackDataEXT const *data,
-                               void *user_data) {
+    VKAPI_ATTR VkBool32 VKAPI_CALL VkDebugUtilsMessengerEXT_message_callback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+        VkDebugUtilsMessageTypeFlagsEXT type,
+        VkDebugUtilsMessengerCallbackDataEXT const *data,
+        void *user_data) {
         Log::warn("--- Vulkan::Debugger Message ---");
         Log::warn("Message name: {}", data->pMessageIdName);
         Log::warn("Message Id: {}", data->messageIdNumber);

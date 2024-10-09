@@ -1,27 +1,15 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    constexpr std::array<const char *, 1> VALIDATION_LAYERS = {
-        "VK_LAYER_KHRONOS_validation",
-    };
-
-    class Instance {
-        VkInstance _handle;
-
-        /**
-         * @brief Check if all required validation layers are supported.
-         *
-         */
-        void check_validation_layers() const;
-
-      public:
-        Instance(const Display &display);
-        ~Instance();
-
-        VkInstance handle() const;
-    };
+    /**
+     * @brief Build the Vulkan instance.
+     *
+     * @param display
+     * @return VkInstance
+     */
+    VkInstance VkInstance_build(const Display &display);
 } // namespace Dynamo::Graphics::Vulkan
