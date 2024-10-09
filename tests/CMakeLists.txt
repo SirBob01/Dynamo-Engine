@@ -9,8 +9,11 @@ set(BUILD_TESTING off)
 
 add_compile_options(-Wall -g -O3 -fPIC -march=native)
 
+execute_process(COMMAND "../submodules/shaderc/utils/git-sync-deps")
+
 add_subdirectory("../" "./Dynamo")
 add_subdirectory("../submodules/Catch2" "./Catch2")
+
 
 # Compile each demo
 file(GLOB_RECURSE TESTS "./src/*.cpp")

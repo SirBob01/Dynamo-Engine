@@ -15,6 +15,8 @@ namespace Dynamo::Graphics::Vulkan {
             return "VK_PHYSICAL_DEVICE_TYPE_CPU";
         case VK_PHYSICAL_DEVICE_TYPE_MAX_ENUM:
             return "VK_PHYSICAL_DEVICE_TYPE_MAX_ENUM";
+        default:
+            return "";
         }
     }
 
@@ -98,6 +100,8 @@ namespace Dynamo::Graphics::Vulkan {
             return "VK_PIPELINE_COMPILE_REQUIRED_EXT";
         case VK_RESULT_MAX_ENUM:
             return "VK_RESULT_MAX_ENUM";
+        default:
+            return "";
         }
     }
 

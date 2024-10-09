@@ -25,12 +25,6 @@ jobs:
           vulkan-components: Vulkan-Headers, Vulkan-Loader, Glslang
           vulkan-use-cache: true
 
-      - name: Build
-        run: |
-          threads=`nproc`
-          cmake .
-          make -j $threads
-
       - name: Build Tests
         working-directory: tests
         run: |

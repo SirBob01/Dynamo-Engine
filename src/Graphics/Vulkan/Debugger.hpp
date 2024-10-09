@@ -4,9 +4,6 @@
 
 #include <Utils/Log.hpp>
 
-static PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebuggerDispatch;
-static PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebuggerDispatch;
-
 namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Build the debug messenger.
