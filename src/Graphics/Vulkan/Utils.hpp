@@ -19,10 +19,10 @@ namespace Dynamo::Graphics::Vulkan {
     /**
      * @brief Convert VkResult to string.
      *
-     * @param type
+     * @param result
      * @return const char*
      */
-    const char *VkResult_string(VkResult type);
+    const char *VkResult_string(VkResult result);
 
     /**
      * @brief Log the result of a Vulkan operation.

@@ -22,3 +22,6 @@
 [submodule "submodules/libsndfile"]
 	path = submodules/libsndfile
 	url = git@github.com:libsndfile/libsndfile.git
+[submodule "submodules/shaderc"]
+	path = submodules/shaderc
+	url = git@github.com:SirBob01/shaderc.git

@@ -9,6 +9,8 @@ add_compile_options(-Wall -g -O3 -fPIC -march=native)
 
 find_package(Vulkan REQUIRED glslangValidator)
 
+execute_process(COMMAND "submodules/shaderc/utils/git-sync-deps")
+
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory("submodules/fmt")
 add_subdirectory("submodules/glfw")
@@ -20,10 +22,10 @@ set(SPIRV_REFLECT_EXAMPLES OFF CACHE BOOL "SPIRV-Reflect examples")
 set(SPIRV_REFLECT_STATIC_LIB ON CACHE BOOL "SPIRV-Reflect static library")
 add_subdirectory("submodules/spirv-reflect")
 
-# set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL "Shaderc examples")
-# set(SHADERC_SKIP_TESTS ON CACHE BOOL "Shaderc tests")
-# set(SHADERC_SKIP_INSTALL ON CACHE BOOL "Shaderc install")
-# add_subdirectory("submodules/shaderc")
+set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL "Shaderc examples")
+set(SHADERC_SKIP_TESTS ON CACHE BOOL "Shaderc tests")
+set(SHADERC_SKIP_INSTALL ON CACHE BOOL "Shaderc install")
+add_subdirectory("submodules/shaderc")
 
 set(BUILD_SHARED_LIBS ON)
 set(BUILD_TESTING OFF CACHE BOOL "Libsndfile testing")
@@ -41,4 +43,4 @@ add_library(Dynamo SHARED ${SOURCES} ${INCLUDE} ${STB_SOURCES})
 target_include_directories(Dynamo PUBLIC "./src" "./submodules/stb")
 
 # Link all libraries together
-target_link_libraries(Dynamo fmt glfw Vulkan::Vulkan PortAudio sndfile tinyobjloader spirv-reflect-static)
+target_link_libraries(Dynamo fmt glfw Vulkan::Vulkan PortAudio sndfile tinyobjloader spirv-reflect-static shaderc)
