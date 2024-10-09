@@ -1,12 +1,16 @@
 #pragma once
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_core.h>
 
-#include <Graphics/Vulkan/Device.hpp>
-#include <Graphics/Vulkan/Image.hpp>
+#include <Display.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
+    /**
+     * @brief Image view configuration settings.
+     *
+     */
     struct ImageViewSettings {
+        VkFormat format = VK_FORMAT_B8G8R8A8_SRGB;
         VkImageViewType type = VK_IMAGE_VIEW_TYPE_2D;
         VkImageAspectFlags aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
 
@@ -17,16 +21,15 @@ namespace Dynamo::Graphics::Vulkan {
         unsigned layer_count = 1;
     };
 
-    class ImageView {
-        Image &_image;
-        VkImageView _handle;
-
-      public:
-        ImageView(Image &image, const ImageViewSettings &settings);
-        ~ImageView();
-
-        VkImageView handle() const;
-
-        const Image &image() const;
-    };
+    /**
+     * @brief Build a Vulkan image view.
+     *
+     * @param device
+     * @param image
+     * @param settings
+     * @return VkImageView
+     */
+    VkImageView VkImageView_build(VkDevice device,
+                                  VkImage image,
+                                  ImageViewSettings settings);
 } // namespace Dynamo::Graphics::Vulkan

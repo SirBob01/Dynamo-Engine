@@ -1,32 +1,35 @@
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
+#include <Graphics/Vulkan/Utils.hpp>
 #include <Utils/Log.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
-    PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle, Surface &surface) :
-        _handle(handle) {
-        vkGetPhysicalDeviceProperties(_handle, &_properties);
-        vkGetPhysicalDeviceMemoryProperties(_handle, &_memory_properties);
-        vkGetPhysicalDeviceFeatures(_handle, &_features);
+    PhysicalDevice PhysicalDevice::build(VkPhysicalDevice handle,
+                                         VkSurfaceKHR surface) {
+        PhysicalDevice device;
+        device.handle = handle;
+        device.surface = surface;
+
+        vkGetPhysicalDeviceProperties(handle, &device.properties);
+        vkGetPhysicalDeviceMemoryProperties(handle, &device.memory);
+        vkGetPhysicalDeviceFeatures(handle, &device.features);
 
         // Enumerate device queue families
-        unsigned queue_family_count = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(_handle,
-                                                 &queue_family_count,
-                                                 nullptr);
-
-        _queue_families.resize(queue_family_count);
-        vkGetPhysicalDeviceQueueFamilyProperties(_handle,
-                                                 &queue_family_count,
-                                                 _queue_families.data());
+        unsigned count = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(handle, &count, nullptr);
+        std::vector<VkQueueFamilyProperties> queue_families(count);
+        vkGetPhysicalDeviceQueueFamilyProperties(handle,
+                                                 &count,
+                                                 queue_families.data());
 
         // Select queue families for each type
         unsigned index = 0;
-        for (const VkQueueFamilyProperties family : _queue_families) {
+        for (const VkQueueFamilyProperties family : queue_families) {
             VkBool32 surface_support = 0;
             VkResult result =
-                vkGetPhysicalDeviceSurfaceSupportKHR(_handle,
+                vkGetPhysicalDeviceSurfaceSupportKHR(handle,
                                                      index,
-                                                     surface.handle(),
+                                                     surface,
                                                      &surface_support);
             if (result != VK_SUCCESS) {
                 Log::error("Vulkan::PhysicalDevice was unable to query for "
@@ -34,181 +37,146 @@ namespace Dynamo::Graphics::Vulkan {
             }
 
             // Dedicated presentation queues
-            if (surface_support && family.queueCount > _present_queues.count) {
-                _present_queues.count = family.queueCount;
-                _present_queues.index = index;
-                _present_queues.priority = 0;
+            if (surface_support &&
+                family.queueCount > device.present_queues.count) {
+                device.present_queues.count = family.queueCount;
+                device.present_queues.index = index;
+                device.present_queues.priority = 0;
             }
 
             // Dedicated graphics queues
             if ((family.queueFlags & VK_QUEUE_GRAPHICS_BIT) &&
-                family.queueCount > _graphics_queues.count) {
-                _graphics_queues.count = family.queueCount;
-                _graphics_queues.index = index;
-                _graphics_queues.priority = 0;
+                family.queueCount > device.graphics_queues.count) {
+                device.graphics_queues.count = family.queueCount;
+                device.graphics_queues.index = index;
+                device.graphics_queues.priority = 0;
             }
 
             // Dedicated transfer queues
             if ((family.queueFlags & VK_QUEUE_TRANSFER_BIT) &&
-                family.queueCount > _transfer_queues.count) {
-                _transfer_queues.count = family.queueCount;
-                _transfer_queues.index = index;
-                _transfer_queues.priority = 0;
+                family.queueCount > device.transfer_queues.count) {
+                device.transfer_queues.count = family.queueCount;
+                device.transfer_queues.index = index;
+                device.transfer_queues.priority = 0;
             }
 
             // Dedicated compute queues
             if ((family.queueFlags & VK_QUEUE_COMPUTE_BIT) &&
-                family.queueCount > _compute_queues.count) {
-                _compute_queues.count = family.queueCount;
-                _compute_queues.index = index;
-                _compute_queues.priority = 0;
+                family.queueCount > device.compute_queues.count) {
+                device.compute_queues.count = family.queueCount;
+                device.compute_queues.index = index;
+                device.compute_queues.priority = 0;
             }
         }
 
+        return device;
+    }
+
+    PhysicalDevice PhysicalDevice::select(VkInstance instance,
+                                          VkSurfaceKHR surface) {
+        unsigned count = 0;
+        vkEnumeratePhysicalDevices(instance, &count, nullptr);
+        std::vector<VkPhysicalDevice> handles(count);
+        vkEnumeratePhysicalDevices(instance, &count, handles.data());
+
+        if (count == 0) {
+            Log::error("No Vulkan-compatible physical devices available.");
+        }
+
+        Log::info("Selecting Vulkan device:");
+        PhysicalDevice best = PhysicalDevice::build(handles[0], surface);
+        for (unsigned i = 0; i < handles.size(); i++) {
+            PhysicalDevice device = PhysicalDevice::build(handles[i], surface);
+            unsigned score = device.score();
+            if (score > best.score()) {
+                best = device;
+            }
+            Log::info("* \"{}\" {} (Score {})",
+                      device.properties.deviceName,
+                      VkPhysicalDeviceType_string(device.properties.deviceType),
+                      score);
+        }
+
+        if (best.score() == 0) {
+            Log::error("No VkPhysicalDevice meets minimum requirements.");
+        } else {
+            Log::info("Vulkan using \"{}\"", best.properties.deviceName);
+        }
+        Log::info("");
+
+        // Log device queue families
+        Log::info("Vulkan graphics queues (Family Index: {} | Count: {})",
+                  best.graphics_queues.index,
+                  best.graphics_queues.count);
+        Log::info("Vulkan present queues (Family Index: {} | Count: {})",
+                  best.present_queues.index,
+                  best.present_queues.count);
+        Log::info("Vulkan transfer queues (Family Index: {} | Count: {})",
+                  best.transfer_queues.index,
+                  best.transfer_queues.count);
+        Log::info("Vulkan compute queues (Family Index: {} | Count: {})",
+                  best.compute_queues.index,
+                  best.compute_queues.count);
+        Log::info("");
+
+        return best;
+    }
+
+    SwapchainOptions PhysicalDevice::get_swapchain_options() const {
+        SwapchainOptions options;
+
         // Query for device surface capabilities
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-            _handle,
-            surface.handle(),
-            &_swapchain_options.capabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(handle,
+                                                  surface,
+                                                  &options.capabilities);
 
         // Query for surface formats
         unsigned formats_count = 0;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(_handle,
-                                             surface.handle(),
+        vkGetPhysicalDeviceSurfaceFormatsKHR(handle,
+                                             surface,
                                              &formats_count,
                                              nullptr);
-
-        _swapchain_options.formats.resize(formats_count);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(_handle,
-                                             surface.handle(),
+        options.formats.resize(formats_count);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(handle,
+                                             surface,
                                              &formats_count,
-                                             _swapchain_options.formats.data());
+                                             options.formats.data());
 
         // Query for surface present modes
         unsigned present_modes_count = 0;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(_handle,
-                                                  surface.handle(),
+        vkGetPhysicalDeviceSurfacePresentModesKHR(handle,
+                                                  surface,
                                                   &present_modes_count,
                                                   nullptr);
+        options.present_modes.resize(present_modes_count);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(handle,
+                                                  surface,
+                                                  &present_modes_count,
+                                                  options.present_modes.data());
 
-        _swapchain_options.present_modes.resize(present_modes_count);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(
-            _handle,
-            surface.handle(),
-            &present_modes_count,
-            _swapchain_options.present_modes.data());
-
-        // Enumerate device extensions
-        unsigned ext_count = 0;
-        vkEnumerateDeviceExtensionProperties(_handle,
-                                             nullptr,
-                                             &ext_count,
-                                             nullptr);
-
-        _extensions.resize(ext_count);
-        vkEnumerateDeviceExtensionProperties(_handle,
-                                             nullptr,
-                                             &ext_count,
-                                             _extensions.data());
-
-        // Set the required device extensions
-        _required_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-        const char *portability_ext_name = "VK_KHR_portability_subset";
-        for (const VkExtensionProperties &extension : _extensions) {
-            if (!std::strcmp(extension.extensionName, portability_ext_name)) {
-                _required_extensions.push_back(portability_ext_name);
-            }
-        }
+        return options;
     }
 
-    bool PhysicalDevice::supports_required_extensions() const {
-        for (const char *ext_name : _required_extensions) {
-            bool found = false;
-            for (const VkExtensionProperties &extension : _extensions) {
-                if (!std::strcmp(extension.extensionName, ext_name)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    VkPhysicalDevice PhysicalDevice::handle() const { return _handle; }
-
-    const VkPhysicalDeviceProperties &PhysicalDevice::properties() const {
-        return _properties;
-    }
-
-    const VkPhysicalDeviceMemoryProperties &
-    PhysicalDevice::memory_properties() const {
-        return _memory_properties;
-    }
-
-    const VkPhysicalDeviceFeatures &PhysicalDevice::features() const {
-        return _features;
-    }
-
-    const std::vector<VkQueueFamilyProperties> &
-    PhysicalDevice::queue_families() const {
-        return _queue_families;
-    }
-
-    const std::vector<VkExtensionProperties> &
-    PhysicalDevice::extensions() const {
-        return _extensions;
-    }
-
-    const std::vector<const char *> &
-    PhysicalDevice::required_extensions() const {
-        return _required_extensions;
-    }
-
-    const QueueFamily &PhysicalDevice::graphics_queues() const {
-        return _graphics_queues;
-    }
-
-    const QueueFamily &PhysicalDevice::present_queues() const {
-        return _present_queues;
-    }
-
-    const QueueFamily &PhysicalDevice::transfer_queues() const {
-        return _transfer_queues;
-    }
-
-    const QueueFamily &PhysicalDevice::compute_queues() const {
-        return _compute_queues;
-    }
-
-    const SwapchainOptions &PhysicalDevice::swapchain_options() const {
-        return _swapchain_options;
-    }
-
-    int PhysicalDevice::score() const {
+    unsigned PhysicalDevice::score() const {
+        SwapchainOptions swapchain_options = get_swapchain_options();
         if (
             // Required device features
-            !_features.fillModeNonSolid || !_features.sampleRateShading ||
-            !_features.samplerAnisotropy || !_features.multiViewport ||
+            !features.fillModeNonSolid || !features.sampleRateShading ||
+            !features.samplerAnisotropy || !features.multiViewport ||
 
             // Required device queues
-            !_graphics_queues.count || !_transfer_queues.count ||
-            !_present_queues.count || !_compute_queues.count ||
+            !graphics_queues.count || !transfer_queues.count ||
+            !present_queues.count || !compute_queues.count ||
 
             // Required swapchain support
-            _swapchain_options.present_modes.empty() ||
-            _swapchain_options.formats.empty() ||
-
-            // Extensions
-            !supports_required_extensions()) {
+            swapchain_options.present_modes.empty() ||
+            swapchain_options.formats.empty()) {
             return 0;
         }
 
         // Prioritize discrete GPU
-        int value = 0;
-        switch (_properties.deviceType) {
+        unsigned value = 0;
+        switch (properties.deviceType) {
         case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
             value += 1000;
             break;
@@ -229,14 +197,12 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Prioritize device with certain features
-        value += _features.geometryShader * 1000;
-        value += _features.tessellationShader * 1000;
-        value += _features.wideLines * 500;
+        value += features.geometryShader * 1000;
+        value += features.tessellationShader * 1000;
+        value += features.wideLines * 500;
 
         // Prioritize device with higher limits
-        value += _properties.limits.maxImageDimension2D;
-        value += _properties.limits.maxDrawIndexedIndexValue;
-        value += _properties.limits.maxMemoryAllocationCount;
+        value += properties.limits.maxImageDimension2D;
 
         return value;
     }

@@ -20,6 +20,11 @@ set(SPIRV_REFLECT_EXAMPLES OFF CACHE BOOL "SPIRV-Reflect examples")
 set(SPIRV_REFLECT_STATIC_LIB ON CACHE BOOL "SPIRV-Reflect static library")
 add_subdirectory("submodules/spirv-reflect")
 
+# set(SHADERC_SKIP_EXAMPLES ON CACHE BOOL "Shaderc examples")
+# set(SHADERC_SKIP_TESTS ON CACHE BOOL "Shaderc tests")
+# set(SHADERC_SKIP_INSTALL ON CACHE BOOL "Shaderc install")
+# add_subdirectory("submodules/shaderc")
+
 set(BUILD_SHARED_LIBS ON)
 set(BUILD_TESTING OFF CACHE BOOL "Libsndfile testing")
 set(BUILD_PROGRAMS OFF CACHE BOOL "Libsndfile programs")

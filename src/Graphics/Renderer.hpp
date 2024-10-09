@@ -1,13 +1,13 @@
 #pragma once
 
-#include <memory>
+#include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
 #include <Graphics/Vulkan/Debugger.hpp>
 #include <Graphics/Vulkan/Device.hpp>
+#include <Graphics/Vulkan/ImageView.hpp>
 #include <Graphics/Vulkan/Instance.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
-#include <Graphics/Vulkan/Surface.hpp>
 #include <Graphics/Vulkan/Swapchain.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
@@ -16,21 +16,16 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class Renderer {
-        std::unique_ptr<Instance> _instance;
-        std::unique_ptr<Debugger> _debugger;
-        std::unique_ptr<Surface> _surface;
+        const Display &_display;
 
-        std::vector<PhysicalDevice> _physical_devices;
+        VkInstance _instance;
+        VkDebugUtilsMessengerEXT _debugger;
+        VkSurfaceKHR _surface;
 
-        std::unique_ptr<Device> _device;
-        std::unique_ptr<Swapchain> _swapchain;
+        PhysicalDevice _physical;
+        VkDevice _device;
 
-        /**
-         * @brief Enumerate available GPUs and return the most suitable one.
-         *
-         * @return PhysicalDevice&
-         */
-        PhysicalDevice &find_physical_device();
+        Swapchain _swapchain;
 
       public:
         /**
@@ -39,5 +34,17 @@ namespace Dynamo::Graphics::Vulkan {
          * @param display
          */
         Renderer(const Display &display);
+
+        /**
+         * @brief Cleanup and destroy the renderer.
+         *
+         */
+        ~Renderer();
+
+        /**
+         * @brief Refresh the renderer.
+         *
+         */
+        void refresh();
     };
 } // namespace Dynamo::Graphics::Vulkan

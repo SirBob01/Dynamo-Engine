@@ -2,33 +2,46 @@
 
 #include <optional>
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan_core.h>
 
-#include <Graphics/Vulkan/Device.hpp>
-#include <Graphics/Vulkan/Image.hpp>
+#include <Display.hpp>
 #include <Graphics/Vulkan/ImageView.hpp>
+#include <Graphics/Vulkan/PhysicalDevice.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    class Swapchain {
-        Device &_device;
-        VkSwapchainKHR _handle;
+    /**
+     * @brief Wrapper object for a Vulkan swapchain and its properties.
+     *
+     */
+    struct Swapchain {
+        VkSwapchainKHR handle;
+        VkDevice device;
 
-        VkExtent2D _extent;
-        VkSurfaceFormatKHR _format;
-        VkPresentModeKHR _present_mode;
+        VkExtent2D extent;
+        VkSurfaceFormatKHR surface_format;
+        VkPresentModeKHR present_mode;
 
-        std::vector<std::unique_ptr<Image>> _images;
-        std::vector<std::unique_ptr<ImageView>> _image_views;
+        std::vector<VkImage> images;
+        std::vector<VkImageView> views;
 
-      public:
-        Swapchain(Device &device,
-                  Surface &surface,
-                  const Display &display,
-                  std::optional<VkSwapchainKHR> prev = {});
-        ~Swapchain();
+        /**
+         * @brief Build a Vulkan swapchain.
+         *
+         * @param device
+         * @param physical
+         * @param display
+         * @param previous
+         * @return Swapchain
+         */
+        static Swapchain build(VkDevice device,
+                               const PhysicalDevice &physical,
+                               const Display &display,
+                               std::optional<VkSwapchainKHR> previous = {});
 
-        const std::vector<std::unique_ptr<Image>> &images() const;
-
-        const std::vector<std::unique_ptr<ImageView>> &image_views() const;
+        /**
+         * @brief Destroy the swapchain and its dependents.
+         *
+         */
+        void destroy();
     };
 } // namespace Dynamo::Graphics::Vulkan

@@ -49,7 +49,7 @@ namespace Dynamo {
          * @param instance
          * @return VkSurfaceKHR
          */
-        VkSurfaceKHR create_vulkan_surface(const VkInstance &instance) const;
+        VkSurfaceKHR create_vulkan_surface(VkInstance instance) const;
 
         /**
          * @brief Get the display title.

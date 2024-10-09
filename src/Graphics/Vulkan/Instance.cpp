@@ -1,8 +1,36 @@
 #include <Graphics/Vulkan/Instance.hpp>
+#include <Graphics/Vulkan/Utils.hpp>
 #include <Utils/Log.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    Instance::Instance(const Display &display) {
+    static std::array<const char *, 1> VALIDATION_LAYERS = {
+        "VK_LAYER_KHRONOS_validation",
+    };
+
+    void check_validation_layers() {
+        unsigned count;
+        vkEnumerateInstanceLayerProperties(&count, nullptr);
+        std::vector<VkLayerProperties> layer_list(count);
+        vkEnumerateInstanceLayerProperties(&count, layer_list.data());
+
+        // Check if all requested layers are available
+        for (const char *layer_name : VALIDATION_LAYERS) {
+            bool found = false;
+            for (VkLayerProperties &properties : layer_list) {
+                if (!std::strcmp(properties.layerName, layer_name)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Log::error(
+                    "Requested layer {} for Vulkan::Instance not supported.",
+                    layer_name);
+            }
+        }
+    }
+
+    VkInstance VkInstance_build(const Display &display) {
         std::vector<const char *> extensions = display.get_vulkan_extensions();
 
         VkApplicationInfo app_info = {};
@@ -31,43 +59,15 @@ namespace Dynamo::Graphics::Vulkan {
         instance_info.enabledExtensionCount = extensions.size();
         instance_info.ppEnabledExtensionNames = extensions.data();
 
-        Log::info("Required Vulkan::Instance extensions:");
+        Log::info("Required Vulkan extensions:");
         for (const char *ext : extensions) {
             Log::info("* {}", ext);
         }
         Log::info("");
 
-        VkResult result = vkCreateInstance(&instance_info, nullptr, &_handle);
-        if (result != VK_SUCCESS) {
-            Log::error("Unable to create Vulkan::Instance.");
-        }
+        VkInstance instance;
+        VkResult_log("Create Instance",
+                     vkCreateInstance(&instance_info, nullptr, &instance));
+        return instance;
     }
-
-    Instance::~Instance() { vkDestroyInstance(_handle, nullptr); }
-
-    void Instance::check_validation_layers() const {
-        unsigned count;
-        vkEnumerateInstanceLayerProperties(&count, nullptr);
-
-        std::vector<VkLayerProperties> layer_list(count);
-        vkEnumerateInstanceLayerProperties(&count, layer_list.data());
-
-        // Check if all requested layers are available
-        for (const char *layer_name : VALIDATION_LAYERS) {
-            bool found = false;
-            for (VkLayerProperties &properties : layer_list) {
-                if (!std::strcmp(properties.layerName, layer_name)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                Log::error(
-                    "Requested layer {} for Vulkan::Instance not supported.",
-                    layer_name);
-            }
-        }
-    }
-
-    VkInstance Instance::handle() const { return _handle; }
 } // namespace Dynamo::Graphics::Vulkan

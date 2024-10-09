@@ -1,56 +1,27 @@
 #include <Graphics/Vulkan/Device.hpp>
+#include <Graphics/Vulkan/Utils.hpp>
 #include <Utils/Log.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    Device::Device(PhysicalDevice &physical) : _physical(physical) {
-        // Enable certain features of the physical device
-        VkPhysicalDeviceFeatures device_features = {};
-        device_features.samplerAnisotropy = true;
-        device_features.sampleRateShading = true;
-        device_features.fillModeNonSolid = true;
-        device_features.multiViewport = true;
+    static const char *VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME =
+        "VK_KHR_portability_subset";
+    static std::array<const char *, 2> EXTENSIONS = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME,
+    };
 
-        VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing = {};
-        descriptor_indexing.sType =
-            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
-        descriptor_indexing.descriptorBindingPartiallyBound = true;
-        descriptor_indexing.runtimeDescriptorArray = true;
-        descriptor_indexing.descriptorBindingVariableDescriptorCount = true;
-
-        // Get all required device extensions and queues
-        const std::vector<const char *> &extensions =
-            _physical.required_extensions();
-        const std::vector<VkDeviceQueueCreateInfo> queue_infos =
-            get_queue_infos();
-
-        VkDeviceCreateInfo device_info = {};
-        device_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        device_info.queueCreateInfoCount = queue_infos.size();
-        device_info.pQueueCreateInfos = queue_infos.data();
-        device_info.enabledExtensionCount = extensions.size();
-        device_info.ppEnabledExtensionNames = extensions.data();
-        device_info.pEnabledFeatures = &device_features;
-        device_info.pNext = &descriptor_indexing;
-
-        VkResult result =
-            vkCreateDevice(_physical.handle(), &device_info, nullptr, &_handle);
-        if (result != VK_SUCCESS) {
-            Log::error("Unable to create Vulkan::Device.");
-        }
-    }
-
-    Device::~Device() { vkDestroyDevice(_handle, nullptr); }
-
-    std::vector<VkDeviceQueueCreateInfo> Device::get_queue_infos() const {
+    void build_queue_infos(const PhysicalDevice &physical,
+                           VkDeviceQueueCreateInfo *dst,
+                           unsigned *count) {
         std::array<std::reference_wrapper<const QueueFamily>, 4> families = {
-            _physical.graphics_queues(),
-            _physical.present_queues(),
-            _physical.transfer_queues(),
-            _physical.compute_queues(),
+            physical.graphics_queues,
+            physical.present_queues,
+            physical.transfer_queues,
+            physical.compute_queues,
         };
-        std::vector<VkDeviceQueueCreateInfo> queue_infos;
 
         // Build unique queue create info structures
+        *count = 0;
         for (const QueueFamily family : families) {
             VkDeviceQueueCreateInfo queue_info = {};
             queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -59,46 +30,83 @@ namespace Dynamo::Graphics::Vulkan {
             queue_info.pQueuePriorities = &family.priority;
 
             bool found = false;
-            for (VkDeviceQueueCreateInfo &info : queue_infos) {
-                if (info.queueFamilyIndex == family.index) {
+            for (unsigned i = 0; i < *count; i++) {
+                if (dst[i].queueFamilyIndex == family.index) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                queue_infos.push_back(queue_info);
+                dst[(*count)++] = queue_info;
             }
         }
-
-        return queue_infos;
     }
 
-    VkDevice Device::handle() const { return _handle; }
+    bool requires_portability(const PhysicalDevice &device) {
+        // Enumerate device extensions
+        unsigned count = 0;
+        vkEnumerateDeviceExtensionProperties(device.handle,
+                                             nullptr,
+                                             &count,
+                                             nullptr);
+        std::vector<VkExtensionProperties> extensions(count);
+        vkEnumerateDeviceExtensionProperties(device.handle,
+                                             nullptr,
+                                             &count,
+                                             extensions.data());
 
-    const PhysicalDevice &Device::physical() const { return _physical; }
-
-    VkQueue Device::queue(QueueType type, unsigned index) const {
-        QueueFamily family;
-        switch (type) {
-        case QueueType::Graphics:
-            family = _physical.graphics_queues();
-            break;
-        case QueueType::Present:
-            family = _physical.present_queues();
-            break;
-        case QueueType::Transfer:
-            family = _physical.transfer_queues();
-            break;
-        case QueueType::Compute:
-            family = _physical.compute_queues();
-            break;
+        // Check if portability subset extension is available
+        for (const VkExtensionProperties &extension : extensions) {
+            if (!std::strcmp(extension.extensionName,
+                             VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
+                return true;
+            }
         }
-        DYN_ASSERT(index < family.count);
+        return false;
+    }
 
+    VkDevice VkDevice_build(const PhysicalDevice &physical) {
+        // Enable physical device features
+        VkPhysicalDeviceFeatures device_features = {};
+        device_features.samplerAnisotropy = true;
+        device_features.sampleRateShading = true;
+        device_features.fillModeNonSolid = true;
+        device_features.multiViewport = true;
+
+        // Enable descriptor indexing features
+        VkPhysicalDeviceDescriptorIndexingFeatures descriptor_indexing = {};
+        descriptor_indexing.sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        descriptor_indexing.descriptorBindingPartiallyBound = true;
+        descriptor_indexing.runtimeDescriptorArray = true;
+        descriptor_indexing.descriptorBindingVariableDescriptorCount = true;
+
+        // Get all required device queues
+        std::array<VkDeviceQueueCreateInfo, 4> queue_infos;
+        unsigned count;
+        build_queue_infos(physical, queue_infos.data(), &count);
+
+        VkDeviceCreateInfo device_info = {};
+        device_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        device_info.queueCreateInfoCount = count;
+        device_info.pQueueCreateInfos = queue_infos.data();
+        device_info.enabledExtensionCount = 1 + requires_portability(physical);
+        device_info.ppEnabledExtensionNames = EXTENSIONS.data();
+        device_info.pEnabledFeatures = &device_features;
+        device_info.pNext = &descriptor_indexing;
+
+        VkDevice device;
+        VkResult_log(
+            "Create Device",
+            vkCreateDevice(physical.handle, &device_info, nullptr, &device));
+        return device;
+    }
+
+    VkQueue
+    VkDevice_queue(VkDevice device, const QueueFamily &family, unsigned index) {
+        DYN_ASSERT(index < family.count);
         VkQueue queue;
-        vkGetDeviceQueue(_handle, family.index, index, &queue);
+        vkGetDeviceQueue(device, family.index, index, &queue);
         return queue;
     }
-
-    void Device::await() const { vkDeviceWaitIdle(_handle); }
 } // namespace Dynamo::Graphics::Vulkan
