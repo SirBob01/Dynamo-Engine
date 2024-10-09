@@ -1,6 +1,9 @@
 #include <Graphics/Vulkan/Debugger.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
 
+static PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebuggerDispatch;
+static PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebuggerDispatch;
+
 VKAPI_ATTR VkResult VKAPI_CALL vkCreateDebugUtilsMessengerEXT(
     VkInstance instance,
     const VkDebugUtilsMessengerCreateInfoEXT *create_info,

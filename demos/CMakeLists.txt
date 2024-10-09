@@ -7,6 +7,8 @@ set(CMAKE_C_STANDARD_REQUIRED on)
 
 add_compile_options(-Wall -g -O3 -fPIC -march=native)
 
+execute_process(COMMAND "../submodules/shaderc/utils/git-sync-deps")
+
 add_subdirectory("../" "./Dynamo")
 
 # Compile each demo
