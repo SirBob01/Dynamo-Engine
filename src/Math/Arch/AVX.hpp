@@ -5,8 +5,7 @@
 #include <Math/Arch/SSE.hpp>
 
 namespace Dynamo::Vectorize::AVX {
-    inline void
-    smul(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void smul(const float *src, const float scalar, float *dst, unsigned length) {
         __m256 scalar_v = _mm256_set1_ps(scalar);
         unsigned rem = length % 8;
         float *dst_end = dst + length - rem;
@@ -20,8 +19,7 @@ namespace Dynamo::Vectorize::AVX {
         SSE::smul(src, scalar, dst, rem);
     }
 
-    inline void
-    vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
         unsigned rem = length % 8;
         float *dst_end = dst + length - rem;
         while (dst < dst_end) {
@@ -36,8 +34,7 @@ namespace Dynamo::Vectorize::AVX {
         SSE::vadd(src_a, src_b, dst, rem);
     }
 
-    inline void
-    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
         unsigned rem = length % 8;
         float *dst_end = dst + length - rem;
         while (dst < dst_end) {
@@ -52,8 +49,7 @@ namespace Dynamo::Vectorize::AVX {
         SSE::vsub(src_a, src_b, dst, rem);
     }
 
-    inline void
-    vsma(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void vsma(const float *src, const float scalar, float *dst, unsigned length) {
         __m256 scalar_v = _mm256_set1_ps(scalar);
         unsigned rem = length % 8;
         float *dst_end = dst + length - rem;
@@ -68,11 +64,7 @@ namespace Dynamo::Vectorize::AVX {
         SSE::vsma(src, scalar, dst, rem);
     }
 
-    inline void vclamp(const float *src,
-                       const float lo,
-                       const float hi,
-                       float *dst,
-                       unsigned length) {
+    inline void vclamp(const float *src, const float lo, const float hi, float *dst, unsigned length) {
         __m256 lo_v = _mm256_set1_ps(lo);
         __m256 hi_v = _mm256_set1_ps(hi);
         unsigned rem = length % 8;

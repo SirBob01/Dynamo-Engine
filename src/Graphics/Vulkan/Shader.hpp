@@ -25,10 +25,8 @@ namespace Dynamo::Graphics::Vulkan {
          * @param stage
          * @return VkShaderModule
          */
-        static Shader build(VkDevice device,
-                            const std::string &name,
-                            const std::string &code,
-                            VkShaderStageFlagBits stage);
+        static Shader
+        build(VkDevice device, const std::string &name, const std::string &code, VkShaderStageFlagBits stage);
 
         /**
          * @brief Compile a shader source.
@@ -38,9 +36,8 @@ namespace Dynamo::Graphics::Vulkan {
          * @param stage
          * @return std::vector<uint32_t>
          */
-        static std::vector<uint32_t> compile(const std::string &name,
-                                             const std::string &code,
-                                             VkShaderStageFlagBits stage);
+        static std::vector<uint32_t>
+        compile(const std::string &name, const std::string &code, VkShaderStageFlagBits stage);
 
         /**
          * @brief Destroy the shader module.

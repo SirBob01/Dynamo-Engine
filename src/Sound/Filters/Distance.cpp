@@ -13,10 +13,7 @@ namespace Dynamo::Sound {
         return (outer_radius - distance) / (outer_radius - inner_radius);
     }
 
-    void Distance::apply(const Buffer &src,
-                         Buffer &dst,
-                         const Source &source,
-                         const Listener &listener) {
+    void Distance::apply(const Buffer &src, Buffer &dst, const Source &source, const Listener &listener) {
         float distance = (source.position - listener.position).length();
         float gain = linear(distance);
 

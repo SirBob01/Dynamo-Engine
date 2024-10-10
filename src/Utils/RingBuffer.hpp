@@ -19,10 +19,8 @@ namespace Dynamo {
     template <typename T, unsigned N>
     class RingBuffer {
         static const unsigned MASK = N - 1;
-        static_assert(N > 0 && (N & MASK) == 0,
-                      "RingBuffer size (> 0) should be a power of 2");
-        static_assert(std::is_trivially_copyable<T>::value,
-                      "RingBuffer element type must be trivially copyable");
+        static_assert(N > 0 && (N & MASK) == 0, "RingBuffer size (> 0) should be a power of 2");
+        static_assert(std::is_trivially_copyable<T>::value, "RingBuffer element type must be trivially copyable");
 
         std::array<T, N> _buffer;
         unsigned _read;

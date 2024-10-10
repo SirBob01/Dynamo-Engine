@@ -208,6 +208,4 @@ TEST_CASE("Box2 invalid y", "[Box2]") {
     REQUIRE(!a.valid());
 }
 
-TEST_CASE("Box2 hash", "[Box2]") {
-    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Box2>());
-}
+TEST_CASE("Box2 hash", "[Box2]") { REQUIRE_NOTHROW(std::unordered_set<Dynamo::Box2>()); }

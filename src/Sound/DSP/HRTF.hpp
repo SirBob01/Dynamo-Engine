@@ -25,8 +25,7 @@ namespace Dynamo::Sound {
      * @brief HRIR coefficients array
      *
      */
-    static const std::vector<WaveSample> HRIR_COEFFICIENTS =
-        read_HRIR_coefficients();
+    static const std::vector<WaveSample> HRIR_COEFFICIENTS = read_HRIR_coefficients();
 
     /**
      * @brief Length of an HRIR
@@ -61,8 +60,7 @@ namespace Dynamo::Sound {
          * @param source_position   Position of the sound source
          * @return Vec2
          */
-        Vec2 compute_point(const Vec3 &listener_position,
-                           const Vec3 &source_position) const;
+        Vec2 compute_point(const Vec3 &listener_position, const Vec3 &source_position) const;
 
       public:
         /**

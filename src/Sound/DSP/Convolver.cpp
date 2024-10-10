@@ -14,11 +14,8 @@ namespace Dynamo::Sound {
             unsigned partition_offset = i * BLOCK_LENGTH_2;
 
             unsigned copy_size = std::min(BLOCK_LENGTH, M);
-            std::copy(ir + ir_offset,
-                      ir + ir_offset + copy_size,
-                      _partitions.data() + partition_offset);
-            Fourier::transform(_partitions.data() + partition_offset,
-                               BLOCK_LENGTH_2);
+            std::copy(ir + ir_offset, ir + ir_offset + copy_size, _partitions.data() + partition_offset);
+            Fourier::transform(_partitions.data() + partition_offset, BLOCK_LENGTH_2);
 
             M -= copy_size;
         }
@@ -29,20 +26,14 @@ namespace Dynamo::Sound {
 
     void Convolver::compute(WaveSample *src, WaveSample *dst, unsigned N) {
         // Shift back the second half of the input buffer
-        std::copy(_input.begin() + BLOCK_LENGTH,
-                  _input.begin() + BLOCK_LENGTH_2,
-                  _input.begin());
+        std::copy(_input.begin() + BLOCK_LENGTH, _input.begin() + BLOCK_LENGTH_2, _input.begin());
 
         // Read the latest samples, zeroing out the remainder of buffer
         std::copy(src, src + N, _input.begin() + BLOCK_LENGTH);
-        std::fill(_input.begin() + BLOCK_LENGTH + N,
-                  _input.begin() + BLOCK_LENGTH_2,
-                  0);
+        std::fill(_input.begin() + BLOCK_LENGTH + N, _input.begin() + BLOCK_LENGTH_2, 0);
 
         // Shift up the frequency delay-line by one partition
-        std::copy(_fdl.begin(),
-                  _fdl.end() - BLOCK_LENGTH_2,
-                  _fdl.begin() + BLOCK_LENGTH_2);
+        std::copy(_fdl.begin(), _fdl.end() - BLOCK_LENGTH_2, _fdl.begin() + BLOCK_LENGTH_2);
 
         // Forward transform the input block onto the frequency delay-line
         std::copy(_input.begin(), _input.end(), _fdl.begin());

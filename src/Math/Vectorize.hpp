@@ -33,8 +33,7 @@ namespace Dynamo::Vectorize {
      * @param dst
      * @param length
      */
-    inline void
-    smul(const float *src_a, const float scalar, float *dst, unsigned length) {
+    inline void smul(const float *src_a, const float scalar, float *dst, unsigned length) {
         arch::smul(src_a, scalar, dst, length);
     }
 
@@ -46,8 +45,7 @@ namespace Dynamo::Vectorize {
      * @param dst
      * @param length
      */
-    inline void
-    vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
         arch::vadd(src_a, src_b, dst, length);
     }
 
@@ -59,8 +57,7 @@ namespace Dynamo::Vectorize {
      * @param dst
      * @param length
      */
-    inline void
-    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
         arch::vsub(src_a, src_b, dst, length);
     }
 
@@ -73,8 +70,7 @@ namespace Dynamo::Vectorize {
      * @param dst
      * @param length
      */
-    inline void
-    vsma(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void vsma(const float *src, const float scalar, float *dst, unsigned length) {
         arch::vsma(src, scalar, dst, length);
     }
 
@@ -87,11 +83,7 @@ namespace Dynamo::Vectorize {
      * @param dst
      * @param length
      */
-    inline void vclamp(const float *src,
-                       const float lo,
-                       const float hi,
-                       float *dst,
-                       unsigned length) {
+    inline void vclamp(const float *src, const float lo, const float hi, float *dst, unsigned length) {
         arch::vclamp(src, lo, hi, dst, length);
     }
 } // namespace Dynamo::Vectorize

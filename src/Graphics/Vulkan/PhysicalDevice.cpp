@@ -4,8 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
-    PhysicalDevice PhysicalDevice::build(VkPhysicalDevice handle,
-                                         VkSurfaceKHR surface) {
+    PhysicalDevice PhysicalDevice::build(VkPhysicalDevice handle, VkSurfaceKHR surface) {
         PhysicalDevice device;
         device.handle = handle;
         device.surface = surface;
@@ -18,51 +17,41 @@ namespace Dynamo::Graphics::Vulkan {
         unsigned count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(handle, &count, nullptr);
         std::vector<VkQueueFamilyProperties> queue_families(count);
-        vkGetPhysicalDeviceQueueFamilyProperties(handle,
-                                                 &count,
-                                                 queue_families.data());
+        vkGetPhysicalDeviceQueueFamilyProperties(handle, &count, queue_families.data());
 
         // Select queue families for each type
         unsigned index = 0;
         for (const VkQueueFamilyProperties family : queue_families) {
             VkBool32 surface_support = 0;
-            VkResult result =
-                vkGetPhysicalDeviceSurfaceSupportKHR(handle,
-                                                     index,
-                                                     surface,
-                                                     &surface_support);
+            VkResult result = vkGetPhysicalDeviceSurfaceSupportKHR(handle, index, surface, &surface_support);
             if (result != VK_SUCCESS) {
                 Log::error("Vulkan::PhysicalDevice was unable to query for "
                            "surface support.");
             }
 
             // Dedicated presentation queues
-            if (surface_support &&
-                family.queueCount > device.present_queues.count) {
+            if (surface_support && family.queueCount > device.present_queues.count) {
                 device.present_queues.count = family.queueCount;
                 device.present_queues.index = index;
                 device.present_queues.priority = 0;
             }
 
             // Dedicated graphics queues
-            if ((family.queueFlags & VK_QUEUE_GRAPHICS_BIT) &&
-                family.queueCount > device.graphics_queues.count) {
+            if ((family.queueFlags & VK_QUEUE_GRAPHICS_BIT) && family.queueCount > device.graphics_queues.count) {
                 device.graphics_queues.count = family.queueCount;
                 device.graphics_queues.index = index;
                 device.graphics_queues.priority = 0;
             }
 
             // Dedicated transfer queues
-            if ((family.queueFlags & VK_QUEUE_TRANSFER_BIT) &&
-                family.queueCount > device.transfer_queues.count) {
+            if ((family.queueFlags & VK_QUEUE_TRANSFER_BIT) && family.queueCount > device.transfer_queues.count) {
                 device.transfer_queues.count = family.queueCount;
                 device.transfer_queues.index = index;
                 device.transfer_queues.priority = 0;
             }
 
             // Dedicated compute queues
-            if ((family.queueFlags & VK_QUEUE_COMPUTE_BIT) &&
-                family.queueCount > device.compute_queues.count) {
+            if ((family.queueFlags & VK_QUEUE_COMPUTE_BIT) && family.queueCount > device.compute_queues.count) {
                 device.compute_queues.count = family.queueCount;
                 device.compute_queues.index = index;
                 device.compute_queues.priority = 0;
@@ -72,8 +61,7 @@ namespace Dynamo::Graphics::Vulkan {
         return device;
     }
 
-    PhysicalDevice PhysicalDevice::select(VkInstance instance,
-                                          VkSurfaceKHR surface) {
+    PhysicalDevice PhysicalDevice::select(VkInstance instance, VkSurfaceKHR surface) {
         unsigned count = 0;
         vkEnumeratePhysicalDevices(instance, &count, nullptr);
         std::vector<VkPhysicalDevice> handles(count);
@@ -126,33 +114,19 @@ namespace Dynamo::Graphics::Vulkan {
         SwapchainOptions options;
 
         // Query for device surface capabilities
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(handle,
-                                                  surface,
-                                                  &options.capabilities);
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(handle, surface, &options.capabilities);
 
         // Query for surface formats
         unsigned formats_count = 0;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(handle,
-                                             surface,
-                                             &formats_count,
-                                             nullptr);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(handle, surface, &formats_count, nullptr);
         options.formats.resize(formats_count);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(handle,
-                                             surface,
-                                             &formats_count,
-                                             options.formats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(handle, surface, &formats_count, options.formats.data());
 
         // Query for surface present modes
         unsigned present_modes_count = 0;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(handle,
-                                                  surface,
-                                                  &present_modes_count,
-                                                  nullptr);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(handle, surface, &present_modes_count, nullptr);
         options.present_modes.resize(present_modes_count);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(handle,
-                                                  surface,
-                                                  &present_modes_count,
-                                                  options.present_modes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(handle, surface, &present_modes_count, options.present_modes.data());
 
         return options;
     }
@@ -161,16 +135,14 @@ namespace Dynamo::Graphics::Vulkan {
         SwapchainOptions swapchain_options = get_swapchain_options();
         if (
             // Required device features
-            !features.fillModeNonSolid || !features.sampleRateShading ||
-            !features.samplerAnisotropy || !features.multiViewport ||
+            !features.fillModeNonSolid || !features.sampleRateShading || !features.samplerAnisotropy ||
+            !features.multiViewport ||
 
             // Required device queues
-            !graphics_queues.count || !transfer_queues.count ||
-            !present_queues.count || !compute_queues.count ||
+            !graphics_queues.count || !transfer_queues.count || !present_queues.count || !compute_queues.count ||
 
             // Required swapchain support
-            swapchain_options.present_modes.empty() ||
-            swapchain_options.formats.empty()) {
+            swapchain_options.present_modes.empty() || swapchain_options.formats.empty()) {
             return 0;
         }
 

@@ -41,8 +41,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param surface
          * @return PhysicalDevice
          */
-        static PhysicalDevice build(VkPhysicalDevice handle,
-                                    VkSurfaceKHR surface);
+        static PhysicalDevice build(VkPhysicalDevice handle, VkSurfaceKHR surface);
 
         /**
          * @brief Select a suitable physical device based on its score.

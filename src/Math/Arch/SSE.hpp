@@ -5,8 +5,7 @@
 #include <Math/Arch/Scalar.hpp>
 
 namespace Dynamo::Vectorize::SSE {
-    inline void
-    smul(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void smul(const float *src, const float scalar, float *dst, unsigned length) {
         __m128 scalar_v = _mm_set1_ps(scalar);
         unsigned rem = length % 4;
         float *dst_end = dst + length - rem;
@@ -20,8 +19,7 @@ namespace Dynamo::Vectorize::SSE {
         Scalar::smul(src, scalar, dst, rem);
     }
 
-    inline void
-    vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
         unsigned rem = length % 4;
         float *dst_end = dst + length - rem;
         while (dst < dst_end) {
@@ -36,8 +34,7 @@ namespace Dynamo::Vectorize::SSE {
         Scalar::vadd(src_a, src_b, dst, rem);
     }
 
-    inline void
-    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
         unsigned rem = length % 4;
         float *dst_end = dst + length - rem;
         while (dst < dst_end) {
@@ -52,8 +49,7 @@ namespace Dynamo::Vectorize::SSE {
         Scalar::vsub(src_a, src_b, dst, rem);
     }
 
-    inline void
-    vsma(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void vsma(const float *src, const float scalar, float *dst, unsigned length) {
         __m128 scalar_v = _mm_set1_ps(scalar);
         unsigned rem = length % 4;
         float *dst_end = dst + length - rem;
@@ -68,11 +64,7 @@ namespace Dynamo::Vectorize::SSE {
         Scalar::vsma(src, scalar, dst, rem);
     }
 
-    inline void vclamp(const float *src,
-                       const float lo,
-                       const float hi,
-                       float *dst,
-                       unsigned length) {
+    inline void vclamp(const float *src, const float lo, const float hi, float *dst, unsigned length) {
         __m128 lo_v = _mm_set1_ps(lo);
         __m128 hi_v = _mm_set1_ps(hi);
         unsigned rem = length % 4;

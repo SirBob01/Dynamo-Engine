@@ -18,8 +18,7 @@ namespace Dynamo::Sound {
         PaError err;
         err = Pa_Initialize();
         if (err != paNoError) {
-            Log::error("Could not initialize PortAudio subsystem: {}",
-                       Pa_GetErrorText(err));
+            Log::error("Could not initialize PortAudio subsystem: {}", Pa_GetErrorText(err));
         }
 
         // Set the default input and output devices
@@ -31,8 +30,7 @@ namespace Dynamo::Sound {
             }
         }
         for (const Device &device : _devices) {
-            if (device.id != Pa_GetDefaultInputDevice() &&
-                device.input_channels > 0) {
+            if (device.id != Pa_GetDefaultInputDevice() && device.input_channels > 0) {
                 set_input(device);
                 break;
             }
@@ -50,23 +48,20 @@ namespace Dynamo::Sound {
         if (_input_stream) {
             err = Pa_CloseStream(_input_stream);
             if (err != paNoError) {
-                Log::error("PortAudio could not close input stream: {}",
-                           Pa_GetErrorText(err));
+                Log::error("PortAudio could not close input stream: {}", Pa_GetErrorText(err));
             }
         }
         if (_output_stream) {
             err = Pa_CloseStream(_output_stream);
             if (err != paNoError) {
-                Log::error("PortAudio could not close output stream: {}",
-                           Pa_GetErrorText(err));
+                Log::error("PortAudio could not close output stream: {}", Pa_GetErrorText(err));
             }
         }
 
         // Uninitialize PortAudio
         err = Pa_Terminate();
         if (err != paNoError) {
-            Log::error("Could not terminate PortAudio subsystem: {}",
-                       Pa_GetErrorText(err));
+            Log::error("Could not terminate PortAudio subsystem: {}", Pa_GetErrorText(err));
         }
     }
 
@@ -77,8 +72,7 @@ namespace Dynamo::Sound {
                                 PaStreamCallbackFlags status_flags,
                                 void *data) {
         PaState *state = static_cast<PaState *>(data);
-        state->buffer.write(static_cast<const WaveSample *>(input),
-                            frame_count * state->channels);
+        state->buffer.write(static_cast<const WaveSample *>(input), frame_count * state->channels);
         return 0;
     }
 
@@ -89,16 +83,14 @@ namespace Dynamo::Sound {
                                  PaStreamCallbackFlags status_flags,
                                  void *data) {
         PaState *state = static_cast<PaState *>(data);
-        state->buffer.read(static_cast<WaveSample *>(output),
-                           frame_count * state->channels);
+        state->buffer.read(static_cast<WaveSample *>(output), frame_count * state->channels);
         return 0;
     }
 
     void Jukebox::process_source(Source &source) {
         // Calculate the number of frames in the destination buffer
         Buffer &buffer = source._buffer;
-        double frame_stop = std::min(source._frame + MAX_CHUNK_LENGTH,
-                                     static_cast<double>(buffer.frames()));
+        double frame_stop = std::min(source._frame + MAX_CHUNK_LENGTH, static_cast<double>(buffer.frames()));
         double frames = frame_stop - source._frame;
 
         // Calculate the number of frames required to process
@@ -129,10 +121,7 @@ namespace Dynamo::Sound {
 
         // Mix the processed sound onto the composite signal
         for (unsigned c = 0; c < _composite.channels(); c++) {
-            Vectorize::vsma(_remixed[c],
-                            _volume,
-                            _composite[c],
-                            _remixed.frames());
+            Vectorize::vsma(_remixed[c], _volume, _composite[c], _remixed.frames());
         }
 
         // Advance chunk frame
@@ -148,8 +137,7 @@ namespace Dynamo::Sound {
         int device_count = Pa_GetDeviceCount();
         if (device_count < 0) {
             err = device_count;
-            Log::error("PortAudio failed to count sound devices: {}",
-                       Pa_GetErrorText(err));
+            Log::error("PortAudio failed to count sound devices: {}", Pa_GetErrorText(err));
         }
 
         // List all devices
@@ -176,8 +164,7 @@ namespace Dynamo::Sound {
         if (_input_stream) {
             err = Pa_CloseStream(_input_stream);
             if (err != paNoError) {
-                Log::error("PortAudio could not close input stream: {}",
-                           Pa_GetErrorText(err));
+                Log::error("PortAudio could not close input stream: {}", Pa_GetErrorText(err));
             }
         }
 
@@ -201,14 +188,12 @@ namespace Dynamo::Sound {
                             input_callback,
                             &_input_state);
         if (err != paNoError) {
-            Log::error("Could not open PortAudio input stream: {}",
-                       Pa_GetErrorText(err));
+            Log::error("Could not open PortAudio input stream: {}", Pa_GetErrorText(err));
         }
 
         err = Pa_StartStream(_input_stream);
         if (err != paNoError) {
-            Log::error("Could not start PortAudio input stream: {}",
-                       Pa_GetErrorText(err));
+            Log::error("Could not start PortAudio input stream: {}", Pa_GetErrorText(err));
         }
 
         const PaStreamInfo *info = Pa_GetStreamInfo(_input_stream);
@@ -224,8 +209,7 @@ namespace Dynamo::Sound {
         if (_output_stream) {
             err = Pa_CloseStream(_output_stream);
             if (err != paNoError) {
-                Log::error("PortAudio could not close output stream: {}",
-                           Pa_GetErrorText(err));
+                Log::error("PortAudio could not close output stream: {}", Pa_GetErrorText(err));
             }
         }
 
@@ -246,14 +230,12 @@ namespace Dynamo::Sound {
                             output_callback,
                             &_output_state);
         if (err != paNoError) {
-            Log::error("Could not open PortAudio output stream: {}",
-                       Pa_GetErrorText(err));
+            Log::error("Could not open PortAudio output stream: {}", Pa_GetErrorText(err));
         }
 
         err = Pa_StartStream(_output_stream);
         if (err != paNoError) {
-            Log::error("Could not start PortAudio output stream: {}",
-                       Pa_GetErrorText(err));
+            Log::error("Could not start PortAudio output stream: {}", Pa_GetErrorText(err));
         }
 
         const PaStreamInfo *info = Pa_GetStreamInfo(_output_stream);
@@ -268,19 +250,13 @@ namespace Dynamo::Sound {
         _composite.resize(MAX_CHUNK_LENGTH, device.output_channels);
     }
 
-    void Jukebox::set_volume(float volume) {
-        _volume = std::clamp(volume, 0.0f, 1.0f);
-    }
+    void Jukebox::set_volume(float volume) { _volume = std::clamp(volume, 0.0f, 1.0f); }
 
     float Jukebox::get_volume() const { return _volume; }
 
-    bool Jukebox::is_playing() {
-        return _output_stream != nullptr && Pa_IsStreamActive(_output_stream);
-    }
+    bool Jukebox::is_playing() { return _output_stream != nullptr && Pa_IsStreamActive(_output_stream); }
 
-    bool Jukebox::is_recording() {
-        return _input_stream != nullptr && Pa_IsStreamActive(_input_stream);
-    }
+    bool Jukebox::is_recording() { return _input_stream != nullptr && Pa_IsStreamActive(_input_stream); }
 
     void Jukebox::play(Source &source) {
         if (source._playing) return;
@@ -334,11 +310,7 @@ namespace Dynamo::Sound {
 
         // Clamp channels
         for (unsigned c = 0; c < _composite.channels(); c++) {
-            Vectorize::vclamp(_composite[c],
-                              -1,
-                              1,
-                              _composite[c],
-                              _composite.frames());
+            Vectorize::vclamp(_composite[c], -1, 1, _composite[c], _composite.frames());
         }
 
         // Interleave the composite and write to the ring buffer

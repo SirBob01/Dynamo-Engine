@@ -3,9 +3,7 @@
 #include <Utils/Log.hpp>
 
 namespace Dynamo {
-    Display::Display(const std::string &title,
-                     unsigned window_width,
-                     unsigned window_height) {
+    Display::Display(const std::string &title, unsigned window_width, unsigned window_height) {
         if (!glfwInit()) {
             Log::error("GLFW failed to initialize.");
         }
@@ -17,11 +15,7 @@ namespace Dynamo {
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        _window = glfwCreateWindow(window_width,
-                                   window_height,
-                                   title.c_str(),
-                                   nullptr,
-                                   nullptr);
+        _window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);
         if (!_window) {
             Log::error("GLFW failed to create a display window.");
         }
@@ -51,8 +45,7 @@ namespace Dynamo {
 
     VkSurfaceKHR Display::create_vulkan_surface(VkInstance instance) const {
         VkSurfaceKHR surface;
-        VkResult result =
-            glfwCreateWindowSurface(instance, _window, nullptr, &surface);
+        VkResult result = glfwCreateWindowSurface(instance, _window, nullptr, &surface);
         if (result != VK_SUCCESS) {
             Log::error("Unable to create Vulkan surface from Display.");
         }
@@ -77,15 +70,11 @@ namespace Dynamo {
 
     bool Display::is_open() const { return !glfwWindowShouldClose(_window); }
 
-    bool Display::is_fullscreen() const {
-        return glfwGetWindowMonitor(_window) != nullptr;
-    }
+    bool Display::is_fullscreen() const { return glfwGetWindowMonitor(_window) != nullptr; }
 
     bool Display::is_vsync() const { return _vsync; }
 
-    void Display::set_window_size(Vec2 size) {
-        glfwSetWindowSize(_window, size.x, size.y);
-    }
+    void Display::set_window_size(Vec2 size) { glfwSetWindowSize(_window, size.x, size.y); }
 
     void Display::set_fullscreen(bool flag) {
         Vec2 size = get_window_size();
@@ -125,11 +114,7 @@ namespace Dynamo {
 
     void Display::set_icon(const std::string &filepath) {
         int width, height, channels;
-        stbi_uc *pixels = stbi_load(filepath.c_str(),
-                                    &width,
-                                    &height,
-                                    &channels,
-                                    STBI_rgb_alpha);
+        stbi_uc *pixels = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         if (!pixels) {
             Log::warn("Could not load window icon file `{}`", filepath);
             return;

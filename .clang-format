@@ -1,7 +1,7 @@
 Language: Cpp
 
 IndentWidth: 4
-ColumnLimit: 80
+ColumnLimit: 120
 
 DerivePointerAlignment: false
 PointerAlignment: Right

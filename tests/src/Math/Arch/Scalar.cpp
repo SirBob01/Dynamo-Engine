@@ -29,10 +29,7 @@ TEST_CASE("Vectorize Scalar vadd", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize Scalar vadd benchmark") {
-        Dynamo::Vectorize::Scalar::vadd(src_a.data(),
-                                        src_b.data(),
-                                        dst.data(),
-                                        LENGTH);
+        Dynamo::Vectorize::Scalar::vadd(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -49,10 +46,7 @@ TEST_CASE("Vectorize Scalar vsub", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize Scalar vsub benchmark") {
-        Dynamo::Vectorize::Scalar::vsub(src_a.data(),
-                                        src_b.data(),
-                                        dst.data(),
-                                        LENGTH);
+        Dynamo::Vectorize::Scalar::vsub(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -87,11 +81,7 @@ TEST_CASE("Vectorize Scalar vclamp", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize Scalar clamp benchmark") {
-        Dynamo::Vectorize::Scalar::vclamp(src.data(),
-                                          lo,
-                                          hi,
-                                          dst.data(),
-                                          LENGTH);
+        Dynamo::Vectorize::Scalar::vclamp(src.data(), lo, hi, dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {

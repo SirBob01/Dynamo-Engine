@@ -144,6 +144,4 @@ TEST_CASE("Triangle2 inequality", "[Triangle2]") {
     REQUIRE(triangle1 != triangle2);
 }
 
-TEST_CASE("Triangle2 hash", "[Triangle2]") {
-    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Triangle2>());
-}
+TEST_CASE("Triangle2 hash", "[Triangle2]") { REQUIRE_NOTHROW(std::unordered_set<Dynamo::Triangle2>()); }

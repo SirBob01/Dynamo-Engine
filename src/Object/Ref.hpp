@@ -131,9 +131,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Ref<T> &rhs) const {
-            return rhs._ptr == _ptr;
-        }
+        inline bool operator==(const Ref<T> &rhs) const { return rhs._ptr == _ptr; }
 
         /**
          * @brief Inequality operator.
@@ -142,9 +140,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Ref<T> &rhs) const {
-            return rhs._ptr != _ptr;
-        }
+        inline bool operator!=(const Ref<T> &rhs) const { return rhs._ptr != _ptr; }
 
         /**
          * @brief Copy assignment operator.
@@ -191,7 +187,5 @@ namespace Dynamo {
  */
 template <typename T>
 struct std::hash<Dynamo::Ref<T>> {
-    inline size_t operator()(const Dynamo::Ref<T> &ref) const {
-        return std::hash(ref._ptr);
-    }
+    inline size_t operator()(const Dynamo::Ref<T> &ref) const { return std::hash(ref._ptr); }
 };

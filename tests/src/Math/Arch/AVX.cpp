@@ -14,9 +14,7 @@ TEST_CASE("Vectorize AVX smul", "[Vectorize]") {
     fill_array(src);
     fill_array(dst);
 
-    BENCHMARK("Vectorize AVX smul benchmark") {
-        Dynamo::Vectorize::AVX::smul(src.data(), scalar, dst.data(), LENGTH);
-    };
+    BENCHMARK("Vectorize AVX smul benchmark") { Dynamo::Vectorize::AVX::smul(src.data(), scalar, dst.data(), LENGTH); };
 
     for (unsigned i = 0; i < LENGTH; i++) {
         REQUIRE(dst[i] == scalar * src[i]);
@@ -32,10 +30,7 @@ TEST_CASE("Vectorize AVX vadd", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize AVX vadd benchmark") {
-        Dynamo::Vectorize::AVX::vadd(src_a.data(),
-                                     src_b.data(),
-                                     dst.data(),
-                                     LENGTH);
+        Dynamo::Vectorize::AVX::vadd(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -52,10 +47,7 @@ TEST_CASE("Vectorize AVX vsub", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize AVX vsub benchmark") {
-        Dynamo::Vectorize::AVX::vsub(src_a.data(),
-                                     src_b.data(),
-                                     dst.data(),
-                                     LENGTH);
+        Dynamo::Vectorize::AVX::vsub(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -99,7 +91,5 @@ TEST_CASE("Vectorize AVX vclamp", "[Vectorize]") {
 }
 
 #else
-TEST_CASE("Vectorize AVX null", "[Vectorize]") {
-    Dynamo::Log::info("AVX instruction set not supported.");
-}
+TEST_CASE("Vectorize AVX null", "[Vectorize]") { Dynamo::Log::info("AVX instruction set not supported."); }
 #endif

@@ -19,8 +19,7 @@ namespace Dynamo {
          * @param center
          * @param radius
          */
-        constexpr Circle(Vec2 center = {}, float radius = 1) :
-            center(center), radius(radius) {}
+        constexpr Circle(Vec2 center = {}, float radius = 1) : center(center), radius(radius) {}
 
         /**
          * @brief Get the circumference of this circle.
@@ -88,9 +87,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Circle &rhs) const {
-            return radius == rhs.radius && center == rhs.center;
-        }
+        inline bool operator==(const Circle &rhs) const { return radius == rhs.radius && center == rhs.center; }
 
         /**
          * @brief Inequality operator.
@@ -99,9 +96,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Circle &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Circle &rhs) const { return !(*this == rhs); }
 
         /**
          * @brief Test if the circle is valid (radius is non-negative).

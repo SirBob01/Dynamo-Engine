@@ -213,6 +213,4 @@ TEST_CASE("Quaternion inequality", "[Quaternion]") {
     REQUIRE(a != d);
 }
 
-TEST_CASE("Quaternion hash", "[Quaternion]") {
-    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Quaternion>());
-}
+TEST_CASE("Quaternion hash", "[Quaternion]") { REQUIRE_NOTHROW(std::unordered_set<Dynamo::Quaternion>()); }

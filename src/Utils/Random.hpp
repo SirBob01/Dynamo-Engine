@@ -27,7 +27,5 @@ namespace Dynamo::Random {
      * @param max Maximum value exclusive.
      * @return float
      */
-    inline float range(float min, float max) {
-        return min + ((max - min) * random());
-    }
+    inline float range(float min, float max) { return min + ((max - min) * random()); }
 } // namespace Dynamo::Random

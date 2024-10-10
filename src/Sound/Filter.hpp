@@ -25,10 +25,7 @@ namespace Dynamo::Sound {
          * @param listener
          * @return Sound&
          */
-        virtual void apply(const Buffer &src,
-                           Buffer &dst,
-                           const Source &source,
-                           const Listener &listener) = 0;
+        virtual void apply(const Buffer &src, Buffer &dst, const Source &source, const Listener &listener) = 0;
     };
 
     /**

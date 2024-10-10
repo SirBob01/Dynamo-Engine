@@ -75,9 +75,7 @@ namespace Dynamo {
          * @param rhs
          * @return Complex
          */
-        inline Complex operator+(const Complex &rhs) const {
-            return Complex(re + rhs.re, im + rhs.im);
-        }
+        inline Complex operator+(const Complex &rhs) const { return Complex(re + rhs.re, im + rhs.im); }
 
         /**
          * @brief Subtract another complex number.
@@ -85,9 +83,7 @@ namespace Dynamo {
          * @param rhs
          * @return Complex
          */
-        inline Complex operator-(const Complex &rhs) const {
-            return Complex(re - rhs.re, im - rhs.im);
-        }
+        inline Complex operator-(const Complex &rhs) const { return Complex(re - rhs.re, im - rhs.im); }
 
         /**
          * @brief Multiply by another complex number.
@@ -107,9 +103,7 @@ namespace Dynamo {
          * @param scalar
          * @return Complex
          */
-        inline Complex operator*(float scalar) const {
-            return Complex(scalar * re, scalar * im);
-        }
+        inline Complex operator*(float scalar) const { return Complex(scalar * re, scalar * im); }
 
         /**
          * @brief Divide by another complex number.
@@ -117,9 +111,7 @@ namespace Dynamo {
          * @param rhs
          * @return Complex
          */
-        inline Complex operator/(const Complex &rhs) const {
-            return *this * rhs.reciprocal();
-        }
+        inline Complex operator/(const Complex &rhs) const { return *this * rhs.reciprocal(); }
 
         /**
          * @brief Divide by a scalar.
@@ -211,9 +203,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Complex &rhs) const {
-            return rhs.re == re && rhs.im == im;
-        }
+        inline bool operator==(const Complex &rhs) const { return rhs.re == re && rhs.im == im; }
 
         /**
          * @brief Inequality operator.
@@ -222,9 +212,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Complex &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Complex &rhs) const { return !(*this == rhs); }
     };
 } // namespace Dynamo
 

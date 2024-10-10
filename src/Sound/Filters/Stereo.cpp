@@ -3,10 +3,7 @@
 #include <Sound/Source.hpp>
 
 namespace Dynamo::Sound {
-    void Stereo::apply(const Buffer &src,
-                       Buffer &dst,
-                       const Source &source,
-                       const Listener &listener) {
+    void Stereo::apply(const Buffer &src, Buffer &dst, const Source &source, const Listener &listener) {
         Vec3 delta = source.position - listener.position;
         Vec3 up = listener.rotation.up();
         Vec3 right = listener.rotation.right();

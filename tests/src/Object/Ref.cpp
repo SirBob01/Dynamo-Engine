@@ -7,8 +7,7 @@ class Dummy : public Dynamo::Object {
     unsigned *_deletes;
 
   public:
-    Dummy(unsigned value, unsigned *deletes) :
-        _value(value), _deletes(deletes) {}
+    Dummy(unsigned value, unsigned *deletes) : _value(value), _deletes(deletes) {}
     ~Dummy() { (*_deletes)++; }
 
     unsigned get_value() { return _value; }

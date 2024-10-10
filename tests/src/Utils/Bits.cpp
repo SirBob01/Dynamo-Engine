@@ -10,18 +10,12 @@ TEST_CASE("Find LSB", "[Bits]") {
 }
 
 TEST_CASE("Reverse bits", "[Bits]") {
-    REQUIRE(Dynamo::reverse_bits(0b10000) ==
-            0b00001000000000000000000000000000);
-    REQUIRE(Dynamo::reverse_bits(0b10001) ==
-            0b10001000000000000000000000000000);
-    REQUIRE(Dynamo::reverse_bits(0b101000) ==
-            0b00010100000000000000000000000000);
-    REQUIRE(Dynamo::reverse_bits(0b00001000000000000000000000000000) ==
-            0b10000);
-    REQUIRE(Dynamo::reverse_bits(0b10001000000000000000000000000000) ==
-            0b10001);
-    REQUIRE(Dynamo::reverse_bits(0b00010100000000000000000000000000) ==
-            0b101000);
+    REQUIRE(Dynamo::reverse_bits(0b10000) == 0b00001000000000000000000000000000);
+    REQUIRE(Dynamo::reverse_bits(0b10001) == 0b10001000000000000000000000000000);
+    REQUIRE(Dynamo::reverse_bits(0b101000) == 0b00010100000000000000000000000000);
+    REQUIRE(Dynamo::reverse_bits(0b00001000000000000000000000000000) == 0b10000);
+    REQUIRE(Dynamo::reverse_bits(0b10001000000000000000000000000000) == 0b10001);
+    REQUIRE(Dynamo::reverse_bits(0b00010100000000000000000000000000) == 0b101000);
 }
 
 TEST_CASE("Round to next power of 2", "[Bits]") {

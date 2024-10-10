@@ -12,9 +12,7 @@ namespace Dynamo {
 
     void Allocator::defragment(std::list<Block>::iterator it) {
 #ifdef DYN_DEBUG
-        Log::info("Defragmentation target: {} {}",
-                  it->offset,
-                  it->offset + it->size);
+        Log::info("Defragmentation target: {} {}", it->offset, it->offset + it->size);
         Log::info("Before defragmentation: {}", print());
 #endif
         Block block = *it;
@@ -46,8 +44,7 @@ namespace Dynamo {
 #endif
     }
 
-    std::optional<unsigned> Allocator::reserve(unsigned size,
-                                               unsigned alignment) {
+    std::optional<unsigned> Allocator::reserve(unsigned size, unsigned alignment) {
         for (auto it = _free.begin(); it != _free.end(); it++) {
             Block &block = *it;
 
@@ -86,9 +83,7 @@ namespace Dynamo {
 
     void Allocator::free(unsigned offset) {
         if (_used.count(offset) == 0) {
-            Log::error("Allocator::free() failed, invalid offset {}: {}",
-                       offset,
-                       print());
+            Log::error("Allocator::free() failed, invalid offset {}: {}", offset, print());
         }
 
         // New free block
@@ -156,9 +151,7 @@ namespace Dynamo {
 #endif
     }
 
-    bool Allocator::is_reserved(unsigned offset) const {
-        return _used.count(offset) > 0;
-    }
+    bool Allocator::is_reserved(unsigned offset) const { return _used.count(offset) > 0; }
 
     unsigned Allocator::capacity() const { return _capacity; }
 
@@ -178,8 +171,7 @@ namespace Dynamo {
 
         while (it != _free.end()) {
             unsigned right = it->offset + it->size;
-            str += " | " + std::to_string(it->offset) + ", " +
-                   std::to_string(right);
+            str += " | " + std::to_string(it->offset) + ", " + std::to_string(right);
 
             // Show the allocation before the next free block
             auto next = std::next(it);

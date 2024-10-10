@@ -24,15 +24,13 @@ namespace Dynamo::Fourier {
      * @brief Pre-compute twiddle factors for the forward fourier transform.
      *
      */
-    static const std::array<Complex, 32> TWIDDLE_TABLE_FFT =
-        construct_twiddle_table(false);
+    static const std::array<Complex, 32> TWIDDLE_TABLE_FFT = construct_twiddle_table(false);
 
     /**
      * @brief Pre-compute twiddle factors for the inverse fourier transform.
      *
      */
-    static const std::array<Complex, 32> TWIDDLE_TABLE_IFFT =
-        construct_twiddle_table(true);
+    static const std::array<Complex, 32> TWIDDLE_TABLE_IFFT = construct_twiddle_table(true);
 
     /**
      * @brief Implementation of the fourier transform algorithm to extract

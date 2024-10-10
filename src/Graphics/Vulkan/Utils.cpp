@@ -107,9 +107,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     void VkResult_log(const std::string &op_message, VkResult result) {
         if (result != VK_SUCCESS) {
-            Log::error("Graphics::Vulkan {}: {}",
-                       op_message,
-                       VkResult_string(result));
+            Log::error("Graphics::Vulkan {}: {}", op_message, VkResult_string(result));
         }
     }
 } // namespace Dynamo::Graphics::Vulkan

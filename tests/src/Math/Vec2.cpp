@@ -138,6 +138,4 @@ TEST_CASE("Vec2 inequality", "[Vec2]") {
     REQUIRE(a != d);
 }
 
-TEST_CASE("Vec2 hash", "[Vec2]") {
-    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Vec2>());
-}
+TEST_CASE("Vec2 hash", "[Vec2]") { REQUIRE_NOTHROW(std::unordered_set<Dynamo::Vec2>()); }

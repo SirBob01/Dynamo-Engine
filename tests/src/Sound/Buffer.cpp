@@ -257,12 +257,9 @@ TEST_CASE("Buffer remix 4 - 1", "[Buffer]") {
     dst.silence();
     src.remix(dst);
 
-    REQUIRE(dst[0][0] ==
-            0.25 * (src[0][0] + src[1][0] + src[2][0] + src[3][0]));
-    REQUIRE(dst[0][1] ==
-            0.25 * (src[0][1] + src[1][1] + src[2][1] + src[3][1]));
-    REQUIRE(dst[0][2] ==
-            0.25 * (src[0][2] + src[1][2] + src[2][2] + src[3][2]));
+    REQUIRE(dst[0][0] == 0.25 * (src[0][0] + src[1][0] + src[2][0] + src[3][0]));
+    REQUIRE(dst[0][1] == 0.25 * (src[0][1] + src[1][1] + src[2][1] + src[3][1]));
+    REQUIRE(dst[0][2] == 0.25 * (src[0][2] + src[1][2] + src[2][2] + src[3][2]));
 }
 
 TEST_CASE("Buffer remix 4 - 2", "[Buffer]") {
@@ -320,15 +317,9 @@ TEST_CASE("Buffer remix 6 - 1", "[Buffer]") {
     dst.silence();
     src.remix(dst);
 
-    REQUIRE_THAT(dst[0][0],
-                 Approx(M_SQRT1_2 * (src[0][0] + src[1][0]) + src[2][0] +
-                        0.5 * (src[4][0] + src[5][0])));
-    REQUIRE_THAT(dst[0][1],
-                 Approx(M_SQRT1_2 * (src[0][1] + src[1][1]) + src[2][1] +
-                        0.5 * (src[4][1] + src[5][1])));
-    REQUIRE_THAT(dst[0][2],
-                 Approx(M_SQRT1_2 * (src[0][2] + src[1][2]) + src[2][2] +
-                        0.5 * (src[4][2] + src[5][2])));
+    REQUIRE_THAT(dst[0][0], Approx(M_SQRT1_2 * (src[0][0] + src[1][0]) + src[2][0] + 0.5 * (src[4][0] + src[5][0])));
+    REQUIRE_THAT(dst[0][1], Approx(M_SQRT1_2 * (src[0][1] + src[1][1]) + src[2][1] + 0.5 * (src[4][1] + src[5][1])));
+    REQUIRE_THAT(dst[0][2], Approx(M_SQRT1_2 * (src[0][2] + src[1][2]) + src[2][2] + 0.5 * (src[4][2] + src[5][2])));
 }
 
 TEST_CASE("Buffer remix 6 - 2", "[Buffer]") {
@@ -338,19 +329,13 @@ TEST_CASE("Buffer remix 6 - 2", "[Buffer]") {
     dst.silence();
     src.remix(dst);
 
-    REQUIRE_THAT(dst[0][0],
-                 Approx(src[0][0] + M_SQRT1_2 * (src[2][0] + src[4][0]), 1e-5));
-    REQUIRE_THAT(dst[0][1],
-                 Approx(src[0][1] + M_SQRT1_2 * (src[2][1] + src[4][1]), 1e-5));
-    REQUIRE_THAT(dst[0][2],
-                 Approx(src[0][2] + M_SQRT1_2 * (src[2][2] + src[4][2]), 1e-5));
+    REQUIRE_THAT(dst[0][0], Approx(src[0][0] + M_SQRT1_2 * (src[2][0] + src[4][0]), 1e-5));
+    REQUIRE_THAT(dst[0][1], Approx(src[0][1] + M_SQRT1_2 * (src[2][1] + src[4][1]), 1e-5));
+    REQUIRE_THAT(dst[0][2], Approx(src[0][2] + M_SQRT1_2 * (src[2][2] + src[4][2]), 1e-5));
 
-    REQUIRE_THAT(dst[1][0],
-                 Approx(src[1][0] + M_SQRT1_2 * (src[2][0] + src[5][0]), 1e-5));
-    REQUIRE_THAT(dst[1][1],
-                 Approx(src[1][1] + M_SQRT1_2 * (src[2][1] + src[5][1]), 1e-5));
-    REQUIRE_THAT(dst[1][2],
-                 Approx(src[1][2] + M_SQRT1_2 * (src[2][2] + src[5][2]), 1e-5));
+    REQUIRE_THAT(dst[1][0], Approx(src[1][0] + M_SQRT1_2 * (src[2][0] + src[5][0]), 1e-5));
+    REQUIRE_THAT(dst[1][1], Approx(src[1][1] + M_SQRT1_2 * (src[2][1] + src[5][1]), 1e-5));
+    REQUIRE_THAT(dst[1][2], Approx(src[1][2] + M_SQRT1_2 * (src[2][2] + src[5][2]), 1e-5));
 }
 
 TEST_CASE("Buffer remix 6 - 4", "[Buffer]") {
