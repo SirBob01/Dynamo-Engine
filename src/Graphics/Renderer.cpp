@@ -1,7 +1,5 @@
-#include "Graphics/Vulkan/Synchronize.hpp"
 #include <Graphics/Renderer.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
-#include <vulkan/vulkan_core.h>
 
 static const char *TRIANGLE_VERTEX_SHADER = R"(
 #version 450
@@ -47,16 +45,22 @@ namespace Dynamo::Graphics::Vulkan {
         _surface = _display.create_vulkan_surface(_instance);
 
         // Build the physical device
-        _physical = PhysicalDevice::select(_instance, _surface);
+        _physical = PhysicalDevice_select(_instance, _surface);
         _device = VkDevice_build(_physical);
 
         // Build the swapchain and its views and framebuffers
-        _swapchain = Swapchain::build(_device, _physical, _display);
+        _swapchain = Swapchain_build(_device, _physical, _display);
+
+        // Color fill clear value
+        _clear.color.float32[0] = 0;
+        _clear.color.float32[1] = 0;
+        _clear.color.float32[2] = 0;
+        _clear.color.float32[3] = 1;
 
         /** Demo Triangle rendering specific objects */
 
-        _vertex = Shader::build(_device, "Vertex", TRIANGLE_VERTEX_SHADER, VK_SHADER_STAGE_VERTEX_BIT);
-        _fragment = Shader::build(_device, "Fragment", TRIANGLE_FRAGMENT_SHADER, VK_SHADER_STAGE_FRAGMENT_BIT);
+        _vertex = Shader_build(_device, "Vertex", TRIANGLE_VERTEX_SHADER, VK_SHADER_STAGE_VERTEX_BIT);
+        _fragment = Shader_build(_device, "Fragment", TRIANGLE_FRAGMENT_SHADER, VK_SHADER_STAGE_FRAGMENT_BIT);
 
         _layout = VkPipelineLayout_build(_device);
 
@@ -76,8 +80,15 @@ namespace Dynamo::Graphics::Vulkan {
         pipeline_settings.fragment = _fragment;
         _pipeline = VkPipeline_build(_device, VK_NULL_HANDLE, pipeline_settings);
 
-        for (VkImageView view : _swapchain.views) {
-            _framebuffers.push_back(VkFramebuffer_build(_device, _renderpass, view, _swapchain.extent));
+        for (VkImage image : _swapchain.images) {
+            ImageViewSettings view_settings;
+            view_settings.format = _swapchain.surface_format.format;
+
+            VkImageView view = VkImageView_build(_device, image, view_settings);
+            _views.push_back(view);
+
+            VkFramebuffer framebuffer = VkFramebuffer_build(_device, _renderpass, view, _swapchain.extent);
+            _framebuffers.push_back(framebuffer);
         }
 
         _command_pool = VkCommandPool_build(_device, _physical.graphics_queues);
@@ -97,17 +108,20 @@ namespace Dynamo::Graphics::Vulkan {
         vkDestroySemaphore(_device, _s_render_start, nullptr);
         vkDestroySemaphore(_device, _s_render_done, nullptr);
         vkDestroyCommandPool(_device, _command_pool, nullptr);
-        for (VkFramebuffer framebuffer : _framebuffers) {
-            vkDestroyFramebuffer(_device, framebuffer, nullptr);
-        }
         vkDestroyPipeline(_device, _pipeline, nullptr);
         vkDestroyPipelineLayout(_device, _layout, nullptr);
         vkDestroyRenderPass(_device, _renderpass, nullptr);
-        _vertex.destroy();
-        _fragment.destroy();
+        vkDestroyShaderModule(_device, _vertex.handle, nullptr);
+        vkDestroyShaderModule(_device, _fragment.handle, nullptr);
 
         // Cleanup
-        _swapchain.destroy();
+        for (VkFramebuffer framebuffer : _framebuffers) {
+            vkDestroyFramebuffer(_device, framebuffer, nullptr);
+        }
+        for (VkImageView view : _views) {
+            vkDestroyImageView(_device, view, nullptr);
+        }
+        vkDestroySwapchainKHR(_device, _swapchain.handle, nullptr);
         vkDestroyDevice(_device, nullptr);
         vkDestroySurfaceKHR(_instance, _surface, nullptr);
 #ifdef DYN_DEBUG
@@ -116,21 +130,61 @@ namespace Dynamo::Graphics::Vulkan {
         vkDestroyInstance(_instance, nullptr);
     }
 
+    void Renderer::rebuild_swapchain() {
+        vkDeviceWaitIdle(_device);
+
+        VkSwapchainKHR previous = _swapchain.handle;
+        _swapchain = Swapchain_build(_device, _physical, _display, previous);
+
+        // Destroy old swapchain resources
+        for (VkFramebuffer framebuffer : _framebuffers) {
+            vkDestroyFramebuffer(_device, framebuffer, nullptr);
+        }
+        for (VkImageView view : _views) {
+            vkDestroyImageView(_device, view, nullptr);
+        }
+        vkDestroySwapchainKHR(_device, previous, nullptr);
+
+        // Allocate new swapchain resources
+        _views.clear();
+        _framebuffers.clear();
+        for (VkImage image : _swapchain.images) {
+            ImageViewSettings view_settings;
+            view_settings.format = _swapchain.surface_format.format;
+
+            VkImageView view = VkImageView_build(_device, image, view_settings);
+            _views.push_back(view);
+
+            VkFramebuffer framebuffer = VkFramebuffer_build(_device, _renderpass, view, _swapchain.extent);
+            _framebuffers.push_back(framebuffer);
+        }
+    }
+
+    void Renderer::set_clear(Color color) {
+        _clear.color.float32[0] = color.r;
+        _clear.color.float32[1] = color.g;
+        _clear.color.float32[2] = color.b;
+        _clear.color.float32[3] = color.a;
+    }
+
     void Renderer::refresh() {
         vkWaitForFences(_device, 1, &_f_frame_ready, VK_TRUE, UINT64_MAX);
-        vkResetFences(_device, 1, &_f_frame_ready);
-
-        VkQueue queue = VkDevice_queue(_device, _physical.graphics_queues, 0);
 
         unsigned image_index;
-        VkResult_log("Acquire Swapchain Image",
-                     vkAcquireNextImageKHR(_device,
-                                           _swapchain.handle,
-                                           UINT64_MAX,
-                                           _s_render_start,
-                                           VK_NULL_HANDLE,
-                                           &image_index));
+        VkResult acquire_result = vkAcquireNextImageKHR(_device,
+                                                        _swapchain.handle,
+                                                        UINT64_MAX,
+                                                        _s_render_start,
+                                                        VK_NULL_HANDLE,
+                                                        &image_index);
+        if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR) {
+            rebuild_swapchain();
+            return;
+        } else if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR) {
+            VkResult_log("Acquire Image", acquire_result);
+        }
 
+        VkResult_log("Reset Fence", vkResetFences(_device, 1, &_f_frame_ready));
         VkResult_log("Reset Command Buffer", vkResetCommandBuffer(_command_buffer, 0));
 
         VkCommandBufferBeginInfo begin_info = {};
@@ -141,14 +195,13 @@ namespace Dynamo::Graphics::Vulkan {
         VkResult_log("Begin Command Recording", vkBeginCommandBuffer(_command_buffer, &begin_info));
 
         VkRenderPassBeginInfo renderpass_begin_info = {};
-        VkClearValue clear_value = {{{0, 0, 0, 1}}};
         renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderpass_begin_info.renderPass = _renderpass;
         renderpass_begin_info.renderArea.extent = _swapchain.extent;
         renderpass_begin_info.renderArea.offset.x = 0;
         renderpass_begin_info.renderArea.offset.y = 0;
         renderpass_begin_info.clearValueCount = 1;
-        renderpass_begin_info.pClearValues = &clear_value;
+        renderpass_begin_info.pClearValues = &_clear;
         renderpass_begin_info.framebuffer = _framebuffers[image_index];
 
         vkCmdBeginRenderPass(_command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
@@ -175,6 +228,8 @@ namespace Dynamo::Graphics::Vulkan {
         vkCmdEndRenderPass(_command_buffer);
         VkResult_log("End Command Buffer", vkEndCommandBuffer(_command_buffer));
 
+        VkQueue queue = VkDevice_queue(_device, _physical.graphics_queues, 0);
+
         VkSubmitInfo submit_info = {};
         VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -197,6 +252,12 @@ namespace Dynamo::Graphics::Vulkan {
         present_info.pImageIndices = &image_index;
         present_info.pResults = nullptr;
 
-        VkResult_log("Graphics Present", vkQueuePresentKHR(queue, &present_info));
+        VkResult present_result = vkQueuePresentKHR(queue, &present_info);
+
+        if (present_result == VK_ERROR_OUT_OF_DATE_KHR || present_result == VK_SUBOPTIMAL_KHR) {
+            rebuild_swapchain();
+        } else if (present_result != VK_SUCCESS) {
+            VkResult_log("Present Render", present_result);
+        }
     }
 } // namespace Dynamo::Graphics::Vulkan

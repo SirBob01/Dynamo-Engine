@@ -1,6 +1,5 @@
 #include <Graphics/Vulkan/GraphicsPipeline.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
-#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
     VkPipelineShaderStageCreateInfo build_shader_stage(const Shader &shader) {

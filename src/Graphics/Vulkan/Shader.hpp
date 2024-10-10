@@ -14,35 +14,26 @@ namespace Dynamo::Graphics::Vulkan {
         VkShaderModule handle;
         VkDevice device;
         VkShaderStageFlagBits stage;
-        std::string name;
-
-        /**
-         * @brief Build a shader module from source.
-         *
-         * @param device
-         * @param name
-         * @param code
-         * @param stage
-         * @return VkShaderModule
-         */
-        static Shader
-        build(VkDevice device, const std::string &name, const std::string &code, VkShaderStageFlagBits stage);
-
-        /**
-         * @brief Compile a shader source.
-         *
-         * @param name
-         * @param code
-         * @param stage
-         * @return std::vector<uint32_t>
-         */
-        static std::vector<uint32_t>
-        compile(const std::string &name, const std::string &code, VkShaderStageFlagBits stage);
-
-        /**
-         * @brief Destroy the shader module.
-         *
-         */
-        void destroy();
     };
+
+    /**
+     * @brief Build a shader module from source.
+     *
+     * @param device
+     * @param name
+     * @param code
+     * @param stage
+     * @return VkShaderModule
+     */
+    Shader Shader_build(VkDevice device, const std::string &name, const std::string &code, VkShaderStageFlagBits stage);
+
+    /**
+     * @brief Compile a shader source.
+     *
+     * @param name
+     * @param code
+     * @param stage
+     * @return std::vector<uint32_t>
+     */
+    std::vector<uint32_t> Shader_compile(const std::string &name, const std::string &code, VkShaderStageFlagBits stage);
 } // namespace Dynamo::Graphics::Vulkan
