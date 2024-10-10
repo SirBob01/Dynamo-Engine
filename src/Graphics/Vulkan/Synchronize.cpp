@@ -1,6 +1,5 @@
 #include <Graphics/Vulkan/Synchronize.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
-#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
     VkFence VkFence_build(VkDevice device) {

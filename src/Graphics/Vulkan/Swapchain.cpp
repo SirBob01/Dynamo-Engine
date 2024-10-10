@@ -1,6 +1,5 @@
 #include <Graphics/Vulkan/Swapchain.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
-#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
     VkExtent2D compute_extent(const Display &display, const SwapchainOptions &options) {
@@ -36,13 +35,12 @@ namespace Dynamo::Graphics::Vulkan {
         return present_mode;
     }
 
-    Swapchain Swapchain::build(VkDevice device,
-                               const PhysicalDevice &physical,
-                               const Display &display,
-                               std::optional<VkSwapchainKHR> previous) {
+    Swapchain Swapchain_build(VkDevice device,
+                              const PhysicalDevice &physical,
+                              const Display &display,
+                              std::optional<VkSwapchainKHR> previous) {
         Swapchain swapchain;
         SwapchainOptions options = physical.get_swapchain_options();
-        swapchain.device = device;
         swapchain.extent = compute_extent(display, options);
         swapchain.surface_format = select_surface_format(options);
         swapchain.present_mode = select_present_mode(display, options);
@@ -94,20 +92,6 @@ namespace Dynamo::Graphics::Vulkan {
         swapchain.images.resize(count);
         vkGetSwapchainImagesKHR(device, swapchain.handle, &count, swapchain.images.data());
 
-        // Build views
-        for (VkImage image : swapchain.images) {
-            ImageViewSettings settings;
-            settings.format = swapchain.surface_format.format;
-            VkImageView view = VkImageView_build(device, image, settings);
-            swapchain.views.push_back(view);
-        }
         return swapchain;
-    }
-
-    void Swapchain::destroy() {
-        for (VkImageView view : views) {
-            vkDestroyImageView(device, view, nullptr);
-        }
-        vkDestroySwapchainKHR(device, handle, nullptr);
     }
 } // namespace Dynamo::Graphics::Vulkan

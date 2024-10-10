@@ -1,6 +1,5 @@
-#include <Graphics/Vulkan/CommandPool.hpp>
+#include <Graphics/Vulkan/Command.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
-#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
     VkCommandPool VkCommandPool_build(VkDevice device, QueueFamily family) {

@@ -1,10 +1,9 @@
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
 #include <Utils/Log.hpp>
-#include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
-    PhysicalDevice PhysicalDevice::build(VkPhysicalDevice handle, VkSurfaceKHR surface) {
+    PhysicalDevice PhysicalDevice_build(VkPhysicalDevice handle, VkSurfaceKHR surface) {
         PhysicalDevice device;
         device.handle = handle;
         device.surface = surface;
@@ -61,7 +60,7 @@ namespace Dynamo::Graphics::Vulkan {
         return device;
     }
 
-    PhysicalDevice PhysicalDevice::select(VkInstance instance, VkSurfaceKHR surface) {
+    PhysicalDevice PhysicalDevice_select(VkInstance instance, VkSurfaceKHR surface) {
         unsigned count = 0;
         vkEnumeratePhysicalDevices(instance, &count, nullptr);
         std::vector<VkPhysicalDevice> handles(count);
@@ -72,9 +71,9 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         Log::info("Selecting Vulkan device:");
-        PhysicalDevice best = PhysicalDevice::build(handles[0], surface);
+        PhysicalDevice best = PhysicalDevice_build(handles[0], surface);
         for (unsigned i = 0; i < handles.size(); i++) {
-            PhysicalDevice device = PhysicalDevice::build(handles[i], surface);
+            PhysicalDevice device = PhysicalDevice_build(handles[i], surface);
             unsigned score = device.score();
             if (score > best.score()) {
                 best = device;

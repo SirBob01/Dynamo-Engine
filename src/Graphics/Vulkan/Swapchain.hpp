@@ -15,33 +15,25 @@ namespace Dynamo::Graphics::Vulkan {
      */
     struct Swapchain {
         VkSwapchainKHR handle;
-        VkDevice device;
 
         VkExtent2D extent;
         VkSurfaceFormatKHR surface_format;
         VkPresentModeKHR present_mode;
 
         std::vector<VkImage> images;
-        std::vector<VkImageView> views;
-
-        /**
-         * @brief Build a Vulkan swapchain.
-         *
-         * @param device
-         * @param physical
-         * @param display
-         * @param previous
-         * @return Swapchain
-         */
-        static Swapchain build(VkDevice device,
-                               const PhysicalDevice &physical,
-                               const Display &display,
-                               std::optional<VkSwapchainKHR> previous = {});
-
-        /**
-         * @brief Destroy the swapchain and its dependents.
-         *
-         */
-        void destroy();
     };
+
+    /**
+     * @brief Build a Vulkan swapchain.
+     *
+     * @param device
+     * @param physical
+     * @param display
+     * @param previous
+     * @return Swapchain
+     */
+    Swapchain Swapchain_build(VkDevice device,
+                              const PhysicalDevice &physical,
+                              const Display &display,
+                              std::optional<VkSwapchainKHR> previous = {});
 } // namespace Dynamo::Graphics::Vulkan

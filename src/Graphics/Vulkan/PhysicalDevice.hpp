@@ -35,24 +35,6 @@ namespace Dynamo::Graphics::Vulkan {
         QueueFamily transfer_queues;
 
         /**
-         * @brief Build a Vulkan physical device.
-         *
-         * @param handle
-         * @param surface
-         * @return PhysicalDevice
-         */
-        static PhysicalDevice build(VkPhysicalDevice handle, VkSurfaceKHR surface);
-
-        /**
-         * @brief Select a suitable physical device based on its score.
-         *
-         * @param instance
-         * @param surface
-         * @return PhysicalDevice
-         */
-        static PhysicalDevice select(VkInstance instance, VkSurfaceKHR surface);
-
-        /**
          * @brief Get the available swapchain configuration options.
          *
          * @return SwapchainOptions
@@ -66,4 +48,22 @@ namespace Dynamo::Graphics::Vulkan {
          */
         unsigned score() const;
     };
+
+    /**
+     * @brief Build a Vulkan physical device.
+     *
+     * @param handle
+     * @param surface
+     * @return PhysicalDevice
+     */
+    PhysicalDevice PhysicalDevice_build(VkPhysicalDevice handle, VkSurfaceKHR surface);
+
+    /**
+     * @brief Select a suitable physical device based on its score.
+     *
+     * @param instance
+     * @param surface
+     * @return PhysicalDevice
+     */
+    PhysicalDevice PhysicalDevice_select(VkInstance instance, VkSurfaceKHR surface);
 } // namespace Dynamo::Graphics::Vulkan

@@ -5,13 +5,12 @@
 
 namespace Dynamo::Graphics::Vulkan {
     Shader
-    Shader::build(VkDevice device, const std::string &name, const std::string &code, VkShaderStageFlagBits stage) {
-        std::vector<uint32_t> bytecode = compile(name, code, stage);
+    Shader_build(VkDevice device, const std::string &name, const std::string &code, VkShaderStageFlagBits stage) {
+        std::vector<uint32_t> bytecode = Shader_compile(name, code, stage);
 
         Shader shader;
         shader.device = device;
         shader.stage = stage;
-        shader.name = name;
 
         VkShaderModuleCreateInfo shader_info = {};
         shader_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -23,7 +22,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     std::vector<uint32_t>
-    Shader::compile(const std::string &name, const std::string &code, VkShaderStageFlagBits stage) {
+    Shader_compile(const std::string &name, const std::string &code, VkShaderStageFlagBits stage) {
         shaderc::Compiler compiler;
         shaderc::CompileOptions options;
         options.SetOptimizationLevel(shaderc_optimization_level_size);
@@ -62,6 +61,4 @@ namespace Dynamo::Graphics::Vulkan {
 
         return {module.cbegin(), module.cend()};
     }
-
-    void Shader::destroy() { vkDestroyShaderModule(device, handle, nullptr); }
 } // namespace Dynamo::Graphics::Vulkan
