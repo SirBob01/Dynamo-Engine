@@ -21,12 +21,7 @@ namespace Dynamo {
          * @param z Coefficient of k component.
          * @param w Scalar component.
          */
-        constexpr Quaternion(float x = 0,
-                             float y = 0,
-                             float z = 0,
-                             float w = 1) :
-            x(x),
-            y(y), z(z), w(w) {}
+        constexpr Quaternion(float x = 0, float y = 0, float z = 0, float w = 1) : x(x), y(y), z(z), w(w) {}
 
         /**
          * @brief Construct a new Quaternion object from an angle-axis pair.
@@ -48,9 +43,7 @@ namespace Dynamo {
          *
          * @return float
          */
-        inline float length_squared() const {
-            return x * x + y * y + z * z + w * w;
-        }
+        inline float length_squared() const { return x * x + y * y + z * z + w * w; }
 
         /**
          * @brief Calculate the length.
@@ -75,18 +68,14 @@ namespace Dynamo {
          *
          * @return Quaternion
          */
-        inline Quaternion conjugate() const {
-            return Quaternion(-x, -y, -z, w);
-        }
+        inline Quaternion conjugate() const { return Quaternion(-x, -y, -z, w); }
 
         /**
          * @brief Negation.
          *
          * @return Quaternion
          */
-        inline Quaternion operator-() const {
-            return Quaternion(-x, -y, -z, -w);
-        }
+        inline Quaternion operator-() const { return Quaternion(-x, -y, -z, -w); }
 
         /**
          * @brief Add another quaternion.
@@ -233,8 +222,7 @@ namespace Dynamo {
          */
         inline Vec3 rotate(const Vec3 &v) const {
             Vec3 u(x, y, z);
-            return (u * 2 * (u * v)) + (v * (w * w - (u * u))) +
-                   (u.cross(v) * 2 * w);
+            return (u * 2 * (u * v)) + (v * (w * w - (u * u))) + (u.cross(v) * 2 * w);
         }
 
         /**
@@ -291,9 +279,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Quaternion &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Quaternion &rhs) const { return !(*this == rhs); }
     };
 } // namespace Dynamo
 

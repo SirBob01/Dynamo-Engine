@@ -2,9 +2,7 @@
 #include <Graphics/Vulkan/Utils.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    VkImageView VkImageView_build(VkDevice device,
-                                  VkImage image,
-                                  ImageViewSettings settings) {
+    VkImageView VkImageView_build(VkDevice device, VkImage image, ImageViewSettings settings) {
         VkImageViewCreateInfo view_info = {};
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         view_info.image = image;
@@ -22,8 +20,7 @@ namespace Dynamo::Graphics::Vulkan {
         view_info.subresourceRange.layerCount = settings.layer_count;
 
         VkImageView view;
-        VkResult_log("Create ImageView",
-                     vkCreateImageView(device, &view_info, nullptr, &view));
+        VkResult_log("Create ImageView", vkCreateImageView(device, &view_info, nullptr, &view));
         return view;
     }
 } // namespace Dynamo::Graphics::Vulkan

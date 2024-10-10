@@ -23,9 +23,7 @@ namespace Dynamo::Graphics::Vulkan {
                 }
             }
             if (!found) {
-                Log::error(
-                    "Requested layer {} for Vulkan::Instance not supported.",
-                    layer_name);
+                Log::error("Requested layer {} for Vulkan::Instance not supported.", layer_name);
             }
         }
     }
@@ -66,8 +64,7 @@ namespace Dynamo::Graphics::Vulkan {
         Log::info("");
 
         VkInstance instance;
-        VkResult_log("Create Instance",
-                     vkCreateInstance(&instance_info, nullptr, &instance));
+        VkResult_log("Create Instance", vkCreateInstance(&instance_info, nullptr, &instance));
         return instance;
     }
 } // namespace Dynamo::Graphics::Vulkan

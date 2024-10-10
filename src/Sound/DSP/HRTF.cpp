@@ -47,8 +47,7 @@ namespace Dynamo::Sound {
         }
     }
 
-    Vec2 HRTF::compute_point(const Vec3 &listener_position,
-                             const Vec3 &source_position) const {
+    Vec2 HRTF::compute_point(const Vec3 &listener_position, const Vec3 &source_position) const {
         Vec3 disp = source_position - listener_position;
 
         float azimuth = std::asin(disp.x / disp.length());

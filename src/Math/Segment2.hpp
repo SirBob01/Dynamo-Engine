@@ -52,9 +52,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Segment2 &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Segment2 &rhs) const { return !(*this == rhs); }
     };
 } // namespace Dynamo
 

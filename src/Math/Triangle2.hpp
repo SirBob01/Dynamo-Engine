@@ -21,8 +21,7 @@ namespace Dynamo {
          * @param b
          * @param c
          */
-        constexpr Triangle2(Vec2 a = {}, Vec2 b = {}, Vec2 c = {}) :
-            a(a), b(b), c(c) {}
+        constexpr Triangle2(Vec2 a = {}, Vec2 b = {}, Vec2 c = {}) : a(a), b(b), c(c) {}
 
         /**
          * @brief Calculate the circle which minimally contains this triangle.
@@ -90,9 +89,8 @@ namespace Dynamo {
          * @return unsigned
          */
         inline unsigned shared_vertices(const Triangle2 &rhs) const {
-            return (a == rhs.a) + (a == rhs.b) + (a == rhs.c) + (b == rhs.a) +
-                   (b == rhs.b) + (b == rhs.c) + (c == rhs.a) + (c == rhs.b) +
-                   (c == rhs.c);
+            return (a == rhs.a) + (a == rhs.b) + (a == rhs.c) + (b == rhs.a) + (b == rhs.b) + (b == rhs.c) +
+                   (c == rhs.a) + (c == rhs.b) + (c == rhs.c);
         }
 
         /**
@@ -102,9 +100,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool adjacent(const Triangle2 &rhs) const {
-            return shared_vertices(rhs) > 1;
-        }
+        inline bool adjacent(const Triangle2 &rhs) const { return shared_vertices(rhs) > 1; }
 
         /**
          * @brief Equality operator.
@@ -113,9 +109,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Triangle2 &rhs) const {
-            return a == rhs.a && b == rhs.b && c == rhs.c;
-        }
+        inline bool operator==(const Triangle2 &rhs) const { return a == rhs.a && b == rhs.b && c == rhs.c; }
 
         /**
          * @brief Inequality operator.
@@ -124,9 +118,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Triangle2 &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Triangle2 &rhs) const { return !(*this == rhs); }
     };
 } // namespace Dynamo
 

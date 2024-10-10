@@ -5,8 +5,7 @@
 #include <Math/Arch/Scalar.hpp>
 
 namespace Dynamo::Vectorize::Neon {
-    inline void
-    smul(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void smul(const float *src, const float scalar, float *dst, unsigned length) {
         float32x4_t scalar_v = vdupq_n_f32(scalar);
         unsigned rem = length % 16;
         float *dst_end = dst + length - rem;
@@ -39,8 +38,7 @@ namespace Dynamo::Vectorize::Neon {
         Scalar::smul(src, scalar, dst, rem_1);
     }
 
-    inline void
-    vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vadd(const float *src_a, const float *src_b, float *dst, unsigned length) {
         unsigned rem = length % 16;
         float *dst_end = dst + length - rem;
         while (dst < dst_end) {
@@ -76,8 +74,7 @@ namespace Dynamo::Vectorize::Neon {
         Scalar::vadd(src_a, src_b, dst, rem_1);
     }
 
-    inline void
-    vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
+    inline void vsub(const float *src_a, const float *src_b, float *dst, unsigned length) {
         unsigned rem = length % 16;
         float *dst_end = dst + length - rem;
         while (dst < dst_end) {
@@ -113,8 +110,7 @@ namespace Dynamo::Vectorize::Neon {
         Scalar::vsub(src_a, src_b, dst, rem_1);
     }
 
-    inline void
-    vsma(const float *src, const float scalar, float *dst, unsigned length) {
+    inline void vsma(const float *src, const float scalar, float *dst, unsigned length) {
         float32x4_t scalar_v = vdupq_n_f32(scalar);
         unsigned rem = length % 16;
         float *dst_end = dst + length - rem;
@@ -149,11 +145,7 @@ namespace Dynamo::Vectorize::Neon {
         Scalar::vsma(src, scalar, dst, rem_1);
     }
 
-    inline void vclamp(const float *src,
-                       const float lo,
-                       const float hi,
-                       float *dst,
-                       unsigned length) {
+    inline void vclamp(const float *src, const float lo, const float hi, float *dst, unsigned length) {
         float32x4_t lo_v = vdupq_n_f32(lo);
         float32x4_t hi_v = vdupq_n_f32(hi);
         unsigned rem = length % 16;

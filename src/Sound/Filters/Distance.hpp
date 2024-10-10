@@ -28,9 +28,6 @@ namespace Dynamo::Sound {
          */
         float linear(float distance);
 
-        void apply(const Buffer &src,
-                   Buffer &dst,
-                   const Source &source,
-                   const Listener &listener) override;
+        void apply(const Buffer &src, Buffer &dst, const Source &source, const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

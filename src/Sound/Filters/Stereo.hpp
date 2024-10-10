@@ -12,9 +12,6 @@ namespace Dynamo::Sound {
         Buffer _mono;
 
       public:
-        void apply(const Buffer &src,
-                   Buffer &dst,
-                   const Source &source,
-                   const Listener &listener) override;
+        void apply(const Buffer &src, Buffer &dst, const Source &source, const Listener &listener) override;
     };
 } // namespace Dynamo::Sound

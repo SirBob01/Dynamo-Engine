@@ -31,9 +31,7 @@ namespace Dynamo {
          * @param window_width
          * @param window_height
          */
-        Display(const std::string &title,
-                unsigned window_width,
-                unsigned window_height);
+        Display(const std::string &title, unsigned window_width, unsigned window_height);
         ~Display();
 
         /**

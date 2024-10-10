@@ -22,8 +22,7 @@ namespace Dynamo::Sound {
      * @brief Length of one wing in the filter
      *
      */
-    static constexpr unsigned FILTER_HALF_LENGTH =
-        FILTER_ZERO_CROSSINGS * FILTER_PRECISION + 1;
+    static constexpr unsigned FILTER_HALF_LENGTH = FILTER_ZERO_CROSSINGS * FILTER_PRECISION + 1;
 
     /**
      * @brief Normalized sinc function
@@ -89,8 +88,8 @@ namespace Dynamo::Sound {
      * @param coeffs
      * @return constexpr std::array<double, FILTER_HALF_LENGTH>
      */
-    constexpr std::array<double, FILTER_HALF_LENGTH> construct_difference_table(
-        const std::array<double, FILTER_HALF_LENGTH> &coeffs) {
+    constexpr std::array<double, FILTER_HALF_LENGTH>
+    construct_difference_table(const std::array<double, FILTER_HALF_LENGTH> &coeffs) {
         std::array<double, FILTER_HALF_LENGTH> diffs = {0};
         for (unsigned i = 0; i < FILTER_HALF_LENGTH - 1; i++) {
             diffs[i] = coeffs[i + 1] - coeffs[i];
@@ -103,16 +102,14 @@ namespace Dynamo::Sound {
      * initialization
      *
      */
-    static const std::array<double, FILTER_HALF_LENGTH> FILTER_RWING =
-        construct_filter_table();
+    static const std::array<double, FILTER_HALF_LENGTH> FILTER_RWING = construct_filter_table();
 
     /**
      * @brief Difference table for filter coefficients, precomputed on
      * initialization
      *
      */
-    static const std::array<double, FILTER_HALF_LENGTH> FILTER_DIFFS =
-        construct_difference_table(FILTER_RWING);
+    static const std::array<double, FILTER_HALF_LENGTH> FILTER_DIFFS = construct_difference_table(FILTER_RWING);
 
     /**
      * @brief Change the sample rate of a signal

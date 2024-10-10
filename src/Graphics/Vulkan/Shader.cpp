@@ -4,10 +4,8 @@
 #include <shaderc/shaderc.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    Shader Shader::build(VkDevice device,
-                         const std::string &name,
-                         const std::string &code,
-                         VkShaderStageFlagBits stage) {
+    Shader
+    Shader::build(VkDevice device, const std::string &name, const std::string &code, VkShaderStageFlagBits stage) {
         std::vector<uint32_t> bytecode = compile(name, code, stage);
 
         Shader shader;
@@ -20,17 +18,12 @@ namespace Dynamo::Graphics::Vulkan {
         shader_info.pCode = bytecode.data();
         shader_info.codeSize = bytecode.size() * sizeof(uint32_t);
 
-        VkResult_log("Create Shader Module",
-                     vkCreateShaderModule(device,
-                                          &shader_info,
-                                          nullptr,
-                                          &shader.handle));
+        VkResult_log("Create Shader Module", vkCreateShaderModule(device, &shader_info, nullptr, &shader.handle));
         return shader;
     }
 
-    std::vector<uint32_t> Shader::compile(const std::string &name,
-                                          const std::string &code,
-                                          VkShaderStageFlagBits stage) {
+    std::vector<uint32_t>
+    Shader::compile(const std::string &name, const std::string &code, VkShaderStageFlagBits stage) {
         shaderc::Compiler compiler;
         shaderc::CompileOptions options;
         options.SetOptimizationLevel(shaderc_optimization_level_size);
@@ -60,13 +53,10 @@ namespace Dynamo::Graphics::Vulkan {
             return {};
         }
 
-        shaderc::SpvCompilationResult module =
-            compiler.CompileGlslToSpv(code, kind, name.c_str(), options);
+        shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(code, kind, name.c_str(), options);
 
-        if (module.GetCompilationStatus() !=
-            shaderc_compilation_status_success) {
-            Log::error("Vulkan Shader Compile Error:\n{}",
-                       module.GetErrorMessage());
+        if (module.GetCompilationStatus() != shaderc_compilation_status_success) {
+            Log::error("Vulkan Shader Compile Error:\n{}", module.GetErrorMessage());
             return {};
         }
 

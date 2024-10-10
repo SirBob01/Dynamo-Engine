@@ -11,10 +11,7 @@ namespace Dynamo::Sound {
         std::vector<FilterRef> _sequence;
 
       public:
-        void apply(const Buffer &src,
-                   Buffer &dst,
-                   const Source &source,
-                   const Listener &listener) override;
+        void apply(const Buffer &src, Buffer &dst, const Source &source, const Listener &listener) override;
 
         /**
          * @brief Add a filter.

@@ -20,8 +20,7 @@ namespace Dynamo {
          * @param y
          * @param z
          */
-        constexpr Vec3(float x = 0, float y = 0, float z = 0) :
-            x(x), y(y), z(z) {}
+        constexpr Vec3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
 
         /**
          * @brief Calculate the squared length.
@@ -43,9 +42,7 @@ namespace Dynamo {
          * @param rhs
          * @return Vec3
          */
-        inline Vec3 operator+(const Vec3 &rhs) const {
-            return Vec3(x + rhs.x, y + rhs.y, z + rhs.z);
-        }
+        inline Vec3 operator+(const Vec3 &rhs) const { return Vec3(x + rhs.x, y + rhs.y, z + rhs.z); }
 
         /**
          * @brief Subtract another vector.
@@ -53,9 +50,7 @@ namespace Dynamo {
          * @param rhs
          * @return Vec3
          */
-        inline Vec3 operator-(const Vec3 &rhs) const {
-            return Vec3(x - rhs.x, y - rhs.y, z - rhs.z);
-        }
+        inline Vec3 operator-(const Vec3 &rhs) const { return Vec3(x - rhs.x, y - rhs.y, z - rhs.z); }
 
         /**
          * @brief Multiply by a scalar.
@@ -63,9 +58,7 @@ namespace Dynamo {
          * @param scalar
          * @return Vec3
          */
-        inline Vec3 operator*(float scalar) const {
-            return Vec3(x * scalar, y * scalar, z * scalar);
-        }
+        inline Vec3 operator*(float scalar) const { return Vec3(x * scalar, y * scalar, z * scalar); }
 
         /**
          * @brief Divide by a scalar.
@@ -150,8 +143,7 @@ namespace Dynamo {
          */
         inline Vec3 &transform(const Mat4 &mat) {
             const auto &vals = mat.values;
-            float w =
-                1.0 / (vals[12] * x + vals[13] * y + vals[14] * z + vals[15]);
+            float w = 1.0 / (vals[12] * x + vals[13] * y + vals[14] * z + vals[15]);
             x = (vals[0] * x + vals[1] * y + vals[2] * z + vals[3]) * w;
             y = (vals[4] * x + vals[5] * y + vals[6] * z + vals[7]) * w;
             y = (vals[8] * x + vals[9] * y + vals[10] * z + vals[11]) * w;
@@ -164,9 +156,7 @@ namespace Dynamo {
          * @param rhs
          * @return float
          */
-        inline float operator*(const Vec3 &rhs) const {
-            return x * rhs.x + y * rhs.y + z * rhs.z;
-        }
+        inline float operator*(const Vec3 &rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z; }
 
         /**
          * @brief 3D cross product.
@@ -188,9 +178,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Vec3 &rhs) const {
-            return x == rhs.x && y == rhs.y && z == rhs.z;
-        }
+        inline bool operator==(const Vec3 &rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
 
         /**
          * @brief Inequality operator.
@@ -199,9 +187,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Vec3 &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Vec3 &rhs) const { return !(*this == rhs); }
     };
 } // namespace Dynamo
 

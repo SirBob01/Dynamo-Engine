@@ -14,9 +14,7 @@ TEST_CASE("Vectorize SSE smul", "[Vectorize]") {
     fill_array(src);
     fill_array(dst);
 
-    BENCHMARK("Vectorize SSE smul benchmark") {
-        Dynamo::Vectorize::SSE::smul(src.data(), scalar, dst.data(), LENGTH);
-    };
+    BENCHMARK("Vectorize SSE smul benchmark") { Dynamo::Vectorize::SSE::smul(src.data(), scalar, dst.data(), LENGTH); };
 
     for (unsigned i = 0; i < LENGTH; i++) {
         REQUIRE(dst[i] == scalar * src[i]);
@@ -32,10 +30,7 @@ TEST_CASE("Vectorize SSE vadd", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize SSE vadd benchmark") {
-        Dynamo::Vectorize::SSE::vadd(src_a.data(),
-                                     src_b.data(),
-                                     dst.data(),
-                                     LENGTH);
+        Dynamo::Vectorize::SSE::vadd(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -52,10 +47,7 @@ TEST_CASE("Vectorize SSE vsub", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize SSE vsub benchmark") {
-        Dynamo::Vectorize::SSE::vsub(src_a.data(),
-                                     src_b.data(),
-                                     dst.data(),
-                                     LENGTH);
+        Dynamo::Vectorize::SSE::vsub(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -99,7 +91,5 @@ TEST_CASE("Vectorize SSE vclamp", "[Vectorize]") {
 }
 
 #else
-TEST_CASE("Vectorize SSE null", "[Vectorize]") {
-    Dynamo::Log::info("SSE instruction set not supported.");
-}
+TEST_CASE("Vectorize SSE null", "[Vectorize]") { Dynamo::Log::info("SSE instruction set not supported."); }
 #endif

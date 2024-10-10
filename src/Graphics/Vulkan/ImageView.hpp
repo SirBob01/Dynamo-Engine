@@ -29,7 +29,5 @@ namespace Dynamo::Graphics::Vulkan {
      * @param settings
      * @return VkImageView
      */
-    VkImageView VkImageView_build(VkDevice device,
-                                  VkImage image,
-                                  ImageViewSettings settings);
+    VkImageView VkImageView_build(VkDevice device, VkImage image, ImageViewSettings settings);
 } // namespace Dynamo::Graphics::Vulkan

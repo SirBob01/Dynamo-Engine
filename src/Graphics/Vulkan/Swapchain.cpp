@@ -3,8 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace Dynamo::Graphics::Vulkan {
-    VkExtent2D compute_extent(const Display &display,
-                              const SwapchainOptions &options) {
+    VkExtent2D compute_extent(const Display &display, const SwapchainOptions &options) {
         Vec2 size = display.get_framebuffer_size();
         VkExtent2D extent;
         extent.width = std::clamp(static_cast<unsigned>(size.x),
@@ -18,16 +17,14 @@ namespace Dynamo::Graphics::Vulkan {
 
     VkSurfaceFormatKHR select_surface_format(const SwapchainOptions &options) {
         for (VkSurfaceFormatKHR query : options.formats) {
-            if (query.format == VK_FORMAT_B8G8R8A8_SRGB &&
-                query.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+            if (query.format == VK_FORMAT_B8G8R8A8_SRGB && query.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
                 return query;
             }
         }
         return options.formats[0];
     }
 
-    VkPresentModeKHR select_present_mode(const Display &display,
-                                         const SwapchainOptions &options) {
+    VkPresentModeKHR select_present_mode(const Display &display, const SwapchainOptions &options) {
         VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
         for (VkPresentModeKHR query : options.present_modes) {
             if (!display.is_vsync() && query == VK_PRESENT_MODE_IMMEDIATE_KHR) {
@@ -89,20 +86,13 @@ namespace Dynamo::Graphics::Vulkan {
             swapchain_info.oldSwapchain = previous.value();
         }
 
-        VkResult_log("Create Swapchain",
-                     vkCreateSwapchainKHR(device,
-                                          &swapchain_info,
-                                          nullptr,
-                                          &swapchain.handle));
+        VkResult_log("Create Swapchain", vkCreateSwapchainKHR(device, &swapchain_info, nullptr, &swapchain.handle));
 
         // Get swapchain images
         unsigned count = 0;
         vkGetSwapchainImagesKHR(device, swapchain.handle, &count, nullptr);
         swapchain.images.resize(count);
-        vkGetSwapchainImagesKHR(device,
-                                swapchain.handle,
-                                &count,
-                                swapchain.images.data());
+        vkGetSwapchainImagesKHR(device, swapchain.handle, &count, swapchain.images.data());
 
         // Build views
         for (VkImage image : swapchain.images) {

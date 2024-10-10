@@ -157,6 +157,4 @@ TEST_CASE("Complex number inequality", "[Complex]") {
     REQUIRE(a != d);
 }
 
-TEST_CASE("Complex number hash", "[Complex]") {
-    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Complex>());
-}
+TEST_CASE("Complex number hash", "[Complex]") { REQUIRE_NOTHROW(std::unordered_set<Dynamo::Complex>()); }

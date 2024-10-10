@@ -27,6 +27,4 @@ TEST_CASE("Segment2 inequality", "[Segment2]") {
     REQUIRE(a != b);
 }
 
-TEST_CASE("Segment2 hash", "[Segment2]") {
-    REQUIRE_NOTHROW(std::unordered_set<Dynamo::Segment2>());
-}
+TEST_CASE("Segment2 hash", "[Segment2]") { REQUIRE_NOTHROW(std::unordered_set<Dynamo::Segment2>()); }

@@ -4,35 +4,20 @@
 #include <new>
 
 namespace Dynamo::Sound {
-    void vadd_channel(const Buffer &src,
-                      Buffer &dst,
-                      unsigned src_channel,
-                      unsigned dst_channel) {
-        Vectorize::vadd(src[src_channel],
-                        dst[dst_channel],
-                        dst[dst_channel],
-                        src.frames());
+    void vadd_channel(const Buffer &src, Buffer &dst, unsigned src_channel, unsigned dst_channel) {
+        Vectorize::vadd(src[src_channel], dst[dst_channel], dst[dst_channel], src.frames());
     }
 
-    void vsma_channel(const Buffer &src,
-                      Buffer &dst,
-                      float scalar,
-                      unsigned src_channel,
-                      unsigned dst_channel) {
-        Vectorize::vsma(src[src_channel],
-                        scalar,
-                        dst[dst_channel],
-                        src.frames());
+    void vsma_channel(const Buffer &src, Buffer &dst, float scalar, unsigned src_channel, unsigned dst_channel) {
+        Vectorize::vsma(src[src_channel], scalar, dst[dst_channel], src.frames());
     }
 
-    Buffer::Buffer(unsigned frames, unsigned channels) :
-        _frames(frames), _channels(channels) {
+    Buffer::Buffer(unsigned frames, unsigned channels) : _frames(frames), _channels(channels) {
         unsigned length = std::max(frames * channels, 1U);
         _samples = new (std::align_val_t(64)) WaveSample[length];
     }
 
-    Buffer::Buffer(WaveSample *samples, unsigned frames, unsigned channels) :
-        Buffer(frames, channels) {
+    Buffer::Buffer(WaveSample *samples, unsigned frames, unsigned channels) : Buffer(frames, channels) {
         std::copy(samples, samples + (_frames * _channels), _samples);
     }
 
@@ -77,9 +62,7 @@ namespace Dynamo::Sound {
 
     unsigned Buffer::channels() const { return _channels; }
 
-    void Buffer::silence() {
-        std::fill(_samples, _samples + (_frames * _channels), 0);
-    }
+    void Buffer::silence() { std::fill(_samples, _samples + (_frames * _channels), 0); }
 
     void Buffer::resize(const unsigned frames, const unsigned channels) {
         unsigned prev_size = _frames * _channels;

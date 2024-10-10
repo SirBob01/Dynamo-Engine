@@ -22,6 +22,5 @@ namespace Dynamo::Graphics::Vulkan {
      * @param index
      * @return VkQueue
      */
-    VkQueue
-    VkDevice_queue(VkDevice device, const QueueFamily &family, unsigned index);
+    VkQueue VkDevice_queue(VkDevice device, const QueueFamily &family, unsigned index);
 } // namespace Dynamo::Graphics::Vulkan

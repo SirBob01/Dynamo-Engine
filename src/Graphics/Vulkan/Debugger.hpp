@@ -11,8 +11,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @param instance
      * @return VkDebugUtilsMessengerEXT
      */
-    VkDebugUtilsMessengerEXT
-    VkDebugUtilsMessengerEXT_build(VkInstance instance);
+    VkDebugUtilsMessengerEXT VkDebugUtilsMessengerEXT_build(VkInstance instance);
 
     /**
      * @brief Debug messenger callback.
@@ -23,10 +22,10 @@ namespace Dynamo::Graphics::Vulkan {
      * @param user_data
      * @return VKAPI_ATTR
      */
-    VKAPI_ATTR VkBool32 VKAPI_CALL VkDebugUtilsMessengerEXT_message_callback(
-        VkDebugUtilsMessageSeverityFlagBitsEXT severity,
-        VkDebugUtilsMessageTypeFlagsEXT type,
-        VkDebugUtilsMessengerCallbackDataEXT const *data,
-        void *user_data);
+    VKAPI_ATTR VkBool32 VKAPI_CALL
+    VkDebugUtilsMessengerEXT_message_callback(VkDebugUtilsMessageSeverityFlagBitsEXT severity,
+                                              VkDebugUtilsMessageTypeFlagsEXT type,
+                                              VkDebugUtilsMessengerCallbackDataEXT const *data,
+                                              void *user_data);
 
 } // namespace Dynamo::Graphics::Vulkan

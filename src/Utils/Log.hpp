@@ -5,12 +5,8 @@
 #endif
 
 #ifdef DYN_DEBUG
-#define DYN_ASSERT(cond)                                                       \
-    !(cond) ? Dynamo::Log::error("Assertion {} failed: {}, Line {}",           \
-                                 #cond,                                        \
-                                 __FILE__,                                     \
-                                 __LINE__)                                     \
-            : (void(0))
+#define DYN_ASSERT(cond)                                                                                               \
+    !(cond) ? Dynamo::Log::error("Assertion {} failed: {}, Line {}", #cond, __FILE__, __LINE__) : (void(0))
 #else
 #define DYN_ASSERT(cond) (void(0))
 #endif
@@ -40,9 +36,7 @@ namespace Dynamo {
         template <typename... Args>
         static void info(std::string fmt = "", Args... args) {
             std::string message = fmt::format(fmt, args...);
-            std::string line = fmt::format("[INFO {:%Y-%m-%d %H:%M:%S}] {}",
-                                           Clock::time(),
-                                           message);
+            std::string line = fmt::format("[INFO {:%Y-%m-%d %H:%M:%S}] {}", Clock::time(), message);
             std::cout << line << "\n";
         }
 
@@ -56,9 +50,7 @@ namespace Dynamo {
         template <typename... Args>
         static void warn(std::string fmt, Args... args) {
             std::string message = fmt::format(fmt, args...);
-            std::string line = fmt::format("[WARN {:%Y-%m-%d %H:%M:%S}] {}",
-                                           Clock::time(),
-                                           message);
+            std::string line = fmt::format("[WARN {:%Y-%m-%d %H:%M:%S}] {}", Clock::time(), message);
             std::cout << line << "\n";
         }
 
@@ -72,9 +64,7 @@ namespace Dynamo {
         template <typename... Args>
         static void error(std::string fmt, Args... args) {
             std::string message = fmt::format(fmt, args...);
-            std::string line = fmt::format("[ERROR {:%Y-%m-%d %H:%M:%S}] {}",
-                                           Clock::time(),
-                                           message);
+            std::string line = fmt::format("[ERROR {:%Y-%m-%d %H:%M:%S}] {}", Clock::time(), message);
             std::cout << line << "\n";
             throw std::runtime_error("Dynamo fatal.");
         }

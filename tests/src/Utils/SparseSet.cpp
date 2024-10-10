@@ -189,9 +189,7 @@ TEST_CASE("SparseSet forall", "[SparseSet]") {
     std::vector<char> items;
     std::vector<Dynamo::Id> ids;
 
-    set.forall([&](char &item, Dynamo::Id id) {
-        triplets.push_back({item, id});
-    });
+    set.forall([&](char &item, Dynamo::Id id) { triplets.push_back({item, id}); });
     set.forall_items([&](char &item) { items.push_back(item); });
     set.forall_ids([&](Dynamo::Id id) { ids.push_back(id); });
 

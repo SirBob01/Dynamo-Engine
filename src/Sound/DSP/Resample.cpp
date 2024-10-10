@@ -34,8 +34,7 @@ namespace Dynamo::Sound {
             for (unsigned i = 0; i < FILTER_HALF_LENGTH; i++) {
                 int s_i = src_f - i;
                 int h_i = l + i * filter_step;
-                if (s_i < 0 || h_i >= static_cast<int>(FILTER_HALF_LENGTH))
-                    break;
+                if (s_i < 0 || h_i >= static_cast<int>(FILTER_HALF_LENGTH)) break;
                 double weight = FILTER_RWING[h_i] + interp * FILTER_DIFFS[h_i];
                 dst_sample += src[s_i] * weight;
             }
@@ -52,9 +51,7 @@ namespace Dynamo::Sound {
             for (unsigned i = 0; i < FILTER_HALF_LENGTH; i++) {
                 int s_i = src_f + i + 1;
                 int h_i = l + i * filter_step;
-                if (s_i >= time_end ||
-                    h_i >= static_cast<int>(FILTER_HALF_LENGTH))
-                    break;
+                if (s_i >= time_end || h_i >= static_cast<int>(FILTER_HALF_LENGTH)) break;
                 double weight = FILTER_RWING[h_i] + interp * FILTER_DIFFS[h_i];
                 dst_sample += src[s_i] * weight;
             }

@@ -32,10 +32,7 @@ TEST_CASE("Vectorize Neon vadd", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize Neon vadd benchmark") {
-        Dynamo::Vectorize::Neon::vadd(src_a.data(),
-                                      src_b.data(),
-                                      dst.data(),
-                                      LENGTH);
+        Dynamo::Vectorize::Neon::vadd(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -52,10 +49,7 @@ TEST_CASE("Vectorize Neon vsub", "[Vectorize]") {
     fill_array(dst);
 
     BENCHMARK("Vectorize Neon vsub benchmark") {
-        Dynamo::Vectorize::Neon::vsub(src_a.data(),
-                                      src_b.data(),
-                                      dst.data(),
-                                      LENGTH);
+        Dynamo::Vectorize::Neon::vsub(src_a.data(), src_b.data(), dst.data(), LENGTH);
     };
 
     for (unsigned i = 0; i < LENGTH; i++) {
@@ -99,7 +93,5 @@ TEST_CASE("Vectorize Neon vclamp", "[Vectorize]") {
 }
 
 #else
-TEST_CASE("Vectorize Neon null", "[Vectorize]") {
-    Dynamo::Log::info("Neon instruction set not supported.");
-}
+TEST_CASE("Vectorize Neon null", "[Vectorize]") { Dynamo::Log::info("Neon instruction set not supported."); }
 #endif

@@ -81,8 +81,7 @@ namespace Dynamo {
          * @return Vec2
          */
         inline Vec2 clamp(const Vec2 &point) const {
-            return Vec2(std::clamp(point.x, min.x, max.x),
-                        std::clamp(point.y, min.y, max.y));
+            return Vec2(std::clamp(point.x, min.x, max.x), std::clamp(point.y, min.y, max.y));
         }
 
         /**
@@ -131,9 +130,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator==(const Box2 &rhs) const {
-            return min == rhs.min && max == rhs.max;
-        }
+        inline bool operator==(const Box2 &rhs) const { return min == rhs.min && max == rhs.max; }
 
         /**
          * @brief Inequality operator.
@@ -142,9 +139,7 @@ namespace Dynamo {
          * @return true
          * @return false
          */
-        inline bool operator!=(const Box2 &rhs) const {
-            return !(*this == rhs);
-        }
+        inline bool operator!=(const Box2 &rhs) const { return !(*this == rhs); }
 
         /**
          * @brief Test if the bounding volume is valid (min is less than max).

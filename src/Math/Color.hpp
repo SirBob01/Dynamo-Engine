@@ -26,8 +26,7 @@ namespace Dynamo {
          * @param b Blue channel.
          * @param a Alpha channel.
          */
-        constexpr Color(float r = 0, float g = 0, float b = 0, float a = 1) :
-            r(r), g(g), b(b), a(a) {}
+        constexpr Color(float r = 0, float g = 0, float b = 0, float a = 1) : r(r), g(g), b(b), a(a) {}
 
         /**
          * @brief Linearly interpolate between two colors.

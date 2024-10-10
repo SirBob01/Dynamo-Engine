@@ -9,8 +9,7 @@ TEST_CASE("Triangulation", "[Delaunay]") {
         {0, 5},
         {2.5, 2.5},
     };
-    std::vector<Dynamo::Triangle2> triangles =
-        Dynamo::Delaunay::triangulate(points);
+    std::vector<Dynamo::Triangle2> triangles = Dynamo::Delaunay::triangulate(points);
     REQUIRE(triangles.size() == 4);
 }
 
@@ -52,8 +51,7 @@ TEST_CASE("Super triangle", "[Delaunay]") {
         {50, 12},
     };
     Dynamo::Box2 bounds = Dynamo::Delaunay::calculate_bounding_volume(points);
-    Dynamo::Triangle2 triangle =
-        Dynamo::Delaunay::calculate_super_triangle(bounds);
+    Dynamo::Triangle2 triangle = Dynamo::Delaunay::calculate_super_triangle(bounds);
 
     for (const Dynamo::Vec2 &point : points) {
         Dynamo::Vec3 coords = triangle.barycentric(point);

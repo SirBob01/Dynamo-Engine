@@ -24,11 +24,7 @@ namespace Dynamo {
         glfwSetScrollCallback(_window, scroll_cb);
 
         // On key state change
-        auto key_cb = [](GLFWwindow *window,
-                         int key,
-                         int scancode,
-                         int action,
-                         int mods) {
+        auto key_cb = [](GLFWwindow *window, int key, int scancode, int action, int mods) {
             void *userptr = glfwGetWindowUserPointer(window);
             InputState *state = static_cast<InputState *>(userptr);
             switch (action) {
@@ -45,10 +41,7 @@ namespace Dynamo {
         glfwSetKeyCallback(_window, key_cb);
 
         // On mouse button state change
-        auto click_cb = [](GLFWwindow *window,
-                           int button,
-                           int action,
-                           int mods) {
+        auto click_cb = [](GLFWwindow *window, int button, int action, int mods) {
             void *userptr = glfwGetWindowUserPointer(window);
             InputState *state = static_cast<InputState *>(userptr);
             switch (action) {
@@ -65,38 +58,21 @@ namespace Dynamo {
         glfwSetMouseButtonCallback(_window, click_cb);
     }
 
-    const Vec2 &Input::get_mouse_position() const {
-        return _state.mouse_position;
-    }
+    const Vec2 &Input::get_mouse_position() const { return _state.mouse_position; }
 
-    const Vec2 &Input::get_scroll_offset() const {
-        return _state.scroll_offset;
-    }
+    const Vec2 &Input::get_scroll_offset() const { return _state.scroll_offset; }
 
-    bool Input::is_pressed(KeyCode code) {
-        return _state.key_pressed.count(code);
-    }
+    bool Input::is_pressed(KeyCode code) { return _state.key_pressed.count(code); }
 
-    bool Input::is_pressed(MouseCode code) {
-        return _state.mouse_pressed.count(code);
-    }
+    bool Input::is_pressed(MouseCode code) { return _state.mouse_pressed.count(code); }
 
-    bool Input::is_released(KeyCode code) {
-        return _state.key_released.count(code);
-    }
+    bool Input::is_released(KeyCode code) { return _state.key_released.count(code); }
 
-    bool Input::is_released(MouseCode code) {
-        return _state.mouse_released.count(code);
-    }
+    bool Input::is_released(MouseCode code) { return _state.mouse_released.count(code); }
 
-    bool Input::is_down(KeyCode code) {
-        return glfwGetKey(_window, static_cast<int>(code)) == GLFW_PRESS;
-    }
+    bool Input::is_down(KeyCode code) { return glfwGetKey(_window, static_cast<int>(code)) == GLFW_PRESS; }
 
-    bool Input::is_down(MouseCode code) {
-        return glfwGetMouseButton(_window, static_cast<int>(code)) ==
-               GLFW_PRESS;
-    }
+    bool Input::is_down(MouseCode code) { return glfwGetMouseButton(_window, static_cast<int>(code)) == GLFW_PRESS; }
 
     void Input::poll() {
         // Reset scroll state

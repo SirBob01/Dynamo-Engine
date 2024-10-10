@@ -35,9 +35,7 @@ namespace Dynamo {
             while (!_terminate) {
                 // Wait until a job becomes available
                 std::unique_lock<std::mutex> lock(_mutex);
-                _conditional_start.wait(lock, [this]() {
-                    return !_jobs.empty() || _terminate;
-                });
+                _conditional_start.wait(lock, [this]() { return !_jobs.empty() || _terminate; });
                 if (!_terminate) {
                     // Get the next job
                     std::function<void()> job = std::move(_jobs.front());
@@ -101,10 +99,7 @@ namespace Dynamo {
          * @param args     Arguments to the function.
          * @return std::future<R>
          */
-        template <typename F,
-                  typename... A,
-                  typename R =
-                      std::invoke_result_t<std::decay_t<F>, std::decay_t<A>...>>
+        template <typename F, typename... A, typename R = std::invoke_result_t<std::decay_t<F>, std::decay_t<A>...>>
         std::future<R> submit(F &&callable, A &&...args) {
             auto promise = std::make_shared<std::promise<R>>();
             std::function<void()> job = [promise, callable, args...]() {
