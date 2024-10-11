@@ -91,12 +91,19 @@ namespace Dynamo::Graphics::Vulkan {
             _framebuffers.push_back(framebuffer);
         }
 
-        _command_pool = VkCommandPool_build(_device, _physical.graphics_queues);
-        _command_buffer = VkCommandBuffer_allocate(_device, _command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1)[0];
+        // Command buffer pools for each queue family
+        _graphics_pool = VkCommandPool_build(_device, _physical.graphics_queues);
 
-        _f_frame_ready = VkFence_build(_device);
-        _s_render_start = VkSemaphore_build(_device);
-        _s_render_done = VkSemaphore_build(_device);
+        // Frame sync objects
+        std::vector<VkCommandBuffer> command_buffers =
+            VkCommandBuffer_allocate(_device, _graphics_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, _frame_context.size());
+        for (unsigned i = 0; i < _frame_context.size(); i++) {
+            _frame_context[i].sync_fence = VkFence_build(_device);
+            _frame_context[i].sync_render_start = VkSemaphore_build(_device);
+            _frame_context[i].sync_render_done = VkSemaphore_build(_device);
+            _frame_context[i].command_buffer = command_buffers[i];
+        }
+        _current_frame = 0;
     }
 
     Renderer::~Renderer() {
@@ -104,10 +111,6 @@ namespace Dynamo::Graphics::Vulkan {
         vkDeviceWaitIdle(_device);
 
         // Cleanup Triangle Demo objects
-        vkDestroyFence(_device, _f_frame_ready, nullptr);
-        vkDestroySemaphore(_device, _s_render_start, nullptr);
-        vkDestroySemaphore(_device, _s_render_done, nullptr);
-        vkDestroyCommandPool(_device, _command_pool, nullptr);
         vkDestroyPipeline(_device, _pipeline, nullptr);
         vkDestroyPipelineLayout(_device, _layout, nullptr);
         vkDestroyRenderPass(_device, _renderpass, nullptr);
@@ -115,6 +118,12 @@ namespace Dynamo::Graphics::Vulkan {
         vkDestroyShaderModule(_device, _fragment.handle, nullptr);
 
         // Cleanup
+        for (unsigned i = 0; i < _frame_context.size(); i++) {
+            vkDestroyFence(_device, _frame_context[i].sync_fence, nullptr);
+            vkDestroySemaphore(_device, _frame_context[i].sync_render_start, nullptr);
+            vkDestroySemaphore(_device, _frame_context[i].sync_render_done, nullptr);
+        }
+        vkDestroyCommandPool(_device, _graphics_pool, nullptr);
         for (VkFramebuffer framebuffer : _framebuffers) {
             vkDestroyFramebuffer(_device, framebuffer, nullptr);
         }
@@ -168,13 +177,14 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Renderer::refresh() {
-        vkWaitForFences(_device, 1, &_f_frame_ready, VK_TRUE, UINT64_MAX);
+        FrameContext frame = _frame_context[_current_frame];
+        vkWaitForFences(_device, 1, &frame.sync_fence, VK_TRUE, UINT64_MAX);
 
         unsigned image_index;
         VkResult acquire_result = vkAcquireNextImageKHR(_device,
                                                         _swapchain.handle,
                                                         UINT64_MAX,
-                                                        _s_render_start,
+                                                        frame.sync_render_start,
                                                         VK_NULL_HANDLE,
                                                         &image_index);
         if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -184,15 +194,15 @@ namespace Dynamo::Graphics::Vulkan {
             VkResult_log("Acquire Image", acquire_result);
         }
 
-        VkResult_log("Reset Fence", vkResetFences(_device, 1, &_f_frame_ready));
-        VkResult_log("Reset Command Buffer", vkResetCommandBuffer(_command_buffer, 0));
+        VkResult_log("Reset Fence", vkResetFences(_device, 1, &frame.sync_fence));
+        VkResult_log("Reset Command Buffer", vkResetCommandBuffer(frame.command_buffer, 0));
 
         VkCommandBufferBeginInfo begin_info = {};
         begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         begin_info.flags = 0;
         begin_info.pInheritanceInfo = nullptr;
 
-        VkResult_log("Begin Command Recording", vkBeginCommandBuffer(_command_buffer, &begin_info));
+        VkResult_log("Begin Command Recording", vkBeginCommandBuffer(frame.command_buffer, &begin_info));
 
         VkRenderPassBeginInfo renderpass_begin_info = {};
         renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -204,9 +214,9 @@ namespace Dynamo::Graphics::Vulkan {
         renderpass_begin_info.pClearValues = &_clear;
         renderpass_begin_info.framebuffer = _framebuffers[image_index];
 
-        vkCmdBeginRenderPass(_command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
-        vkCmdBindPipeline(_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+        vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
 
         VkViewport viewport;
         viewport.minDepth = 0;
@@ -215,18 +225,18 @@ namespace Dynamo::Graphics::Vulkan {
         viewport.height = _swapchain.extent.height;
         viewport.x = 0;
         viewport.y = 0;
-        vkCmdSetViewport(_command_buffer, 0, 1, &viewport);
+        vkCmdSetViewport(frame.command_buffer, 0, 1, &viewport);
 
         VkRect2D scissor;
         scissor.extent = _swapchain.extent;
         scissor.offset.x = 0;
         scissor.offset.y = 0;
-        vkCmdSetScissor(_command_buffer, 0, 1, &scissor);
+        vkCmdSetScissor(frame.command_buffer, 0, 1, &scissor);
 
-        vkCmdDraw(_command_buffer, 3, 1, 0, 0);
+        vkCmdDraw(frame.command_buffer, 3, 1, 0, 0);
 
-        vkCmdEndRenderPass(_command_buffer);
-        VkResult_log("End Command Buffer", vkEndCommandBuffer(_command_buffer));
+        vkCmdEndRenderPass(frame.command_buffer);
+        VkResult_log("End Command Buffer", vkEndCommandBuffer(frame.command_buffer));
 
         VkQueue queue = VkDevice_queue(_device, _physical.graphics_queues, 0);
 
@@ -234,19 +244,19 @@ namespace Dynamo::Graphics::Vulkan {
         VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = &_command_buffer;
+        submit_info.pCommandBuffers = &frame.command_buffer;
         submit_info.waitSemaphoreCount = 1;
-        submit_info.pWaitSemaphores = &_s_render_start;
+        submit_info.pWaitSemaphores = &frame.sync_render_start;
         submit_info.signalSemaphoreCount = 1;
-        submit_info.pSignalSemaphores = &_s_render_done;
+        submit_info.pSignalSemaphores = &frame.sync_render_done;
         submit_info.pWaitDstStageMask = &wait_stage_mask;
 
-        VkResult_log("Graphics Submit", vkQueueSubmit(queue, 1, &submit_info, _f_frame_ready));
+        VkResult_log("Graphics Submit", vkQueueSubmit(queue, 1, &submit_info, frame.sync_fence));
 
         VkPresentInfoKHR present_info = {};
         present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         present_info.waitSemaphoreCount = 1;
-        present_info.pWaitSemaphores = &_s_render_done;
+        present_info.pWaitSemaphores = &frame.sync_render_done;
         present_info.swapchainCount = 1;
         present_info.pSwapchains = &_swapchain.handle;
         present_info.pImageIndices = &image_index;
@@ -259,5 +269,7 @@ namespace Dynamo::Graphics::Vulkan {
         } else if (present_result != VK_SUCCESS) {
             VkResult_log("Present Render", present_result);
         }
+
+        _current_frame = (_current_frame + 1) % _frame_context.size();
     }
 } // namespace Dynamo::Graphics::Vulkan
