@@ -31,24 +31,29 @@ namespace Dynamo::Graphics::Vulkan {
         VkDevice _device;
 
         Swapchain _swapchain;
-
         VkClearValue _clear;
 
+        // This should be cached somewhere {
         Shader _vertex;
         Shader _fragment;
         VkPipelineLayout _layout;
         VkRenderPass _renderpass;
         VkPipeline _pipeline;
+        // }
+
+        VkCommandPool _graphics_pool;
 
         std::vector<VkImageView> _views;
         std::vector<VkFramebuffer> _framebuffers;
 
-        VkCommandPool _command_pool;
-        VkCommandBuffer _command_buffer;
-
-        VkFence _f_frame_ready;
-        VkSemaphore _s_render_start;
-        VkSemaphore _s_render_done;
+        struct FrameContext {
+            VkFence sync_fence;
+            VkSemaphore sync_render_start;
+            VkSemaphore sync_render_done;
+            VkCommandBuffer command_buffer;
+        };
+        std::array<FrameContext, 3> _frame_context;
+        unsigned _current_frame;
 
         /**
          * @brief Rebuild the swapchain.
