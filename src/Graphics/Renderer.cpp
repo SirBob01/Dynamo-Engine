@@ -37,19 +37,19 @@ void main() {
 )";
 
 namespace Dynamo::Graphics::Vulkan {
-    Renderer::Renderer(const Display &display) : _display(display) {
-        _instance = VkInstance_build(_display);
+    Renderer::Renderer(const Display &display, const std::string &pipeline_cache_filename) : _display(display) {
+        _instance = VkInstance_create(_display);
 #ifdef DYN_DEBUG
-        _debugger = VkDebugUtilsMessengerEXT_build(_instance);
+        _debugger = VkDebugUtilsMessengerEXT_create(_instance);
 #endif
         _surface = _display.create_vulkan_surface(_instance);
 
-        // Build the physical device
-        _physical = PhysicalDevice_select(_instance, _surface);
-        _device = VkDevice_build(_physical);
+        // Create the logical device
+        _physical = PhysicalDevice::select(_instance, _surface);
+        _device = VkDevice_create(_physical);
 
         // Build the swapchain and its views and framebuffers
-        _swapchain = Swapchain_build(_device, _physical, _display);
+        _swapchain = Swapchain(_device, _physical, _display);
 
         // Color fill clear value
         _clear.color.float32[0] = 0;
@@ -57,50 +57,47 @@ namespace Dynamo::Graphics::Vulkan {
         _clear.color.float32[2] = 0;
         _clear.color.float32[3] = 1;
 
+        // Vulkan object caches
+        _shader_cache = ShaderCache(_device);
+        _pipeline_cache = PipelineCache(_device, pipeline_cache_filename);
+
         /** Demo Triangle rendering specific objects */
-
-        _vertex = Shader_build(_device, "Vertex", TRIANGLE_VERTEX_SHADER, VK_SHADER_STAGE_VERTEX_BIT);
-        _fragment = Shader_build(_device, "Fragment", TRIANGLE_FRAGMENT_SHADER, VK_SHADER_STAGE_FRAGMENT_BIT);
-
-        _layout = VkPipelineLayout_build(_device);
-
-        RenderPassSettings renderpass_settings;
-        renderpass_settings.clear_color = true;
-        renderpass_settings.color_format = _swapchain.surface_format.format;
-        _renderpass = VkRenderPass_build(_device, renderpass_settings);
+        _layout = VkPipelineLayout_create(_device);
 
         GraphicsPipelineSettings pipeline_settings;
         pipeline_settings.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         pipeline_settings.cull_mode = VK_CULL_MODE_NONE;
         pipeline_settings.polygon_mode = VK_POLYGON_MODE_FILL;
         pipeline_settings.layout = _layout;
-        pipeline_settings.renderpass = _renderpass;
-        pipeline_settings.subpass = 0;
-        pipeline_settings.vertex = _vertex;
-        pipeline_settings.fragment = _fragment;
-        _pipeline = VkPipeline_build(_device, VK_NULL_HANDLE, pipeline_settings);
+
+        pipeline_settings.renderpass.clear_color = true;
+        pipeline_settings.renderpass.color_format = _swapchain.surface_format.format;
+
+        pipeline_settings.vertex = _shader_cache.build({TRIANGLE_VERTEX_SHADER, VK_SHADER_STAGE_VERTEX_BIT});
+        pipeline_settings.fragment = _shader_cache.build({TRIANGLE_FRAGMENT_SHADER, VK_SHADER_STAGE_FRAGMENT_BIT});
+        _pipeline_pass = _pipeline_cache.build(pipeline_settings);
 
         for (VkImage image : _swapchain.images) {
             ImageViewSettings view_settings;
             view_settings.format = _swapchain.surface_format.format;
 
-            VkImageView view = VkImageView_build(_device, image, view_settings);
+            VkImageView view = VkImageView_create(_device, image, view_settings);
             _views.push_back(view);
 
-            VkFramebuffer framebuffer = VkFramebuffer_build(_device, _renderpass, view, _swapchain.extent);
+            VkFramebuffer framebuffer = VkFramebuffer_create(_device, _pipeline_pass.pass, view, _swapchain.extent);
             _framebuffers.push_back(framebuffer);
         }
 
         // Command buffer pools for each queue family
-        _graphics_pool = VkCommandPool_build(_device, _physical.graphics_queues);
+        _graphics_pool = VkCommandPool_create(_device, _physical.graphics_queues);
 
         // Frame sync objects
         std::vector<VkCommandBuffer> command_buffers =
             VkCommandBuffer_allocate(_device, _graphics_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, _frame_context.size());
         for (unsigned i = 0; i < _frame_context.size(); i++) {
-            _frame_context[i].sync_fence = VkFence_build(_device);
-            _frame_context[i].sync_render_start = VkSemaphore_build(_device);
-            _frame_context[i].sync_render_done = VkSemaphore_build(_device);
+            _frame_context[i].sync_fence = VkFence_create(_device);
+            _frame_context[i].sync_render_start = VkSemaphore_create(_device);
+            _frame_context[i].sync_render_done = VkSemaphore_create(_device);
             _frame_context[i].command_buffer = command_buffers[i];
         }
         _current_frame = 0;
@@ -111,19 +108,17 @@ namespace Dynamo::Graphics::Vulkan {
         vkDeviceWaitIdle(_device);
 
         // Cleanup Triangle Demo objects
-        vkDestroyPipeline(_device, _pipeline, nullptr);
+        _pipeline_cache.destroy();
+        _shader_cache.destroy();
         vkDestroyPipelineLayout(_device, _layout, nullptr);
-        vkDestroyRenderPass(_device, _renderpass, nullptr);
-        vkDestroyShaderModule(_device, _vertex.handle, nullptr);
-        vkDestroyShaderModule(_device, _fragment.handle, nullptr);
 
         // Cleanup
+        vkDestroyCommandPool(_device, _graphics_pool, nullptr);
         for (unsigned i = 0; i < _frame_context.size(); i++) {
             vkDestroyFence(_device, _frame_context[i].sync_fence, nullptr);
             vkDestroySemaphore(_device, _frame_context[i].sync_render_start, nullptr);
             vkDestroySemaphore(_device, _frame_context[i].sync_render_done, nullptr);
         }
-        vkDestroyCommandPool(_device, _graphics_pool, nullptr);
         for (VkFramebuffer framebuffer : _framebuffers) {
             vkDestroyFramebuffer(_device, framebuffer, nullptr);
         }
@@ -143,7 +138,7 @@ namespace Dynamo::Graphics::Vulkan {
         vkDeviceWaitIdle(_device);
 
         VkSwapchainKHR previous = _swapchain.handle;
-        _swapchain = Swapchain_build(_device, _physical, _display, previous);
+        _swapchain = Swapchain(_device, _physical, _display, previous);
 
         // Destroy old swapchain resources
         for (VkFramebuffer framebuffer : _framebuffers) {
@@ -161,10 +156,10 @@ namespace Dynamo::Graphics::Vulkan {
             ImageViewSettings view_settings;
             view_settings.format = _swapchain.surface_format.format;
 
-            VkImageView view = VkImageView_build(_device, image, view_settings);
+            VkImageView view = VkImageView_create(_device, image, view_settings);
             _views.push_back(view);
 
-            VkFramebuffer framebuffer = VkFramebuffer_build(_device, _renderpass, view, _swapchain.extent);
+            VkFramebuffer framebuffer = VkFramebuffer_create(_device, _pipeline_pass.pass, view, _swapchain.extent);
             _framebuffers.push_back(framebuffer);
         }
     }
@@ -206,7 +201,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         VkRenderPassBeginInfo renderpass_begin_info = {};
         renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderpass_begin_info.renderPass = _renderpass;
+        renderpass_begin_info.renderPass = _pipeline_pass.pass;
         renderpass_begin_info.renderArea.extent = _swapchain.extent;
         renderpass_begin_info.renderArea.offset.x = 0;
         renderpass_begin_info.renderArea.offset.y = 0;
@@ -216,7 +211,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
-        vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
+        vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_pass.pipeline);
 
         VkViewport viewport;
         viewport.minDepth = 0;
@@ -238,7 +233,8 @@ namespace Dynamo::Graphics::Vulkan {
         vkCmdEndRenderPass(frame.command_buffer);
         VkResult_log("End Command Buffer", vkEndCommandBuffer(frame.command_buffer));
 
-        VkQueue queue = VkDevice_queue(_device, _physical.graphics_queues, 0);
+        VkQueue queue;
+        vkGetDeviceQueue(_device, _physical.graphics_queues.index, 0, &queue);
 
         VkSubmitInfo submit_info = {};
         VkPipelineStageFlags wait_stage_mask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;

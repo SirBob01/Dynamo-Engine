@@ -3,7 +3,7 @@
 namespace Dynamo {
     Application::Application(const ApplicationSettings &settings) {
         _display = std::make_unique<Display>(settings.title, settings.window_width, settings.window_height);
-        _renderer = std::make_unique<Graphics::Vulkan::Renderer>(*_display);
+        _renderer = std::make_unique<Graphics::Vulkan::Renderer>(*_display, "vulkan_cache.bin");
         _jukebox = std::make_unique<Sound::Jukebox>();
 
         // Run audio on a separate thread

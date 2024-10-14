@@ -3,14 +3,13 @@
 #include <Utils/Log.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    PhysicalDevice PhysicalDevice_build(VkPhysicalDevice handle, VkSurfaceKHR surface) {
-        PhysicalDevice device;
-        device.handle = handle;
-        device.surface = surface;
+    PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle, VkSurfaceKHR surface) {
+        this->handle = handle;
+        this->surface = surface;
 
-        vkGetPhysicalDeviceProperties(handle, &device.properties);
-        vkGetPhysicalDeviceMemoryProperties(handle, &device.memory);
-        vkGetPhysicalDeviceFeatures(handle, &device.features);
+        vkGetPhysicalDeviceProperties(handle, &properties);
+        vkGetPhysicalDeviceMemoryProperties(handle, &memory);
+        vkGetPhysicalDeviceFeatures(handle, &features);
 
         // Enumerate device queue families
         unsigned count = 0;
@@ -29,38 +28,36 @@ namespace Dynamo::Graphics::Vulkan {
             }
 
             // Dedicated presentation queues
-            if (surface_support && family.queueCount > device.present_queues.count) {
-                device.present_queues.count = family.queueCount;
-                device.present_queues.index = index;
-                device.present_queues.priority = 0;
+            if (surface_support && family.queueCount > present_queues.count) {
+                present_queues.count = family.queueCount;
+                present_queues.index = index;
+                present_queues.priorities.resize(family.queueCount, 0);
             }
 
             // Dedicated graphics queues
-            if ((family.queueFlags & VK_QUEUE_GRAPHICS_BIT) && family.queueCount > device.graphics_queues.count) {
-                device.graphics_queues.count = family.queueCount;
-                device.graphics_queues.index = index;
-                device.graphics_queues.priority = 0;
+            if ((family.queueFlags & VK_QUEUE_GRAPHICS_BIT) && family.queueCount > graphics_queues.count) {
+                graphics_queues.count = family.queueCount;
+                graphics_queues.index = index;
+                graphics_queues.priorities.resize(family.queueCount, 0);
             }
 
             // Dedicated transfer queues
-            if ((family.queueFlags & VK_QUEUE_TRANSFER_BIT) && family.queueCount > device.transfer_queues.count) {
-                device.transfer_queues.count = family.queueCount;
-                device.transfer_queues.index = index;
-                device.transfer_queues.priority = 0;
+            if ((family.queueFlags & VK_QUEUE_TRANSFER_BIT) && family.queueCount > transfer_queues.count) {
+                transfer_queues.count = family.queueCount;
+                transfer_queues.index = index;
+                transfer_queues.priorities.resize(family.queueCount, 0);
             }
 
             // Dedicated compute queues
-            if ((family.queueFlags & VK_QUEUE_COMPUTE_BIT) && family.queueCount > device.compute_queues.count) {
-                device.compute_queues.count = family.queueCount;
-                device.compute_queues.index = index;
-                device.compute_queues.priority = 0;
+            if ((family.queueFlags & VK_QUEUE_COMPUTE_BIT) && family.queueCount > compute_queues.count) {
+                compute_queues.count = family.queueCount;
+                compute_queues.index = index;
+                compute_queues.priorities.resize(family.queueCount, 0);
             }
         }
-
-        return device;
     }
 
-    PhysicalDevice PhysicalDevice_select(VkInstance instance, VkSurfaceKHR surface) {
+    PhysicalDevice PhysicalDevice::select(VkInstance instance, VkSurfaceKHR surface) {
         unsigned count = 0;
         vkEnumeratePhysicalDevices(instance, &count, nullptr);
         std::vector<VkPhysicalDevice> handles(count);
@@ -71,9 +68,9 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         Log::info("Selecting Vulkan device:");
-        PhysicalDevice best = PhysicalDevice_build(handles[0], surface);
+        PhysicalDevice best = PhysicalDevice(handles[0], surface);
         for (unsigned i = 0; i < handles.size(); i++) {
-            PhysicalDevice device = PhysicalDevice_build(handles[i], surface);
+            PhysicalDevice device = PhysicalDevice(handles[i], surface);
             unsigned score = device.score();
             if (score > best.score()) {
                 best = device;
@@ -130,6 +127,50 @@ namespace Dynamo::Graphics::Vulkan {
         return options;
     }
 
+    std::vector<QueueFamilyRef> PhysicalDevice::unique_queue_families() const {
+        std::array<QueueFamilyRef, 4> families = {
+            graphics_queues,
+            present_queues,
+            transfer_queues,
+            compute_queues,
+        };
+
+        std::vector<QueueFamilyRef> unique;
+        for (const QueueFamily &family : families) {
+            bool found = false;
+            for (const QueueFamily &u_family : unique) {
+                if (u_family.index == family.index) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                unique.push_back(family);
+            }
+        }
+        return unique;
+    }
+
+    std::vector<const char *> PhysicalDevice::required_extensions() const {
+        std::vector<const char *> required_extensions = {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        };
+
+        // Check if portability subset extension is available
+        unsigned count = 0;
+        vkEnumerateDeviceExtensionProperties(handle, nullptr, &count, nullptr);
+        std::vector<VkExtensionProperties> extensions(count);
+        vkEnumerateDeviceExtensionProperties(handle, nullptr, &count, extensions.data());
+
+        const char *VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME = "VK_KHR_portability_subset";
+        for (const VkExtensionProperties &extension : extensions) {
+            if (!std::strcmp(extension.extensionName, VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME)) {
+                required_extensions.push_back(VK_KHR_PORTABILITY_SUBSET_EXTENSION_NAME);
+            }
+        }
+        return required_extensions;
+    }
+
     unsigned PhysicalDevice::score() const {
         SwapchainOptions swapchain_options = get_swapchain_options();
         if (
@@ -170,7 +211,6 @@ namespace Dynamo::Graphics::Vulkan {
         // Prioritize device with certain features
         value += features.geometryShader * 1000;
         value += features.tessellationShader * 1000;
-        value += features.wideLines * 500;
 
         // Prioritize device with higher limits
         value += properties.limits.maxImageDimension2D;
