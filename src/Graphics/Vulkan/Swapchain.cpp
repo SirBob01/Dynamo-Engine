@@ -35,15 +35,14 @@ namespace Dynamo::Graphics::Vulkan {
         return present_mode;
     }
 
-    Swapchain Swapchain_build(VkDevice device,
-                              const PhysicalDevice &physical,
-                              const Display &display,
-                              std::optional<VkSwapchainKHR> previous) {
-        Swapchain swapchain;
+    Swapchain::Swapchain(VkDevice device,
+                         const PhysicalDevice &physical,
+                         const Display &display,
+                         std::optional<VkSwapchainKHR> previous) {
         SwapchainOptions options = physical.get_swapchain_options();
-        swapchain.extent = compute_extent(display, options);
-        swapchain.surface_format = select_surface_format(options);
-        swapchain.present_mode = select_present_mode(display, options);
+        extent = compute_extent(display, options);
+        surface_format = select_surface_format(options);
+        present_mode = select_present_mode(display, options);
 
         // Create swapchain handle
         VkSwapchainCreateInfoKHR swapchain_info = {};
@@ -51,11 +50,11 @@ namespace Dynamo::Graphics::Vulkan {
         swapchain_info.surface = physical.surface;
         swapchain_info.preTransform = options.capabilities.currentTransform;
         swapchain_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        swapchain_info.presentMode = swapchain.present_mode;
+        swapchain_info.presentMode = present_mode;
         swapchain_info.clipped = VK_TRUE;
-        swapchain_info.imageFormat = swapchain.surface_format.format;
-        swapchain_info.imageColorSpace = swapchain.surface_format.colorSpace;
-        swapchain_info.imageExtent = swapchain.extent;
+        swapchain_info.imageFormat = surface_format.format;
+        swapchain_info.imageColorSpace = surface_format.colorSpace;
+        swapchain_info.imageExtent = extent;
         swapchain_info.imageArrayLayers = 1;
         swapchain_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
         swapchain_info.minImageCount = options.capabilities.minImageCount + 1;
@@ -84,14 +83,12 @@ namespace Dynamo::Graphics::Vulkan {
             swapchain_info.oldSwapchain = previous.value();
         }
 
-        VkResult_log("Create Swapchain", vkCreateSwapchainKHR(device, &swapchain_info, nullptr, &swapchain.handle));
+        VkResult_log("Create Swapchain", vkCreateSwapchainKHR(device, &swapchain_info, nullptr, &handle));
 
         // Get swapchain images
         unsigned count = 0;
-        vkGetSwapchainImagesKHR(device, swapchain.handle, &count, nullptr);
-        swapchain.images.resize(count);
-        vkGetSwapchainImagesKHR(device, swapchain.handle, &count, swapchain.images.data());
-
-        return swapchain;
+        vkGetSwapchainImagesKHR(device, handle, &count, nullptr);
+        images.resize(count);
+        vkGetSwapchainImagesKHR(device, handle, &count, images.data());
     }
 } // namespace Dynamo::Graphics::Vulkan

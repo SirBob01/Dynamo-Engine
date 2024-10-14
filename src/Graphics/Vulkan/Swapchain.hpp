@@ -5,7 +5,6 @@
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
-#include <Graphics/Vulkan/ImageView.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
@@ -21,19 +20,20 @@ namespace Dynamo::Graphics::Vulkan {
         VkPresentModeKHR present_mode;
 
         std::vector<VkImage> images;
-    };
 
-    /**
-     * @brief Build a Vulkan swapchain.
-     *
-     * @param device
-     * @param physical
-     * @param display
-     * @param previous
-     * @return Swapchain
-     */
-    Swapchain Swapchain_build(VkDevice device,
-                              const PhysicalDevice &physical,
-                              const Display &display,
-                              std::optional<VkSwapchainKHR> previous = {});
+        /**
+         * @brief Create a Vulkan swapchain.
+         *
+         * @param device
+         * @param physical
+         * @param display
+         * @param previous
+         * @return Swapchain
+         */
+        Swapchain(VkDevice device,
+                  const PhysicalDevice &physical,
+                  const Display &display,
+                  std::optional<VkSwapchainKHR> previous = {});
+        Swapchain() = default;
+    };
 } // namespace Dynamo::Graphics::Vulkan

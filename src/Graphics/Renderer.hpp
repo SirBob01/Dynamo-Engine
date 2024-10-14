@@ -4,16 +4,10 @@
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
-#include <Graphics/Vulkan/Command.hpp>
-#include <Graphics/Vulkan/Debugger.hpp>
-#include <Graphics/Vulkan/Device.hpp>
-#include <Graphics/Vulkan/GraphicsPipeline.hpp>
-#include <Graphics/Vulkan/ImageView.hpp>
-#include <Graphics/Vulkan/Instance.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
-#include <Graphics/Vulkan/Shader.hpp>
+#include <Graphics/Vulkan/PipelineCache.hpp>
+#include <Graphics/Vulkan/ShaderCache.hpp>
 #include <Graphics/Vulkan/Swapchain.hpp>
-#include <Graphics/Vulkan/Synchronize.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -33,12 +27,12 @@ namespace Dynamo::Graphics::Vulkan {
         Swapchain _swapchain;
         VkClearValue _clear;
 
-        // This should be cached somewhere {
-        Shader _vertex;
-        Shader _fragment;
+        ShaderCache _shader_cache;
+        PipelineCache _pipeline_cache;
+
+        // These should be cached somewhere {
         VkPipelineLayout _layout;
-        VkRenderPass _renderpass;
-        VkPipeline _pipeline;
+        PipelinePass _pipeline_pass;
         // }
 
         VkCommandPool _graphics_pool;
@@ -66,8 +60,9 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Initialize the renderer.
          *
          * @param display
+         * @param pipeline_cache_filename
          */
-        Renderer(const Display &display);
+        Renderer(const Display &display, const std::string &pipeline_cache_filename);
 
         /**
          * @brief Cleanup and destroy the renderer.
