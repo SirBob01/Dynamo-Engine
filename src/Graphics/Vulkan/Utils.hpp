@@ -130,6 +130,32 @@ namespace Dynamo::Graphics::Vulkan {
     VkDevice VkDevice_create(const PhysicalDevice &physical);
 
     /**
+     * @brief Allocate Vulkan device memory.
+     *
+     * @param device
+     * @param type_index
+     * @param size
+     * @return VkDeviceMemory
+     */
+    VkDeviceMemory VkDeviceMemory_allocate(VkDevice device, unsigned type_index, unsigned size);
+
+    /**
+     * @brief Create a Vulkan buffer.
+     *
+     * @param device
+     * @param usage
+     * @param size
+     * @param queue_families
+     * @param queue_family_count
+     * @return VkBuffer
+     */
+    VkBuffer VkBuffer_create(VkDevice device,
+                             VkBufferUsageFlags usage,
+                             unsigned size,
+                             const QueueFamily *queue_families,
+                             unsigned queue_family_count);
+
+    /**
      * @brief Create a Vulkan image view.
      *
      * @param device
@@ -205,11 +231,15 @@ namespace Dynamo::Graphics::Vulkan {
      * @param device
      * @param pool
      * @param level
+     * @param dst
      * @param count
      * @return std::vector<VkCommandBuffer>
      */
-    std::vector<VkCommandBuffer>
-    VkCommandBuffer_allocate(VkDevice device, VkCommandPool pool, VkCommandBufferLevel level, unsigned count);
+    void VkCommandBuffer_allocate(VkDevice device,
+                                  VkCommandPool pool,
+                                  VkCommandBufferLevel level,
+                                  VkCommandBuffer *dst,
+                                  unsigned count);
 
     /**
      * @brief Create a Vulkan fence.

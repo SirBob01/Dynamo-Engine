@@ -43,13 +43,13 @@ namespace Dynamo::Graphics::Vulkan {
         PipelinePass build(GraphicsPipelineSettings settings);
 
         /**
-         * @brief Clear all pipelines in the cache.
+         * @brief Clear all pipelines in the cache, invalidating all handles.
          *
          */
         void clear();
 
         /**
-         * @brief Destroy the builder.
+         * @brief Destroy the cache, invalidating all handles.
          *
          */
         void destroy();

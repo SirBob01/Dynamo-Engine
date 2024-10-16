@@ -1,4 +1,5 @@
 #include <Graphics/Vulkan/Utils.hpp>
+#include <vulkan/vulkan_core.h>
 
 static PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebuggerDispatch;
 static PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebuggerDispatch;
@@ -303,6 +304,45 @@ namespace Dynamo::Graphics::Vulkan {
         return device;
     }
 
+    VkDeviceMemory VkDeviceMemory_allocate(VkDevice device, unsigned type_index, unsigned size) {
+        VkMemoryAllocateInfo alloc_info = {};
+        alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc_info.memoryTypeIndex = type_index;
+        alloc_info.allocationSize = size;
+
+        VkDeviceMemory memory;
+        VkResult_log("Allocate Memory", vkAllocateMemory(device, &alloc_info, nullptr, &memory));
+        return memory;
+    }
+
+    VkBuffer VkBuffer_create(VkDevice device,
+                             VkBufferUsageFlags usage,
+                             unsigned size,
+                             const QueueFamily *queue_families,
+                             unsigned queue_family_count) {
+        std::vector<unsigned> family_indices;
+        for (unsigned i = 0; i < queue_family_count; i++) {
+            family_indices.push_back(queue_families[i].index);
+        }
+
+        VkBufferCreateInfo buffer_info = {};
+        buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_info.usage = usage;
+        buffer_info.size = size;
+        buffer_info.queueFamilyIndexCount = family_indices.size();
+        buffer_info.pQueueFamilyIndices = family_indices.data();
+
+        if (family_indices.size() > 1) {
+            buffer_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
+        } else {
+            buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        }
+
+        VkBuffer buffer;
+        VkResult_log("Create Buffer", vkCreateBuffer(device, &buffer_info, nullptr, &buffer));
+        return buffer;
+    }
+
     VkImageView VkImageView_create(VkDevice device, VkImage image, ImageViewSettings settings) {
         VkImageViewCreateInfo view_info = {};
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -548,17 +588,18 @@ namespace Dynamo::Graphics::Vulkan {
         return pool;
     }
 
-    std::vector<VkCommandBuffer>
-    VkCommandBuffer_allocate(VkDevice device, VkCommandPool pool, VkCommandBufferLevel level, unsigned count) {
+    void VkCommandBuffer_allocate(VkDevice device,
+                                  VkCommandPool pool,
+                                  VkCommandBufferLevel level,
+                                  VkCommandBuffer *dst,
+                                  unsigned count) {
         VkCommandBufferAllocateInfo alloc_info{};
         alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         alloc_info.commandPool = pool;
         alloc_info.level = level;
         alloc_info.commandBufferCount = count;
 
-        std::vector<VkCommandBuffer> buffers(count);
-        VkResult_log("Allocate Command Buffers", vkAllocateCommandBuffers(device, &alloc_info, buffers.data()));
-        return buffers;
+        VkResult_log("Allocate Command Buffers", vkAllocateCommandBuffers(device, &alloc_info, dst));
     }
 
     VkFence VkFence_create(VkDevice device) {

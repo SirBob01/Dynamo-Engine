@@ -40,7 +40,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkShaderModule build(const ShaderKey &key);
 
         /**
-         * @brief Destroy the shader cache.
+         * @brief Destroy the shader cache, invalidating all handles.
          *
          */
         void destroy();

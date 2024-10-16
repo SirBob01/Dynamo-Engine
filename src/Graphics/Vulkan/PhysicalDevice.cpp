@@ -3,13 +3,18 @@
 #include <Utils/Log.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle, VkSurfaceKHR surface) {
-        this->handle = handle;
-        this->surface = surface;
+    PhysicalDevice::PhysicalDevice(VkPhysicalDevice handle, VkSurfaceKHR surface) : handle(handle), surface(surface) {
+        maintenance.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MAINTENANCE_3_PROPERTIES;
+        maintenance.pNext = nullptr;
 
-        vkGetPhysicalDeviceProperties(handle, &properties);
+        VkPhysicalDeviceProperties2 properties2;
+        properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        properties2.pNext = &maintenance;
+
+        vkGetPhysicalDeviceProperties2(handle, &properties2);
         vkGetPhysicalDeviceMemoryProperties(handle, &memory);
         vkGetPhysicalDeviceFeatures(handle, &features);
+        properties = properties2.properties;
 
         // Enumerate device queue families
         unsigned count = 0;
@@ -87,6 +92,10 @@ namespace Dynamo::Graphics::Vulkan {
             Log::info("Vulkan using \"{}\"", best.properties.deviceName);
         }
         Log::info("");
+
+        Log::info("Vulkan max allocation size: {}M", best.maintenance.maxMemoryAllocationSize / (1024.0 * 1024.0));
+        Log::info("Vulkan max allocation count: {}", best.properties.limits.maxMemoryAllocationCount);
+        Log::info("Vulkan max per-set descriptors: {}", best.maintenance.maxPerSetDescriptors);
 
         // Log device queue families
         Log::info("Vulkan graphics queues (Family Index: {} | Count: {})",
@@ -176,7 +185,6 @@ namespace Dynamo::Graphics::Vulkan {
         if (
             // Required device features
             !features.fillModeNonSolid || !features.sampleRateShading || !features.samplerAnisotropy ||
-            !features.multiViewport ||
 
             // Required device queues
             !graphics_queues.count || !transfer_queues.count || !present_queues.count || !compute_queues.count ||

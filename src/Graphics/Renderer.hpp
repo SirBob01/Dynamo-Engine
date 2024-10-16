@@ -4,6 +4,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
+#include <Graphics/Vulkan/Buffer.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
 #include <Graphics/Vulkan/PipelineCache.hpp>
 #include <Graphics/Vulkan/ShaderCache.hpp>
@@ -30,12 +31,17 @@ namespace Dynamo::Graphics::Vulkan {
         ShaderCache _shader_cache;
         PipelineCache _pipeline_cache;
 
+        VkCommandPool _graphics_pool;
+        VkCommandPool _transfer_pool;
+
+        Buffer _vertex_buffer;
+        Buffer _index_buffer;
+        Buffer _staging_buffer;
+
         // These should be cached somewhere {
         VkPipelineLayout _layout;
         PipelinePass _pipeline_pass;
         // }
-
-        VkCommandPool _graphics_pool;
 
         std::vector<VkImageView> _views;
         std::vector<VkFramebuffer> _framebuffers;
@@ -60,9 +66,9 @@ namespace Dynamo::Graphics::Vulkan {
          * @brief Initialize the renderer.
          *
          * @param display
-         * @param pipeline_cache_filename
+         * @param root_asset_directory
          */
-        Renderer(const Display &display, const std::string &pipeline_cache_filename);
+        Renderer(const Display &display, const std::string &root_asset_directory);
 
         /**
          * @brief Cleanup and destroy the renderer.
