@@ -35,6 +35,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkSurfaceKHR surface;
 
         VkPhysicalDeviceProperties properties;
+        VkPhysicalDeviceMaintenance3Properties maintenance;
         VkPhysicalDeviceMemoryProperties memory;
         VkPhysicalDeviceFeatures features;
 

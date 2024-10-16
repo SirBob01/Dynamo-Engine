@@ -36,8 +36,13 @@ void main() {
 }
 )";
 
+// TODO:
+// * Frame Context struct      <- Move to its own file with its own constructor and destroyer
+// * Vertex attribute handling <- Vertex attributes should be determined from shader reflection (bindings)
+//                             <- Deinterleaved, 1 binding per vertex attribute
+
 namespace Dynamo::Graphics::Vulkan {
-    Renderer::Renderer(const Display &display, const std::string &pipeline_cache_filename) : _display(display) {
+    Renderer::Renderer(const Display &display, const std::string &root_asset_directory) : _display(display) {
         _instance = VkInstance_create(_display);
 #ifdef DYN_DEBUG
         _debugger = VkDebugUtilsMessengerEXT_create(_instance);
@@ -59,7 +64,31 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Vulkan object caches
         _shader_cache = ShaderCache(_device);
-        _pipeline_cache = PipelineCache(_device, pipeline_cache_filename);
+        _pipeline_cache = PipelineCache(_device, root_asset_directory + "/vulkan_cache.bin");
+
+        // Command buffer pools for each queue family
+        _graphics_pool = VkCommandPool_create(_device, _physical.graphics_queues);
+        _transfer_pool = VkCommandPool_create(_device, _physical.transfer_queues);
+
+        // Main buffers
+        std::array<VkCommandBuffer, 3> transfer_buffers;
+        VkCommandBuffer_allocate(_device, _transfer_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, transfer_buffers.data(), 3);
+        _vertex_buffer = Buffer(_device,
+                                _physical,
+                                transfer_buffers[0],
+                                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        _index_buffer = Buffer(_device,
+                               _physical,
+                               transfer_buffers[1],
+                               VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        _staging_buffer = Buffer(_device,
+                                 _physical,
+                                 transfer_buffers[2],
+                                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT |
+                                     VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         /** Demo Triangle rendering specific objects */
         _layout = VkPipelineLayout_create(_device);
@@ -88,17 +117,14 @@ namespace Dynamo::Graphics::Vulkan {
             _framebuffers.push_back(framebuffer);
         }
 
-        // Command buffer pools for each queue family
-        _graphics_pool = VkCommandPool_create(_device, _physical.graphics_queues);
-
         // Frame sync objects
-        std::vector<VkCommandBuffer> command_buffers =
-            VkCommandBuffer_allocate(_device, _graphics_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, _frame_context.size());
-        for (unsigned i = 0; i < _frame_context.size(); i++) {
+        std::array<VkCommandBuffer, 3> graphics_buffers;
+        VkCommandBuffer_allocate(_device, _graphics_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, graphics_buffers.data(), 3);
+        for (unsigned i = 0; i < 3; i++) {
             _frame_context[i].sync_fence = VkFence_create(_device);
             _frame_context[i].sync_render_start = VkSemaphore_create(_device);
             _frame_context[i].sync_render_done = VkSemaphore_create(_device);
-            _frame_context[i].command_buffer = command_buffers[i];
+            _frame_context[i].command_buffer = graphics_buffers[i];
         }
         _current_frame = 0;
     }
@@ -108,12 +134,17 @@ namespace Dynamo::Graphics::Vulkan {
         vkDeviceWaitIdle(_device);
 
         // Cleanup Triangle Demo objects
-        _pipeline_cache.destroy();
-        _shader_cache.destroy();
         vkDestroyPipelineLayout(_device, _layout, nullptr);
 
-        // Cleanup
+        // Cleanup high level objects
+        _pipeline_cache.destroy();
+        _shader_cache.destroy();
+        _vertex_buffer.destroy();
+        _index_buffer.destroy();
+        _staging_buffer.destroy();
+
         vkDestroyCommandPool(_device, _graphics_pool, nullptr);
+        vkDestroyCommandPool(_device, _transfer_pool, nullptr);
         for (unsigned i = 0; i < _frame_context.size(); i++) {
             vkDestroyFence(_device, _frame_context[i].sync_fence, nullptr);
             vkDestroySemaphore(_device, _frame_context[i].sync_render_start, nullptr);

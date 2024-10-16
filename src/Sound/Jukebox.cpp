@@ -30,7 +30,7 @@ namespace Dynamo::Sound {
             }
         }
         for (const Device &device : _devices) {
-            if (device.id != Pa_GetDefaultInputDevice() && device.input_channels > 0) {
+            if (device.id == Pa_GetDefaultInputDevice() && device.input_channels > 0) {
                 set_input(device);
                 break;
             }
