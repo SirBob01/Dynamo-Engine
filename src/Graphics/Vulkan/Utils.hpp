@@ -43,6 +43,18 @@ namespace Dynamo::Graphics::Vulkan {
     };
 
     /**
+     * @brief Framebuffer configuration settings.
+     *
+     */
+    struct FramebufferSettings {
+        VkImageView view;
+        VkExtent2D extent;
+        VkRenderPass pass;
+
+        bool operator==(const FramebufferSettings &other) const;
+    };
+
+    /**
      * @brief Shader key.
      *
      */
@@ -209,12 +221,10 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Create a Vulkan framebuffer.
      *
      * @param device
-     * @param renderpass
-     * @param view
-     * @param extent
+     * @param settings
      * @return VkFramebuffer
      */
-    VkFramebuffer VkFramebuffer_create(VkDevice device, VkRenderPass renderpass, VkImageView view, VkExtent2D extent);
+    VkFramebuffer VkFramebuffer_create(VkDevice device, const FramebufferSettings &settings);
 
     /**
      * @brief Create a Vulkan command pool.
@@ -273,6 +283,18 @@ struct std::hash<Dynamo::Graphics::Vulkan::RenderPassSettings> {
         size_t hash4 = std::hash<unsigned>{}(settings.sample_count);
 
         return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3) ^ (hash4 << 4);
+    }
+};
+
+template <>
+struct std::hash<Dynamo::Graphics::Vulkan::FramebufferSettings> {
+    inline size_t operator()(const Dynamo::Graphics::Vulkan::FramebufferSettings &settings) const {
+        size_t hash0 = std::hash<unsigned>{}(settings.extent.width);
+        size_t hash1 = std::hash<unsigned>{}(settings.extent.height);
+        size_t hash2 = std::hash<void *>{}(settings.pass);
+        size_t hash3 = std::hash<void *>{}(settings.view);
+
+        return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3);
     }
 };
 

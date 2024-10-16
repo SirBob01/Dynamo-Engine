@@ -42,6 +42,11 @@ namespace Dynamo::Graphics::Vulkan {
                clear_color == other.clear_color && clear_depth == other.clear_depth;
     }
 
+    bool FramebufferSettings::operator==(const FramebufferSettings &other) const {
+        return view == other.view && extent.width == other.extent.width && extent.height == other.extent.height &&
+               pass == other.pass;
+    }
+
     bool ShaderKey::operator==(const ShaderKey &other) const { return code == other.code && stage == other.stage; }
 
     bool GraphicsPipelineSettings::operator==(const GraphicsPipelineSettings &other) const {
@@ -562,14 +567,14 @@ namespace Dynamo::Graphics::Vulkan {
         return pipeline;
     }
 
-    VkFramebuffer VkFramebuffer_create(VkDevice device, VkRenderPass renderpass, VkImageView view, VkExtent2D extent) {
+    VkFramebuffer VkFramebuffer_create(VkDevice device, const FramebufferSettings &settings) {
         VkFramebufferCreateInfo framebuffer_info = {};
         framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebuffer_info.renderPass = renderpass;
+        framebuffer_info.renderPass = settings.pass;
         framebuffer_info.attachmentCount = 1;
-        framebuffer_info.pAttachments = &view;
-        framebuffer_info.width = extent.width;
-        framebuffer_info.height = extent.height;
+        framebuffer_info.pAttachments = &settings.view;
+        framebuffer_info.width = settings.extent.width;
+        framebuffer_info.height = settings.extent.height;
         framebuffer_info.layers = 1;
 
         VkFramebuffer framebuffer;

@@ -2,29 +2,32 @@
 #include <Graphics/Vulkan/Utils.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    VkExtent2D compute_extent(const Display &display, const SwapchainOptions &options) {
+    Swapchain::Swapchain(VkDevice device,
+                         const PhysicalDevice &physical,
+                         const Display &display,
+                         std::optional<Swapchain> previous) :
+        device(device) {
+        SwapchainOptions options = physical.get_swapchain_options();
+
+        // Compute swapchain size
         Vec2 size = display.get_framebuffer_size();
-        VkExtent2D extent;
         extent.width = std::clamp(static_cast<unsigned>(size.x),
                                   options.capabilities.minImageExtent.width,
                                   options.capabilities.maxImageExtent.width);
         extent.height = std::clamp(static_cast<unsigned>(size.y),
                                    options.capabilities.minImageExtent.height,
                                    options.capabilities.maxImageExtent.height);
-        return extent;
-    }
 
-    VkSurfaceFormatKHR select_surface_format(const SwapchainOptions &options) {
+        // Select optimal surface format
         for (VkSurfaceFormatKHR query : options.formats) {
             if (query.format == VK_FORMAT_B8G8R8A8_SRGB && query.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-                return query;
+                surface_format = query;
+                break;
             }
         }
-        return options.formats[0];
-    }
 
-    VkPresentModeKHR select_present_mode(const Display &display, const SwapchainOptions &options) {
-        VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
+        // Select present mode based on display v-sync flag
+        present_mode = VK_PRESENT_MODE_FIFO_KHR;
         for (VkPresentModeKHR query : options.present_modes) {
             if (!display.is_vsync() && query == VK_PRESENT_MODE_IMMEDIATE_KHR) {
                 present_mode = query;
@@ -32,17 +35,6 @@ namespace Dynamo::Graphics::Vulkan {
                 present_mode = query;
             }
         }
-        return present_mode;
-    }
-
-    Swapchain::Swapchain(VkDevice device,
-                         const PhysicalDevice &physical,
-                         const Display &display,
-                         std::optional<VkSwapchainKHR> previous) {
-        SwapchainOptions options = physical.get_swapchain_options();
-        extent = compute_extent(display, options);
-        surface_format = select_surface_format(options);
-        present_mode = select_present_mode(display, options);
 
         // Create swapchain handle
         VkSwapchainCreateInfoKHR swapchain_info = {};
@@ -80,15 +72,36 @@ namespace Dynamo::Graphics::Vulkan {
         // Handle swapchain recreation
         swapchain_info.oldSwapchain = VK_NULL_HANDLE;
         if (previous.has_value()) {
-            swapchain_info.oldSwapchain = previous.value();
+            swapchain_info.oldSwapchain = previous.value().handle;
         }
 
         VkResult_log("Create Swapchain", vkCreateSwapchainKHR(device, &swapchain_info, nullptr, &handle));
+
+        // Destroy the old swapchain
+        if (previous.has_value()) {
+            previous.value().destroy();
+        }
 
         // Get swapchain images
         unsigned count = 0;
         vkGetSwapchainImagesKHR(device, handle, &count, nullptr);
         images.resize(count);
         vkGetSwapchainImagesKHR(device, handle, &count, images.data());
+
+        // Initialize swapchain views
+        for (const VkImage image : images) {
+            ImageViewSettings view_settings;
+            view_settings.format = surface_format.format;
+
+            VkImageView view = VkImageView_create(device, image, view_settings);
+            views.push_back(view);
+        }
+    }
+
+    void Swapchain::destroy() {
+        for (const VkImageView view : views) {
+            vkDestroyImageView(device, view, nullptr);
+        }
+        vkDestroySwapchainKHR(device, handle, nullptr);
     }
 } // namespace Dynamo::Graphics::Vulkan

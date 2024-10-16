@@ -37,7 +37,6 @@ void main() {
 )";
 
 // TODO:
-// * Frame Context struct      <- Move to its own file with its own constructor and destroyer
 // * Vertex attribute handling <- Vertex attributes should be determined from shader reflection (bindings)
 //                             <- Deinterleaved, 1 binding per vertex attribute
 
@@ -53,22 +52,20 @@ namespace Dynamo::Graphics::Vulkan {
         _physical = PhysicalDevice::select(_instance, _surface);
         _device = VkDevice_create(_physical);
 
-        // Build the swapchain and its views and framebuffers
+        // Build the swapchain and its views
         _swapchain = Swapchain(_device, _physical, _display);
-
-        // Color fill clear value
-        _clear.color.float32[0] = 0;
-        _clear.color.float32[1] = 0;
-        _clear.color.float32[2] = 0;
-        _clear.color.float32[3] = 1;
 
         // Vulkan object caches
         _shader_cache = ShaderCache(_device);
         _pipeline_cache = PipelineCache(_device, root_asset_directory + "/vulkan_cache.bin");
+        _framebuffer_cache = FramebufferCache(_device);
 
         // Command buffer pools for each queue family
         _graphics_pool = VkCommandPool_create(_device, _physical.graphics_queues);
         _transfer_pool = VkCommandPool_create(_device, _physical.transfer_queues);
+
+        // Frame contexts
+        _frame_contexts = FrameContextList<3>(_device, _graphics_pool);
 
         // Main buffers
         std::array<VkCommandBuffer, 3> transfer_buffers;
@@ -90,7 +87,14 @@ namespace Dynamo::Graphics::Vulkan {
                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT |
                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
+        // Color fill clear value
+        _clear.color.float32[0] = 0;
+        _clear.color.float32[1] = 0;
+        _clear.color.float32[2] = 0;
+        _clear.color.float32[3] = 1;
+
         /** Demo Triangle rendering specific objects */
+
         _layout = VkPipelineLayout_create(_device);
 
         GraphicsPipelineSettings pipeline_settings;
@@ -105,28 +109,6 @@ namespace Dynamo::Graphics::Vulkan {
         pipeline_settings.vertex = _shader_cache.build({TRIANGLE_VERTEX_SHADER, VK_SHADER_STAGE_VERTEX_BIT});
         pipeline_settings.fragment = _shader_cache.build({TRIANGLE_FRAGMENT_SHADER, VK_SHADER_STAGE_FRAGMENT_BIT});
         _pipeline_pass = _pipeline_cache.build(pipeline_settings);
-
-        for (VkImage image : _swapchain.images) {
-            ImageViewSettings view_settings;
-            view_settings.format = _swapchain.surface_format.format;
-
-            VkImageView view = VkImageView_create(_device, image, view_settings);
-            _views.push_back(view);
-
-            VkFramebuffer framebuffer = VkFramebuffer_create(_device, _pipeline_pass.pass, view, _swapchain.extent);
-            _framebuffers.push_back(framebuffer);
-        }
-
-        // Frame sync objects
-        std::array<VkCommandBuffer, 3> graphics_buffers;
-        VkCommandBuffer_allocate(_device, _graphics_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, graphics_buffers.data(), 3);
-        for (unsigned i = 0; i < 3; i++) {
-            _frame_context[i].sync_fence = VkFence_create(_device);
-            _frame_context[i].sync_render_start = VkSemaphore_create(_device);
-            _frame_context[i].sync_render_done = VkSemaphore_create(_device);
-            _frame_context[i].command_buffer = graphics_buffers[i];
-        }
-        _current_frame = 0;
     }
 
     Renderer::~Renderer() {
@@ -137,26 +119,17 @@ namespace Dynamo::Graphics::Vulkan {
         vkDestroyPipelineLayout(_device, _layout, nullptr);
 
         // Cleanup high level objects
+        _framebuffer_cache.destroy();
         _pipeline_cache.destroy();
         _shader_cache.destroy();
+        _frame_contexts.destroy();
         _vertex_buffer.destroy();
         _index_buffer.destroy();
         _staging_buffer.destroy();
+        _swapchain.destroy();
 
         vkDestroyCommandPool(_device, _graphics_pool, nullptr);
         vkDestroyCommandPool(_device, _transfer_pool, nullptr);
-        for (unsigned i = 0; i < _frame_context.size(); i++) {
-            vkDestroyFence(_device, _frame_context[i].sync_fence, nullptr);
-            vkDestroySemaphore(_device, _frame_context[i].sync_render_start, nullptr);
-            vkDestroySemaphore(_device, _frame_context[i].sync_render_done, nullptr);
-        }
-        for (VkFramebuffer framebuffer : _framebuffers) {
-            vkDestroyFramebuffer(_device, framebuffer, nullptr);
-        }
-        for (VkImageView view : _views) {
-            vkDestroyImageView(_device, view, nullptr);
-        }
-        vkDestroySwapchainKHR(_device, _swapchain.handle, nullptr);
         vkDestroyDevice(_device, nullptr);
         vkDestroySurfaceKHR(_instance, _surface, nullptr);
 #ifdef DYN_DEBUG
@@ -166,33 +139,12 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Renderer::rebuild_swapchain() {
-        vkDeviceWaitIdle(_device);
-
-        VkSwapchainKHR previous = _swapchain.handle;
-        _swapchain = Swapchain(_device, _physical, _display, previous);
-
         // Destroy old swapchain resources
-        for (VkFramebuffer framebuffer : _framebuffers) {
-            vkDestroyFramebuffer(_device, framebuffer, nullptr);
-        }
-        for (VkImageView view : _views) {
-            vkDestroyImageView(_device, view, nullptr);
-        }
-        vkDestroySwapchainKHR(_device, previous, nullptr);
+        vkDeviceWaitIdle(_device);
+        _framebuffer_cache.destroy();
 
-        // Allocate new swapchain resources
-        _views.clear();
-        _framebuffers.clear();
-        for (VkImage image : _swapchain.images) {
-            ImageViewSettings view_settings;
-            view_settings.format = _swapchain.surface_format.format;
-
-            VkImageView view = VkImageView_create(_device, image, view_settings);
-            _views.push_back(view);
-
-            VkFramebuffer framebuffer = VkFramebuffer_create(_device, _pipeline_pass.pass, view, _swapchain.extent);
-            _framebuffers.push_back(framebuffer);
-        }
+        // Rebuild the swapchain
+        _swapchain = Swapchain(_device, _physical, _display, _swapchain);
     }
 
     void Renderer::set_clear(Color color) {
@@ -203,7 +155,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Renderer::refresh() {
-        FrameContext frame = _frame_context[_current_frame];
+        const FrameContext &frame = _frame_contexts.next();
         vkWaitForFences(_device, 1, &frame.sync_fence, VK_TRUE, UINT64_MAX);
 
         unsigned image_index;
@@ -230,20 +182,6 @@ namespace Dynamo::Graphics::Vulkan {
 
         VkResult_log("Begin Command Recording", vkBeginCommandBuffer(frame.command_buffer, &begin_info));
 
-        VkRenderPassBeginInfo renderpass_begin_info = {};
-        renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderpass_begin_info.renderPass = _pipeline_pass.pass;
-        renderpass_begin_info.renderArea.extent = _swapchain.extent;
-        renderpass_begin_info.renderArea.offset.x = 0;
-        renderpass_begin_info.renderArea.offset.y = 0;
-        renderpass_begin_info.clearValueCount = 1;
-        renderpass_begin_info.pClearValues = &_clear;
-        renderpass_begin_info.framebuffer = _framebuffers[image_index];
-
-        vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
-
-        vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_pass.pipeline);
-
         VkViewport viewport;
         viewport.minDepth = 0;
         viewport.maxDepth = 1;
@@ -259,9 +197,29 @@ namespace Dynamo::Graphics::Vulkan {
         scissor.offset.y = 0;
         vkCmdSetScissor(frame.command_buffer, 0, 1, &scissor);
 
+        // -- TODO: Factor these out into model draw commands
+        FramebufferSettings framebuffer_settings;
+        framebuffer_settings.view = _swapchain.views[image_index];
+        framebuffer_settings.extent = _swapchain.extent;
+        framebuffer_settings.pass = _pipeline_pass.pass;
+
+        VkRenderPassBeginInfo renderpass_begin_info = {};
+        renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderpass_begin_info.renderPass = _pipeline_pass.pass;
+        renderpass_begin_info.renderArea.extent = _swapchain.extent;
+        renderpass_begin_info.renderArea.offset.x = 0;
+        renderpass_begin_info.renderArea.offset.y = 0;
+        renderpass_begin_info.clearValueCount = 1;
+        renderpass_begin_info.pClearValues = &_clear;
+        renderpass_begin_info.framebuffer = _framebuffer_cache.build(framebuffer_settings);
+        vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_pass.pipeline);
         vkCmdDraw(frame.command_buffer, 3, 1, 0, 0);
 
         vkCmdEndRenderPass(frame.command_buffer);
+        // --
+
         VkResult_log("End Command Buffer", vkEndCommandBuffer(frame.command_buffer));
 
         VkQueue queue;
@@ -296,7 +254,5 @@ namespace Dynamo::Graphics::Vulkan {
         } else if (present_result != VK_SUCCESS) {
             VkResult_log("Present Render", present_result);
         }
-
-        _current_frame = (_current_frame + 1) % _frame_context.size();
     }
 } // namespace Dynamo::Graphics::Vulkan

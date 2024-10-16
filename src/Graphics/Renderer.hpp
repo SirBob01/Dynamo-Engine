@@ -5,6 +5,8 @@
 
 #include <Display.hpp>
 #include <Graphics/Vulkan/Buffer.hpp>
+#include <Graphics/Vulkan/FrameContext.hpp>
+#include <Graphics/Vulkan/FramebufferCache.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
 #include <Graphics/Vulkan/PipelineCache.hpp>
 #include <Graphics/Vulkan/ShaderCache.hpp>
@@ -26,34 +28,26 @@ namespace Dynamo::Graphics::Vulkan {
         VkDevice _device;
 
         Swapchain _swapchain;
-        VkClearValue _clear;
 
         ShaderCache _shader_cache;
         PipelineCache _pipeline_cache;
+        FramebufferCache _framebuffer_cache;
 
         VkCommandPool _graphics_pool;
         VkCommandPool _transfer_pool;
+
+        FrameContextList<3> _frame_contexts;
 
         Buffer _vertex_buffer;
         Buffer _index_buffer;
         Buffer _staging_buffer;
 
+        VkClearValue _clear;
+
         // These should be cached somewhere {
         VkPipelineLayout _layout;
         PipelinePass _pipeline_pass;
         // }
-
-        std::vector<VkImageView> _views;
-        std::vector<VkFramebuffer> _framebuffers;
-
-        struct FrameContext {
-            VkFence sync_fence;
-            VkSemaphore sync_render_start;
-            VkSemaphore sync_render_done;
-            VkCommandBuffer command_buffer;
-        };
-        std::array<FrameContext, 3> _frame_context;
-        unsigned _current_frame;
 
         /**
          * @brief Rebuild the swapchain.
