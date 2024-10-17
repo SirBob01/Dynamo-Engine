@@ -641,6 +641,30 @@ namespace Dynamo::Graphics::Vulkan {
         return buffer;
     }
 
+    void VkBuffer_copy(VkBuffer src,
+                       VkBuffer dst,
+                       VkQueue queue,
+                       VkCommandBuffer command_buffer,
+                       VkBufferCopy *regions,
+                       unsigned region_count) {
+        // Copy command
+        VkCommandBufferBeginInfo begin_info = {};
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(command_buffer, &begin_info);
+        vkCmdCopyBuffer(command_buffer, src, dst, region_count, regions);
+        vkEndCommandBuffer(command_buffer);
+
+        // Submit the command to the transfer queue
+        VkSubmitInfo submit_info = {};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &command_buffer;
+
+        vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+    }
+
     VkImageView VkImageView_create(VkDevice device, VkImage image, ImageViewSettings settings) {
         VkImageViewCreateInfo view_info = {};
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

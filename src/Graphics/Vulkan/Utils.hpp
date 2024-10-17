@@ -174,6 +174,23 @@ namespace Dynamo::Graphics::Vulkan {
                              unsigned queue_family_count);
 
     /**
+     * @brief Submit a command to copy the contents of a Vulkan buffer to another buffer.
+     *
+     * @param src
+     * @param dst
+     * @param queue
+     * @param command_buffer
+     * @param regions
+     * @param region_count
+     */
+    void VkBuffer_copy(VkBuffer src,
+                       VkBuffer dst,
+                       VkQueue queue,
+                       VkCommandBuffer command_buffer,
+                       VkBufferCopy *regions,
+                       unsigned region_count);
+
+    /**
      * @brief Create a Vulkan image view.
      *
      * @param device
