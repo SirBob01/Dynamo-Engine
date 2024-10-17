@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Math/Color.hpp>
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
@@ -14,7 +13,7 @@
 #include <Graphics/Vulkan/PipelineCache.hpp>
 #include <Graphics/Vulkan/ShaderSet.hpp>
 #include <Graphics/Vulkan/Swapchain.hpp>
-#include <Utils/SparseSet.hpp>
+#include <Math/Color.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**

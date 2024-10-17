@@ -100,6 +100,14 @@ namespace Dynamo::Graphics::Vulkan {
     const char *VkShaderStageFlagBits_string(VkShaderStageFlagBits stage);
 
     /**
+     * @brief Convert VkDescriptorType to string.
+     *
+     * @param type
+     * @return const char*
+     */
+    const char *VkDescriptorType_string(VkDescriptorType type);
+
+    /**
      * @brief Convert VkResult to string.
      *
      * @param result

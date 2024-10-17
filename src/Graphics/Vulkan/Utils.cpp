@@ -369,6 +369,45 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
+    const char *VkDescriptorType_string(VkDescriptorType type) {
+        switch (type) {
+        case VK_DESCRIPTOR_TYPE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_SAMPLER";
+        case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER";
+        case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+            return "VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE";
+        case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_IMAGE";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC";
+        case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+            return "VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT";
+        case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT:
+            return "VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT";
+        case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+            return "VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR";
+        case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
+            return "VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV";
+        case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
+            return "VK_DESCRIPTOR_TYPE_MUTABLE_VALVE";
+        case VK_DESCRIPTOR_TYPE_MAX_ENUM:
+            return "VK_DESCRIPTOR_TYPE_MAX_ENUM";
+        default:
+            return "";
+        }
+    }
+
     const char *VkResult_string(VkResult result) {
         switch (result) {
         case VK_SUCCESS:
