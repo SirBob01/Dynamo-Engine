@@ -18,21 +18,20 @@ namespace Dynamo::Graphics::Vulkan {
      */
     class Buffer {
         VkDevice _device;
-        VkDeviceMemory _memory;
-        VkBuffer _handle;
-
-        VkPhysicalDeviceMemoryProperties _memory_properties;
-
+        VkPhysicalDeviceMemoryProperties _physical_settings;
         VkCommandBuffer _command_buffer;
         VkQueue _transfer_queue;
 
+        VkBufferUsageFlags _usage;
+        VkMemoryPropertyFlags _properties;
+        VkMemoryRequirements _requirements;
+
         Allocator _allocator;
-        unsigned _alignment;
+
+        VkDeviceMemory _memory;
+        VkBuffer _handle;
 
         char *_mapped;
-
-        VkBufferUsageFlags _usage;
-        VkMemoryPropertyFlags _property_flags;
 
         /**
          * @brief Allocate memory for a buffer.
@@ -50,7 +49,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param regions
          * @param region_count
          */
-        void copy(VkBuffer src, VkBuffer dst, VkBufferCopy *regions, unsigned region_count);
+        void copy_raw(VkBuffer src, VkBuffer dst, VkBufferCopy *regions, unsigned region_count);
 
       public:
         Buffer(VkDevice device,
@@ -59,6 +58,13 @@ namespace Dynamo::Graphics::Vulkan {
                VkBufferUsageFlagBits usage,
                VkMemoryPropertyFlags properties);
         Buffer() = default;
+
+        /**
+         * @brief Get the buffer handle.
+         *
+         * @return VkBuffer
+         */
+        VkBuffer handle() const;
 
         /**
          * @brief Get the capacity of the buffer.
@@ -106,7 +112,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param block_offset
          * @param length
          */
-        void host_write(char *src, unsigned block_offset, unsigned length);
+        void host_write(const char *src, unsigned block_offset, unsigned length);
 
         /**
          * @brief Read from the buffer.

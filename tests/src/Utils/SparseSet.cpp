@@ -158,7 +158,7 @@ TEST_CASE("SparseSet mismatched id version", "[SparseSet]") {
     REQUIRE(!set.empty());
 }
 
-TEST_CASE("SparseSet forall", "[SparseSet]") {
+TEST_CASE("SparseSet foreach", "[SparseSet]") {
     CharSet set;
     Dynamo::IdTracker tracker;
 
@@ -189,9 +189,9 @@ TEST_CASE("SparseSet forall", "[SparseSet]") {
     std::vector<char> items;
     std::vector<Dynamo::Id> ids;
 
-    set.forall([&](char &item, Dynamo::Id id) { triplets.push_back({item, id}); });
-    set.forall_items([&](char &item) { items.push_back(item); });
-    set.forall_ids([&](Dynamo::Id id) { ids.push_back(id); });
+    set.foreach ([&](char &item, Dynamo::Id id) { triplets.push_back({item, id}); });
+    set.foreach_items([&](char &item) { items.push_back(item); });
+    set.foreach_ids([&](Dynamo::Id id) { ids.push_back(id); });
 
     REQUIRE(triplets[0].item == 'c');
     REQUIRE(triplets[0].id == c);
