@@ -14,7 +14,7 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Descriptor set layout bindings.
      *
      */
-    struct DescriptorSetLayout {
+    struct DescriptorLayout {
         std::vector<VkDescriptorSetLayoutBinding> bindings;
         unsigned set_number;
     };
@@ -27,7 +27,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkShaderModule handle;
         std::vector<VkVertexInputBindingDescription> bindings;
         std::vector<VkVertexInputAttributeDescription> attributes;
-        std::vector<DescriptorSetLayout> descriptor_sets;
+        std::vector<DescriptorLayout> descriptor_layouts;
     };
 
     /**

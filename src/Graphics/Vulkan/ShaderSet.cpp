@@ -100,7 +100,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         for (unsigned i = 0; i < count; i++) {
             const SpvReflectDescriptorSet &set = *sets[i];
-            DescriptorSetLayout layout;
+            DescriptorLayout layout;
             layout.set_number = set.set;
             Log::info("* Descriptor Set: {}", layout.set_number);
             for (unsigned j = 0; j < set.binding_count; j++) {
@@ -120,7 +120,7 @@ namespace Dynamo::Graphics::Vulkan {
                           VkDescriptorType_string(layout_binding.descriptorType));
                 layout.bindings.push_back(layout_binding);
             }
-            module.descriptor_sets.push_back(layout);
+            module.descriptor_layouts.push_back(layout);
         }
     }
 
