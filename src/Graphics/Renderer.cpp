@@ -1,44 +1,4 @@
 #include <Graphics/Renderer.hpp>
-#include <Graphics/Vulkan/Utils.hpp>
-
-static const char *TRIANGLE_VERTEX_SHADER = R"(
-#version 450
-
-layout(location = 0) out vec3 fragColor;
-
-vec2 positions[3] = vec2[](
-    vec2(0.0, -0.5),
-    vec2(0.5, 0.5),
-    vec2(-0.5, 0.5)
-);
-
-vec3 colors[3] = vec3[](
-    vec3(1.0, 0.0, 0.0),
-    vec3(0.0, 1.0, 0.0),
-    vec3(0.0, 0.0, 1.0)
-);
-
-void main() {
-    gl_Position = vec4(positions[gl_VertexIndex], 0.0, 1.0);
-    fragColor = colors[gl_VertexIndex];
-}
-)";
-
-static const char *TRIANGLE_FRAGMENT_SHADER = R"(
-#version 450
-
-layout(location = 0) in vec3 fragColor;
-
-layout(location = 0) out vec4 outColor;
-
-void main() {
-    outColor = vec4(fragColor, 1.0);
-}
-)";
-
-// TODO:
-// * Vertex attribute handling <- Vertex attributes should be determined from shader reflection (bindings)
-//                             <- Deinterleaved, 1 binding per vertex attribute
 
 namespace Dynamo::Graphics::Vulkan {
     Renderer::Renderer(const Display &display, const std::string &root_asset_directory) : _display(display) {
@@ -55,17 +15,9 @@ namespace Dynamo::Graphics::Vulkan {
         // Build the swapchain and its views
         _swapchain = Swapchain(_device, _physical, _display);
 
-        // Vulkan object caches
-        _shader_cache = ShaderCache(_device);
-        _pipeline_cache = PipelineCache(_device, root_asset_directory + "/vulkan_cache.bin");
-        _framebuffer_cache = FramebufferCache(_device);
-
         // Command buffer pools for each queue family
         _graphics_pool = VkCommandPool_create(_device, _physical.graphics_queues);
         _transfer_pool = VkCommandPool_create(_device, _physical.transfer_queues);
-
-        // Frame contexts
-        _frame_contexts = FrameContextList<3>(_device, _graphics_pool);
 
         // Main buffers
         std::array<VkCommandBuffer, 3> transfer_buffers;
@@ -87,6 +39,14 @@ namespace Dynamo::Graphics::Vulkan {
                                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT |
                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
+        // Vulkan object caches
+        _shader_set = ShaderSet(_device);
+        _pipeline_cache = PipelineCache(_device, root_asset_directory + "/vulkan_cache.bin");
+        _framebuffer_cache = FramebufferCache(_device);
+
+        // Frame contexts
+        _frame_contexts = FrameContextList<3>(_device, _graphics_pool);
+
         // Color fill clear value
         _clear.color.float32[0] = 0;
         _clear.color.float32[1] = 0;
@@ -96,19 +56,6 @@ namespace Dynamo::Graphics::Vulkan {
         /** Demo Triangle rendering specific objects */
 
         _layout = VkPipelineLayout_create(_device);
-
-        GraphicsPipelineSettings pipeline_settings;
-        pipeline_settings.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-        pipeline_settings.cull_mode = VK_CULL_MODE_NONE;
-        pipeline_settings.polygon_mode = VK_POLYGON_MODE_FILL;
-        pipeline_settings.layout = _layout;
-
-        pipeline_settings.renderpass.clear_color = true;
-        pipeline_settings.renderpass.color_format = _swapchain.surface_format.format;
-
-        pipeline_settings.vertex = _shader_cache.build({TRIANGLE_VERTEX_SHADER, VK_SHADER_STAGE_VERTEX_BIT});
-        pipeline_settings.fragment = _shader_cache.build({TRIANGLE_FRAGMENT_SHADER, VK_SHADER_STAGE_FRAGMENT_BIT});
-        _pipeline_pass = _pipeline_cache.build(pipeline_settings);
     }
 
     Renderer::~Renderer() {
@@ -121,13 +68,14 @@ namespace Dynamo::Graphics::Vulkan {
         // Cleanup high level objects
         _framebuffer_cache.destroy();
         _pipeline_cache.destroy();
-        _shader_cache.destroy();
         _frame_contexts.destroy();
         _vertex_buffer.destroy();
         _index_buffer.destroy();
         _staging_buffer.destroy();
         _swapchain.destroy();
+        _shader_set.destroy();
 
+        // Destroy Vulkan core objects
         vkDestroyCommandPool(_device, _graphics_pool, nullptr);
         vkDestroyCommandPool(_device, _transfer_pool, nullptr);
         vkDestroyDevice(_device, nullptr);
@@ -153,6 +101,18 @@ namespace Dynamo::Graphics::Vulkan {
         _clear.color.float32[2] = color.b;
         _clear.color.float32[3] = color.a;
     }
+
+    Mesh Renderer::build_mesh(const MeshDescriptor &descriptor) {
+        return _mesh_set.build(descriptor, _vertex_buffer, _index_buffer, _staging_buffer);
+    }
+
+    void Renderer::destroy_mesh(Mesh mesh) { _mesh_set.free(mesh, _vertex_buffer, _index_buffer); }
+
+    void Renderer::draw(const Model &model) { _models.push_back(model); }
+
+    Shader Renderer::build_shader(const ShaderDescriptor &descriptor) { return _shader_set.build(descriptor); }
+
+    void Renderer::destroy_shader(Shader shader) { _shader_set.destroy(shader); }
 
     void Renderer::refresh() {
         const FrameContext &frame = _frame_contexts.next();
@@ -197,28 +157,51 @@ namespace Dynamo::Graphics::Vulkan {
         scissor.offset.y = 0;
         vkCmdSetScissor(frame.command_buffer, 0, 1, &scissor);
 
-        // -- TODO: Factor these out into model draw commands
-        FramebufferSettings framebuffer_settings;
-        framebuffer_settings.view = _swapchain.views[image_index];
-        framebuffer_settings.extent = _swapchain.extent;
-        framebuffer_settings.pass = _pipeline_pass.pass;
+        // Iterate over models and draw
+        for (Model model : _models) {
+            // TODO: Group models by material
+            VkFormat format = _swapchain.surface_format.format;
+            PipelinePass pipeline_pass = _pipeline_cache.build_material(model.material, _shader_set, _layout, format);
 
-        VkRenderPassBeginInfo renderpass_begin_info = {};
-        renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderpass_begin_info.renderPass = _pipeline_pass.pass;
-        renderpass_begin_info.renderArea.extent = _swapchain.extent;
-        renderpass_begin_info.renderArea.offset.x = 0;
-        renderpass_begin_info.renderArea.offset.y = 0;
-        renderpass_begin_info.clearValueCount = 1;
-        renderpass_begin_info.pClearValues = &_clear;
-        renderpass_begin_info.framebuffer = _framebuffer_cache.build(framebuffer_settings);
-        vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+            FramebufferSettings framebuffer_settings;
+            framebuffer_settings.view = _swapchain.views[image_index];
+            framebuffer_settings.extent = _swapchain.extent;
+            framebuffer_settings.pass = pipeline_pass.pass;
+            VkFramebuffer framebuffer = _framebuffer_cache.build(framebuffer_settings);
 
-        vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline_pass.pipeline);
-        vkCmdDraw(frame.command_buffer, 3, 1, 0, 0);
+            VkRenderPassBeginInfo renderpass_begin_info = {};
+            renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            renderpass_begin_info.renderPass = pipeline_pass.pass;
+            renderpass_begin_info.renderArea.extent = _swapchain.extent;
+            renderpass_begin_info.renderArea.offset.x = 0;
+            renderpass_begin_info.renderArea.offset.y = 0;
+            renderpass_begin_info.clearValueCount = 1;
+            renderpass_begin_info.pClearValues = &_clear;
+            renderpass_begin_info.framebuffer = framebuffer;
+
+            vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_pass.pipeline);
+
+            MeshAllocation &allocation = _mesh_set.get(model.mesh);
+
+            vkCmdBindVertexBuffers(frame.command_buffer,
+                                   0,
+                                   allocation.attribute_offsets.size(),
+                                   allocation.buffers.data(),
+                                   allocation.attribute_offsets.data());
+            if (allocation.index_type != VK_INDEX_TYPE_NONE_KHR) {
+                vkCmdBindIndexBuffer(frame.command_buffer,
+                                     _index_buffer.handle(),
+                                     allocation.index_offset,
+                                     allocation.index_type);
+                vkCmdDrawIndexed(frame.command_buffer, allocation.index_count, allocation.instance_count, 0, 0, 0);
+            } else {
+                vkCmdDraw(frame.command_buffer, allocation.vertex_count, allocation.instance_count, 0, 0);
+            }
+        }
+        _models.clear();
 
         vkCmdEndRenderPass(frame.command_buffer);
-        // --
 
         VkResult_log("End Command Buffer", vkEndCommandBuffer(frame.command_buffer));
 

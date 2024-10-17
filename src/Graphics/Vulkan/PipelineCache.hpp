@@ -5,7 +5,8 @@
 
 #include <vulkan/vulkan_core.h>
 
-#include <Graphics/Vulkan/ShaderCache.hpp>
+#include <Graphics/Material.hpp>
+#include <Graphics/Vulkan/ShaderSet.hpp>
 #include <Graphics/Vulkan/Utils.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
@@ -40,7 +41,19 @@ namespace Dynamo::Graphics::Vulkan {
          * @param settings
          * @return PipelinePass
          */
-        PipelinePass build(GraphicsPipelineSettings settings);
+        PipelinePass build(const GraphicsPipelineSettings &settings);
+
+        /**
+         * @brief Build a pipeline pass from a material.
+         *
+         * @param material
+         * @param shader_set
+         * @param layout
+         * @param color_format
+         * @return PipelinePass
+         */
+        PipelinePass
+        build_material(const Material &material, ShaderSet &shader_set, VkPipelineLayout layout, VkFormat color_format);
 
         /**
          * @brief Clear all pipelines in the cache, invalidating all handles.

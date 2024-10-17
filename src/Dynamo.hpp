@@ -2,6 +2,7 @@
 #include <Asset/Sound.hpp>
 #include <Clock.hpp>
 #include <Display.hpp>
+#include <Graphics/Mesh.hpp>
 #include <Graphics/Renderer.hpp>
 #include <Input.hpp>
 #include <Math/Box2.hpp>

@@ -4,13 +4,17 @@
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
+#include <Graphics/Mesh.hpp>
+#include <Graphics/Model.hpp>
 #include <Graphics/Vulkan/Buffer.hpp>
 #include <Graphics/Vulkan/FrameContext.hpp>
 #include <Graphics/Vulkan/FramebufferCache.hpp>
+#include <Graphics/Vulkan/MeshSet.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
 #include <Graphics/Vulkan/PipelineCache.hpp>
-#include <Graphics/Vulkan/ShaderCache.hpp>
+#include <Graphics/Vulkan/ShaderSet.hpp>
 #include <Graphics/Vulkan/Swapchain.hpp>
+#include <Utils/SparseSet.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -29,25 +33,30 @@ namespace Dynamo::Graphics::Vulkan {
 
         Swapchain _swapchain;
 
-        ShaderCache _shader_cache;
-        PipelineCache _pipeline_cache;
-        FramebufferCache _framebuffer_cache;
-
         VkCommandPool _graphics_pool;
         VkCommandPool _transfer_pool;
-
-        FrameContextList<3> _frame_contexts;
 
         Buffer _vertex_buffer;
         Buffer _index_buffer;
         Buffer _staging_buffer;
 
+        MeshSet _mesh_set;
+        ShaderSet _shader_set;
+        PipelineCache _pipeline_cache;
+        FramebufferCache _framebuffer_cache;
+
+        FrameContextList<3> _frame_contexts;
+
+        std::vector<Model> _models;
         VkClearValue _clear;
 
-        // These should be cached somewhere {
+        // < TODO:
+        // * Depth-stencil buffer
+        // * Uniform buffers
+        // * Textures
+        // * Improve Material system
         VkPipelineLayout _layout;
-        PipelinePass _pipeline_pass;
-        // }
+        // >
 
         /**
          * @brief Rebuild the swapchain.
@@ -76,6 +85,43 @@ namespace Dynamo::Graphics::Vulkan {
          * @param color
          */
         void set_clear(Color color);
+
+        /**
+         * @brief Build a mesh and upload to VRAM.
+         *
+         * @param descriptor
+         * @return Mesh
+         */
+        Mesh build_mesh(const MeshDescriptor &descriptor);
+
+        /**
+         * @brief Free mesh resources.
+         *
+         * @param mesh
+         */
+        void destroy_mesh(Mesh mesh);
+
+        /**
+         * @brief Build a shader module.
+         *
+         * @param descriptor
+         * @return Shader
+         */
+        Shader build_shader(const ShaderDescriptor &descriptor);
+
+        /**
+         * @brief Free shader resources.
+         *
+         * @param shader
+         */
+        void destroy_shader(Shader shader);
+
+        /**
+         * @brief Draw a model in the current frame.
+         *
+         * @param model
+         */
+        void draw(const Model &model);
 
         /**
          * @brief Refresh the renderer.

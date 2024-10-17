@@ -7,6 +7,7 @@
 
 #include <Display.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
+#include <Graphics/Vulkan/ShaderSet.hpp>
 #include <Utils/Log.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
@@ -55,17 +56,6 @@ namespace Dynamo::Graphics::Vulkan {
     };
 
     /**
-     * @brief Shader key.
-     *
-     */
-    struct ShaderKey {
-        std::string code;
-        VkShaderStageFlagBits stage;
-
-        bool operator==(const ShaderKey &other) const;
-    };
-
-    /**
      * @brief Graphics pipeline configuration settings.
      *
      */
@@ -74,8 +64,8 @@ namespace Dynamo::Graphics::Vulkan {
         VkPolygonMode polygon_mode = VK_POLYGON_MODE_FILL;
         VkCullModeFlags cull_mode = VK_CULL_MODE_BACK_BIT;
 
-        VkShaderModule vertex;
-        VkShaderModule fragment;
+        ShaderModule vertex;
+        ShaderModule fragment;
 
         RenderPassSettings renderpass;
 
@@ -84,6 +74,14 @@ namespace Dynamo::Graphics::Vulkan {
 
         bool operator==(const GraphicsPipelineSettings &other) const;
     };
+
+    /**
+     * @brief Compute the size of VkFormat
+     *
+     * @param format
+     * @return unsigned
+     */
+    unsigned VkFormat_size(VkFormat format);
 
     /**
      * @brief Convert VkPhysicalDeviceType to string.
@@ -299,22 +297,13 @@ struct std::hash<Dynamo::Graphics::Vulkan::FramebufferSettings> {
 };
 
 template <>
-struct std::hash<Dynamo::Graphics::Vulkan::ShaderKey> {
-    inline size_t operator()(const Dynamo::Graphics::Vulkan::ShaderKey &key) const {
-        size_t hash0 = std::hash<std::string>{}(key.code);
-        size_t hash1 = std::hash<unsigned>{}(key.stage);
-        return hash0 ^ (hash1 + 0x9e3779b9 + (hash0 << 6) + (hash0 >> 2));
-    }
-};
-
-template <>
 struct std::hash<Dynamo::Graphics::Vulkan::GraphicsPipelineSettings> {
     inline size_t operator()(const Dynamo::Graphics::Vulkan::GraphicsPipelineSettings &settings) const {
         size_t hash0 = std::hash<unsigned>{}(settings.topology);
         size_t hash1 = std::hash<unsigned>{}(settings.polygon_mode);
         size_t hash2 = std::hash<unsigned>{}(settings.cull_mode);
-        size_t hash3 = std::hash<void *>{}(settings.vertex);
-        size_t hash4 = std::hash<void *>{}(settings.fragment);
+        size_t hash3 = std::hash<void *>{}(settings.vertex.handle);
+        size_t hash4 = std::hash<void *>{}(settings.fragment.handle);
         size_t hash5 = std::hash<Dynamo::Graphics::Vulkan::RenderPassSettings>{}(settings.renderpass);
         size_t hash6 = std::hash<void *>{}(settings.layout);
 

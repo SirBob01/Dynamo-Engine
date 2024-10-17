@@ -211,13 +211,27 @@ namespace Dynamo {
         inline const T &get(Id id) const { return (*this)[find(id)]; }
 
         /**
+         * @brief Get begin iterator to the dense array.
+         *
+         * @return T*
+         */
+        inline auto begin() { return _pool.begin(); }
+
+        /**
+         * @brief Get end iterator to the dense array.
+         *
+         * @return T*
+         */
+        inline auto end() { return _pool.end(); }
+
+        /**
          * @brief Apply a function to each member of the set.
          *
          * @tparam Functor
          * @param function Function that takes a T object and its id.
          */
         template <typename Functor>
-        inline void forall(Functor &&function) {
+        inline void foreach (Functor &&function) {
             for (unsigned i = 0; i < size(); i++) {
                 function(_pool[i], _dense[i]);
             }
@@ -230,7 +244,7 @@ namespace Dynamo {
          * @param function Function that takes a T object.
          */
         template <typename Functor>
-        inline void forall_items(Functor &&function) {
+        inline void foreach_items(Functor &&function) {
             for (unsigned i = 0; i < size(); i++) {
                 function(_pool[i]);
             }
@@ -243,7 +257,7 @@ namespace Dynamo {
          * @param function Function that takes an id.
          */
         template <typename Functor>
-        inline void forall_ids(Functor &&function) {
+        inline void foreach_ids(Functor &&function) {
             for (unsigned i = 0; i < size(); i++) {
                 function(_dense[i]);
             }

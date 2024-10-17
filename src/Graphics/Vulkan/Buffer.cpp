@@ -8,35 +8,32 @@ namespace Dynamo::Graphics::Vulkan {
                    VkBufferUsageFlagBits usage,
                    VkMemoryPropertyFlags properties) :
         _device(device),
-        _memory_properties(physical.memory), _command_buffer(command_buffer), _allocator(MIN_ALLOCATION_SIZE),
-        _usage(usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT) {
-        _handle = VkBuffer_create(_device, _usage, MIN_ALLOCATION_SIZE, nullptr, 0);
+        _physical_settings(physical.memory), _command_buffer(command_buffer),
+        _usage(usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT), _properties(properties),
+        _allocator(MIN_ALLOCATION_SIZE) {
+        _handle = VkBuffer_create(_device, _usage, _allocator.capacity(), nullptr, 0);
         _memory = allocate(_handle);
         vkBindBufferMemory(_device, _handle, _memory, 0);
         vkGetDeviceQueue(_device, physical.transfer_queues.index, 0, &_transfer_queue);
     }
 
     VkDeviceMemory Buffer::allocate(VkBuffer buffer) {
-        VkMemoryRequirements requirements;
-        vkGetBufferMemoryRequirements(_device, buffer, &requirements);
+        vkGetBufferMemoryRequirements(_device, buffer, &_requirements);
 
         unsigned type_index;
-        for (type_index = 0; type_index < _memory_properties.memoryTypeCount; type_index++) {
-            VkMemoryType type = _memory_properties.memoryTypes[type_index];
-            if ((requirements.memoryTypeBits & (1 << type_index)) &&
-                ((_property_flags & type.propertyFlags) == _property_flags)) {
+        for (type_index = 0; type_index < _physical_settings.memoryTypeCount; type_index++) {
+            VkMemoryType type = _physical_settings.memoryTypes[type_index];
+            if ((_requirements.memoryTypeBits & (1 << type_index)) &&
+                ((_properties & type.propertyFlags) == _properties)) {
                 break;
             }
         }
-        if (type_index == _memory_properties.memoryTypeCount) {
+        if (type_index == _physical_settings.memoryTypeCount) {
             Log::error("Vulkan could not find suitable memory type for buffer.");
         }
 
-        _alignment = requirements.alignment;
-
-        VkDeviceMemory memory = VkDeviceMemory_allocate(_device, type_index, requirements.size);
-
-        if (_property_flags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
+        VkDeviceMemory memory = VkDeviceMemory_allocate(_device, type_index, _requirements.size);
+        if (_properties & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) {
             VkResult_log(
                 "Map Device Memory",
                 vkMapMemory(_device, memory, 0, _allocator.capacity(), 0, reinterpret_cast<void **>(&_mapped)));
@@ -46,7 +43,7 @@ namespace Dynamo::Graphics::Vulkan {
         return memory;
     }
 
-    void Buffer::copy(VkBuffer src, VkBuffer dst, VkBufferCopy *regions, unsigned region_count) {
+    void Buffer::copy_raw(VkBuffer src, VkBuffer dst, VkBufferCopy *regions, unsigned region_count) {
         // Reset the command buffer
         vkResetCommandBuffer(_command_buffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
 
@@ -69,19 +66,21 @@ namespace Dynamo::Graphics::Vulkan {
         vkQueueWaitIdle(_transfer_queue);
     }
 
+    VkBuffer Buffer::handle() const { return _handle; }
+
     unsigned Buffer::capacity() const { return _allocator.capacity(); }
 
     unsigned Buffer::reserve(unsigned size) {
-        std::optional<unsigned> result = _allocator.reserve(size, _alignment);
+        std::optional<unsigned> result = _allocator.reserve(size, _requirements.alignment);
         if (result.has_value()) {
             return result.value();
         } else {
             unsigned curr = _allocator.capacity();
             unsigned next = std::max(curr + size, curr * 2);
-            resize(align_size(next, _alignment));
+            resize(align_size(next, _requirements.alignment));
 
             // If this fails, we're in trouble...
-            return _allocator.reserve(size, _alignment).value();
+            return _allocator.reserve(size, _requirements.alignment).value();
         }
     }
 
@@ -103,7 +102,7 @@ namespace Dynamo::Graphics::Vulkan {
         copy_region.srcOffset = 0;
         copy_region.size = _allocator.capacity();
 
-        copy(_handle, next_handle, &copy_region, 1);
+        copy_raw(_handle, next_handle, &copy_region, 1);
 
         // Destroy old resources
         vkDestroyBuffer(_device, _handle, nullptr);
@@ -117,7 +116,7 @@ namespace Dynamo::Graphics::Vulkan {
         _allocator.grow(size);
     }
 
-    void Buffer::host_write(char *src, unsigned block_offset, unsigned length) {
+    void Buffer::host_write(const char *src, unsigned block_offset, unsigned length) {
         if (!_allocator.is_reserved(block_offset)) {
             Log::error("Invalid Vulkan buffer offset write");
         }
@@ -133,7 +132,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Buffer::copy_to(Buffer &dst, VkBufferCopy *regions, unsigned region_count) {
-        copy(_handle, dst._handle, regions, region_count);
+        copy_raw(_handle, dst._handle, regions, region_count);
     }
 
     void Buffer::destroy() {

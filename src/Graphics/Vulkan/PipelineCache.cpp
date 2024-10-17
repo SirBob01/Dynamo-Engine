@@ -20,7 +20,7 @@ namespace Dynamo::Graphics::Vulkan {
         _ofstream.open(filename, std::ios::trunc | std::ios::binary);
     }
 
-    PipelinePass PipelineCache::build(GraphicsPipelineSettings settings) {
+    PipelinePass PipelineCache::build(const GraphicsPipelineSettings &settings) {
         PipelinePass result;
 
         // Render Pass
@@ -42,6 +42,57 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         return result;
+    }
+
+    PipelinePass PipelineCache::build_material(const Material &material,
+                                               ShaderSet &shader_set,
+                                               VkPipelineLayout layout,
+                                               VkFormat color_format) {
+        GraphicsPipelineSettings pipeline_settings;
+        switch (material.topology) {
+        case Topology::Point:
+            pipeline_settings.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+            break;
+        case Topology::Triangle:
+            pipeline_settings.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+            break;
+        case Topology::Line:
+            pipeline_settings.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+            break;
+        }
+
+        switch (material.cull) {
+        case Cull::None:
+            pipeline_settings.cull_mode = VK_CULL_MODE_NONE;
+            break;
+        case Cull::Back:
+            pipeline_settings.cull_mode = VK_CULL_MODE_BACK_BIT;
+            break;
+        case Cull::Front:
+            pipeline_settings.cull_mode = VK_CULL_MODE_FRONT_BIT;
+            break;
+        }
+
+        switch (material.fill) {
+        case Fill::Point:
+            pipeline_settings.polygon_mode = VK_POLYGON_MODE_POINT;
+            break;
+        case Fill::Line:
+            pipeline_settings.polygon_mode = VK_POLYGON_MODE_LINE;
+            break;
+        case Fill::Face:
+            pipeline_settings.polygon_mode = VK_POLYGON_MODE_FILL;
+            break;
+        }
+        pipeline_settings.layout = layout;
+
+        pipeline_settings.renderpass.clear_color = true;
+        pipeline_settings.renderpass.color_format = color_format;
+
+        pipeline_settings.vertex = shader_set.get(material.vertex);
+        pipeline_settings.fragment = shader_set.get(material.fragment);
+
+        return build(pipeline_settings);
     }
 
     void PipelineCache::clear() {
