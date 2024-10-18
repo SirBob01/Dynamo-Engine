@@ -17,6 +17,8 @@ namespace Dynamo::Graphics::Vulkan {
     struct DescriptorSetLayout {
         std::vector<VkDescriptorSetLayoutBinding> bindings;
         unsigned set_number;
+
+        bool operator==(const DescriptorSetLayout &other) const;
     };
 
     /**

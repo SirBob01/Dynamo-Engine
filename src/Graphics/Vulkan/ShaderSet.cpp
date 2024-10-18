@@ -6,6 +6,24 @@
 namespace Dynamo::Graphics::Vulkan {
     constexpr char INSTANCE_VAR_PREFIX[] = "instance";
 
+    bool DescriptorSetLayout::operator==(const DescriptorSetLayout &other) const {
+        // Descriptor set layouts are compatible as long as bindings are the same
+        if (bindings.size() != other.bindings.size()) {
+            return false;
+        }
+
+        for (unsigned i = 0; i < bindings.size(); i++) {
+            const VkDescriptorSetLayoutBinding &a = bindings[i];
+            const VkDescriptorSetLayoutBinding &b = other.bindings[i];
+
+            if (a.binding != b.binding || a.descriptorType != b.descriptorType ||
+                a.descriptorCount != b.descriptorCount || a.stageFlags != b.stageFlags) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     ShaderSet::ShaderSet(VkDevice device) : _device(device) {}
 
     std::vector<uint32_t>
@@ -129,10 +147,11 @@ namespace Dynamo::Graphics::Vulkan {
         for (auto &set : module.descriptor_sets) {
             Log::info("* Descriptor Set: {}", set.set_number);
             for (auto &binding : set.bindings) {
-                Log::info(" -> Binding (binding: {}, count: {}, type: {})",
+                Log::info(" -> Binding (binding: {}, count: {}, type: {}, stage: {})",
                           binding.binding,
                           binding.descriptorCount,
-                          VkDescriptorType_string(binding.descriptorType));
+                          VkDescriptorType_string(binding.descriptorType),
+                          VkShaderStageFlagBits_string(static_cast<VkShaderStageFlagBits>(binding.stageFlags)));
             }
         }
     }
