@@ -1,5 +1,4 @@
 #include <Graphics/Vulkan/Utils.hpp>
-#include <vulkan/vulkan_core.h>
 
 static PFN_vkCreateDebugUtilsMessengerEXT vkCreateDebuggerDispatch;
 static PFN_vkDestroyDebugUtilsMessengerEXT vkDestroyDebuggerDispatch;
@@ -369,6 +368,45 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
+    const char *VkDescriptorType_string(VkDescriptorType type) {
+        switch (type) {
+        case VK_DESCRIPTOR_TYPE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_SAMPLER";
+        case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER";
+        case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+            return "VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE";
+        case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_IMAGE";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC";
+        case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+            return "VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT";
+        case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT:
+            return "VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT";
+        case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+            return "VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR";
+        case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
+            return "VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV";
+        case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
+            return "VK_DESCRIPTOR_TYPE_MUTABLE_VALVE";
+        case VK_DESCRIPTOR_TYPE_MAX_ENUM:
+            return "VK_DESCRIPTOR_TYPE_MAX_ENUM";
+        default:
+            return "";
+        }
+    }
+
     const char *VkResult_string(VkResult result) {
         switch (result) {
         case VK_SUCCESS:
@@ -602,26 +640,59 @@ namespace Dynamo::Graphics::Vulkan {
         return buffer;
     }
 
-    VkImageView VkImageView_create(VkDevice device, VkImage image, ImageViewSettings settings) {
+    void VkBuffer_copy(VkBuffer src,
+                       VkBuffer dst,
+                       VkQueue queue,
+                       VkCommandBuffer command_buffer,
+                       VkBufferCopy *regions,
+                       unsigned region_count) {
+        // Copy command
+        VkCommandBufferBeginInfo begin_info = {};
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(command_buffer, &begin_info);
+        vkCmdCopyBuffer(command_buffer, src, dst, region_count, regions);
+        vkEndCommandBuffer(command_buffer);
+
+        // Submit the command to the transfer queue
+        VkSubmitInfo submit_info = {};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &command_buffer;
+
+        vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+    }
+
+    VkImageView VkImageView_create(VkDevice device,
+                                   VkImage image,
+                                   VkFormat format,
+                                   VkImageViewType type,
+                                   const VkImageSubresourceRange &subresources,
+                                   const VkComponentMapping &swizzle) {
         VkImageViewCreateInfo view_info = {};
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         view_info.image = image;
-        view_info.format = settings.format;
-        view_info.viewType = settings.type;
-        view_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-        view_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-        view_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-        view_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-        view_info.subresourceRange.aspectMask = settings.aspect_mask;
-        view_info.subresourceRange.baseMipLevel = settings.mip_base;
-        view_info.subresourceRange.levelCount = settings.mip_count;
-        view_info.subresourceRange.baseArrayLayer = settings.layer_base;
-        view_info.subresourceRange.layerCount = settings.layer_count;
+        view_info.format = format;
+        view_info.viewType = type;
+        view_info.components = swizzle;
+        view_info.subresourceRange = subresources;
 
         VkImageView view;
         VkResult_log("Create ImageView", vkCreateImageView(device, &view_info, nullptr, &view));
         return view;
+    }
+
+    VkDescriptorSetLayout VkDescriptorSetLayout_create(VkDevice device, const DescriptorSetLayout &layout) {
+        VkDescriptorSetLayoutCreateInfo layout_info = {};
+        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = layout.bindings.size();
+        layout_info.pBindings = layout.bindings.data();
+
+        VkDescriptorSetLayout vk_layout;
+        VkResult_log("Create Descriptor Set Layout",
+                     vkCreateDescriptorSetLayout(device, &layout_info, nullptr, &vk_layout));
+        return vk_layout;
     }
 
     VkRenderPass VkRenderPass_create(VkDevice device, const RenderPassSettings &settings) {

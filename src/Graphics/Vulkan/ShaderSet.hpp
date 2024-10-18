@@ -11,6 +11,15 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
+     * @brief Descriptor set layout bindings.
+     *
+     */
+    struct DescriptorSetLayout {
+        std::vector<VkDescriptorSetLayoutBinding> bindings;
+        unsigned set_number;
+    };
+
+    /**
      * @brief Shader module instance.
      *
      */
@@ -18,6 +27,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkShaderModule handle;
         std::vector<VkVertexInputBindingDescription> bindings;
         std::vector<VkVertexInputAttributeDescription> attributes;
+        std::vector<DescriptorSetLayout> descriptor_sets;
     };
 
     /**
@@ -48,6 +58,14 @@ namespace Dynamo::Graphics::Vulkan {
          * @param reflection
          */
         void reflect_vertex_input(ShaderModule &module, SpvReflectShaderModule reflection);
+
+        /**
+         * @brief Extract descriptor sets from the shader source.
+         *
+         * @param module
+         * @param reflection
+         */
+        void reflect_descriptor_sets(ShaderModule &module, SpvReflectShaderModule reflection);
 
       public:
         ShaderSet(VkDevice device);

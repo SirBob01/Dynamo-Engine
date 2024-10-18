@@ -12,22 +12,6 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
-     * @brief Image view configuration settings.
-     *
-     */
-    struct ImageViewSettings {
-        VkFormat format = VK_FORMAT_B8G8R8A8_SRGB;
-        VkImageViewType type = VK_IMAGE_VIEW_TYPE_2D;
-        VkImageAspectFlags aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
-
-        unsigned mip_base = 0;
-        unsigned mip_count = 1;
-
-        unsigned layer_base = 0;
-        unsigned layer_count = 1;
-    };
-
-    /**
      * @brief Render pass configuration settings.
      *
      */
@@ -100,6 +84,14 @@ namespace Dynamo::Graphics::Vulkan {
     const char *VkShaderStageFlagBits_string(VkShaderStageFlagBits stage);
 
     /**
+     * @brief Convert VkDescriptorType to string.
+     *
+     * @param type
+     * @return const char*
+     */
+    const char *VkDescriptorType_string(VkDescriptorType type);
+
+    /**
      * @brief Convert VkResult to string.
      *
      * @param result
@@ -166,14 +158,48 @@ namespace Dynamo::Graphics::Vulkan {
                              unsigned queue_family_count);
 
     /**
+     * @brief Submit a command to copy the contents of a Vulkan buffer to another buffer.
+     *
+     * @param src
+     * @param dst
+     * @param queue
+     * @param command_buffer
+     * @param regions
+     * @param region_count
+     */
+    void VkBuffer_copy(VkBuffer src,
+                       VkBuffer dst,
+                       VkQueue queue,
+                       VkCommandBuffer command_buffer,
+                       VkBufferCopy *regions,
+                       unsigned region_count);
+
+    /**
      * @brief Create a Vulkan image view.
      *
      * @param device
      * @param image
-     * @param settings
+     * @param format
+     * @param type
+     * @param subresources
+     * @param swizzle
      * @return VkImageView
      */
-    VkImageView VkImageView_create(VkDevice device, VkImage image, ImageViewSettings settings);
+    VkImageView VkImageView_create(VkDevice device,
+                                   VkImage image,
+                                   VkFormat format,
+                                   VkImageViewType type,
+                                   const VkImageSubresourceRange &subresources,
+                                   const VkComponentMapping &swizzle = {});
+
+    /**
+     * @brief Create a Vulkan descriptor set layout.
+     *
+     * @param device
+     * @param layout
+     * @return VkDescriptorSetLayout
+     */
+    VkDescriptorSetLayout VkDescriptorSetLayout_create(VkDevice device, const DescriptorSetLayout &layout);
 
     /**
      * @brief Create a Vulkan render pass.

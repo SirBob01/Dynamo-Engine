@@ -79,12 +79,61 @@ namespace Dynamo::Graphics::Vulkan {
             attribute.format = format;
             attribute.offset = 0;
             module.attributes.push_back(attribute);
+        }
 
-            Log::info("Binding (binding: {}, stride: {}, rate: {})",
+        Log::info("* Inputs");
+        for (auto &binding : module.bindings) {
+            Log::info(" -> Binding (binding: {}, stride: {}, rate: {})",
                       binding.binding,
                       binding.stride,
-                      instanced ? "per-instance" : "per-vertex");
-            Log::info("Attribute (location: {}, binding: {})", attribute.location, attribute.binding);
+                      binding.inputRate == VK_VERTEX_INPUT_RATE_INSTANCE ? "per-instance" : "per-vertex");
+        }
+        for (auto &attribute : module.attributes) {
+            Log::info(" -> Attribute (location: {}, binding: {})", attribute.location, attribute.binding);
+        }
+    }
+
+    void ShaderSet::reflect_descriptor_sets(ShaderModule &module, SpvReflectShaderModule reflection) {
+        uint32_t count = 0;
+        SpvReflectResult result = spvReflectEnumerateDescriptorSets(&reflection, &count, NULL);
+        DYN_ASSERT(result == SPV_REFLECT_RESULT_SUCCESS);
+
+        std::vector<SpvReflectDescriptorSet *> sets(count);
+        result = spvReflectEnumerateDescriptorSets(&reflection, &count, sets.data());
+        DYN_ASSERT(result == SPV_REFLECT_RESULT_SUCCESS);
+
+        for (unsigned i = 0; i < count; i++) {
+            const SpvReflectDescriptorSet &refl_set = *sets[i];
+
+            DescriptorSetLayout set;
+            set.set_number = refl_set.set;
+            for (unsigned j = 0; j < refl_set.binding_count; j++) {
+                const SpvReflectDescriptorBinding &refl_binding = *refl_set.bindings[j];
+                VkDescriptorSetLayoutBinding binding;
+                binding.binding = refl_binding.binding;
+                binding.pImmutableSamplers = nullptr;
+                binding.stageFlags = static_cast<VkShaderStageFlagBits>(reflection.shader_stage);
+                binding.descriptorType = static_cast<VkDescriptorType>(refl_binding.descriptor_type);
+                binding.descriptorCount = 1;
+                for (unsigned k = 0; k < refl_binding.array.dims_count; k++) {
+                    binding.descriptorCount *= refl_binding.array.dims[k];
+                }
+                set.bindings.push_back(binding);
+            }
+
+            // Sort the bindings
+            std::sort(set.bindings.begin(), set.bindings.end(), [](auto &a, auto &b) { return a.binding < b.binding; });
+            module.descriptor_sets.push_back(set);
+        }
+
+        for (auto &set : module.descriptor_sets) {
+            Log::info("* Descriptor Set: {}", set.set_number);
+            for (auto &binding : set.bindings) {
+                Log::info(" -> Binding (binding: {}, count: {}, type: {})",
+                          binding.binding,
+                          binding.descriptorCount,
+                          VkDescriptorType_string(binding.descriptorType));
+            }
         }
     }
 
@@ -125,6 +174,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         Log::info("Shader {} reflection:", descriptor.name);
         reflect_vertex_input(module, reflection);
+        reflect_descriptor_sets(module, reflection);
         spvReflectDestroyShaderModule(&reflection);
         Log::info("");
 

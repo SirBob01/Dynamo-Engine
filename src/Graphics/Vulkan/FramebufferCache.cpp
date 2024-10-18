@@ -16,7 +16,7 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void FramebufferCache::destroy() {
-        for (const auto [key, framebuffer] : _cache) {
+        for (const auto &[key, framebuffer] : _cache) {
             vkDestroyFramebuffer(_device, framebuffer, nullptr);
         }
         _cache.clear();

@@ -41,16 +41,6 @@ namespace Dynamo::Graphics::Vulkan {
          */
         VkDeviceMemory allocate(VkBuffer buffer);
 
-        /**
-         * @brief Copy buffer regions.
-         *
-         * @param src
-         * @param dst
-         * @param regions
-         * @param region_count
-         */
-        void copy_raw(VkBuffer src, VkBuffer dst, VkBufferCopy *regions, unsigned region_count);
-
       public:
         Buffer(VkDevice device,
                const PhysicalDevice &physical,
