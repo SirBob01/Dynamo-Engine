@@ -182,21 +182,17 @@ namespace Dynamo::Graphics::Vulkan {
             vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_pass.pipeline);
 
-            MeshAllocation &allocation = _mesh_set.get(model.mesh);
-
+            MeshAllocation &mesh = _mesh_set.get(model.mesh);
             vkCmdBindVertexBuffers(frame.command_buffer,
                                    0,
-                                   allocation.attribute_offsets.size(),
-                                   allocation.buffers.data(),
-                                   allocation.attribute_offsets.data());
-            if (allocation.index_type != VK_INDEX_TYPE_NONE_KHR) {
-                vkCmdBindIndexBuffer(frame.command_buffer,
-                                     _index_buffer.handle(),
-                                     allocation.index_offset,
-                                     allocation.index_type);
-                vkCmdDrawIndexed(frame.command_buffer, allocation.index_count, allocation.instance_count, 0, 0, 0);
+                                   mesh.attribute_offsets.size(),
+                                   mesh.buffers.data(),
+                                   mesh.attribute_offsets.data());
+            if (mesh.index_type != VK_INDEX_TYPE_NONE_KHR) {
+                vkCmdBindIndexBuffer(frame.command_buffer, _index_buffer.handle(), mesh.index_offset, mesh.index_type);
+                vkCmdDrawIndexed(frame.command_buffer, mesh.index_count, mesh.instance_count, 0, 0, 0);
             } else {
-                vkCmdDraw(frame.command_buffer, allocation.vertex_count, allocation.instance_count, 0, 0);
+                vkCmdDraw(frame.command_buffer, mesh.vertex_count, mesh.instance_count, 0, 0);
             }
         }
         _models.clear();
