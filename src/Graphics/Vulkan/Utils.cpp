@@ -37,22 +37,6 @@ VkDebugUtilsMessengerEXT_message_callback(VkDebugUtilsMessageSeverityFlagBitsEXT
 }
 
 namespace Dynamo::Graphics::Vulkan {
-    bool RenderPassSettings::operator==(const RenderPassSettings &other) const {
-        return color_format == other.color_format && depth_format == other.depth_format &&
-               clear_color == other.clear_color && clear_depth == other.clear_depth;
-    }
-
-    bool FramebufferSettings::operator==(const FramebufferSettings &other) const {
-        return view == other.view && extent.width == other.extent.width && extent.height == other.extent.height &&
-               pass == other.pass;
-    }
-
-    bool GraphicsPipelineSettings::operator==(const GraphicsPipelineSettings &other) const {
-        return topology == other.topology && polygon_mode == other.polygon_mode && cull_mode == other.cull_mode &&
-               vertex.handle == other.vertex.handle && fragment.handle == other.fragment.handle &&
-               layout == other.layout && renderpass == other.renderpass;
-    }
-
     unsigned VkFormat_size(VkFormat format) {
         switch (format) {
         case VK_FORMAT_UNDEFINED:
@@ -369,6 +353,45 @@ namespace Dynamo::Graphics::Vulkan {
         }
     }
 
+    const char *VkDescriptorType_string(VkDescriptorType type) {
+        switch (type) {
+        case VK_DESCRIPTOR_TYPE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_SAMPLER";
+        case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER";
+        case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+            return "VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE";
+        case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_IMAGE";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER";
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC";
+        case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+            return "VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT";
+        case VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT:
+            return "VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT";
+        case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR:
+            return "VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR";
+        case VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV:
+            return "VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV";
+        case VK_DESCRIPTOR_TYPE_MUTABLE_VALVE:
+            return "VK_DESCRIPTOR_TYPE_MUTABLE_VALVE";
+        case VK_DESCRIPTOR_TYPE_MAX_ENUM:
+            return "VK_DESCRIPTOR_TYPE_MAX_ENUM";
+        default:
+            return "";
+        }
+    }
+
     const char *VkResult_string(VkResult result) {
         switch (result) {
         case VK_SUCCESS:
@@ -457,6 +480,39 @@ namespace Dynamo::Graphics::Vulkan {
     void VkResult_log(const std::string &op_message, VkResult result) {
         if (result != VK_SUCCESS) {
             Log::error("Graphics::Vulkan {}: {}", op_message, VkResult_string(result));
+        }
+    }
+
+    VkPolygonMode convert_fill(Fill fill) {
+        switch (fill) {
+        case Fill::Point:
+            return VK_POLYGON_MODE_POINT;
+        case Fill::Line:
+            return VK_POLYGON_MODE_LINE;
+        case Fill::Face:
+            return VK_POLYGON_MODE_FILL;
+        }
+    }
+
+    VkCullModeFlags convert_cull(Cull cull) {
+        switch (cull) {
+        case Cull::None:
+            return VK_CULL_MODE_NONE;
+        case Cull::Back:
+            return VK_CULL_MODE_BACK_BIT;
+        case Cull::Front:
+            return VK_CULL_MODE_FRONT_BIT;
+        }
+    }
+
+    VkPrimitiveTopology convert_topology(Topology topology) {
+        switch (topology) {
+        case Topology::Point:
+            return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+        case Topology::Triangle:
+            return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        case Topology::Line:
+            return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
         }
     }
 
@@ -602,80 +658,74 @@ namespace Dynamo::Graphics::Vulkan {
         return buffer;
     }
 
-    VkImageView VkImageView_create(VkDevice device, VkImage image, ImageViewSettings settings) {
+    void VkBuffer_immediate_copy(VkBuffer src,
+                                 VkBuffer dst,
+                                 VkQueue queue,
+                                 VkCommandBuffer command_buffer,
+                                 VkBufferCopy *regions,
+                                 unsigned region_count) {
+        // Copy command
+        VkCommandBufferBeginInfo begin_info = {};
+        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(command_buffer, &begin_info);
+        vkCmdCopyBuffer(command_buffer, src, dst, region_count, regions);
+        vkEndCommandBuffer(command_buffer);
+
+        // Submit the command to the transfer queue
+        VkSubmitInfo submit_info = {};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &command_buffer;
+
+        vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+    }
+
+    VkImageView VkImageView_create(VkDevice device,
+                                   VkImage image,
+                                   VkFormat format,
+                                   VkImageViewType type,
+                                   const VkImageSubresourceRange &subresources,
+                                   const VkComponentMapping &swizzle) {
         VkImageViewCreateInfo view_info = {};
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         view_info.image = image;
-        view_info.format = settings.format;
-        view_info.viewType = settings.type;
-        view_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-        view_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-        view_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-        view_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-        view_info.subresourceRange.aspectMask = settings.aspect_mask;
-        view_info.subresourceRange.baseMipLevel = settings.mip_base;
-        view_info.subresourceRange.levelCount = settings.mip_count;
-        view_info.subresourceRange.baseArrayLayer = settings.layer_base;
-        view_info.subresourceRange.layerCount = settings.layer_count;
+        view_info.format = format;
+        view_info.viewType = type;
+        view_info.components = swizzle;
+        view_info.subresourceRange = subresources;
 
         VkImageView view;
         VkResult_log("Create ImageView", vkCreateImageView(device, &view_info, nullptr, &view));
         return view;
     }
 
-    VkRenderPass VkRenderPass_create(VkDevice device, const RenderPassSettings &settings) {
-        // Color buffer
-        VkAttachmentDescription color = {};
-        color.format = settings.color_format;
-        color.loadOp = settings.clear_color ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
-        color.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        color.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        color.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        color.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        color.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-        color.samples = VK_SAMPLE_COUNT_1_BIT; // TODO
+    VkDescriptorSetLayout VkDescriptorSetLayout_create(VkDevice device,
+                                                       const VkDescriptorSetLayoutBinding *bindings,
+                                                       unsigned binding_count) {
+        VkDescriptorSetLayoutCreateInfo layout_info = {};
+        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = binding_count;
+        layout_info.pBindings = bindings;
 
-        std::array<VkAttachmentDescription, 1> attachments = {color};
-
-        VkAttachmentReference color_ref = {};
-        color_ref.attachment = 0;
-        color_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-        VkSubpassDescription subpass = {};
-        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-        subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &color_ref;
-
-        VkSubpassDependency dependency = {};
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-        VkRenderPassCreateInfo renderpass_info = {};
-        renderpass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderpass_info.attachmentCount = attachments.size();
-        renderpass_info.pAttachments = attachments.data();
-        renderpass_info.subpassCount = 1;
-        renderpass_info.pSubpasses = &subpass;
-        renderpass_info.dependencyCount = 1;
-        renderpass_info.pDependencies = &dependency;
-
-        VkRenderPass renderpass;
-        VkResult_log("Create Render Pass", vkCreateRenderPass(device, &renderpass_info, nullptr, &renderpass));
-        return renderpass;
+        VkDescriptorSetLayout vk_layout;
+        VkResult_log("Create Descriptor Set Layout",
+                     vkCreateDescriptorSetLayout(device, &layout_info, nullptr, &vk_layout));
+        return vk_layout;
     }
 
-    VkPipelineLayout VkPipelineLayout_create(VkDevice device) {
+    VkPipelineLayout VkPipelineLayout_create(VkDevice device,
+                                             VkDescriptorSetLayout *layouts,
+                                             unsigned layout_count,
+                                             VkPushConstantRange *pc_ranges,
+                                             unsigned pc_range_count) {
         VkPipelineLayoutCreateInfo layout_info = {};
         layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        layout_info.setLayoutCount = 0;
-        layout_info.pSetLayouts = nullptr;
-        layout_info.pushConstantRangeCount = 0;
-        layout_info.pPushConstantRanges = nullptr;
+        layout_info.setLayoutCount = layout_count;
+        layout_info.pSetLayouts = layouts;
+        layout_info.pushConstantRangeCount = pc_range_count;
+        layout_info.pPushConstantRanges = pc_ranges;
 
         VkPipelineLayout layout;
         VkResult_log("Create Pipeline Layout", vkCreatePipelineLayout(device, &layout_info, nullptr, &layout));
@@ -693,143 +743,20 @@ namespace Dynamo::Graphics::Vulkan {
         return shader;
     }
 
-    VkPipeline VkPipeline_create(VkDevice device,
-                                 VkPipelineCache cache,
-                                 VkRenderPass pass,
-                                 const GraphicsPipelineSettings &settings) {
-        VkGraphicsPipelineCreateInfo pipeline_info = {};
-        pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-
-        // Dynamic pipeline states that need to be set during command recording
-        std::array<VkDynamicState, 4> dynamic_states = {
-            VK_DYNAMIC_STATE_VIEWPORT,
-            VK_DYNAMIC_STATE_SCISSOR,
-            VK_DYNAMIC_STATE_BLEND_CONSTANTS,
-            VK_DYNAMIC_STATE_DEPTH_BOUNDS,
-        };
-        VkPipelineDynamicStateCreateInfo dynamic = {};
-        dynamic.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-        dynamic.dynamicStateCount = dynamic_states.size();
-        dynamic.pDynamicStates = dynamic_states.data();
-        pipeline_info.pDynamicState = &dynamic;
-
-        // Programmable shader stages
-        std::array<VkPipelineShaderStageCreateInfo, 2> stages;
-
-        VkPipelineShaderStageCreateInfo vertex_stage_info = {};
-        vertex_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        vertex_stage_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
-        vertex_stage_info.module = settings.vertex.handle;
-        vertex_stage_info.pName = "main";
-        stages[0] = vertex_stage_info;
-
-        VkPipelineShaderStageCreateInfo fragment_stage_info = {};
-        fragment_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        fragment_stage_info.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragment_stage_info.module = settings.fragment.handle;
-        fragment_stage_info.pName = "main";
-        stages[1] = fragment_stage_info;
-
-        pipeline_info.stageCount = stages.size();
-        pipeline_info.pStages = stages.data();
-
-        // Dynamic viewport state
-        VkPipelineViewportStateCreateInfo viewport = {};
-        viewport.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        viewport.viewportCount = 1;
-        viewport.scissorCount = 1;
-        pipeline_info.pViewportState = &viewport;
-
-        // Vertex input
-        VkPipelineVertexInputStateCreateInfo input = {};
-        input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        input.vertexBindingDescriptionCount = settings.vertex.bindings.size();
-        input.pVertexBindingDescriptions = settings.vertex.bindings.data();
-        input.vertexAttributeDescriptionCount = settings.vertex.attributes.size();
-        input.pVertexAttributeDescriptions = settings.vertex.attributes.data();
-        pipeline_info.pVertexInputState = &input;
-
-        // Input assembly
-        VkPipelineInputAssemblyStateCreateInfo assembly = {};
-        assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-        assembly.topology = settings.topology;
-        assembly.primitiveRestartEnable = VK_FALSE;
-        pipeline_info.pInputAssemblyState = &assembly;
-
-        // Rasterizer
-        VkPipelineRasterizationStateCreateInfo rasterizer = {};
-        rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-        rasterizer.polygonMode = settings.polygon_mode;
-        rasterizer.cullMode = settings.cull_mode;
-        rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-        rasterizer.lineWidth = 1;
-        rasterizer.rasterizerDiscardEnable = VK_FALSE;
-        rasterizer.depthClampEnable = VK_FALSE;
-        rasterizer.depthBiasEnable = VK_FALSE;
-        rasterizer.depthBiasConstantFactor = 0;
-        rasterizer.depthBiasClamp = 0;
-        rasterizer.depthBiasSlopeFactor = 0;
-        pipeline_info.pRasterizationState = &rasterizer;
-
-        // Multisampling (TODO)
-        VkPipelineMultisampleStateCreateInfo ms = {};
-        ms.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-        ms.sampleShadingEnable = VK_FALSE;
-        ms.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-        ms.minSampleShading = 1;
-        ms.pSampleMask = nullptr;
-        ms.alphaToCoverageEnable = VK_FALSE;
-        ms.alphaToOneEnable = VK_FALSE;
-        pipeline_info.pMultisampleState = &ms;
-
-        // Color blending (TODO allow custom blend presets e.g., add, subtract)
-        VkPipelineColorBlendAttachmentState blend_attachment = {};
-        blend_attachment.blendEnable = VK_TRUE;
-        blend_attachment.colorWriteMask =
-            VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-        blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-        blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
-        blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-        blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-        blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
-
-        VkPipelineColorBlendStateCreateInfo blend = {};
-        blend.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-        blend.attachmentCount = 1;
-        blend.pAttachments = &blend_attachment;
-        blend.logicOpEnable = VK_FALSE;
-        blend.logicOp = VK_LOGIC_OP_COPY;
-        pipeline_info.pColorBlendState = &blend;
-
-        // Depth and stencil testing (TODO)
-        pipeline_info.pDepthStencilState = nullptr;
-
-        // Renderpass and layout
-        pipeline_info.subpass = 0;
-        pipeline_info.renderPass = pass;
-        pipeline_info.layout = settings.layout;
-
-        // As pipeline derivation
-        pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
-        pipeline_info.basePipelineIndex = 0;
-
-        // Build and cache
-        VkPipeline pipeline;
-        VkResult_log("Create Graphics Pipeline",
-                     vkCreateGraphicsPipelines(device, cache, 1, &pipeline_info, nullptr, &pipeline));
-        return pipeline;
-    }
-
-    VkFramebuffer VkFramebuffer_create(VkDevice device, const FramebufferSettings &settings) {
+    VkFramebuffer VkFramebuffer_create(VkDevice device,
+                                       VkRenderPass renderpass,
+                                       const VkExtent2D &extent,
+                                       const VkImageView *views,
+                                       unsigned view_count,
+                                       unsigned layer_count) {
         VkFramebufferCreateInfo framebuffer_info = {};
         framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebuffer_info.renderPass = settings.pass;
-        framebuffer_info.attachmentCount = 1;
-        framebuffer_info.pAttachments = &settings.view;
-        framebuffer_info.width = settings.extent.width;
-        framebuffer_info.height = settings.extent.height;
-        framebuffer_info.layers = 1;
+        framebuffer_info.renderPass = renderpass;
+        framebuffer_info.attachmentCount = view_count;
+        framebuffer_info.pAttachments = views;
+        framebuffer_info.width = extent.width;
+        framebuffer_info.height = extent.height;
+        framebuffer_info.layers = layer_count;
 
         VkFramebuffer framebuffer;
         VkResult_log("Create Framebuffer", vkCreateFramebuffer(device, &framebuffer_info, nullptr, &framebuffer));

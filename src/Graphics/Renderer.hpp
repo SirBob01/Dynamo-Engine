@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Math/Color.hpp>
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
@@ -9,12 +8,12 @@
 #include <Graphics/Vulkan/Buffer.hpp>
 #include <Graphics/Vulkan/FrameContext.hpp>
 #include <Graphics/Vulkan/FramebufferCache.hpp>
+#include <Graphics/Vulkan/MaterialRegistry.hpp>
 #include <Graphics/Vulkan/MeshSet.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
-#include <Graphics/Vulkan/PipelineCache.hpp>
 #include <Graphics/Vulkan/ShaderSet.hpp>
 #include <Graphics/Vulkan/Swapchain.hpp>
-#include <Utils/SparseSet.hpp>
+#include <Math/Color.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -40,23 +39,21 @@ namespace Dynamo::Graphics::Vulkan {
         Buffer _index_buffer;
         Buffer _staging_buffer;
 
-        MeshSet _mesh_set;
-        ShaderSet _shader_set;
-        PipelineCache _pipeline_cache;
-        FramebufferCache _framebuffer_cache;
+        MeshSet _meshes;
+        ShaderSet _shaders;
+        MaterialRegistry _materials;
+        FramebufferCache _framebuffers;
 
         FrameContextList<3> _frame_contexts;
 
         std::vector<Model> _models;
         VkClearValue _clear;
 
-        // < TODO:
-        // * Depth-stencil buffer
+        // TODO:
         // * Uniform buffers
+        // * Depth-stencil buffer
         // * Textures
-        // * Improve Material system
-        VkPipelineLayout _layout;
-        // >
+        // * Group draws by renderpass / pipeline / pipeline layout
 
         /**
          * @brief Rebuild the swapchain.

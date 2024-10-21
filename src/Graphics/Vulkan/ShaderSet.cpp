@@ -79,12 +79,70 @@ namespace Dynamo::Graphics::Vulkan {
             attribute.format = format;
             attribute.offset = 0;
             module.attributes.push_back(attribute);
+        }
 
-            Log::info("Binding (binding: {}, stride: {}, rate: {})",
+        Log::info("* Inputs");
+        for (auto &binding : module.bindings) {
+            Log::info(" -> Binding (binding: {}, stride: {}, rate: {})",
                       binding.binding,
                       binding.stride,
-                      instanced ? "per-instance" : "per-vertex");
-            Log::info("Attribute (location: {}, binding: {})", attribute.location, attribute.binding);
+                      binding.inputRate == VK_VERTEX_INPUT_RATE_INSTANCE ? "per-instance" : "per-vertex");
+        }
+        for (auto &attribute : module.attributes) {
+            Log::info(" -> Attribute (location: {}, binding: {})", attribute.location, attribute.binding);
+        }
+    }
+
+    void ShaderSet::reflect_descriptor_sets(ShaderModule &module, SpvReflectShaderModule reflection) {
+        uint32_t count = 0;
+        SpvReflectResult result = spvReflectEnumerateDescriptorSets(&reflection, &count, NULL);
+        DYN_ASSERT(result == SPV_REFLECT_RESULT_SUCCESS);
+
+        std::vector<SpvReflectDescriptorSet *> sets(count);
+        result = spvReflectEnumerateDescriptorSets(&reflection, &count, sets.data());
+        DYN_ASSERT(result == SPV_REFLECT_RESULT_SUCCESS);
+
+        for (unsigned i = 0; i < count; i++) {
+            const SpvReflectDescriptorSet &refl_set = *sets[i];
+            Log::info("* Descriptor Set: {}", refl_set.set);
+
+            std::vector<VkDescriptorSetLayoutBinding> bindings;
+            for (unsigned j = 0; j < refl_set.binding_count; j++) {
+                const SpvReflectDescriptorBinding &refl_binding = *refl_set.bindings[j];
+                VkDescriptorSetLayoutBinding binding;
+                binding.binding = refl_binding.binding;
+                binding.pImmutableSamplers = nullptr;
+                binding.stageFlags = static_cast<VkShaderStageFlagBits>(reflection.shader_stage);
+                binding.descriptorType = static_cast<VkDescriptorType>(refl_binding.descriptor_type);
+                binding.descriptorCount = 1;
+                for (unsigned k = 0; k < refl_binding.array.dims_count; k++) {
+                    binding.descriptorCount *= refl_binding.array.dims[k];
+                }
+                bindings.push_back(binding);
+
+                Log::info(" -> Binding (binding: {}, count: {}, type: {}, stage: {})",
+                          binding.binding,
+                          binding.descriptorCount,
+                          VkDescriptorType_string(binding.descriptorType),
+                          VkShaderStageFlagBits_string(static_cast<VkShaderStageFlagBits>(binding.stageFlags)));
+            }
+
+            // Sort the bindings
+            std::sort(bindings.begin(), bindings.end(), [](auto &a, auto &b) { return a.binding < b.binding; });
+
+            // Build descriptor set layout
+            DescriptorLayoutKey key;
+            key.bindings = bindings;
+
+            VkDescriptorSetLayout layout;
+            auto layout_it = _descriptor_layouts.find(key);
+            if (layout_it != _descriptor_layouts.end()) {
+                layout = layout_it->second;
+            } else {
+                layout = VkDescriptorSetLayout_create(_device, bindings.data(), bindings.size());
+                _descriptor_layouts.emplace(key, layout);
+            }
+            module.descriptor_set_layouts.push_back(layout);
         }
     }
 
@@ -125,6 +183,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         Log::info("Shader {} reflection:", descriptor.name);
         reflect_vertex_input(module, reflection);
+        reflect_descriptor_sets(module, reflection);
         spvReflectDestroyShaderModule(&reflection);
         Log::info("");
 
@@ -134,7 +193,7 @@ namespace Dynamo::Graphics::Vulkan {
         return shader;
     }
 
-    ShaderModule &ShaderSet::get(Shader shader) { return _modules.get(shader); }
+    const ShaderModule &ShaderSet::get(Shader shader) const { return _modules.get(shader); }
 
     void ShaderSet::destroy(Shader shader) {
         ShaderModule &module = _modules.get(shader);
@@ -144,6 +203,11 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void ShaderSet::destroy() {
+        for (const auto &[key, layout] : _descriptor_layouts) {
+            vkDestroyDescriptorSetLayout(_device, layout, nullptr);
+        }
+        _descriptor_layouts.clear();
+
         for (ShaderModule &module : _modules) {
             vkDestroyShaderModule(_device, module.handle, nullptr);
         }
