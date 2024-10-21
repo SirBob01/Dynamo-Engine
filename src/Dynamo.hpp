@@ -2,8 +2,11 @@
 #include <Asset/Sound.hpp>
 #include <Clock.hpp>
 #include <Display.hpp>
+#include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
+#include <Graphics/Model.hpp>
 #include <Graphics/Renderer.hpp>
+#include <Graphics/Shader.hpp>
 #include <Input.hpp>
 #include <Math/Box2.hpp>
 #include <Math/Circle.hpp>

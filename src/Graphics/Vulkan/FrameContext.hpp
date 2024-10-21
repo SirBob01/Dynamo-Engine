@@ -36,7 +36,7 @@ namespace Dynamo::Graphics::Vulkan {
         FrameContextList(VkDevice device, VkCommandPool command_pool) : _device(device), _index(0) {
             std::array<VkCommandBuffer, N> buffers;
             VkCommandBuffer_allocate(device, command_pool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, buffers.data(), N);
-            for (unsigned i = 0; i < 3; i++) {
+            for (unsigned i = 0; i < N; i++) {
                 _contexts[i].sync_fence = VkFence_create(device);
                 _contexts[i].sync_render_start = VkSemaphore_create(device);
                 _contexts[i].sync_render_done = VkSemaphore_create(device);

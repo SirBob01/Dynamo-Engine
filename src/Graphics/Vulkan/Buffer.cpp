@@ -43,29 +43,6 @@ namespace Dynamo::Graphics::Vulkan {
         return memory;
     }
 
-    void Buffer::copy_raw(VkBuffer src, VkBuffer dst, VkBufferCopy *regions, unsigned region_count) {
-        // Reset the command buffer
-        vkResetCommandBuffer(_command_buffer, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
-
-        // Copy command
-        VkCommandBufferBeginInfo begin_info = {};
-        begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-        vkBeginCommandBuffer(_command_buffer, &begin_info);
-        vkCmdCopyBuffer(_command_buffer, src, dst, region_count, regions);
-        vkEndCommandBuffer(_command_buffer);
-
-        // Submit the command to the transfer queue
-        VkSubmitInfo submit_info = {};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = &_command_buffer;
-
-        vkQueueSubmit(_transfer_queue, 1, &submit_info, VK_NULL_HANDLE);
-        vkQueueWaitIdle(_transfer_queue);
-    }
-
     VkBuffer Buffer::handle() const { return _handle; }
 
     unsigned Buffer::capacity() const { return _allocator.capacity(); }
@@ -97,12 +74,14 @@ namespace Dynamo::Graphics::Vulkan {
         VkDeviceMemory next_memory = allocate(next_handle);
         vkBindBufferMemory(_device, next_handle, next_memory, 0);
 
-        VkBufferCopy copy_region;
-        copy_region.dstOffset = 0;
-        copy_region.srcOffset = 0;
-        copy_region.size = _allocator.capacity();
+        // Copy contents to new buffer
+        VkBufferCopy region;
+        region.dstOffset = 0;
+        region.srcOffset = 0;
+        region.size = _allocator.capacity();
 
-        copy_raw(_handle, next_handle, &copy_region, 1);
+        VkBuffer_immediate_copy(_handle, next_handle, _transfer_queue, _command_buffer, &region, 1);
+        vkQueueWaitIdle(_transfer_queue);
 
         // Destroy old resources
         vkDestroyBuffer(_device, _handle, nullptr);
@@ -132,7 +111,8 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     void Buffer::copy_to(Buffer &dst, VkBufferCopy *regions, unsigned region_count) {
-        copy_raw(_handle, dst._handle, regions, region_count);
+        VkBuffer_immediate_copy(_handle, dst._handle, _transfer_queue, _command_buffer, regions, region_count);
+        vkQueueWaitIdle(_transfer_queue);
     }
 
     void Buffer::destroy() {

@@ -11,6 +11,49 @@
 
 namespace Dynamo::Graphics::Vulkan {
     /**
+     * @brief Descriptor set layout bindings.
+     *
+     */
+    struct DescriptorLayoutKey {
+        std::vector<VkDescriptorSetLayoutBinding> bindings;
+
+        inline bool operator==(const DescriptorLayoutKey &other) const {
+            // Descriptor set layouts are compatible as long as bindings are the same
+            if (bindings.size() != other.bindings.size()) {
+                return false;
+            }
+
+            for (unsigned i = 0; i < bindings.size(); i++) {
+                const VkDescriptorSetLayoutBinding &a = bindings[i];
+                const VkDescriptorSetLayoutBinding &b = other.bindings[i];
+
+                if (a.binding != b.binding || a.descriptorType != b.descriptorType ||
+                    a.descriptorCount != b.descriptorCount || a.stageFlags != b.stageFlags) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        struct Hash {
+            inline size_t operator()(const DescriptorLayoutKey &layout) const {
+                size_t hash_base = 0;
+                for (const VkDescriptorSetLayoutBinding &binding : layout.bindings) {
+                    size_t hash0 = std::hash<unsigned>{}(binding.binding);
+                    size_t hash1 = std::hash<unsigned>{}(binding.descriptorCount);
+                    size_t hash2 = std::hash<unsigned>{}(binding.descriptorType);
+                    size_t hash3 = std::hash<unsigned>{}(binding.stageFlags);
+                    size_t hash4 = std::hash<const void *>{}(binding.pImmutableSamplers);
+
+                    size_t binding_hash = hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3) ^ (hash4 << 4);
+                    hash_base ^= binding_hash;
+                }
+                return hash_base;
+            }
+        };
+    };
+
+    /**
      * @brief Shader module instance.
      *
      */
@@ -18,6 +61,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkShaderModule handle;
         std::vector<VkVertexInputBindingDescription> bindings;
         std::vector<VkVertexInputAttributeDescription> attributes;
+        std::vector<VkDescriptorSetLayout> descriptor_set_layouts;
     };
 
     /**
@@ -28,6 +72,7 @@ namespace Dynamo::Graphics::Vulkan {
         VkDevice _device;
         IdTracker _ids;
         SparseSet<ShaderModule> _modules;
+        std::unordered_map<DescriptorLayoutKey, VkDescriptorSetLayout, DescriptorLayoutKey::Hash> _descriptor_layouts;
 
         /**
          * @brief Compile a shader source.
@@ -49,6 +94,14 @@ namespace Dynamo::Graphics::Vulkan {
          */
         void reflect_vertex_input(ShaderModule &module, SpvReflectShaderModule reflection);
 
+        /**
+         * @brief Extract descriptor sets from the shader source.
+         *
+         * @param module
+         * @param reflection
+         */
+        void reflect_descriptor_sets(ShaderModule &module, SpvReflectShaderModule reflection);
+
       public:
         ShaderSet(VkDevice device);
         ShaderSet() = default;
@@ -59,7 +112,7 @@ namespace Dynamo::Graphics::Vulkan {
          * @param shader
          * @return ShaderModule&
          */
-        ShaderModule &get(Shader shader);
+        const ShaderModule &get(Shader shader) const;
 
         /**
          * @brief Build a shader module from a descriptor.

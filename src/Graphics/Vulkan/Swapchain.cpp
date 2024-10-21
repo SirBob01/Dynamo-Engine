@@ -31,8 +31,10 @@ namespace Dynamo::Graphics::Vulkan {
         for (VkPresentModeKHR query : options.present_modes) {
             if (!display.is_vsync() && query == VK_PRESENT_MODE_IMMEDIATE_KHR) {
                 present_mode = query;
+                break;
             } else if (query == VK_PRESENT_MODE_MAILBOX_KHR) {
                 present_mode = query;
+                break;
             }
         }
 
@@ -90,10 +92,16 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Initialize swapchain views
         for (const VkImage image : images) {
-            ImageViewSettings view_settings;
-            view_settings.format = surface_format.format;
+            VkFormat format = surface_format.format;
 
-            VkImageView view = VkImageView_create(device, image, view_settings);
+            VkImageSubresourceRange subresources;
+            subresources.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            subresources.baseArrayLayer = 0;
+            subresources.layerCount = 1;
+            subresources.baseMipLevel = 0;
+            subresources.levelCount = 1;
+
+            VkImageView view = VkImageView_create(device, image, format, VK_IMAGE_VIEW_TYPE_2D, subresources);
             views.push_back(view);
         }
     }

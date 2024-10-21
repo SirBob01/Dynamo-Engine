@@ -40,9 +40,9 @@ namespace Dynamo::Graphics::Vulkan {
                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
         // Vulkan object caches
-        _shader_set = ShaderSet(_device);
-        _pipeline_cache = PipelineCache(_device, root_asset_directory + "/vulkan_cache.bin");
-        _framebuffer_cache = FramebufferCache(_device);
+        _shaders = ShaderSet(_device);
+        _materials = MaterialRegistry(_device, root_asset_directory + "/vulkan_cache.bin");
+        _framebuffers = FramebufferCache(_device);
 
         // Frame contexts
         _frame_contexts = FrameContextList<3>(_device, _graphics_pool);
@@ -52,30 +52,26 @@ namespace Dynamo::Graphics::Vulkan {
         _clear.color.float32[1] = 0;
         _clear.color.float32[2] = 0;
         _clear.color.float32[3] = 1;
-
-        /** Demo Triangle rendering specific objects */
-
-        _layout = VkPipelineLayout_create(_device);
     }
 
     Renderer::~Renderer() {
         // Wait for device queues to finish processing
         vkDeviceWaitIdle(_device);
 
-        // Cleanup Triangle Demo objects
-        vkDestroyPipelineLayout(_device, _layout, nullptr);
+        // Cache built pipelines
+        _materials.write_to_disk();
 
-        // Cleanup high level objects
-        _framebuffer_cache.destroy();
-        _pipeline_cache.destroy();
+        // High-level objects
         _frame_contexts.destroy();
         _vertex_buffer.destroy();
         _index_buffer.destroy();
         _staging_buffer.destroy();
+        _framebuffers.destroy();
+        _materials.destroy();
+        _shaders.destroy();
         _swapchain.destroy();
-        _shader_set.destroy();
 
-        // Destroy Vulkan core objects
+        // Vulkan core objects
         vkDestroyCommandPool(_device, _graphics_pool, nullptr);
         vkDestroyCommandPool(_device, _transfer_pool, nullptr);
         vkDestroyDevice(_device, nullptr);
@@ -89,7 +85,7 @@ namespace Dynamo::Graphics::Vulkan {
     void Renderer::rebuild_swapchain() {
         // Destroy old swapchain resources
         vkDeviceWaitIdle(_device);
-        _framebuffer_cache.destroy();
+        _framebuffers.destroy();
 
         // Rebuild the swapchain
         _swapchain = Swapchain(_device, _physical, _display, _swapchain);
@@ -103,16 +99,16 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     Mesh Renderer::build_mesh(const MeshDescriptor &descriptor) {
-        return _mesh_set.build(descriptor, _vertex_buffer, _index_buffer, _staging_buffer);
+        return _meshes.build(descriptor, _vertex_buffer, _index_buffer, _staging_buffer);
     }
 
-    void Renderer::destroy_mesh(Mesh mesh) { _mesh_set.free(mesh, _vertex_buffer, _index_buffer); }
+    void Renderer::destroy_mesh(Mesh mesh) { _meshes.free(mesh, _vertex_buffer, _index_buffer); }
 
     void Renderer::draw(const Model &model) { _models.push_back(model); }
 
-    Shader Renderer::build_shader(const ShaderDescriptor &descriptor) { return _shader_set.build(descriptor); }
+    Shader Renderer::build_shader(const ShaderDescriptor &descriptor) { return _shaders.build(descriptor); }
 
-    void Renderer::destroy_shader(Shader shader) { _shader_set.destroy(shader); }
+    void Renderer::destroy_shader(Shader shader) { _shaders.destroy(shader); }
 
     void Renderer::refresh() {
         const FrameContext &frame = _frame_contexts.next();
@@ -159,19 +155,17 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Iterate over models and draw
         for (Model model : _models) {
-            // TODO: Group models by material
-            VkFormat format = _swapchain.surface_format.format;
-            PipelinePass pipeline_pass = _pipeline_cache.build_material(model.material, _shader_set, _layout, format);
+            MaterialInstance pipeline_pass = _materials.get(model.material, _swapchain, _shaders);
 
             FramebufferSettings framebuffer_settings;
             framebuffer_settings.view = _swapchain.views[image_index];
             framebuffer_settings.extent = _swapchain.extent;
-            framebuffer_settings.pass = pipeline_pass.pass;
-            VkFramebuffer framebuffer = _framebuffer_cache.build(framebuffer_settings);
+            framebuffer_settings.renderpass = pipeline_pass.renderpass;
+            VkFramebuffer framebuffer = _framebuffers.get(framebuffer_settings);
 
             VkRenderPassBeginInfo renderpass_begin_info = {};
             renderpass_begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderpass_begin_info.renderPass = pipeline_pass.pass;
+            renderpass_begin_info.renderPass = pipeline_pass.renderpass;
             renderpass_begin_info.renderArea.extent = _swapchain.extent;
             renderpass_begin_info.renderArea.offset.x = 0;
             renderpass_begin_info.renderArea.offset.y = 0;
@@ -182,26 +176,21 @@ namespace Dynamo::Graphics::Vulkan {
             vkCmdBeginRenderPass(frame.command_buffer, &renderpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_pass.pipeline);
 
-            MeshAllocation &allocation = _mesh_set.get(model.mesh);
-
+            MeshAllocation &mesh = _meshes.get(model.mesh);
             vkCmdBindVertexBuffers(frame.command_buffer,
                                    0,
-                                   allocation.attribute_offsets.size(),
-                                   allocation.buffers.data(),
-                                   allocation.attribute_offsets.data());
-            if (allocation.index_type != VK_INDEX_TYPE_NONE_KHR) {
-                vkCmdBindIndexBuffer(frame.command_buffer,
-                                     _index_buffer.handle(),
-                                     allocation.index_offset,
-                                     allocation.index_type);
-                vkCmdDrawIndexed(frame.command_buffer, allocation.index_count, allocation.instance_count, 0, 0, 0);
+                                   mesh.attribute_offsets.size(),
+                                   mesh.buffers.data(),
+                                   mesh.attribute_offsets.data());
+            if (mesh.index_type != VK_INDEX_TYPE_NONE_KHR) {
+                vkCmdBindIndexBuffer(frame.command_buffer, _index_buffer.handle(), mesh.index_offset, mesh.index_type);
+                vkCmdDrawIndexed(frame.command_buffer, mesh.index_count, mesh.instance_count, 0, 0, 0);
             } else {
-                vkCmdDraw(frame.command_buffer, allocation.vertex_count, allocation.instance_count, 0, 0);
+                vkCmdDraw(frame.command_buffer, mesh.vertex_count, mesh.instance_count, 0, 0);
             }
+            vkCmdEndRenderPass(frame.command_buffer);
         }
         _models.clear();
-
-        vkCmdEndRenderPass(frame.command_buffer);
 
         VkResult_log("End Command Buffer", vkEndCommandBuffer(frame.command_buffer));
 

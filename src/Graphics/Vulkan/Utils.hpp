@@ -1,80 +1,15 @@
 #pragma once
 
-#include <functional>
 #include <string>
 
 #include <vulkan/vulkan_core.h>
 
 #include <Display.hpp>
+#include <Graphics/Material.hpp>
 #include <Graphics/Vulkan/PhysicalDevice.hpp>
-#include <Graphics/Vulkan/ShaderSet.hpp>
 #include <Utils/Log.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
-    /**
-     * @brief Image view configuration settings.
-     *
-     */
-    struct ImageViewSettings {
-        VkFormat format = VK_FORMAT_B8G8R8A8_SRGB;
-        VkImageViewType type = VK_IMAGE_VIEW_TYPE_2D;
-        VkImageAspectFlags aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
-
-        unsigned mip_base = 0;
-        unsigned mip_count = 1;
-
-        unsigned layer_base = 0;
-        unsigned layer_count = 1;
-    };
-
-    /**
-     * @brief Render pass configuration settings.
-     *
-     */
-    struct RenderPassSettings {
-        VkFormat color_format;
-        VkFormat depth_format;
-
-        bool clear_color = false;
-        bool clear_depth = false;
-
-        unsigned sample_count = 1;
-
-        bool operator==(const RenderPassSettings &other) const;
-    };
-
-    /**
-     * @brief Framebuffer configuration settings.
-     *
-     */
-    struct FramebufferSettings {
-        VkImageView view;
-        VkExtent2D extent;
-        VkRenderPass pass;
-
-        bool operator==(const FramebufferSettings &other) const;
-    };
-
-    /**
-     * @brief Graphics pipeline configuration settings.
-     *
-     */
-    struct GraphicsPipelineSettings {
-        VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-        VkPolygonMode polygon_mode = VK_POLYGON_MODE_FILL;
-        VkCullModeFlags cull_mode = VK_CULL_MODE_BACK_BIT;
-
-        ShaderModule vertex;
-        ShaderModule fragment;
-
-        RenderPassSettings renderpass;
-
-        // TODO: Should be determined from shader reflection
-        VkPipelineLayout layout;
-
-        bool operator==(const GraphicsPipelineSettings &other) const;
-    };
-
     /**
      * @brief Compute the size of VkFormat
      *
@@ -100,6 +35,14 @@ namespace Dynamo::Graphics::Vulkan {
     const char *VkShaderStageFlagBits_string(VkShaderStageFlagBits stage);
 
     /**
+     * @brief Convert VkDescriptorType to string.
+     *
+     * @param type
+     * @return const char*
+     */
+    const char *VkDescriptorType_string(VkDescriptorType type);
+
+    /**
      * @brief Convert VkResult to string.
      *
      * @param result
@@ -114,6 +57,30 @@ namespace Dynamo::Graphics::Vulkan {
      * @param result
      */
     void VkResult_log(const std::string &op_message, VkResult result);
+
+    /**
+     * @brief Convert Fill to VkPolygonMode.
+     *
+     * @param fill
+     * @return VkPolygonMode
+     */
+    VkPolygonMode convert_fill(Fill fill);
+
+    /**
+     * @brief Convert Cull to VkCullModeFlags
+     *
+     * @param cull
+     * @return VkCullModeFlags
+     */
+    VkCullModeFlags convert_cull(Cull cull);
+
+    /**
+     * @brief Convert Topology to VkPrimitiveTopology
+     *
+     * @param topology
+     * @return VkPrimitiveTopology
+     */
+    VkPrimitiveTopology convert_topology(Topology topology);
 
     /**
      * @brief Create a Vulkan instance.
@@ -166,31 +133,66 @@ namespace Dynamo::Graphics::Vulkan {
                              unsigned queue_family_count);
 
     /**
+     * @brief Submit a command to copy the contents of a Vulkan buffer to another buffer.
+     *
+     * @param src
+     * @param dst
+     * @param queue
+     * @param command_buffer
+     * @param regions
+     * @param region_count
+     */
+    void VkBuffer_immediate_copy(VkBuffer src,
+                                 VkBuffer dst,
+                                 VkQueue queue,
+                                 VkCommandBuffer command_buffer,
+                                 VkBufferCopy *regions,
+                                 unsigned region_count);
+
+    /**
      * @brief Create a Vulkan image view.
      *
      * @param device
      * @param image
-     * @param settings
+     * @param format
+     * @param type
+     * @param subresources
+     * @param swizzle
      * @return VkImageView
      */
-    VkImageView VkImageView_create(VkDevice device, VkImage image, ImageViewSettings settings);
+    VkImageView VkImageView_create(VkDevice device,
+                                   VkImage image,
+                                   VkFormat format,
+                                   VkImageViewType type,
+                                   const VkImageSubresourceRange &subresources,
+                                   const VkComponentMapping &swizzle = {});
 
     /**
-     * @brief Create a Vulkan render pass.
+     * @brief Create a Vulkan descriptor set layout.
      *
      * @param device
-     * @param settings
-     * @return VkRenderPass
+     * @param bindings
+     * @param binding_count
+     * @return VkDescriptorSetLayout
      */
-    VkRenderPass VkRenderPass_create(VkDevice device, const RenderPassSettings &settings);
+    VkDescriptorSetLayout
+    VkDescriptorSetLayout_create(VkDevice device, const VkDescriptorSetLayoutBinding *bindings, unsigned binding_count);
 
     /**
      * @brief Create a Vulkan pipeline layout.
      *
      * @param device
+     * @param layouts
+     * @param layout_count
+     * @param pc_ranges
+     * @param pc_range_count
      * @return VkPipelineLayout
      */
-    VkPipelineLayout VkPipelineLayout_create(VkDevice device);
+    VkPipelineLayout VkPipelineLayout_create(VkDevice device,
+                                             VkDescriptorSetLayout *layouts,
+                                             unsigned layout_count,
+                                             VkPushConstantRange *pc_ranges,
+                                             unsigned pc_range_count);
 
     /**
      * @brief Create a Vulkan shader module.
@@ -202,27 +204,22 @@ namespace Dynamo::Graphics::Vulkan {
     VkShaderModule VkShaderModule_create(VkDevice device, const std::vector<uint32_t> &bytecode);
 
     /**
-     * @brief Create a Vulkan graphics pipeline.
-     *
-     * @param device
-     * @param cache
-     * @param pass
-     * @param settings
-     * @return VkPipeline
-     */
-    VkPipeline VkPipeline_create(VkDevice device,
-                                 VkPipelineCache cache,
-                                 VkRenderPass pass,
-                                 const GraphicsPipelineSettings &settings);
-
-    /**
      * @brief Create a Vulkan framebuffer.
      *
      * @param device
-     * @param settings
+     * @param renderpass
+     * @param extent
+     * @param views
+     * @param view_count
+     * @param layer_count
      * @return VkFramebuffer
      */
-    VkFramebuffer VkFramebuffer_create(VkDevice device, const FramebufferSettings &settings);
+    VkFramebuffer VkFramebuffer_create(VkDevice device,
+                                       VkRenderPass renderpass,
+                                       const VkExtent2D &extent,
+                                       const VkImageView *views,
+                                       unsigned view_count,
+                                       unsigned layer_count);
 
     /**
      * @brief Create a Vulkan command pool.
@@ -265,48 +262,3 @@ namespace Dynamo::Graphics::Vulkan {
      */
     VkSemaphore VkSemaphore_create(VkDevice device);
 } // namespace Dynamo::Graphics::Vulkan
-
-//// Hash function definitions for key structs.
-//// TODO: Come up with better hash functions?
-
-template <>
-struct std::hash<Dynamo::Graphics::Vulkan::RenderPassSettings> {
-    inline size_t operator()(const Dynamo::Graphics::Vulkan::RenderPassSettings &settings) const {
-        size_t hash0 = std::hash<bool>{}(settings.clear_color);
-        size_t hash1 = std::hash<bool>{}(settings.clear_depth);
-
-        size_t hash2 = std::hash<unsigned>{}(settings.color_format);
-        size_t hash3 = std::hash<unsigned>{}(settings.depth_format);
-
-        size_t hash4 = std::hash<unsigned>{}(settings.sample_count);
-
-        return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3) ^ (hash4 << 4);
-    }
-};
-
-template <>
-struct std::hash<Dynamo::Graphics::Vulkan::FramebufferSettings> {
-    inline size_t operator()(const Dynamo::Graphics::Vulkan::FramebufferSettings &settings) const {
-        size_t hash0 = std::hash<unsigned>{}(settings.extent.width);
-        size_t hash1 = std::hash<unsigned>{}(settings.extent.height);
-        size_t hash2 = std::hash<void *>{}(settings.pass);
-        size_t hash3 = std::hash<void *>{}(settings.view);
-
-        return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3);
-    }
-};
-
-template <>
-struct std::hash<Dynamo::Graphics::Vulkan::GraphicsPipelineSettings> {
-    inline size_t operator()(const Dynamo::Graphics::Vulkan::GraphicsPipelineSettings &settings) const {
-        size_t hash0 = std::hash<unsigned>{}(settings.topology);
-        size_t hash1 = std::hash<unsigned>{}(settings.polygon_mode);
-        size_t hash2 = std::hash<unsigned>{}(settings.cull_mode);
-        size_t hash3 = std::hash<void *>{}(settings.vertex.handle);
-        size_t hash4 = std::hash<void *>{}(settings.fragment.handle);
-        size_t hash5 = std::hash<Dynamo::Graphics::Vulkan::RenderPassSettings>{}(settings.renderpass);
-        size_t hash6 = std::hash<void *>{}(settings.layout);
-
-        return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3) ^ (hash4 << 4) ^ (hash5 << 5) ^ (hash6 << 6);
-    }
-};
