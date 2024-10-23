@@ -35,7 +35,7 @@ namespace Dynamo {
     void Application::update() {
         // Poll for input
         _display->input().poll();
-        _renderer->refresh();
+        _renderer->render();
 
         // Tick
         _clock.tick();

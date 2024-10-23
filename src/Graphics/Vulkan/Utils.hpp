@@ -182,17 +182,17 @@ namespace Dynamo::Graphics::Vulkan {
      * @brief Create a Vulkan pipeline layout.
      *
      * @param device
-     * @param layouts
-     * @param layout_count
-     * @param pc_ranges
-     * @param pc_range_count
+     * @param descriptor_layouts
+     * @param descriptor_layout_count
+     * @param push_constant_ranges
+     * @param push_constant_range_count
      * @return VkPipelineLayout
      */
     VkPipelineLayout VkPipelineLayout_create(VkDevice device,
-                                             VkDescriptorSetLayout *layouts,
-                                             unsigned layout_count,
-                                             VkPushConstantRange *pc_ranges,
-                                             unsigned pc_range_count);
+                                             VkDescriptorSetLayout *descriptor_layouts,
+                                             unsigned descriptor_layout_count,
+                                             VkPushConstantRange *push_constant_ranges,
+                                             unsigned push_constant_range_count);
 
     /**
      * @brief Create a Vulkan shader module.

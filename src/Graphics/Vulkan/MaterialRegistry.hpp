@@ -50,23 +50,24 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     struct PipelineLayoutSettings {
-        VkDescriptorSetLayout *layouts;
-        unsigned layout_count;
-        VkPushConstantRange *pc_ranges;
-        unsigned pc_range_count;
+        VkDescriptorSetLayout *descriptor_layouts;
+        unsigned descriptor_layout_count;
+        VkPushConstantRange *push_constant_ranges;
+        unsigned push_constant_range_count;
 
         inline bool operator==(const PipelineLayoutSettings &other) const {
-            if (layout_count != other.layout_count || pc_range_count != other.pc_range_count) {
+            if (descriptor_layout_count != other.descriptor_layout_count ||
+                push_constant_range_count != other.push_constant_range_count) {
                 return false;
             }
-            for (unsigned i = 0; i < layout_count; i++) {
-                if (layouts[i] != other.layouts[i]) {
+            for (unsigned i = 0; i < descriptor_layout_count; i++) {
+                if (descriptor_layouts[i] != other.descriptor_layouts[i]) {
                     return false;
                 }
             }
-            for (unsigned i = 0; i < pc_range_count; i++) {
-                VkPushConstantRange &a_range = pc_ranges[i];
-                VkPushConstantRange &b_range = other.pc_ranges[i];
+            for (unsigned i = 0; i < push_constant_range_count; i++) {
+                VkPushConstantRange &a_range = push_constant_ranges[i];
+                VkPushConstantRange &b_range = other.push_constant_ranges[i];
                 if (a_range.offset != b_range.offset || a_range.size != b_range.size ||
                     a_range.stageFlags != b_range.stageFlags) {
                     return false;
@@ -78,13 +79,13 @@ namespace Dynamo::Graphics::Vulkan {
         struct Hash {
             inline size_t operator()(const PipelineLayoutSettings &settings) const {
                 size_t hash_base = 0;
-                for (unsigned i = 0; i < settings.layout_count; i++) {
-                    VkDescriptorSetLayout &layout = settings.layouts[i];
+                for (unsigned i = 0; i < settings.descriptor_layout_count; i++) {
+                    VkDescriptorSetLayout &layout = settings.descriptor_layouts[i];
                     size_t hash = std::hash<const void *>{}(layout);
                     hash_base ^= (hash << i);
                 }
-                for (unsigned i = 0; i < settings.pc_range_count; i++) {
-                    VkPushConstantRange &range = settings.pc_ranges[i];
+                for (unsigned i = 0; i < settings.push_constant_range_count; i++) {
+                    VkPushConstantRange &range = settings.push_constant_ranges[i];
                     size_t hash0 = std::hash<unsigned>{}(range.size);
                     size_t hash1 = std::hash<unsigned>{}(range.offset);
                     size_t hash2 = std::hash<unsigned>{}(range.stageFlags);

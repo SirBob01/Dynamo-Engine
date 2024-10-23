@@ -110,7 +110,7 @@ namespace Dynamo::Graphics::Vulkan {
 
     void Renderer::destroy_shader(Shader shader) { _shaders.destroy(shader); }
 
-    void Renderer::refresh() {
+    void Renderer::render() {
         const FrameContext &frame = _frame_contexts.next();
         vkWaitForFences(_device, 1, &frame.sync_fence, VK_TRUE, UINT64_MAX);
 
