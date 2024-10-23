@@ -716,16 +716,16 @@ namespace Dynamo::Graphics::Vulkan {
     }
 
     VkPipelineLayout VkPipelineLayout_create(VkDevice device,
-                                             VkDescriptorSetLayout *layouts,
-                                             unsigned layout_count,
-                                             VkPushConstantRange *pc_ranges,
-                                             unsigned pc_range_count) {
+                                             VkDescriptorSetLayout *descriptor_layouts,
+                                             unsigned descriptor_layout_count,
+                                             VkPushConstantRange *push_constant_ranges,
+                                             unsigned push_constant_range_count) {
         VkPipelineLayoutCreateInfo layout_info = {};
         layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        layout_info.setLayoutCount = layout_count;
-        layout_info.pSetLayouts = layouts;
-        layout_info.pushConstantRangeCount = pc_range_count;
-        layout_info.pPushConstantRanges = pc_ranges;
+        layout_info.setLayoutCount = descriptor_layout_count;
+        layout_info.pSetLayouts = descriptor_layouts;
+        layout_info.pushConstantRangeCount = push_constant_range_count;
+        layout_info.pPushConstantRanges = push_constant_ranges;
 
         VkPipelineLayout layout;
         VkResult_log("Create Pipeline Layout", vkCreatePipelineLayout(device, &layout_info, nullptr, &layout));

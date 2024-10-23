@@ -120,7 +120,8 @@ namespace Dynamo::Graphics::Vulkan {
                 }
                 bindings.push_back(binding);
 
-                Log::info(" -> Binding (binding: {}, count: {}, type: {}, stage: {})",
+                Log::info(" -> Binding (name: {}, binding: {}, count: {}, type: {}, stage: {})",
+                          refl_binding.name,
                           binding.binding,
                           binding.descriptorCount,
                           VkDescriptorType_string(binding.descriptorType),
@@ -142,7 +143,33 @@ namespace Dynamo::Graphics::Vulkan {
                 layout = VkDescriptorSetLayout_create(_device, bindings.data(), bindings.size());
                 _descriptor_layouts.emplace(key, layout);
             }
-            module.descriptor_set_layouts.push_back(layout);
+            module.descriptor_layouts.push_back(layout);
+        }
+    }
+
+    void ShaderSet::reflect_push_constants(ShaderModule &module, SpvReflectShaderModule reflection) {
+        uint32_t count = 0;
+        SpvReflectResult result = spvReflectEnumeratePushConstantBlocks(&reflection, &count, NULL);
+        DYN_ASSERT(result == SPV_REFLECT_RESULT_SUCCESS);
+
+        std::vector<SpvReflectBlockVariable *> push_constants(count);
+        result = spvReflectEnumeratePushConstantBlocks(&reflection, &count, push_constants.data());
+        DYN_ASSERT(result == SPV_REFLECT_RESULT_SUCCESS);
+
+        for (unsigned i = 0; i < count; i++) {
+            SpvReflectBlockVariable &block = *push_constants[i];
+
+            VkPushConstantRange range;
+            range.offset = block.offset;
+            range.size = block.size;
+            range.stageFlags = static_cast<VkShaderStageFlagBits>(reflection.shader_stage);
+
+            module.push_constant_ranges.push_back(range);
+            Log::info("* Push Constant Range (name: {}, offset: {}, size: {}, stage: {})",
+                      block.name,
+                      range.offset,
+                      range.size,
+                      VkShaderStageFlagBits_string(static_cast<VkShaderStageFlagBits>(range.stageFlags)));
         }
     }
 
@@ -184,6 +211,7 @@ namespace Dynamo::Graphics::Vulkan {
         Log::info("Shader {} reflection:", descriptor.name);
         reflect_vertex_input(module, reflection);
         reflect_descriptor_sets(module, reflection);
+        reflect_push_constants(module, reflection);
         spvReflectDestroyShaderModule(&reflection);
         Log::info("");
 

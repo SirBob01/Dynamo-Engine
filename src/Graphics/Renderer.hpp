@@ -50,9 +50,12 @@ namespace Dynamo::Graphics::Vulkan {
         VkClearValue _clear;
 
         // TODO:
-        // * Uniform buffers
+        // * Let Buffer take in fallback memory types, only throw when all options exhausted
+        //    * Actually, maybe refactor the whole thing. Ugly internals
+        // * Uniform buffers -> Need a good way to expose this to user, MaterialInstance handles?
         // * Depth-stencil buffer
-        // * Textures
+        // * Texture system -> Similar to shaders / meshes, generate a handle and return
+        // * Draw-to-texture -> overload render(), render(Texture texture)
         // * Group draws by renderpass / pipeline / pipeline layout
 
         /**
@@ -121,9 +124,9 @@ namespace Dynamo::Graphics::Vulkan {
         void draw(const Model &model);
 
         /**
-         * @brief Refresh the renderer.
+         * @brief Render to the display.
          *
          */
-        void refresh();
+        void render();
     };
 } // namespace Dynamo::Graphics::Vulkan

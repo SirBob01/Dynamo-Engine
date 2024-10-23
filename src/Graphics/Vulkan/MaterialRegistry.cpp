@@ -199,30 +199,39 @@ namespace Dynamo::Graphics::Vulkan {
         const ShaderModule &vertex_module = shaders.get(material.vertex);
         const ShaderModule &fragment_module = shaders.get(material.fragment);
 
-        // TODO: dynamic alloc sucks here, don't do it
-        std::vector<VkDescriptorSetLayout> descriptor_set_layouts;
-        for (const VkDescriptorSetLayout &layout : vertex_module.descriptor_set_layouts) {
-            descriptor_set_layouts.push_back(layout);
+        // Aggregate descriptor layouts
+        std::vector<VkDescriptorSetLayout> descriptor_layouts;
+        for (const VkDescriptorSetLayout &layout : vertex_module.descriptor_layouts) {
+            descriptor_layouts.push_back(layout);
         }
-        for (const VkDescriptorSetLayout &layout : fragment_module.descriptor_set_layouts) {
-            descriptor_set_layouts.push_back(layout);
+        for (const VkDescriptorSetLayout &layout : fragment_module.descriptor_layouts) {
+            descriptor_layouts.push_back(layout);
+        }
+
+        // Aggregate push constant ranges
+        std::vector<VkPushConstantRange> push_constant_ranges;
+        for (const VkPushConstantRange &range : vertex_module.push_constant_ranges) {
+            push_constant_ranges.push_back(range);
+        }
+        for (const VkPushConstantRange &range : fragment_module.push_constant_ranges) {
+            push_constant_ranges.push_back(range);
         }
 
         // Build pipeline layout
         PipelineLayoutSettings pipeline_layout_settings;
-        pipeline_layout_settings.layouts = descriptor_set_layouts.data();
-        pipeline_layout_settings.layout_count = descriptor_set_layouts.size();
-        pipeline_layout_settings.pc_ranges = nullptr;
-        pipeline_layout_settings.pc_range_count = 0;
+        pipeline_layout_settings.descriptor_layouts = descriptor_layouts.data();
+        pipeline_layout_settings.descriptor_layout_count = descriptor_layouts.size();
+        pipeline_layout_settings.push_constant_ranges = push_constant_ranges.data();
+        pipeline_layout_settings.push_constant_range_count = push_constant_ranges.size();
         auto layout_it = _layouts.find(pipeline_layout_settings);
         if (layout_it != _layouts.end()) {
             instance.layout = layout_it->second;
         } else {
             instance.layout = VkPipelineLayout_create(_device,
-                                                      pipeline_layout_settings.layouts,
-                                                      pipeline_layout_settings.layout_count,
-                                                      pipeline_layout_settings.pc_ranges,
-                                                      pipeline_layout_settings.pc_range_count);
+                                                      pipeline_layout_settings.descriptor_layouts,
+                                                      pipeline_layout_settings.descriptor_layout_count,
+                                                      pipeline_layout_settings.push_constant_ranges,
+                                                      pipeline_layout_settings.push_constant_range_count);
             _layouts.emplace(pipeline_layout_settings, instance.layout);
         }
 

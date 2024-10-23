@@ -61,7 +61,8 @@ namespace Dynamo::Graphics::Vulkan {
         VkShaderModule handle;
         std::vector<VkVertexInputBindingDescription> bindings;
         std::vector<VkVertexInputAttributeDescription> attributes;
-        std::vector<VkDescriptorSetLayout> descriptor_set_layouts;
+        std::vector<VkDescriptorSetLayout> descriptor_layouts;
+        std::vector<VkPushConstantRange> push_constant_ranges;
     };
 
     /**
@@ -101,6 +102,14 @@ namespace Dynamo::Graphics::Vulkan {
          * @param reflection
          */
         void reflect_descriptor_sets(ShaderModule &module, SpvReflectShaderModule reflection);
+
+        /**
+         * @brief Extract push constants from the shader source.
+         *
+         * @param module
+         * @param reflection
+         */
+        void reflect_push_constants(ShaderModule &module, SpvReflectShaderModule reflection);
 
       public:
         ShaderSet(VkDevice device);
