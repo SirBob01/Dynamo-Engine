@@ -71,8 +71,8 @@ namespace Dynamo::Graphics::Vulkan {
      */
     class ShaderSet {
         VkDevice _device;
-        IdTracker _ids;
-        SparseSet<ShaderModule> _modules;
+        IdTracker<Shader> _ids;
+        SparseSet<Shader, ShaderModule> _modules;
         std::unordered_map<DescriptorLayoutKey, VkDescriptorSetLayout, DescriptorLayoutKey::Hash> _descriptor_layouts;
 
         /**

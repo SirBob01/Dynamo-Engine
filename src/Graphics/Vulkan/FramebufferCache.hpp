@@ -23,8 +23,8 @@ namespace Dynamo::Graphics::Vulkan {
             inline size_t operator()(const FramebufferSettings &settings) const {
                 size_t hash0 = std::hash<unsigned>{}(settings.extent.width);
                 size_t hash1 = std::hash<unsigned>{}(settings.extent.height);
-                size_t hash2 = std::hash<void *>{}(settings.renderpass);
-                size_t hash3 = std::hash<void *>{}(settings.view);
+                size_t hash2 = std::hash<VkRenderPass>{}(settings.renderpass);
+                size_t hash3 = std::hash<VkImageView>{}(settings.view);
 
                 return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3);
             }

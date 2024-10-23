@@ -9,7 +9,7 @@ namespace Dynamo::Graphics {
      * @brief Mesh handle.
      *
      */
-    using Mesh = Id;
+    DYN_DEFINE_ID_TYPE(Mesh);
 
     /**
      * @brief Mesh index integer width.

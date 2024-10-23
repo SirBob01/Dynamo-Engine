@@ -122,10 +122,10 @@ namespace Dynamo::Graphics::Vulkan {
                 size_t hash0 = std::hash<unsigned>{}(settings.topology);
                 size_t hash1 = std::hash<unsigned>{}(settings.polygon_mode);
                 size_t hash2 = std::hash<unsigned>{}(settings.cull_mode);
-                size_t hash3 = std::hash<void *>{}(settings.vertex.handle);
-                size_t hash4 = std::hash<void *>{}(settings.fragment.handle);
-                size_t hash5 = std::hash<void *>{}(settings.renderpass);
-                size_t hash6 = std::hash<void *>{}(settings.layout);
+                size_t hash3 = std::hash<VkShaderModule>{}(settings.vertex.handle);
+                size_t hash4 = std::hash<VkShaderModule>{}(settings.fragment.handle);
+                size_t hash5 = std::hash<VkRenderPass>{}(settings.renderpass);
+                size_t hash6 = std::hash<VkPipelineLayout>{}(settings.layout);
 
                 return hash0 ^ (hash1 << 1) ^ (hash2 << 2) ^ (hash3 << 3) ^ (hash4 << 4) ^ (hash5 << 5) ^ (hash6 << 6);
             }
