@@ -29,8 +29,8 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class MeshSet {
-        IdTracker _ids;
-        SparseSet<MeshAllocation> _allocations;
+        IdTracker<Mesh> _ids;
+        SparseSet<Mesh, MeshAllocation> _allocations;
 
       public:
         /**

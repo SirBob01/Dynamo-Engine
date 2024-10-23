@@ -1,19 +1,32 @@
 #pragma once
 
+#include <cstdint>
 #include <queue>
 #include <vector>
 
+#define DYN_DEFINE_ID_TYPE(T) using T = struct T##_t *
+
+static_assert(sizeof(void *) == sizeof(uintptr_t), "Pointer and its integer mode must be same size.");
+
 namespace Dynamo {
     /**
-     * @brief Unique identifier supports up to 2^32 - 1 entities simultaneously.
+     * @brief Id index shift.
      *
      */
-    using Id = unsigned long long;
+    constexpr unsigned long long ID_INDEX_SHIFT = (sizeof(uintptr_t) * 8) >> 1;
 
     /**
-     * @brief Generate and discard ids.
+     * @brief Id version mask.
      *
      */
+    constexpr unsigned long long ID_VERSION_MASK = (1ULL << ID_INDEX_SHIFT) - 1;
+
+    /**
+     * @brief Generate and discard typesafe handles.
+     *
+     * @tparam Id
+     */
+    template <typename Id>
     class IdTracker {
         unsigned _index_counter;
 
@@ -33,7 +46,7 @@ namespace Dynamo {
          * @param id
          * @return unsigned
          */
-        static inline unsigned get_index(Id id) { return id >> 32; }
+        static inline unsigned get_index(Id id) { return reinterpret_cast<uintptr_t>(id) >> ID_INDEX_SHIFT; }
 
         /**
          * @brief Get the version of an id.
@@ -41,7 +54,7 @@ namespace Dynamo {
          * @param id
          * @return unsigned
          */
-        static inline unsigned get_version(Id id) { return id & 0xFFFFFFFF; }
+        static inline unsigned get_version(Id id) { return reinterpret_cast<uintptr_t>(id) & ID_VERSION_MASK; }
 
         /**
          * @brief Test if an id is active.
@@ -77,8 +90,8 @@ namespace Dynamo {
             }
 
             // Move index to longer bitstring before compositing
-            Id id = index;
-            return (id << 32) | version;
+            uintptr_t id = index;
+            return reinterpret_cast<Id>((id << ID_INDEX_SHIFT) | version);
         }
 
         /**

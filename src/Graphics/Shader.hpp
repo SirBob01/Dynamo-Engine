@@ -9,7 +9,7 @@ namespace Dynamo::Graphics {
      * @brief Shader handle.
      *
      */
-    using Shader = Id;
+    DYN_DEFINE_ID_TYPE(Shader);
 
     /**
      * @brief Shader pipeline stage.

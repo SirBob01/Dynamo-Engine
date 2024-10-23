@@ -91,8 +91,8 @@ namespace Dynamo::Graphics {
 template <>
 struct std::hash<Dynamo::Graphics::Material> {
     inline size_t operator()(const Dynamo::Graphics::Material &material) const {
-        size_t hash0 = std::hash<unsigned>{}(material.vertex);
-        size_t hash1 = std::hash<unsigned>{}(material.fragment);
+        size_t hash0 = std::hash<Dynamo::Graphics::Shader>{}(material.vertex);
+        size_t hash1 = std::hash<Dynamo::Graphics::Shader>{}(material.fragment);
         size_t hash2 = std::hash<unsigned>{}(static_cast<unsigned>(material.topology));
         size_t hash3 = std::hash<unsigned>{}(static_cast<unsigned>(material.fill));
         size_t hash4 = std::hash<unsigned>{}(static_cast<unsigned>(material.cull));

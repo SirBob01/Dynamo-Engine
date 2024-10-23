@@ -1,11 +1,13 @@
 #include <Dynamo.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-using CharSet = Dynamo::SparseSet<char>;
+DYN_DEFINE_ID_TYPE(Id);
+
+using CharSet = Dynamo::SparseSet<Id, char>;
 
 TEST_CASE("SparseSet []", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
     set.insert(tracker.generate(), 'a');
     set.insert(tracker.generate(), 'b');
@@ -18,7 +20,7 @@ TEST_CASE("SparseSet []", "[SparseSet]") {
 
 TEST_CASE("SparseSet const []", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
     set.insert(tracker.generate(), 'a');
     set.insert(tracker.generate(), 'b');
@@ -33,11 +35,11 @@ TEST_CASE("SparseSet const []", "[SparseSet]") {
 
 TEST_CASE("SparseSet get", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
-    Dynamo::Id b = tracker.generate();
-    Dynamo::Id c = tracker.generate();
+    Id a = tracker.generate();
+    Id b = tracker.generate();
+    Id c = tracker.generate();
 
     set.insert(a, 'a');
     set.insert(b, 'b');
@@ -50,11 +52,11 @@ TEST_CASE("SparseSet get", "[SparseSet]") {
 
 TEST_CASE("SparseSet const get", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
-    Dynamo::Id b = tracker.generate();
-    Dynamo::Id c = tracker.generate();
+    Id a = tracker.generate();
+    Id b = tracker.generate();
+    Id c = tracker.generate();
 
     set.insert(a, 'a');
     set.insert(b, 'b');
@@ -69,17 +71,17 @@ TEST_CASE("SparseSet const get", "[SparseSet]") {
 
 TEST_CASE("SparseSet insert", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
+    Id a = tracker.generate();
     set.insert(a, 'a');
     REQUIRE(set.get(a) == 'a');
 
-    Dynamo::Id b = tracker.generate();
+    Id b = tracker.generate();
     set.insert(b, 'b');
     REQUIRE(set.get(b) == 'b');
 
-    Dynamo::Id c = tracker.generate();
+    Id c = tracker.generate();
     set.insert(c, 'c');
     REQUIRE(set.get(c) == 'c');
 
@@ -89,9 +91,9 @@ TEST_CASE("SparseSet insert", "[SparseSet]") {
 
 TEST_CASE("SparseSet remove", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
+    Id a = tracker.generate();
     set.insert(a, 'a');
     REQUIRE(set.find(a) == 0);
     REQUIRE(set.get(a) == 'a');
@@ -107,17 +109,17 @@ TEST_CASE("SparseSet remove", "[SparseSet]") {
 
 TEST_CASE("SparseSet clear", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
+    Id a = tracker.generate();
     set.insert(a, 'a');
     REQUIRE(set.get(a) == 'a');
 
-    Dynamo::Id b = tracker.generate();
+    Id b = tracker.generate();
     set.insert(b, 'b');
     REQUIRE(set.get(b) == 'b');
 
-    Dynamo::Id c = tracker.generate();
+    Id c = tracker.generate();
     set.insert(c, 'c');
     REQUIRE(set.get(c) == 'c');
 
@@ -141,15 +143,15 @@ TEST_CASE("SparseSet clear", "[SparseSet]") {
 
 TEST_CASE("SparseSet mismatched id version", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
+    Id a = tracker.generate();
     set.insert(a, 'a');
     REQUIRE(set.get(a) == 'a');
 
     tracker.discard(a);
-    Dynamo::Id b = tracker.generate();
-    REQUIRE(Dynamo::IdTracker::get_index(a) == Dynamo::IdTracker::get_index(b));
+    Id b = tracker.generate();
+    REQUIRE(Dynamo::IdTracker<Id>::get_index(a) == Dynamo::IdTracker<Id>::get_index(b));
     REQUIRE_THROWS(set.get(b));
 
     set.insert(b, 'b');
@@ -160,22 +162,22 @@ TEST_CASE("SparseSet mismatched id version", "[SparseSet]") {
 
 TEST_CASE("SparseSet foreach", "[SparseSet]") {
     CharSet set;
-    Dynamo::IdTracker tracker;
+    Dynamo::IdTracker<Id> tracker;
 
-    Dynamo::Id a = tracker.generate();
+    Id a = tracker.generate();
     set.insert(a, 'a');
     REQUIRE(set.get(a) == 'a');
 
-    Dynamo::Id b = tracker.generate();
+    Id b = tracker.generate();
     set.insert(b, 'b');
     REQUIRE(set.get(b) == 'b');
 
-    Dynamo::Id c = tracker.generate();
+    Id c = tracker.generate();
     set.insert(c, 'c');
     REQUIRE(set.get(c) == 'c');
 
     set.remove(a);
-    Dynamo::Id d = tracker.generate();
+    Id d = tracker.generate();
     set.insert(d, 'd');
 
     REQUIRE(set.size() == 3);
@@ -183,15 +185,15 @@ TEST_CASE("SparseSet foreach", "[SparseSet]") {
 
     struct Pair {
         char &item;
-        Dynamo::Id id;
+        Id id;
     };
     std::vector<Pair> triplets;
     std::vector<char> items;
-    std::vector<Dynamo::Id> ids;
+    std::vector<Id> ids;
 
-    set.foreach ([&](char &item, Dynamo::Id id) { triplets.push_back({item, id}); });
+    set.foreach ([&](char &item, Id id) { triplets.push_back({item, id}); });
     set.foreach_items([&](char &item) { items.push_back(item); });
-    set.foreach_ids([&](Dynamo::Id id) { ids.push_back(id); });
+    set.foreach_ids([&](Id id) { ids.push_back(id); });
 
     REQUIRE(triplets[0].item == 'c');
     REQUIRE(triplets[0].id == c);

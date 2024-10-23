@@ -8,15 +8,6 @@
 
 namespace Dynamo {
     /**
-     * @brief Sparse set base class for polymorphism.
-     *
-     */
-    class SparseSetBase {
-      public:
-        virtual ~SparseSetBase() = default;
-    };
-
-    /**
      * @brief Sparse sets are an alternative to the hash map that allow
      * for efficient association of data with unique identifier keys. Both keys
      * and values are stored in contiguous memory for improved cache locality,
@@ -29,10 +20,11 @@ namespace Dynamo {
      * Deletion: O(1).
      * Search: O(1).
      *
-     * @tparam T Type of element
+     * @tparam Id Unique handle type
+     * @tparam T  Type of element
      */
-    template <typename T>
-    class SparseSet final : public SparseSetBase {
+    template <typename Id, typename T>
+    class SparseSet {
         /**
          * @brief Contains the actual item data
          *
@@ -74,7 +66,7 @@ namespace Dynamo {
          * @return int Index position of the value (-1 on failure).
          */
         inline int find(Id id) const {
-            unsigned key = IdTracker::get_index(id);
+            unsigned key = IdTracker<Id>::get_index(id);
             if (key >= _sparse.size()) {
                 return -1;
             }
@@ -109,7 +101,7 @@ namespace Dynamo {
         template <typename... Params>
         inline void insert(Id id, Params... args) {
             // Resize the sparse array or remove the existing item
-            unsigned key = IdTracker::get_index(id);
+            unsigned key = IdTracker<Id>::get_index(id);
             if (key >= _sparse.size()) {
                 _sparse.resize((key + 1) * 2, -1);
             } else if (_sparse[key] != -1) {
@@ -135,7 +127,7 @@ namespace Dynamo {
          * @param id Unique identifier of the object to be removed.
          */
         inline void remove(Id id) {
-            unsigned key = IdTracker::get_index(id);
+            unsigned key = IdTracker<Id>::get_index(id);
             if (key >= _sparse.size()) {
                 return;
             }
@@ -148,7 +140,7 @@ namespace Dynamo {
             }
 
             // Swap last element of dense and pool array to maintain contiguity
-            unsigned new_key = IdTracker::get_index(_dense.back());
+            unsigned new_key = IdTracker<Id>::get_index(_dense.back());
             std::swap(_pool.back(), _pool[index]);
             _pool.pop_back();
 
