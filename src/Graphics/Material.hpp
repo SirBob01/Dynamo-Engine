@@ -5,6 +5,12 @@
 
 namespace Dynamo::Graphics {
     /**
+     * @brief Material handle.
+     *
+     */
+    DYN_DEFINE_ID_TYPE(Material);
+
+    /**
      * @brief Topology modes.
      *
      */
@@ -38,7 +44,7 @@ namespace Dynamo::Graphics {
      * @brief Material descriptor.
      *
      */
-    struct Material {
+    struct MaterialDescriptor {
         /**
          * @brief Vertex shader handle.
          *
@@ -76,7 +82,7 @@ namespace Dynamo::Graphics {
          * @return true
          * @return false
          */
-        inline bool operator==(const Material &other) const {
+        inline bool operator==(const MaterialDescriptor &other) const {
             return vertex == other.vertex && fragment == other.fragment && topology == other.topology &&
                    fill == other.fill && cull == other.cull;
         }
@@ -84,13 +90,13 @@ namespace Dynamo::Graphics {
 } // namespace Dynamo::Graphics
 
 /**
- * @brief Hash function implementation for Graphics Material.
+ * @brief Hash function implementation for Graphics MaterialDescriptor.
  *
  * @tparam
  */
 template <>
-struct std::hash<Dynamo::Graphics::Material> {
-    inline size_t operator()(const Dynamo::Graphics::Material &material) const {
+struct std::hash<Dynamo::Graphics::MaterialDescriptor> {
+    inline size_t operator()(const Dynamo::Graphics::MaterialDescriptor &material) const {
         size_t hash0 = std::hash<Dynamo::Graphics::Shader>{}(material.vertex);
         size_t hash1 = std::hash<Dynamo::Graphics::Shader>{}(material.fragment);
         size_t hash2 = std::hash<unsigned>{}(static_cast<unsigned>(material.topology));

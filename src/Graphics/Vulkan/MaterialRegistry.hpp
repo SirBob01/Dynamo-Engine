@@ -173,29 +173,27 @@ namespace Dynamo::Graphics::Vulkan {
          */
         VkPipeline build_pipeline(const GraphicsPipelineSettings &settings) const;
 
-        /**
-         * @brief Build the material instance.
-         *
-         * @param material
-         * @param swapchain
-         * @param shaders
-         * @return MaterialInstance
-         */
-        MaterialInstance build(const Material &material, const Swapchain &swapchain, const ShaderSet &shaders);
-
       public:
         MaterialRegistry(VkDevice device, const std::string &filename);
         MaterialRegistry() = default;
 
         /**
-         * @brief Build a Vulkan material instance.
+         * @brief Build a material and its resources.
          *
-         * @param material
+         * @param descriptor
          * @param swapchain
          * @param shaders
          * @return MaterialInstance
          */
-        MaterialInstance get(const Material &material, const Swapchain &swapchain, const ShaderSet &shaders);
+        Material build(const MaterialDescriptor &descriptor, const Swapchain &swapchain, const ShaderSet &shaders);
+
+        /**
+         * @brief Get a material instance.
+         *
+         * @param material
+         * @return MaterialInstance&
+         */
+        MaterialInstance &get(Material material);
 
         /**
          * @brief Destroy all Vulkan resources.

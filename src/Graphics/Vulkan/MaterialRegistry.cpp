@@ -193,11 +193,12 @@ namespace Dynamo::Graphics::Vulkan {
         return pipeline;
     }
 
-    MaterialInstance
-    MaterialRegistry::build(const Material &material, const Swapchain &swapchain, const ShaderSet &shaders) {
+    Material MaterialRegistry::build(const MaterialDescriptor &descriptor,
+                                     const Swapchain &swapchain,
+                                     const ShaderSet &shaders) {
         MaterialInstance instance;
-        const ShaderModule &vertex_module = shaders.get(material.vertex);
-        const ShaderModule &fragment_module = shaders.get(material.fragment);
+        const ShaderModule &vertex_module = shaders.get(descriptor.vertex);
+        const ShaderModule &fragment_module = shaders.get(descriptor.fragment);
 
         // Aggregate descriptor layouts
         std::vector<VkDescriptorSetLayout> descriptor_layouts;
@@ -251,9 +252,9 @@ namespace Dynamo::Graphics::Vulkan {
         GraphicsPipelineSettings pipeline_settings;
         pipeline_settings.vertex = vertex_module;
         pipeline_settings.fragment = fragment_module;
-        pipeline_settings.topology = convert_topology(material.topology);
-        pipeline_settings.cull_mode = convert_cull(material.cull);
-        pipeline_settings.polygon_mode = convert_fill(material.fill);
+        pipeline_settings.topology = convert_topology(descriptor.topology);
+        pipeline_settings.cull_mode = convert_cull(descriptor.cull);
+        pipeline_settings.polygon_mode = convert_fill(descriptor.fill);
         pipeline_settings.renderpass = instance.renderpass;
         pipeline_settings.layout = instance.layout;
         auto pipeline_it = _pipelines.find(pipeline_settings);
@@ -264,21 +265,12 @@ namespace Dynamo::Graphics::Vulkan {
             _pipelines.emplace(pipeline_settings, instance.pipeline);
         }
 
-        return instance;
-    }
-
-    MaterialInstance
-    MaterialRegistry::get(const Material &material, const Swapchain &swapchain, const ShaderSet &shaders) {
-        // It's expensive to index into pipeline/layout/pass caches every time, so check if dirty before rebuilding
-        auto instance_it = _instances.find(material);
-        if (instance_it != _instances.end()) {
-            return instance_it->second;
-        }
-
-        MaterialInstance instance = build(material, swapchain, shaders);
+        Material material = IdGenerator<Material>::generate();
         _instances.emplace(material, instance);
-        return instance;
+        return material;
     }
+
+    MaterialInstance &MaterialRegistry::get(Material material) { return _instances.at(material); }
 
     void MaterialRegistry::destroy() {
         // Clean up pipelines

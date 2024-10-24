@@ -117,6 +117,14 @@ namespace Dynamo::Graphics::Vulkan {
         void destroy_shader(Shader shader);
 
         /**
+         * @brief Build a material.
+         *
+         * @param descriptor
+         * @return Material
+         */
+        Material build_material(const MaterialDescriptor &descriptor);
+
+        /**
          * @brief Draw a model in the current frame.
          *
          * @param model

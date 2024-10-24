@@ -110,6 +110,10 @@ namespace Dynamo::Graphics::Vulkan {
 
     void Renderer::destroy_shader(Shader shader) { _shaders.destroy(shader); }
 
+    Material Renderer::build_material(const MaterialDescriptor &descriptor) {
+        return _materials.build(descriptor, _swapchain, _shaders);
+    }
+
     void Renderer::render() {
         const FrameContext &frame = _frame_contexts.next();
         vkWaitForFences(_device, 1, &frame.sync_fence, VK_TRUE, UINT64_MAX);
@@ -155,7 +159,7 @@ namespace Dynamo::Graphics::Vulkan {
 
         // Iterate over models and draw
         for (Model model : _models) {
-            MaterialInstance pipeline_pass = _materials.get(model.material, _swapchain, _shaders);
+            MaterialInstance pipeline_pass = _materials.get(model.material);
 
             FramebufferSettings framebuffer_settings;
             framebuffer_settings.view = _swapchain.views[image_index];
