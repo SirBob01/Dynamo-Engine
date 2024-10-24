@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <Utils/IdTracker.hpp>
+#include <Utils/IdGenerator.hpp>
 #include <Utils/Log.hpp>
 
 namespace Dynamo {
@@ -41,7 +41,7 @@ namespace Dynamo {
          * @brief Contains indices to _dense and _pool
          *
          */
-        std::vector<int> _sparse;
+        std::vector<uintptr_t> _sparse;
 
       public:
         /**
@@ -66,14 +66,14 @@ namespace Dynamo {
          * @return int Index position of the value (-1 on failure).
          */
         inline int find(Id id) const {
-            unsigned key = IdTracker<Id>::get_index(id);
+            uintptr_t key = IdGenerator<Id>::key(id);
             if (key >= _sparse.size()) {
                 return -1;
             }
 
             // Verify that the sparse and dense arrays are correlated
-            int index = _sparse[key];
-            int dense_size = _dense.size();
+            uintptr_t index = _sparse[key];
+            uintptr_t dense_size = _dense.size();
             if (index == -1 || index >= dense_size || _dense[index] != id) {
                 return -1;
             }
@@ -101,7 +101,7 @@ namespace Dynamo {
         template <typename... Params>
         inline void insert(Id id, Params... args) {
             // Resize the sparse array or remove the existing item
-            unsigned key = IdTracker<Id>::get_index(id);
+            uintptr_t key = IdGenerator<Id>::key(id);
             if (key >= _sparse.size()) {
                 _sparse.resize((key + 1) * 2, -1);
             } else if (_sparse[key] != -1) {
@@ -127,20 +127,20 @@ namespace Dynamo {
          * @param id Unique identifier of the object to be removed.
          */
         inline void remove(Id id) {
-            unsigned key = IdTracker<Id>::get_index(id);
+            uintptr_t key = IdGenerator<Id>::key(id);
             if (key >= _sparse.size()) {
                 return;
             }
 
             // Verify that the sparse and dense arrays are correlated
-            int index = _sparse[key];
-            int dense_size = _dense.size();
+            uintptr_t index = _sparse[key];
+            uintptr_t dense_size = _dense.size();
             if (index == -1 || index >= dense_size || _dense[index] != id) {
                 return;
             }
 
             // Swap last element of dense and pool array to maintain contiguity
-            unsigned new_key = IdTracker<Id>::get_index(_dense.back());
+            uintptr_t new_key = IdGenerator<Id>::key(_dense.back());
             std::swap(_pool.back(), _pool[index]);
             _pool.pop_back();
 

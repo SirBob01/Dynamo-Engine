@@ -4,7 +4,6 @@
 
 #include <portaudio.h>
 
-#include <Utils/IdTracker.hpp>
 #include <Utils/RingBuffer.hpp>
 
 #include <Sound/Buffer.hpp>

@@ -2,7 +2,7 @@
 
 #include <Graphics/Material.hpp>
 #include <Graphics/Mesh.hpp>
-#include <Utils/IdTracker.hpp>
+#include <Utils/IdGenerator.hpp>
 
 namespace Dynamo::Graphics {
     /**

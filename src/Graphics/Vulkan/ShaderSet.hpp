@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <spirv_reflect.h>
 #include <vulkan/vulkan_core.h>
 
 #include <Graphics/Shader.hpp>
-#include <Utils/SparseSet.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -71,8 +71,7 @@ namespace Dynamo::Graphics::Vulkan {
      */
     class ShaderSet {
         VkDevice _device;
-        IdTracker<Shader> _ids;
-        SparseSet<Shader, ShaderModule> _modules;
+        std::unordered_map<Shader, ShaderModule> _modules;
         std::unordered_map<DescriptorLayoutKey, VkDescriptorSetLayout, DescriptorLayoutKey::Hash> _descriptor_layouts;
 
         /**

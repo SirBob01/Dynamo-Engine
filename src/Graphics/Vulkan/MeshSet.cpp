@@ -78,22 +78,21 @@ namespace Dynamo::Graphics::Vulkan {
         }
 
         // Register the allocation
-        Mesh mesh = _ids.generate();
-        _allocations.insert(mesh, allocation);
+        Mesh mesh = IdGenerator<Mesh>::generate();
+        _allocations.emplace(mesh, allocation);
         return mesh;
     }
 
-    MeshAllocation &MeshSet::get(Mesh mesh) { return _allocations.get(mesh); }
+    MeshAllocation &MeshSet::get(Mesh mesh) { return _allocations.at(mesh); }
 
     void MeshSet::free(Mesh mesh, Buffer &vertex_buffer, Buffer &index_buffer) {
-        MeshAllocation &allocation = _allocations.get(mesh);
+        MeshAllocation &allocation = _allocations.at(mesh);
         for (unsigned offset : allocation.attribute_offsets) {
             vertex_buffer.free(offset);
         }
         if (allocation.index_type != VK_INDEX_TYPE_NONE_KHR) {
             index_buffer.free(allocation.index_offset);
         }
-        _allocations.remove(mesh);
-        _ids.discard(mesh);
+        _allocations.erase(mesh);
     }
 } // namespace Dynamo::Graphics::Vulkan

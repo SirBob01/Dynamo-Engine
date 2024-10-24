@@ -1,13 +1,13 @@
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 
 #include <vulkan/vulkan_core.h>
 
 #include <Graphics/Mesh.hpp>
 #include <Graphics/Vulkan/Buffer.hpp>
-#include <Utils/IdTracker.hpp>
-#include <Utils/SparseSet.hpp>
+#include <Utils/IdGenerator.hpp>
 
 namespace Dynamo::Graphics::Vulkan {
     /**
@@ -29,8 +29,7 @@ namespace Dynamo::Graphics::Vulkan {
      *
      */
     class MeshSet {
-        IdTracker<Mesh> _ids;
-        SparseSet<Mesh, MeshAllocation> _allocations;
+        std::unordered_map<Mesh, MeshAllocation> _allocations;
 
       public:
         /**
