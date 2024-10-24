@@ -4,8 +4,6 @@
 
 #include <Math/Quaternion.hpp>
 #include <Math/Vec3.hpp>
-#include <Utils/IdTracker.hpp>
-#include <Utils/SparseSet.hpp>
 
 namespace Dynamo::Sound {
     /**
